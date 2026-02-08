@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 import '../../models/fill_blank_question.dart';
+import '../../core/theme/motion.dart';
 import '../../core/widgets/soma_background.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/glass.dart';
@@ -327,8 +328,8 @@ if (q.hint != null) ...[
                       return GestureDetector(
                         onTap: _locked ? null : () => setState(() => _selected = i),
                         child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 180),
-                          curve: Curves.easeOut,
+                          duration: MotionTokens.micro,
+                          curve: MotionTokens.standardCurve,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(18),
                             border: Border.all(

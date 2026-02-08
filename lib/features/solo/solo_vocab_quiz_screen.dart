@@ -1,13 +1,18 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../core/widgets/soma_background.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
+import '../../core/widgets/pressable_scale.dart';
+import '../../core/widgets/staggered_in.dart';
+import '../../core/widgets/reward_sparkle.dart';
 import '../../models/solo_course.dart';
 import 'solo_result_screen.dart';
 import 'solo_course_detail_screen.dart';
 import '../../data/quiz_repository.dart';
 import '../../core/services/tts_service.dart';
+import '../../core/theme/motion.dart';
 
 class SoloVocabQuizScreen extends StatefulWidget {
   const SoloVocabQuizScreen({
@@ -153,8 +158,10 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
     final ok = !timedOut && selected == _correctIndex;
     if (ok) {
       correctCount++;
+      HapticFeedback.mediumImpact();
     } else {
       mistakes.add(q);
+      HapticFeedback.lightImpact();
     }
     quizRepository.recordVocabAnswer(
       courseId: widget.course.id,
@@ -422,40 +429,57 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                         }
                       }
 
-                      return InkWell(
-                        borderRadius: BorderRadius.circular(18),
-                        onTap: revealed
-                            ? null
-                            : () {
-                                setState(() => selected = i);
-                                _submit();
-                              },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 14),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18),
-                            color: bg,
-                            border: Border.all(color: border),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  choices[i],
-                                  style: TextStyle(
-                                      color: Colors.white.withOpacity(0.92),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w800),
-                                ),
+                      return StaggeredIn(
+                        index: i,
+                        child: PressableScale(
+                          onTap: revealed
+                              ? null
+                              : () {
+                                  setState(() => selected = i);
+                                  _submit();
+                                },
+                          child: AnimatedScale(
+                            scale: revealed && isCorrect ? 1.02 : 1,
+                            duration: MotionTokens.short,
+                            curve: MotionTokens.standardCurve,
+                            child: AnimatedContainer(
+                              duration: MotionTokens.short,
+                              curve: MotionTokens.standardCurve,
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(18),
+                                color: bg,
+                                border: Border.all(color: border),
+                                boxShadow: revealed && isCorrect
+                                    ? [
+                                        BoxShadow(
+                                          color: const Color(0xFF2AFADF).withOpacity(0.35),
+                                          blurRadius: 16,
+                                          spreadRadius: 1,
+                                        ),
+                                      ]
+                                    : [],
                               ),
-                              if (revealed && isCorrect)
-                                const Icon(Icons.check_rounded,
-                                    color: Color(0xFF2AFADF))
-                              else if (revealed && isSel && !isCorrect)
-                                const Icon(Icons.close_rounded,
-                                    color: Color(0xFFFF4FD8))
-                            ],
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      choices[i],
+                                      style: TextStyle(
+                                          color: Colors.white.withOpacity(0.92),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w800),
+                                    ),
+                                  ),
+                                  if (revealed && isCorrect) ...[
+                                    const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
+                                    const SizedBox(width: 6),
+                                    const RewardSparkle(show: true),
+                                  ] else if (revealed && isSel && !isCorrect)
+                                    const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8))
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       );

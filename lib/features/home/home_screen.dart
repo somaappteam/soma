@@ -1,7 +1,9 @@
 import 'dart:ui';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
+import '../../core/widgets/pressable_scale.dart';
 import '../../models/solo_course.dart';
 import '../solo/solo_course_detail_screen.dart';
 import '../solo/add_course_screen.dart';
@@ -11,6 +13,7 @@ import '../../data/courses_repository.dart';
 import '../../data/notifications_repository.dart';
 import '../../data/notifications_store.dart';
 import '../../data/auth_repository.dart';
+import '../../core/theme/motion.dart';
 import '../../core/widgets/responsive.dart';
 import '../../core/widgets/soma_background.dart';
 
@@ -157,10 +160,13 @@ class _HomeScreenState extends State<HomeScreen> {
       separatorBuilder: (_, __) => const SizedBox(height: 14),
       itemBuilder: (context, i) {
         if (!editing && i == courses.length) {
-          return _AddCourseButton(
-            onAdded: (newCourse) {
-              _reloadCourses();
-            },
+          return _StaggeredIn(
+            index: i,
+            child: _AddCourseButton(
+              onAdded: (newCourse) {
+                _reloadCourses();
+              },
+            ),
           );
         }
 
@@ -170,22 +176,26 @@ class _HomeScreenState extends State<HomeScreen> {
         final fromLang = parts.isNotEmpty ? parts.first.trim() : fallback;
         final toLang = parts.length > 1 ? parts[1].trim() : fallback;
 
-        return CourseCard(
-          fromLang: fromLang,
-          toLang: toLang,
-          xp: c.xp,
-          time: "00:00:00",
-          onTap: editing
-              ? null
-              : () async {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => SoloCourseDetailScreen(course: c)),
-                  );
-                  _reloadCourses();
-                },
-          onDelete: editing ? () => _confirmDeleteCourse(c) : null,
-          showDelete: editing,
+        return _StaggeredIn(
+          index: i,
+          child: CourseCard(
+            fromLang: fromLang,
+            toLang: toLang,
+            xp: c.xp,
+            time: "00:00:00",
+            heroTag: "course-card-${c.id}",
+            onTap: editing
+                ? null
+                : () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => SoloCourseDetailScreen(course: c)),
+                    );
+                    _reloadCourses();
+                  },
+            onDelete: editing ? () => _confirmDeleteCourse(c) : null,
+            showDelete: editing,
+          ),
         );
       },
     );
@@ -335,8 +345,7 @@ class _SmallIconButton extends StatelessWidget {
     return Glass(
       radius: BorderRadius.circular(14),
       padding: EdgeInsets.zero,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+      child: PressableScale(
         onTap: onTap,
         child: SizedBox(
           width: 44,
@@ -355,6 +364,7 @@ class CourseCard extends StatelessWidget {
   final String toLang;
   final int xp;
   final String time;
+  final String? heroTag;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
   final bool showDelete;
@@ -365,6 +375,7 @@ class CourseCard extends StatelessWidget {
     required this.toLang,
     required this.xp,
     required this.time,
+    this.heroTag,
     this.onTap,
     this.onDelete,
     this.showDelete = false,
@@ -373,94 +384,102 @@ class CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return Glass(
+    final card = Glass(
       radius: BorderRadius.circular(24),
       padding: EdgeInsets.zero,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(24),
+      child: PressableScale(
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
           child: Column(
-        children: [
-          Row(
             children: [
-              _FlagDot(),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  "$fromLang  →  $toLang",
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              if (showDelete)
-                InkWell(
-                  borderRadius: BorderRadius.circular(12),
-                  onTap: onDelete,
-                  child: Padding(
-                    padding: const EdgeInsets.all(6),
-                    child: Icon(Icons.delete_rounded, color: const Color(0xFFFF4ECD).withValues(alpha: 0.9), size: 18),
-                  ),
-                )
-              else
-                Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.75)),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // progress bar glow style
-          Container(
-            height: 10,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(999),
-              color: Colors.white.withValues(alpha: 0.08),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
-            ),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: FractionallySizedBox(
-                widthFactor: 0.62,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(999),
-                    gradient: const LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Color(0xFF2AFADF),
-                        Color(0xFF7C7CFF),
-                        Color(0xFFFF4ECD),
-                      ],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF7C7CFF).withValues(alpha: 0.35),
-                        blurRadius: 18,
-                        spreadRadius: 2, // Reverted to original as BorderRadius is not compatible here
+              Row(
+                children: [
+                  _FlagDot(),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      "$fromLang  →  $toLang",
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
                       ),
-                    ],
+                    ),
+                  ),
+                  if (showDelete)
+                    InkWell(
+                      borderRadius: BorderRadius.circular(12),
+                      onTap: onDelete,
+                      child: Padding(
+                        padding: const EdgeInsets.all(6),
+                        child: Icon(Icons.delete_rounded,
+                            color: const Color(0xFFFF4ECD).withValues(alpha: 0.9), size: 18),
+                      ),
+                    )
+                  else
+                    Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.75)),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              // progress bar glow style
+              Container(
+                height: 10,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(999),
+                  color: Colors.white.withValues(alpha: 0.08),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: FractionallySizedBox(
+                    widthFactor: 0.62,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        gradient: const LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Color(0xFF2AFADF),
+                            Color(0xFF7C7CFF),
+                            Color(0xFFFF4ECD),
+                          ],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF7C7CFF).withValues(alpha: 0.35),
+                            blurRadius: 18,
+                            spreadRadius: 2, // Reverted to original as BorderRadius is not compatible here
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
 
-          const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-          Row(
-            children: [
-              _Pill(icon: Icons.bolt_rounded, label: "+$xp"),
-              const Spacer(),
-              _Pill(icon: Icons.timer_rounded, label: time),
+              Row(
+                children: [
+                  _Pill(icon: Icons.bolt_rounded, label: "+$xp"),
+                  const Spacer(),
+                  _Pill(icon: Icons.timer_rounded, label: time),
+                ],
+              ),
             ],
           ),
-        ],
-      ),
         ),
+      ),
+    );
+    if (heroTag == null) return card;
+    return Hero(
+      tag: heroTag!,
+      child: Material(
+        type: MaterialType.transparency,
+        child: card,
       ),
     );
   }
@@ -522,6 +541,54 @@ class _FlagDot extends StatelessWidget {
   }
 }
 
+class _StaggeredIn extends StatefulWidget {
+  final int index;
+  final Widget child;
+
+  const _StaggeredIn({required this.index, required this.child});
+
+  @override
+  State<_StaggeredIn> createState() => _StaggeredInState();
+}
+
+class _StaggeredInState extends State<_StaggeredIn> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
+  late final Animation<Offset> _offset;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: MotionTokens.long);
+    final curve = CurvedAnimation(parent: _controller, curve: MotionTokens.pageInCurve);
+    _opacity = Tween<double>(begin: 0, end: 1).animate(curve);
+    _offset = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(curve);
+    final delayMs = min(widget.index * 60, 240);
+    Future.delayed(Duration(milliseconds: delayMs), () {
+      if (mounted) {
+        _controller.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _opacity,
+      child: SlideTransition(
+        position: _offset,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
 class _AddCourseButton extends StatelessWidget {
   final void Function(SoloCourse newCourse) onAdded;
 
@@ -533,8 +600,7 @@ class _AddCourseButton extends StatelessWidget {
     return Glass(
       radius: BorderRadius.circular(26),
       padding: EdgeInsets.zero,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(26),
+      child: PressableScale(
         onTap: () async {
           final created = await Navigator.push<SoloCourse>(
             context,
