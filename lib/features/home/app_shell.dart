@@ -80,6 +80,33 @@ class _AppShellState extends State<AppShell> {
       const CirclesScreen(),
       const ProfileScreen(),
     ];
+    final activePage = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 420),
+      reverseDuration: const Duration(milliseconds: 300),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        final slide = Tween<Offset>(
+          begin: const Offset(0, 0.04),
+          end: Offset.zero,
+        ).animate(animation);
+        final fade = Tween<double>(begin: 0.0, end: 1.0).animate(animation);
+        return FadeTransition(
+          opacity: fade,
+          child: SlideTransition(
+            position: slide,
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.98, end: 1.0).animate(animation),
+              child: child,
+            ),
+          ),
+        );
+      },
+      child: KeyedSubtree(
+        key: ValueKey(_index),
+        child: pages[_index],
+      ),
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -93,10 +120,10 @@ class _AppShellState extends State<AppShell> {
                       index: _index,
                       onChanged: _handleNavChange,
                     ),
-                    Expanded(child: pages[_index]),
+                    Expanded(child: activePage),
                   ],
                 )
-              : pages[_index],
+              : activePage,
           bottomNavigationBar: isWide
               ? null
               : _SomaBottomNav(
