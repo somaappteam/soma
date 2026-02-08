@@ -1,0 +1,59 @@
+
+  analyze_clean.txt:368:   
+info - 'withOpacity' is 
+deprecated and shouldn't 
+be used. Use .withValues() 
+to avoid precision loss - l
+ib\features\social\friends_
+screen.dart:157:51 - 
+deprecated_member_use
+> analyze_clean.txt:369:  
+error - The method 
+'DmChatScreen' isn't 
+defined for the type 
+'_FriendsScreenState' - lib
+\features\social\friends_sc
+reen.dart:174:55 - 
+undefined_method
+  analyze_clean.txt:370:   
+info - 'withOpacity' is 
+deprecated and shouldn't 
+be used. Use .withValues() 
+to avoid precision loss - l
+ib\features\social\friends_
+screen.dart:224:29 - 
+deprecated_member_use
+  analyze_clean.txt:371:   
+info - 'withOpacity' is 
+deprecated and shouldn't 
+be used. Use .withValues() 
+to avoid precision loss - l
+ib\features\social\friends_
+screen.dart:245:47 - 
+deprecated_member_use
+  analyze_clean.txt:372:   
+info - 'withOpacity' is 
+deprecated and shouldn't 
+be used. Use .withValues() 
+to avoid precision loss - l
+ib\features\social\friends_
+screen.dart:262:29 - 
+deprecated_member_use
+  analyze_clean.txt:373:   
+info - 'withOpacity' is 
+deprecated and shouldn't 
+be used. Use .withValues() 
+to avoid precision loss - l
+ib\features\social\friends_
+screen.dart:263:48 - 
+deprecated_member_use
+  analyze_clean.txt:374:   
+info - 'withOpacity' is 
+deprecated and shouldn't 
+be used. Use .withValues() 
+to avoid precision loss - l
+ib\features\social\friends_
+screen.dart:270:66 - 
+deprecated_member_use
+
+

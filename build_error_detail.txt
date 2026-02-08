@@ -1,0 +1,585 @@
+
+  build_full_v.txt:306:[   
+     ]   Touching "x64\Rele
+ase\ALL_BUILD\ALL_BUILD.tlo
+g\ALL_BUILD.lastbuildstate"
+.
+  build_full_v.txt:307:[   
+     ] Done Building 
+Project 
+"C:\Users\amosl\soma app\bu
+ild\windows\x64\ALL_BUILD.v
+cxproj" (default targets).
+  build_full_v.txt:308:[   
++9 ms] PrepareForBuild:
+  build_full_v.txt:309:[   
+     ]   Structured output 
+is enabled. The formatting 
+of compiler diagnostics 
+will reflect the error 
+hierarchy. See https://aka.
+ms/cpp/structured-output 
+for more details.
+  build_full_v.txt:310:[   
++1 ms] 
+InitializeBuildStatus:
+  build_full_v.txt:311:[   
+     ]   Touching "x64\Rele
+ase\INSTALL\INSTALL.tlog\un
+successfulbuild".
+  build_full_v.txt:312:[  
++67 ms] CustomBuild:
+  build_full_v.txt:313:[   
+     ]   1>
+  build_full_v.txt:314:[  
++23 ms] PostBuildEvent:
+  build_full_v.txt:315:[   
+     ]   setlocal
+  build_full_v.txt:316:[   
+     ]   "C:\Program 
+Files\Microsoft Visual Stud
+io\18\Community\Common7\IDE
+\CommonExtensions\Microsoft
+\CMake\CMake\bin\cmake.exe"
+ -DBUILD_TYPE=Release -P 
+cmake_install.cmake
+  build_full_v.txt:317:[   
+     ]   if %errorlevel% 
+neq 0 goto :cmEnd
+  build_full_v.txt:318:[   
+     ]   :cmEnd
+  build_full_v.txt:319:[   
+     ]   endlocal & call 
+:cmErrorLevel %errorlevel% 
+& goto :cmDone
+  build_full_v.txt:320:[   
+     ]   :cmErrorLevel
+  build_full_v.txt:321:[   
+     ]   exit /b %1
+  build_full_v.txt:322:[   
+     ]   :cmDone
+  build_full_v.txt:323:[   
+     ]   if %errorlevel% 
+neq 0 goto :VCEnd
+  build_full_v.txt:324:[   
+     ]   :VCEnd
+  build_full_v.txt:325:[  
++88 ms]   -- Install 
+configuration: "Release"
+  build_full_v.txt:326:[   
++2 ms]   -- Up-to-date: 
+C:/Users/amosl/soma app/bui
+ld/windows/x64/runner/Relea
+se/data/icudtl.dat
+  build_full_v.txt:327:[   
+     ]   -- Up-to-date: 
+C:/Users/amosl/soma app/bui
+ld/windows/x64/runner/Relea
+se/flutter_windows.dll
+  build_full_v.txt:328:[   
+     ]   CMake Error at 
+cmake_install.cmake:177 
+(file):
+  build_full_v.txt:329:[   
+     ]     file INSTALL 
+cannot find 
+"C:/Users/amosl/soma
+  build_full_v.txt:330:[   
+     ]     app/build/native
+_assets/windows": No error.
+  build_full_v.txt:331:flut
+ter : [  +17 ms] 
+  build_full_v.txt:332:C:\P
+rogram Files\Microsoft 
+  build_full_v.txt:333:Visu
+al Studio\18\Community\
+  build_full_v.txt:334:MSBu
+ild\Microsoft\VC\v180\M
+  build_full_v.txt:335:icro
+soft.CppCommon.targets(
+> build_full_v.txt:336:166,
+5): error MSB3073: The 
+  build_full_v.txt:337:comm
+and "setlocal 
+  build_full_v.txt:338:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:339:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:340:proj]
+  build_full_v.txt:341:At 
+line:1 char:1
+  build_full_v.txt:342:+ 
+flutter build windows -v 
+  build_full_v.txt:343:--no
+-pub > 
+  build_full_v.txt:344:buil
+d_full_v.txt 2>&1
+  build_full_v.txt:345:+ 
+~~~~~~~~~~~~~~~~~~~~~~~~~
+  build_full_v.txt:346:~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+  
+build_full_v.txt:347:~~~~~
+  build_full_v.txt:348:    
++ CategoryInfo         
+  build_full_v.txt:349:    
+ : NotSpecified: ([    
+  build_full_v.txt:350:  
++17 ms] C:\P...NSTALL.   
+  build_full_v.txt:351: 
+vcxproj]:String) [], R    
+  build_full_v.txt:352:emot
+eException
+  build_full_v.txt:353:    
++ FullyQualifiedErrorI 
+  build_full_v.txt:354:   
+d : NativeCommandError
+  build_full_v.txt:355: 
+  build_full_v.txt:356:[   
++2 ms] C:\Program 
+  build_full_v.txt:357:File
+s\Microsoft Visual Stud
+  build_full_v.txt:358:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:359:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:360:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:361:error 
+MSB3073: "C:\Program 
+  build_full_v.txt:362:File
+s\Microsoft Visual Stud
+  build_full_v.txt:363:io\1
+8\Community\Common7\IDE
+  build_full_v.txt:364:\Com
+monExtensions\Microsoft
+  build_full_v.txt:365:\CMa
+ke\CMake\bin\cmake.exe"
+  build_full_v.txt:366: 
+-DBUILD_TYPE=Release -P 
+  build_full_v.txt:367:cmak
+e_install.cmake 
+  build_full_v.txt:368:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:369:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:370:proj]
+  build_full_v.txt:371:[   
+     ] C:\Program 
+  build_full_v.txt:372:File
+s\Microsoft Visual Stud
+  build_full_v.txt:373:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:374:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:375:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:376:error 
+MSB3073: if 
+  build_full_v.txt:377:%err
+orlevel% neq 0 goto 
+  build_full_v.txt:378::cmE
+nd 
+  build_full_v.txt:379:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:380:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:381:proj]
+  build_full_v.txt:382:[   
+     ] C:\Program 
+  build_full_v.txt:383:File
+s\Microsoft Visual Stud
+  build_full_v.txt:384:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:385:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:386:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:387:error 
+MSB3073: :cmEnd 
+  build_full_v.txt:388:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:389:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:390:proj]
+  build_full_v.txt:391:[   
+     ] C:\Program 
+  build_full_v.txt:392:File
+s\Microsoft Visual Stud
+  build_full_v.txt:393:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:394:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:395:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:396:error 
+MSB3073: endlocal & 
+  
+build_full_v.txt:397:call 
+:cmErrorLevel 
+  build_full_v.txt:398:%err
+orlevel% & goto 
+  build_full_v.txt:399::cmD
+one 
+  build_full_v.txt:400:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:401:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:402:proj]
+  build_full_v.txt:403:[   
+     ] C:\Program 
+  build_full_v.txt:404:File
+s\Microsoft Visual Stud
+  build_full_v.txt:405:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:406:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:407:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:408:error 
+MSB3073: 
+  build_full_v.txt:409::cmE
+rrorLevel 
+  build_full_v.txt:410:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:411:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:412:proj]
+  build_full_v.txt:413:[   
+     ] C:\Program 
+  build_full_v.txt:414:File
+s\Microsoft Visual Stud
+  build_full_v.txt:415:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:416:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:417:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:418:error 
+MSB3073: exit /b %1 
+  build_full_v.txt:419:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:420:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:421:proj]
+  build_full_v.txt:422:[   
+     ] C:\Program 
+  build_full_v.txt:423:File
+s\Microsoft Visual Stud
+  build_full_v.txt:424:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:425:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:426:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:427:error 
+MSB3073: :cmDone 
+  build_full_v.txt:428:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:429:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:430:proj]
+  build_full_v.txt:431:[   
+     ] C:\Program 
+  build_full_v.txt:432:File
+s\Microsoft Visual Stud
+  build_full_v.txt:433:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:434:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:435:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:436:error 
+MSB3073: if 
+  build_full_v.txt:437:%err
+orlevel% neq 0 goto 
+  build_full_v.txt:438::VCE
+nd 
+  build_full_v.txt:439:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:440:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:441:proj]
+  build_full_v.txt:442:[   
+     ] C:\Program 
+  build_full_v.txt:443:File
+s\Microsoft Visual Stud
+  build_full_v.txt:444:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:445:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:446:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:447:error 
+MSB3073: :VCEnd" 
+  build_full_v.txt:448:exit
+ed with code 1. 
+  build_full_v.txt:449:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:450:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:451:proj]
+  build_full_v.txt:452:[   
+     ] Done Building 
+Project 
+"C:\Users\amosl\soma app\bu
+ild\windows\x64\INSTALL.vcx
+proj" (default targets) -- 
+FAILED.
+  build_full_v.txt:453:[   
+     ] Build FAILED.
+  build_full_v.txt:454:[   
+     ] 
+"C:\Users\amosl\soma app\bu
+ild\windows\x64\INSTALL.vcx
+proj" (default target) (1) 
+->
+  build_full_v.txt:455:[   
+     ] (PostBuildEvent 
+target) -> 
+  build_full_v.txt:456:[   
+     ]   C:\Program 
+  build_full_v.txt:457:File
+s\Microsoft Visual Stud
+  build_full_v.txt:458:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:459:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:460:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:461:error 
+MSB3073: The command 
+  build_full_v.txt:462:"set
+local 
+  build_full_v.txt:463:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:464:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:465:proj]
+  build_full_v.txt:466:[   
+     ] C:\Program 
+  build_full_v.txt:467:File
+s\Microsoft Visual Stud
+  build_full_v.txt:468:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:469:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:470:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:471:error 
+MSB3073: "C:\Program 
+  build_full_v.txt:472:File
+s\Microsoft Visual Stud
+  build_full_v.txt:473:io\1
+8\Community\Common7\IDE
+  build_full_v.txt:474:\Com
+monExtensions\Microsoft
+  build_full_v.txt:475:\CMa
+ke\CMake\bin\cmake.exe"
+  build_full_v.txt:476: 
+-DBUILD_TYPE=Release -P 
+  build_full_v.txt:477:cmak
+e_install.cmake 
+  build_full_v.txt:478:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:479:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:480:proj]
+  build_full_v.txt:481:[   
+     ] C:\Program 
+  build_full_v.txt:482:File
+s\Microsoft Visual Stud
+  build_full_v.txt:483:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:484:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:485:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:486:error 
+MSB3073: if 
+  build_full_v.txt:487:%err
+orlevel% neq 0 goto 
+  build_full_v.txt:488::cmE
+nd 
+  build_full_v.txt:489:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:490:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:491:proj]
+  build_full_v.txt:492:[   
+     ] C:\Program 
+  build_full_v.txt:493:File
+s\Microsoft Visual Stud
+  build_full_v.txt:494:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:495:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:496:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:497:error 
+MSB3073: :cmEnd 
+  build_full_v.txt:498:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:499:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:500:proj]
+  build_full_v.txt:501:[   
+     ] C:\Program 
+  build_full_v.txt:502:File
+s\Microsoft Visual Stud
+  build_full_v.txt:503:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:504:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:505:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:506:error 
+MSB3073: endlocal & 
+  
+build_full_v.txt:507:call 
+:cmErrorLevel 
+  build_full_v.txt:508:%err
+orlevel% & goto 
+  build_full_v.txt:509::cmD
+one 
+  build_full_v.txt:510:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:511:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:512:proj]
+  build_full_v.txt:513:[   
+     ] C:\Program 
+  build_full_v.txt:514:File
+s\Microsoft Visual Stud
+  build_full_v.txt:515:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:516:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:517:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:518:error 
+MSB3073: 
+  build_full_v.txt:519::cmE
+rrorLevel 
+  build_full_v.txt:520:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:521:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:522:proj]
+  build_full_v.txt:523:[   
+     ] C:\Program 
+  build_full_v.txt:524:File
+s\Microsoft Visual Stud
+  build_full_v.txt:525:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:526:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:527:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:528:error 
+MSB3073: exit /b %1 
+  build_full_v.txt:529:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:530:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:531:proj]
+  build_full_v.txt:532:[   
+     ] C:\Program 
+  build_full_v.txt:533:File
+s\Microsoft Visual Stud
+  build_full_v.txt:534:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:535:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:536:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:537:error 
+MSB3073: :cmDone 
+  build_full_v.txt:538:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:539:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:540:proj]
+  build_full_v.txt:541:[   
+     ] C:\Program 
+  build_full_v.txt:542:File
+s\Microsoft Visual Stud
+  build_full_v.txt:543:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:544:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:545:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:546:error 
+MSB3073: if 
+  build_full_v.txt:547:%err
+orlevel% neq 0 goto 
+  build_full_v.txt:548::VCE
+nd 
+  build_full_v.txt:549:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:550:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:551:proj]
+  build_full_v.txt:552:[   
+     ] C:\Program 
+  build_full_v.txt:553:File
+s\Microsoft Visual Stud
+  build_full_v.txt:554:io\1
+8\Community\MSBuild\Mic
+  build_full_v.txt:555:roso
+ft\VC\v180\Microsoft.Cp
+  build_full_v.txt:556:pCom
+mon.targets(166,5): 
+> 
+build_full_v.txt:557:error 
+MSB3073: :VCEnd" 
+  build_full_v.txt:558:exit
+ed with code 1. 
+  build_full_v.txt:559:[C:\
+Users\amosl\soma app\bu
+  build_full_v.txt:560:ild\
+windows\x64\INSTALL.vcx
+  
+build_full_v.txt:561:proj]
+  build_full_v.txt:562:[   
+     ]     0 Warning(s)
+
+

@@ -1,0 +1,16 @@
+
+analyze_clean.txt:369:  
+error - The method 
+'DmChatScreen' isn't 
+defined for the type 
+'_FriendsScreenState' - lib
+\features\social\friends_sc
+reen.dart:174:55 - 
+undefined_method
+analyze_clean.txt:539:    
++ FullyQualifiedErrorI    
+d : 
+analyze_clean.txt:540:Nativ
+eCommandError
+
+

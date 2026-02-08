@@ -1,0 +1,564 @@
+Analyzing soma app...                                           
+
+   info - Don't invoke 'print' in production code - lib\core\services\tts_service.dart:17:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\core\services\tts_service.dart:27:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\core\services\tts_service.dart:38:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\core\services\tts_service.dart:46:7 - avoid_print
+warning - The value of the field '_fallbackCourses' isn't used - lib\data\courses_repository.dart:23:26 - unused_field
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:103:46 - unnecessary_non_null_assertion
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:150:46 - unnecessary_non_null_assertion
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:173:46 - unnecessary_non_null_assertion
+   info - Don't use 'BuildContext's across async gaps - lib\features\circles\circle_lobby_screen.dart:186:16 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\circles\circle_lobby_screen.dart:192:16 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\circles\circle_lobby_screen.dart:197:16 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\circles\circle_lobby_screen.dart:204:16 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\circles\circle_lobby_screen.dart:220:16 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\circles\circle_lobby_screen.dart:232:14 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\circles\circle_lobby_screen.dart:234:14 - use_build_context_synchronously
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:262:46 - unnecessary_non_null_assertion
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:277:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:284:56 - deprecated_member_use
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:305:46 - unnecessary_non_null_assertion
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:320:46 - unnecessary_non_null_assertion
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:339:46 - unnecessary_non_null_assertion
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:354:46 - unnecessary_non_null_assertion
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:372:46 - unnecessary_non_null_assertion
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:385:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:392:56 - deprecated_member_use
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:420:46 - unnecessary_non_null_assertion
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:446:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:461:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:463:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:479:55 - deprecated_member_use
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:513:46 - unnecessary_non_null_assertion
+   info - 'WillPopScope' is deprecated and shouldn't be used. Use PopScope instead. The Android predictive back feature will not work with WillPopScope. This feature was deprecated after v3.12.0-1.0.pre - lib\features\circles\circle_lobby_screen.dart:575:12 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:741:61 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:776:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:802:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:831:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:857:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:890:59 - deprecated_member_use
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\circles\circle_lobby_screen.dart:937:41 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\circles\circle_lobby_screen.dart:994:66 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\circles\circle_lobby_screen.dart:1040:66 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1164:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1197:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1214:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1241:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1242:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1246:42 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1266:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1300:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1301:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1306:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1340:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1341:48 - deprecated_member_use
+  error - Undefined name 'l10n' - lib\features\circles\circle_lobby_screen.dart:1350:15 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1352:37 - deprecated_member_use
+  error - Undefined name 'l10n' - lib\features\circles\circle_lobby_screen.dart:1360:15 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1368:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1373:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1374:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1375:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1392:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1393:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1398:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1404:37 - deprecated_member_use
+warning - The value of the local variable 'l10n' isn't used - lib\features\circles\circle_lobby_screen.dart:1418:11 - unused_local_variable
+warning - The '!' will have no effect because the receiver can't be null - lib\features\circles\circle_lobby_screen.dart:1418:46 - unnecessary_non_null_assertion
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1423:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1424:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1429:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1435:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1464:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1465:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1468:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1487:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1520:24 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1527:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1528:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1554:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1566:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1568:62 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1593:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1605:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1634:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1635:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1641:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1656:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1657:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1660:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1679:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1679:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1681:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1681:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1692:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1696:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1748:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1749:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1800:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1801:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1803:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1819:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1819:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1830:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1840:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1862:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1863:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1872:37 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1910:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\circles\circle_lobby_screen.dart:1911:50 - deprecated_member_use
+   info - The import of 'package:flutter/foundation.dart' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/material.dart' - lib\features\circles\create_circle_screen.dart:11:8 - unnecessary_import
+   info - Unnecessary braces in a string interpolation - lib\features\circles\create_circle_screen.dart:261:50 - unnecessary_brace_in_string_interps
+   info - Unnecessary braces in a string interpolation - lib\features\circles\create_circle_screen.dart:261:63 - unnecessary_brace_in_string_interps
+warning - Unused import: '../../data/auth_repository.dart' - lib\features\circles\live_quiz_screen.dart:13:8 - unused_import
+warning - The value of the field '_answerTimers' isn't used - lib\features\circles\live_quiz_screen.dart:248:21 - unused_field
+warning - The value of the field '_random' isn't used - lib\features\circles\live_quiz_screen.dart:249:16 - unused_field
+warning - The declaration '_PlaceholderPage' isn't referenced - lib\features\home\app_shell.dart:352:7 - unused_element
+warning - The value of the local variable 'l10n' isn't used - lib\features\home\home_screen.dart:334:11 - unused_local_variable
+warning - The value of the local variable 'l10n' isn't used - lib\features\home\home_screen.dart:375:11 - unused_local_variable
+warning - The value of the local variable 'l10n' isn't used - lib\features\profile\edit_profile_screen.dart:367:11 - unused_local_variable
+warning - The value of the local variable 'l10n' isn't used - lib\features\profile\privacy_settings_screen.dart:301:11 - unused_local_variable
+warning - The value of the local variable 'l10n' isn't used - lib\features\profile\profile_screen.dart:604:11 - unused_local_variable
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\profile\security_settings_screen.dart:297:9 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\profile\security_settings_screen.dart:313:28 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\profile\security_settings_screen.dart:333:28 - use_build_context_synchronously
+warning - The declaration '_InfoSheet' isn't referenced - lib\features\profile\security_settings_screen.dart:568:7 - unused_element
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\profile\security_settings_screen.dart:702:46 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\profile\security_settings_screen.dart:708:46 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\profile\settings_screen.dart:480:48 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\add_friend_screen.dart:116:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\add_friend_screen.dart:133:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\add_friend_screen.dart:142:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\add_friend_screen.dart:177:47 - deprecated_member_use
+warning - The declaration '_jumpToBottom' isn't referenced - lib\features\social\dm_chat_screen.dart:42:8 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:108:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:222:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:259:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:260:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:263:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:264:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:270:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:310:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:325:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:326:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:329:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\dm_chat_screen.dart:352:47 - deprecated_member_use
+warning - The value of the field '_isLoading' isn't used - lib\features\social\friends_screen.dart:22:8 - unused_field
+warning - The value of the local variable 'incoming' isn't used - lib\features\social\friends_screen.dart:103:11 - unused_local_variable
+warning - The value of the local variable 'outgoing' isn't used - lib\features\social\friends_screen.dart:104:11 - unused_local_variable
+warning - The value of the local variable 'filtered' isn't used - lib\features\social\friends_screen.dart:106:11 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:159:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:170:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:180:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:297:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:358:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:379:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:396:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:397:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:405:63 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:418:36 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:420:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:449:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:450:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:473:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:512:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:513:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:553:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:554:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:576:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:607:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:608:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\friends_screen.dart:610:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:78:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:89:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:99:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:134:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:202:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:237:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:238:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:241:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:242:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:268:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:283:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:295:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:297:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:310:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:329:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:330:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\social\inbox_screen.dart:335:62 - deprecated_member_use
+warning - This default clause is covered by the previous cases - lib\features\social\notifications\notifications_screen.dart:607:7 - unreachable_switch_default
+warning - This default clause is covered by the previous cases - lib\features\social\notifications\notifications_screen.dart:622:7 - unreachable_switch_default
+warning - The '!' will have no effect because the receiver can't be null - lib\features\solo\add_course_screen.dart:29:46 - unnecessary_non_null_assertion
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:53:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:112:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:148:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:192:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:193:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:197:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:207:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:226:37 - deprecated_member_use
+warning - The '!' will have no effect because the receiver can't be null - lib\features\solo\add_course_screen.dart:240:44 - unnecessary_non_null_assertion
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:301:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:307:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:318:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:320:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:333:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:336:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:348:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:366:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:367:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:370:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:371:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\add_course_screen.dart:387:61 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:421:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:450:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:460:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:488:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:489:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:493:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:494:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:496:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:497:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:501:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:502:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:528:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:583:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:644:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:676:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:677:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:680:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:681:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:705:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:706:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_sentences_quiz_screen.dart:710:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:363:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:381:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:409:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:410:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:414:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:415:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:418:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:419:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:423:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:424:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:450:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:494:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:543:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:574:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:575:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:578:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:579:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:603:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:604:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:608:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:688:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\solo_vocab_quiz_screen.dart:689:48 - deprecated_member_use
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:5:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:27:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:28:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:32:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:35:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:40:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:41:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:42:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:43:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:44:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:47:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:50:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:51:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:52:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:53:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:54:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:5:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:19:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:26:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:29:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:37:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:39:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:43:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:44:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:49:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:51:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:52:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:53:7 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\capture_error.dart:2:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\capture_error.dart:10:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\capture_error.dart:12:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\capture_error.dart:14:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:14:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:23:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:27:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:28:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:29:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:30:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:31:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:32:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:36:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:37:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:40:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:42:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:46:5 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\check_columns.dart:2:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\check_columns.dart:12:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_columns.dart:17:5 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\check_courses.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\check_courses.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_courses.dart:14:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_courses.dart:16:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_courses.dart:19:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:14:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:19:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:23:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:25:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:18:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:30:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:38:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:40:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:45:3 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\check_migration_status.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:11:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:32:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:50:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:51:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:53:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:56:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:57:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:59:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:62:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:66:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:67:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:72:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:74:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:80:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:82:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:85:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:86:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:24:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:26:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:29:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:32:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:34:7 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\check_supabase_vocabulary.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\check_supabase_vocabulary.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_supabase_vocabulary.dart:15:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_supabase_vocabulary.dart:18:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_supabase_vocabulary.dart:22:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_supabase_vocabulary.dart:25:5 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\cleanup_ghosts.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:39:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:42:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:44:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:51:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:53:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:57:5 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\close_all_circles.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:23:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:32:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:34:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:37:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:40:5 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\count_supabase_rows.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\count_supabase_rows.dart:12:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\count_supabase_rows.dart:16:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\count_supabase_rows.dart:18:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:8:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:12:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:15:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:29:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:35:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:37:5 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\debug_circle_data.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:5:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:11:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:21:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:25:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:26:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:27:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:30:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:33:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:35:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:37:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:39:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:42:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:46:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:20:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:25:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:26:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:27:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:31:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:33:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:35:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:38:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:39:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:43:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:7:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:13:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:17:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:20:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:32:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:34:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:36:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\fix_imports.dart:32:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\fix_imports.dart:37:3 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\import_data.dart:3:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:18:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:22:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:25:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:74:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:81:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:85:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:88:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:137:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:144:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:152:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_schema.dart:22:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_schema.dart:25:13 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_schema.dart:27:13 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_schema.dart:31:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_schema.dart:34:7 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\migrate_assets.dart:3:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:18:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:19:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:26:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:30:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:33:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:85:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:92:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:96:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:99:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:150:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:157:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:167:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:169:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:181:11 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:182:11 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:186:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_course_id_parsing.dart:19:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_course_id_parsing.dart:22:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_course_id_parsing.dart:24:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_db_conn.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_db_conn.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_db_conn.dart:18:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_db_conn.dart:21:5 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\test_insert.dart:2:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\test_insert.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_insert.dart:18:5 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\test_insert_minimal.dart:2:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\test_insert_minimal.dart:14:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_insert_minimal.dart:16:5 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\test_vocabulary_insert.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:27:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:29:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:33:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:37:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:40:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:12:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:17:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:73:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:78:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:80:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:85:3 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\upload_csv_to_supabase.dart:4:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:21:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:23:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:30:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:34:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:37:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:42:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:46:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:49:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:52:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:75:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:81:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:85:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:88:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:93:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:97:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:100:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:103:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:125:3 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\verify_migration.dart:2:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\verify_migration.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_migration.dart:14:3 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\verify_migration_simple.dart:2:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\verify_migration_simple.dart:16:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_migration_simple.dart:17:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:6:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:11:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:27:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:34:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:42:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:43:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:47:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:50:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:51:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:52:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:53:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:54:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:55:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:56:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:57:3 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\verify_rls.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:9:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:13:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:16:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:18:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:21:8 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:24:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:29:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:32:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:34:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:36:8 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:39:5 - avoid_print
+   info - The imported package 'supabase' isn't a dependency of the importing package - scripts\verify_schema.dart:1:8 - depend_on_referenced_packages
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:19:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:23:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:26:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:29:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:31:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:37:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:44:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:66:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:73:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:82:8 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:85:8 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:12:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:23:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:38:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:40:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:43:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:47:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:50:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:53:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:55:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:58:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:61:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:65:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:67:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:70:3 - avoid_print
+  error - Undefined name 'Sqflite' - scripts\verify_sync.dart:86:21 - undefined_identifier
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:89:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:91:7 - avoid_print
+
+560 issues found. (ran in 2.2s)

@@ -1,0 +1,41 @@
+name: soma
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  google_fonts: ^8.0.0
+  intl: 0.20.2
+  path: ^1.9.1
+  sqflite: ^2.4.2
+  sqflite_common_ffi: ^2.4.0+2
+  supabase_flutter: ^2.12.0
+  agora_rtc_engine: ^6.3.0
+  permission_handler: ^12.0.1
+  shared_preferences: ^2.2.3
+  flutter_tts: ^4.2.5
+  csv: ^6.0.0
+  flutter_svg: ^2.0.10
+  postgres: ^3.5.9
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_driver:
+    sdk: flutter
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/bg/
+    - assets/avatar/

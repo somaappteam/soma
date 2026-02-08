@@ -1,0 +1,100 @@
+[        ]   Touching "x64\Release\flutter_assemble\flutter_assemble.tlog\flutter_assemble.lastbuildstate".
+[        ] Done Building Project "C:\Users\amosl\soma app\build\windows\x64\flutter\flutter_assemble.vcxproj" (default targets).
+[  +47 ms] PrepareForBuild:
+[        ]   Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+[   +1 ms] InitializeBuildStatus:
+[        ]   Creating "flutter_wrapper_app.dir\Release\flutter_.28A843DC.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+[        ]   Touching "flutter_wrapper_app.dir\Release\flutter_.28A843DC.tlog\unsuccessfulbuild".
+[   +2 ms] CustomBuild:
+[        ]   All outputs are up-to-date.
+[  +75 ms] ClCompile:
+[        ]   All outputs are up-to-date.
+[  +33 ms] Lib:
+[        ]   All outputs are up-to-date.
+[   +1 ms]   flutter_wrapper_app.vcxproj -> C:\Users\amosl\soma app\build\windows\x64\flutter\Release\flutter_wrapper_app.lib
+[  +18 ms] FinalizeBuildStatus:
+[        ]   Deleting file "flutter_wrapper_app.dir\Release\flutter_.28A843DC.tlog\unsuccessfulbuild".
+[        ]   Touching "flutter_wrapper_app.dir\Release\flutter_.28A843DC.tlog\flutter_wrapper_app.lastbuildstate".
+[        ] Done Building Project "C:\Users\amosl\soma app\build\windows\x64\flutter\flutter_wrapper_app.vcxproj" (default targets).
+[  +42 ms] Project "C:\Users\amosl\soma app\build\windows\x64\ALL_BUILD.vcxproj" (3) is building "C:\Users\amosl\soma app\build\windows\x64\flutter\flutter_wrapper_plugin.vcxproj" (6) on node 1 (default targets).
+[        ] PrepareForBuild:
+[        ]   Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+[   +1 ms] InitializeBuildStatus:
+[        ]   Creating "flutter_wrapper_plugin.dir\Release\flutter_.E6E2DA01.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+[        ]   Touching "flutter_wrapper_plugin.dir\Release\flutter_.E6E2DA01.tlog\unsuccessfulbuild".
+[   +2 ms] CustomBuild:
+[        ]   All outputs are up-to-date.
+[  +11 ms] ClCompile:
+[        ]   All outputs are up-to-date.
+[   +4 ms] Lib:
+[        ]   All outputs are up-to-date.
+[        ]   flutter_wrapper_plugin.vcxproj -> C:\Users\amosl\soma app\build\windows\x64\flutter\Release\flutter_wrapper_plugin.lib
+[  +10 ms] FinalizeBuildStatus:
+[        ]   Deleting file "flutter_wrapper_plugin.dir\Release\flutter_.E6E2DA01.tlog\unsuccessfulbuild".
+[        ]   Touching "flutter_wrapper_plugin.dir\Release\flutter_.E6E2DA01.tlog\flutter_wrapper_plugin.lastbuildstate".
+[        ] Done Building Project "C:\Users\amosl\soma app\build\windows\x64\flutter\flutter_wrapper_plugin.vcxproj" (default targets).
+[  +47 ms] Project "C:\Users\amosl\soma app\build\windows\x64\ALL_BUILD.vcxproj" (3) is building "C:\Users\amosl\soma app\build\windows\x64\runner\soma.vcxproj" (7) on node 1 (default targets).
+[        ] PrepareForBuild:
+[        ]   Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+[   +2 ms] InitializeBuildStatus:
+[        ]   Creating "soma.dir\Release\soma.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+[        ]   Touching "soma.dir\Release\soma.tlog\unsuccessfulbuild".
+[   +3 ms] CustomBuild:
+[        ]   All outputs are up-to-date.
+[  +18 ms] ClCompile:
+[        ]   All outputs are up-to-date.
+[   +8 ms] ResourceCompile:
+[        ]   All outputs are up-to-date.
+[  +54 ms] Link:
+[        ]   All outputs are up-to-date.
+[   +3 ms]   soma.vcxproj -> C:\Users\amosl\soma app\build\windows\x64\runner\Release\soma.exe
+[   +9 ms] FinalizeBuildStatus:
+[        ]   Deleting file "soma.dir\Release\soma.tlog\unsuccessfulbuild".
+[        ]   Touching "soma.dir\Release\soma.tlog\soma.lastbuildstate".
+[        ] Done Building Project "C:\Users\amosl\soma app\build\windows\x64\runner\soma.vcxproj" (default targets).
+[  +11 ms] PrepareForBuild:
+[        ]   Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+[   +2 ms] InitializeBuildStatus:
+[        ]   Creating "x64\Release\ALL_BUILD\ALL_BUILD.tlog\unsuccessfulbuild" because "AlwaysCreate" was specified.
+[        ]   Touching "x64\Release\ALL_BUILD\ALL_BUILD.tlog\unsuccessfulbuild".
+[   +2 ms] CustomBuild:
+[        ]   All outputs are up-to-date.
+[  +12 ms] FinalizeBuildStatus:
+[        ]   Deleting file "x64\Release\ALL_BUILD\ALL_BUILD.tlog\unsuccessfulbuild".
+[        ]   Touching "x64\Release\ALL_BUILD\ALL_BUILD.tlog\ALL_BUILD.lastbuildstate".
+[        ] Done Building Project "C:\Users\amosl\soma app\build\windows\x64\ALL_BUILD.vcxproj" (default targets).
+[   +9 ms] PrepareForBuild:
+[        ]   Structured output is enabled. The formatting of compiler diagnostics will reflect the error hierarchy. See https://aka.ms/cpp/structured-output for more details.
+[   +3 ms] InitializeBuildStatus:
+[        ]   Touching "x64\Release\INSTALL\INSTALL.tlog\unsuccessfulbuild".
+[  +71 ms] CustomBuild:
+[        ]   1>
+[  +21 ms] PostBuildEvent:
+[        ]   setlocal
+[        ]   "C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -DBUILD_TYPE=Release -P cmake_install.cmake
+[        ]   if %errorlevel% neq 0 goto :cmEnd
+[        ]   :cmEnd
+[        ]   endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+[        ]   :cmErrorLevel
+[        ]   exit /b %1
+[        ]   :cmDone
+[        ]   if %errorlevel% neq 0 goto :VCEnd
+[        ]   :VCEnd
+[  +84 ms]   -- Install configuration: "Release"
+[   +1 ms]   -- Up-to-date: C:/Users/amosl/soma app/build/windows/x64/runner/Release/data/icudtl.dat
+[        ]   -- Up-to-date: C:/Users/amosl/soma app/build/windows/x64/runner/Release/flutter_windows.dll
+[        ]   CMake Error at cmake_install.cmake:177 (file):
+[        ]     file INSTALL cannot find "C:/Users/amosl/soma
+[        ]     app/build/native_assets/windows": No error.
+[        ] Done Building Project "C:\Users\amosl\soma app\build\windows\x64\INSTALL.vcxproj" (default targets) -- FAILED.
+[        ] Build FAILED.
+[        ] "C:\Users\amosl\soma app\build\windows\x64\INSTALL.vcxproj" (default target) (1) ->
+[        ] (PostBuildEvent target) -> 
+[        ]     0 Warning(s)
+[        ]     1 Error(s)
+[        ] Time Elapsed 00:00:08.61
+[  +32 ms] Building Windows application... (completed in 8.9s)
+[   +1 ms] "flutter windows" took 9,068ms.
+[   +1 ms] Running 1 shutdown hook
+[   +3 ms] Shutdown hooks complete
+[ +263 ms] exiting with code 1
