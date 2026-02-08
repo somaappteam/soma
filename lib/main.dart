@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 // import 'package:flutter_driver/driver_extension.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'core/theme/tokens.dart';
+import 'core/theme/app_theme.dart';
 import 'features/auth/splash_screen.dart';
 
 
@@ -13,7 +12,13 @@ import 'dart:io';
 import 'data/content_sync_service.dart';
 import 'data/settings_repository.dart';
 import 'core/services/session_tracker.dart';
+import 'core/services/theme_mode_controller.dart';
 import 'package:flutter/foundation.dart';
+
+enum SyncStatus { idle, syncing, error }
+
+final syncStatusNotifier = ValueNotifier<SyncStatus>(SyncStatus.idle);
+final syncMessageNotifier = ValueNotifier<String?>(null);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +38,8 @@ Future<void> main() async {
   } catch (e) {
     debugPrint("Session tracking failed to start: $e");
   }
+
+  await themeModeController.load();
   
   _runContentSync();
   runApp(const App());
@@ -40,10 +47,15 @@ Future<void> main() async {
 
 Future<void> _runContentSync() async {
   await Future.delayed(const Duration(seconds: 1));
+  syncStatusNotifier.value = SyncStatus.syncing;
+  syncMessageNotifier.value = null;
   try {
     await contentSyncService.syncEverything();
+    syncStatusNotifier.value = SyncStatus.idle;
   } catch (e) {
     debugPrint("Sync failed: $e");
+    syncStatusNotifier.value = SyncStatus.error;
+    syncMessageNotifier.value = "Sync failed. Check your connection.";
   }
 }
 
@@ -77,6 +89,21 @@ class _AppState extends State<App> {
     Locale('pl'),
     Locale('uk'),
     Locale('nl'),
+    Locale('fa'),
+    Locale('pa'),
+    Locale('ta'),
+    Locale('te'),
+    Locale('sw'),
+    Locale('ms'),
+    Locale('ro'),
+    Locale('el'),
+    Locale('hu'),
+    Locale('cs'),
+    Locale('sv'),
+    Locale('he'),
+    Locale('no'),
+    Locale('da'),
+    Locale('fi'),
   ];
 
   Locale? _currentLocale;
@@ -85,7 +112,7 @@ class _AppState extends State<App> {
   void initState() {
     super.initState();
     _loadSavedLocale();
-    _listenToLocaleChanges();
+    _listenToSettingsChanges();
   }
 
   Future<void> _loadSavedLocale() async {
@@ -101,14 +128,18 @@ class _AppState extends State<App> {
     }
   }
 
-  void _listenToLocaleChanges() {
+  void _listenToSettingsChanges() {
     settingsRepository.getSettingsStream().listen((settings) {
       final languageUi = settings['language_ui'] as String?;
+      final themeMode = settings['theme_mode'] as String?;
       if (languageUi != null && mounted) {
         final locale = _languageToLocale(languageUi);
         if (_currentLocale != locale) {
           setState(() => _currentLocale = locale);
         }
+      }
+      if (themeMode != null) {
+        themeModeController.setModeFromSetting(themeMode, persist: false);
       }
     });
   }
@@ -173,66 +204,139 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    final base = ThemeData.dark();
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: _supportedLocales,
-      locale: _currentLocale,
-      theme: base.copyWith(
-        scaffoldBackgroundColor: T.bg0,
-        textTheme: GoogleFonts.poppinsTextTheme(
-          base.textTheme,
-        ).apply(bodyColor: T.textHi, displayColor: T.textHi),
-        pageTransitionsTheme: const PageTransitionsTheme(
-          builders: <TargetPlatform, PageTransitionsBuilder>{
-            TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
-            TargetPlatform.iOS: FadeUpwardsPageTransitionsBuilder(),
-            TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
-            TargetPlatform.macOS: FadeUpwardsPageTransitionsBuilder(),
-            TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
-            TargetPlatform.fuchsia: FadeUpwardsPageTransitionsBuilder(),
+    return AnimatedBuilder(
+      animation: themeModeController,
+      builder: (context, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: _supportedLocales,
+          locale: _currentLocale,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          themeMode: themeModeController.mode,
+          themeAnimationDuration: const Duration(milliseconds: 350),
+          themeAnimationCurve: Curves.easeOutCubic,
+          builder: (context, child) {
+            if (child == null) return const SizedBox.shrink();
+            final background = Theme.of(context).extension<AppBackgroundTheme>()?.gradient;
+            final media = MediaQuery.of(context);
+            final scale = _uiScaleFor(media);
+            Widget content;
+            if (scale == 1.0) {
+              content = DecoratedBox(
+                decoration: BoxDecoration(gradient: background),
+                child: child,
+              );
+            } else {
+
+              final baseTextScale = media.textScaler.scale(1.0);
+              final scaledMedia = media.copyWith(
+                size: Size(media.size.width / scale, media.size.height / scale),
+                padding: _scaleInsets(media.padding, scale),
+                viewPadding: _scaleInsets(media.viewPadding, scale),
+                viewInsets: _scaleInsets(media.viewInsets, scale),
+                systemGestureInsets: _scaleInsets(media.systemGestureInsets, scale),
+                textScaler: TextScaler.linear(baseTextScale * scale),
+              );
+
+              content = DecoratedBox(
+                decoration: BoxDecoration(gradient: background),
+                child: MediaQuery(
+                  data: scaledMedia,
+                  child: Transform.scale(
+                    scale: scale,
+                    alignment: Alignment.topCenter,
+                    child: SizedBox(
+                      width: media.size.width / scale,
+                      height: media.size.height / scale,
+                      child: child,
+                    ),
+                  ),
+                ),
+              );
+            }
+
+            return ValueListenableBuilder<SyncStatus>(
+              valueListenable: syncStatusNotifier,
+              builder: (context, status, _) {
+                return Stack(
+                  children: [
+                    content,
+                    if (status != SyncStatus.idle)
+                      SafeArea(
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            child: _SyncStatusBanner(status: status),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+              },
+            );
           },
-        ),
-      ),
-      builder: (context, child) {
-        if (child == null) return const SizedBox.shrink();
-        final media = MediaQuery.of(context);
-        final scale = _uiScaleFor(media);
-        if (scale == 1.0) {
-          return child;
-        }
-
-        final baseTextScale = media.textScaler.scale(1.0);
-        final scaledMedia = media.copyWith(
-          size: Size(media.size.width / scale, media.size.height / scale),
-          padding: _scaleInsets(media.padding, scale),
-          viewPadding: _scaleInsets(media.viewPadding, scale),
-          viewInsets: _scaleInsets(media.viewInsets, scale),
-          systemGestureInsets: _scaleInsets(media.systemGestureInsets, scale),
-          textScaler: TextScaler.linear(baseTextScale * scale),
+          home: const SplashScreen(),
         );
+      },
+    );
+  }
+}
 
-        return MediaQuery(
-          data: scaledMedia,
-          child: Transform.scale(
-            scale: scale,
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              width: media.size.width / scale,
-              height: media.size.height / scale,
-              child: child,
+class _SyncStatusBanner extends StatelessWidget {
+  final SyncStatus status;
+  const _SyncStatusBanner({required this.status});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final isError = status == SyncStatus.error;
+    final icon = isError ? Icons.wifi_off_rounded : Icons.sync_rounded;
+    final label = isError ? "Sync failed" : "Syncing…";
+
+    return ValueListenableBuilder<String?>(
+      valueListenable: syncMessageNotifier,
+      builder: (context, message, _) {
+        return AnimatedSwitcher(
+          duration: const Duration(milliseconds: 250),
+          child: Container(
+            key: ValueKey(status),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: isError
+                  ? scheme.error.withValues(alpha: 0.2)
+                  : scheme.surfaceContainerHighest.withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.15)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    message ?? label,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurface.withValues(alpha: 0.9),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
       },
-      home: const SplashScreen(),
     );
   }
 }

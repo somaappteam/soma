@@ -5,6 +5,7 @@ import '../../../data/notifications_store.dart';
 import '../../../data/notifications_repository.dart';
 import '../../../data/auth_repository.dart';
 import '../../../core/widgets/responsive.dart';
+import '../../../core/theme/spacing.dart';
 
 import '../../../data/circles_repository.dart';
 import '../../../data/social_repository.dart';
@@ -51,7 +52,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       body: SafeArea(
           child: ResponsiveFrame(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+              padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.sm),
               child: Column(
                 children: [
                   Row(
@@ -68,7 +69,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             child: Center(
                               child: Icon(
                                 Icons.arrow_back_ios_new_rounded,
-                                color: Colors.white.withValues(alpha: 0.9),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
                                 size: 20,
                               ),
                             ),
@@ -79,7 +80,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       Text(
                         l10n.notificationsTitle,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
                               fontWeight: FontWeight.w900,
                             ),
                       ),
@@ -97,7 +97,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               child: Center(
                                 child: Icon(
                                   Icons.done_all_rounded,
-                                  color: Colors.white.withValues(alpha: 0.9),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
                                   size: 22,
                                 ),
                               ),
@@ -106,13 +106,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: S.md),
                   _Tabs(
                     value: activeTab,
                     tabs: tabs,
                     onChanged: (v) => setState(() => tab = v),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: S.sm),
                   Expanded(
                     child: isGuest
                         ? _buildGuestNotifications(context, activeTab)
@@ -120,9 +120,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             stream: notificationsRepository.getNotificationsStream(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(
-                                  child: CircularProgressIndicator(color: Color(0xFF2AFADF)),
-                                );
+                                return const _NotificationsSkeleton();
                               }
 
                               final items = (snapshot.data ?? []).map(_mapNotification).toList();
@@ -142,42 +140,43 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               }).toList();
 
                               if (filtered.isEmpty) {
-                                return Glass(
-                                  radius: BorderRadius.circular(24),
-                                  padding: const EdgeInsets.all(16),
-                                  child: Text(
-                                    l10n.notificationsEmpty,
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.75),
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                );
+                                return _NotificationsEmptyState(message: l10n.notificationsEmpty);
                               }
 
                               return ListView.separated(
                                 physics: const BouncingScrollPhysics(),
                                 itemCount: filtered.length,
-                                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                                separatorBuilder: (_, __) => const SizedBox(height: S.sm),
                                 itemBuilder: (_, i) {
                                   final n = filtered[i];
 
                                   return Dismissible(
                                     key: ValueKey(n.id),
                                     direction: DismissDirection.endToStart,
-                                    background: Container(
-                                      alignment: Alignment.centerRight,
-                                      padding: const EdgeInsets.only(right: 16),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(24),
-                                        color: Colors.redAccent.withValues(alpha: 0.18),
-                                        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                                      background: Container(
+                                        alignment: Alignment.centerRight,
+                                        padding: const EdgeInsets.only(right: S.md),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(24),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .error
+                                              .withValues(alpha: 0.18),
+                                          border: Border.all(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.10),
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.delete_rounded,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.92),
+                                        ),
                                       ),
-                                      child: Icon(
-                                        Icons.delete_rounded,
-                                        color: Colors.white.withValues(alpha: 0.92),
-                                      ),
-                                    ),
                                     onDismissed: (_) {
                                       notificationsRepository.deleteNotification(n.id);
                                       ScaffoldMessenger.of(context).showSnackBar(
@@ -224,23 +223,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         }).toList();
 
         if (filtered.isEmpty) {
-          return Glass(
-            radius: BorderRadius.circular(24),
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              l10n.notificationsEmpty,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.75),
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          );
+          return _NotificationsEmptyState(message: l10n.notificationsEmpty);
         }
 
         return ListView.separated(
           physics: const BouncingScrollPhysics(),
           itemCount: filtered.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 12),
+          separatorBuilder: (_, __) => const SizedBox(height: S.sm),
           itemBuilder: (_, i) {
             final n = filtered[i];
 
@@ -249,15 +238,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               direction: DismissDirection.endToStart,
               background: Container(
                 alignment: Alignment.centerRight,
-                padding: const EdgeInsets.only(right: 16),
+                padding: const EdgeInsets.only(right: S.md),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  color: Colors.redAccent.withValues(alpha: 0.18),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                  color: Theme.of(context).colorScheme.error.withValues(alpha: 0.18),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+                  ),
                 ),
                 child: Icon(
                   Icons.delete_rounded,
-                  color: Colors.white.withValues(alpha: 0.92),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92),
                 ),
               ),
               onDismissed: (_) {
@@ -447,9 +438,10 @@ class _Tabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(999),
-      padding: const EdgeInsets.all(6),
+      padding: const EdgeInsets.all(S.xs),
       child: Row(
         children: tabs.map((t) {
           final selected = t.value == value;
@@ -461,16 +453,20 @@ class _Tabs extends StatelessWidget {
                 height: 38,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  color: selected ? Colors.white.withValues(alpha: 0.14) : Colors.transparent,
+                  color: selected ? scheme.primary.withValues(alpha: 0.16) : Colors.transparent,
                   border: Border.all(
-                    color: selected ? Colors.white.withValues(alpha: 0.22) : Colors.transparent,
+                    color: selected
+                        ? scheme.primary.withValues(alpha: 0.35)
+                        : Colors.transparent,
                   ),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   t.label,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: selected ? 0.95 : 0.65),
+                    color: selected
+                        ? scheme.onSurface.withValues(alpha: 0.95)
+                        : scheme.onSurface.withValues(alpha: 0.65),
                     fontWeight: FontWeight.w900,
                     fontSize: 12,
                   ),
@@ -501,6 +497,8 @@ class _NotifCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final icon = _iconFor(n.type);
     final label = _labelFor(context, n.type);
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Glass(
       radius: BorderRadius.circular(24),
@@ -509,12 +507,12 @@ class _NotifCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+          padding: const EdgeInsets.fromLTRB(S.sm, S.sm, S.sm, S.sm),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _IconBubble(icon: icon, isRead: n.isRead),
-              const SizedBox(width: 12),
+              const SizedBox(width: S.sm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -523,42 +521,39 @@ class _NotifCard extends StatelessWidget {
                       children: [
                         Text(
                           label,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.65),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: scheme.onSurface.withValues(alpha: 0.65),
                             fontWeight: FontWeight.w800,
-                            fontSize: 12,
                           ),
                         ),
                         const Spacer(),
                         Text(
                           _fmtTime(context, n.time),
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.55),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: scheme.onSurface.withValues(alpha: 0.55),
                             fontWeight: FontWeight.w800,
-                            fontSize: 12,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: S.xs),
                     Text(
                       n.title,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: n.isRead ? 0.85 : 1),
+                      style: textTheme.titleMedium?.copyWith(
+                        color: scheme.onSurface.withValues(alpha: n.isRead ? 0.85 : 1),
                         fontWeight: FontWeight.w900,
-                        fontSize: 15,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: S.xxs),
                     Text(
                       n.body,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.65),
+                      style: textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurface.withValues(alpha: 0.65),
                         fontWeight: FontWeight.w700,
                         height: 1.2,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: S.sm),
                     _ActionRow(
                       n: n,
                       onPrimary: onPrimaryAction,
@@ -567,17 +562,17 @@ class _NotifCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: S.sm),
               if (!n.isRead)
                 Container(
                   width: 10,
                   height: 10,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color(0xFF2AFADF),
+                    color: scheme.secondary,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF7C7CFF).withValues(alpha: 0.35),
+                        color: scheme.primary.withValues(alpha: 0.35),
                         blurRadius: 14,
                         spreadRadius: 1,
                       ),
@@ -681,23 +676,23 @@ class _ChipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.xs),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: Colors.black.withValues(alpha: 0.16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          color: scheme.surfaceContainerHighest.withValues(alpha: 0.7),
+          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
         ),
         child: Text(
           label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.92),
-            fontWeight: FontWeight.w900,
-            fontSize: 12.5,
-          ),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: scheme.onSurface.withValues(alpha: 0.92),
+                fontWeight: FontWeight.w900,
+              ),
         ),
       ),
     );
@@ -711,15 +706,135 @@ class _IconBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 44,
       height: 44,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: Colors.white.withValues(alpha: isRead ? 0.06 : 0.10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        color: scheme.surfaceContainerHighest.withValues(alpha: isRead ? 0.5 : 0.75),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
       ),
-      child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 22),
+      child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92), size: 22),
+    );
+  }
+}
+
+class _NotificationsEmptyState extends StatelessWidget {
+  final String message;
+  const _NotificationsEmptyState({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Glass(
+      radius: BorderRadius.circular(24),
+      padding: const EdgeInsets.all(S.lg),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.notifications_none_rounded, color: scheme.primary, size: 28),
+          const SizedBox(height: S.sm),
+          Text(
+            message,
+            style: textTheme.titleMedium?.copyWith(
+              color: scheme.onSurface.withValues(alpha: 0.9),
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: S.xs),
+          Text(
+            AppLocalizations.of(context).notificationsTabAll,
+            style: textTheme.bodySmall?.copyWith(
+              color: scheme.onSurface.withValues(alpha: 0.6),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NotificationsSkeleton extends StatelessWidget {
+  const _NotificationsSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      physics: const BouncingScrollPhysics(),
+      itemCount: 4,
+      separatorBuilder: (_, __) => const SizedBox(height: S.sm),
+      itemBuilder: (context, index) => const _NotificationsSkeletonCard(),
+    );
+  }
+}
+
+class _NotificationsSkeletonCard extends StatelessWidget {
+  const _NotificationsSkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.3, end: 0.7),
+      duration: const Duration(milliseconds: 900),
+      curve: Curves.easeInOut,
+      builder: (context, value, child) {
+        final base = scheme.onSurface.withValues(alpha: 0.08 + (0.06 * value));
+        return Container(
+          padding: const EdgeInsets.all(S.sm),
+          decoration: BoxDecoration(
+            color: base,
+            borderRadius: BorderRadius.circular(24),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: base.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              const SizedBox(width: S.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _SkeletonLine(width: 120, color: base.withValues(alpha: 0.9)),
+                    const SizedBox(height: S.xs),
+                    _SkeletonLine(width: 200, color: base.withValues(alpha: 0.8)),
+                    const SizedBox(height: S.xs),
+                    _SkeletonLine(width: 160, color: base.withValues(alpha: 0.7)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SkeletonLine extends StatelessWidget {
+  final double width;
+  final Color color;
+  const _SkeletonLine({required this.width, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: 10,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(999),
+      ),
     );
   }
 }

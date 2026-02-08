@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../features/info/about_screen.dart';
 import '../../data/settings_repository.dart';
 import '../../data/auth_repository.dart';
-// Note: EditProfileScreen, PrivacySettingsScreen, SecuritySettingsScreen are needed
-// Assuming imports work, if not I'll fix them.
 import 'edit_profile_screen.dart';
 import 'privacy_settings_screen.dart';
 import 'security_settings_screen.dart';
 import '../../data/profile_store.dart';
 import '../auth/welcome_screen.dart';
+import '../../core/services/theme_mode_controller.dart';
+import '../../core/theme/spacing.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -37,13 +38,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     _settingsStream = settingsRepository.getSettingsStream();
+    _guestThemeMode = themeModeController.modeSettingValue;
+    themeModeController.addListener(_handleThemeModeChange);
+  }
+
+  @override
+  void dispose() {
+    themeModeController.removeListener(_handleThemeModeChange);
+    super.dispose();
+  }
+
+  void _handleThemeModeChange() {
+    if (!mounted) return;
+    setState(() => _guestThemeMode = themeModeController.modeSettingValue);
   }
 
   Future<void> _pickTimerSeconds({required int current, required ValueChanged<int> onSelected}) async {
     final options = [10, 15, 20, 25, 30];
     final result = await showModalBottomSheet<int>(
       context: context,
-      backgroundColor: const Color(0xFF1A1630),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => _BottomSheetList<int>(
         title: AppLocalizations.of(context).settingsDefaultTimerPerQuestion,
@@ -64,7 +78,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ];
     final result = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: const Color(0xFF1A1630),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => _BottomSheetList<String>(
         title: AppLocalizations.of(context).settingsMatchDifficulty,
@@ -80,7 +94,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final options = ["08:00", "12:00", "17:00", "20:00", "22:00"];
     final result = await showModalBottomSheet<String>(
       context: context,
-      backgroundColor: const Color(0xFF1A1630),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => _BottomSheetList<String>(
         title: AppLocalizations.of(context).settingsDailyReminder,
@@ -94,38 +108,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showSupportSheet() {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: const Color(0xFF1A1630),
+      backgroundColor: scheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+        padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               l10n.settingsSupport,
-              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+              style: TextStyle(color: scheme.onSurface, fontSize: 18, fontWeight: FontWeight.w900),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: S.xs),
             Text(
               "Reach us any time for help, feedback, or account support.",
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
+              style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: S.md),
             Text(
               "support@soma.app",
-              style: const TextStyle(color: Color(0xFF2AFADF), fontWeight: FontWeight.w800),
+              style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w800),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: S.xs),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: () => Navigator.pop(ctx),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
+                  foregroundColor: scheme.onSurface,
+                  side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.4)),
                 ),
                 child: const Text("Close"),
               ),
@@ -201,10 +216,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       physics: const BouncingScrollPhysics(),
       children: [
         _SectionTitle(l10n.settingsSectionGameplay),
-        const SizedBox(height: 10),
+        const SizedBox(height: S.xs),
         Glass(
           radius: BorderRadius.circular(22),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(S.sm),
           child: Column(
             children: [
               _ToggleRow(
@@ -245,12 +260,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: S.md),
         _SectionTitle(l10n.settingsSectionSoundFeel),
-        const SizedBox(height: 10),
+        const SizedBox(height: S.xs),
         Glass(
           radius: BorderRadius.circular(22),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(S.sm),
           child: Column(
             children: [
               _ToggleRow(
@@ -276,12 +291,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: S.md),
         _SectionTitle(l10n.settingsSectionNotifications),
-        const SizedBox(height: 10),
+        const SizedBox(height: S.xs),
         Glass(
           radius: BorderRadius.circular(22),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(S.sm),
           child: Column(
             children: [
               _ToggleRow(
@@ -303,12 +318,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: S.md),
         _SectionTitle(l10n.settingsSectionAppearance),
-        const SizedBox(height: 10),
+        const SizedBox(height: S.xs),
         Glass(
           radius: BorderRadius.circular(22),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(S.sm),
           child: Column(
             children: [
               _DropdownRow(
@@ -316,7 +331,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 label: l10n.settingsTheme,
                 value: guestThemeValue,
                 items: themeItems,
-                onChanged: (v) => setState(() => _guestThemeMode = v),
+                onChanged: (v) {
+                  setState(() => _guestThemeMode = v);
+                  themeModeController.setModeFromSetting(v);
+                },
               ),
               _DividerSoft(),
               _DropdownRow(
@@ -329,12 +347,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: S.md),
         _SectionTitle(l10n.settingsSectionAbout),
-        const SizedBox(height: 10),
+        const SizedBox(height: S.xs),
         Glass(
           radius: BorderRadius.circular(22),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(S.sm),
           child: Column(
             children: [
               _NavRow(
@@ -358,7 +376,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: S.xxl),
       ],
     );
   }
@@ -413,14 +431,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+            padding: const EdgeInsets.fromLTRB(S.md, S.sm, S.md, S.md),
             child: Column(
               children: [
                 _TopBar(
                   title: l10n.settingsTitle,
                   onBack: () => Navigator.pop(context),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: S.sm),
 
                 Expanded(
                   child: isGuest ? _buildGuestSettings(context) : StreamBuilder<Map<String, dynamic>>(
@@ -457,10 +475,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         physics: const BouncingScrollPhysics(),
                         children: [
                           _SectionTitle(l10n.settingsSectionAccount),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: S.xs),
                           Glass(
                             radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(S.sm),
                             child: Column(
                               children: [
                                 _NavRow(
@@ -499,12 +517,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: S.md),
                           _SectionTitle(l10n.settingsSectionGameplay),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: S.xs),
                           Glass(
                             radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(S.sm),
                             child: Column(
                               children: [
                                 _ToggleRow(
@@ -546,12 +564,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: S.md),
                           _SectionTitle(l10n.settingsSectionSoundFeel),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: S.xs),
                           Glass(
                             radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(S.sm),
                             child: Column(
                               children: [
                                 _ToggleRow(
@@ -578,12 +596,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: S.md),
                           _SectionTitle(l10n.settingsSectionNotifications),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: S.xs),
                           Glass(
                             radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(S.sm),
                             child: Column(
                               children: [
                                 _ToggleRow(
@@ -606,12 +624,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: S.md),
                           _SectionTitle(l10n.settingsSectionAppearance),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: S.xs),
                           Glass(
                             radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(S.sm),
                             child: Column(
                               children: [
                                 _DropdownRow(
@@ -619,7 +637,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   label: l10n.settingsTheme,
                                   value: themeModeValue,
                                   items: themeItems,
-                                  onChanged: (v) => settingsRepository.updateSetting('theme_mode', v),
+                                  onChanged: (v) {
+                                    settingsRepository.updateSetting('theme_mode', v);
+                                    themeModeController.setModeFromSetting(v);
+                                  },
                                 ),
                                 _DividerSoft(),
                                 _DropdownRow(
@@ -633,12 +654,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: S.md),
                           _SectionTitle(l10n.settingsSectionAbout),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: S.xs),
                           Glass(
                             radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(S.sm),
                             child: Column(
                               children: [
                                 _NavRow(
@@ -663,10 +684,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
 
-                          const SizedBox(height: 16),
+                          const SizedBox(height: S.md),
                           Glass(
                             radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(S.sm),
                             child: _DangerRow(
                               icon: Icons.logout_rounded,
                               label: l10n.settingsLogout,
@@ -682,7 +703,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
 
-                          const SizedBox(height: 28),
+                          const SizedBox(height: S.xxl),
                         ],
                       );
                     }
@@ -705,21 +726,21 @@ class _TopBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         GestureDetector(
           onTap: onBack,
           child: Glass(
             radius: BorderRadius.circular(16),
-            padding: const EdgeInsets.all(10),
-            child: Icon(Icons.arrow_back_rounded, color: Colors.white.withValues(alpha: 0.9)),
+            padding: const EdgeInsets.all(S.xs),
+            child: Icon(Icons.arrow_back_rounded, color: scheme.onSurface.withValues(alpha: 0.9)),
           ),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: S.sm),
         Text(
           title,
           style: const TextStyle(
-            color: Colors.white,
             fontSize: 22,
             fontWeight: FontWeight.w800,
           ),
@@ -735,13 +756,14 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Text(
       text,
       style: TextStyle(
-        color: Colors.white.withValues(alpha: 0.85),
-        fontSize: 14,
-        fontWeight: FontWeight.w800,
-        letterSpacing: 0.2,
+        color: scheme.onSurface.withValues(alpha: 0.7),
+        fontSize: 13.5,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.3,
       ),
     );
   }
@@ -750,7 +772,8 @@ class _SectionTitle extends StatelessWidget {
 class _DividerSoft extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Divider(height: 1, thickness: 1, color: Colors.white.withValues(alpha: 0.10));
+    final scheme = Theme.of(context).colorScheme;
+    return Divider(height: 1, thickness: 1, color: scheme.onSurface.withValues(alpha: 0.08));
   }
 }
 
@@ -769,21 +792,25 @@ class _NavRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onTap();
+      },
       borderRadius: BorderRadius.circular(18),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.sm),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white.withValues(alpha: 0.9)),
-            const SizedBox(width: 12),
+            Icon(icon, color: scheme.onSurface.withValues(alpha: 0.9)),
+            const SizedBox(width: S.sm),
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.5,
+                style: TextStyle(
+                  color: scheme.onSurface,
+                  fontSize: 14,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -792,13 +819,13 @@ class _NavRow extends StatelessWidget {
               Text(
                 trailingText!,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontSize: 13,
+                  color: scheme.onSurface.withValues(alpha: 0.6),
+                  fontSize: 12.5,
                   fontWeight: FontWeight.w700,
                 ),
               ),
-            const SizedBox(width: 6),
-            Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.5)),
+            const SizedBox(width: S.xs),
+            Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.45)),
           ],
         ),
       ),
@@ -821,26 +848,29 @@ class _ToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.xs),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white.withValues(alpha: 0.9)),
-          const SizedBox(width: 12),
+          Icon(icon, color: scheme.onSurface.withValues(alpha: 0.9)),
+          const SizedBox(width: S.sm),
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14.5,
+              style: TextStyle(
+                color: scheme.onSurface,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
               ),
             ),
           ),
           Switch(
             value: value,
-            onChanged: onChanged,
-            activeThumbColor: const Color(0xFF2AFADF),
+            onChanged: (next) {
+              HapticFeedback.selectionClick();
+              onChanged(next);
+            },
           ),
         ],
       ),
@@ -865,28 +895,29 @@ class _DropdownRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.xs),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white.withValues(alpha: 0.9)),
-          const SizedBox(width: 12),
+          Icon(icon, color: scheme.onSurface.withValues(alpha: 0.9)),
+          const SizedBox(width: S.sm),
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14.5,
+              style: TextStyle(
+                color: scheme.onSurface,
+                fontSize: 14,
                 fontWeight: FontWeight.w700,
               ),
             ),
           ),
           DropdownButton<String>(
             value: value,
-            dropdownColor: const Color(0xFF1A1630),
+            dropdownColor: scheme.surface,
             underline: const SizedBox.shrink(),
-            iconEnabledColor: Colors.white.withValues(alpha: 0.8),
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+            iconEnabledColor: scheme.onSurface.withValues(alpha: 0.8),
+            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
             items: items
                 .map((e) => DropdownMenuItem<String>(
                       value: e.value,

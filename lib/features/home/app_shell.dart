@@ -33,22 +33,23 @@ class _AppShellState extends State<AppShell> {
 
   Future<void> _showAuthRequiredDialog() async {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     await showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1C1C1C),
+        backgroundColor: scheme.surface,
         title: Text(
           l10n.dialogAuthRequiredTitle,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900),
+          style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
         ),
         content: Text(
           l10n.dialogAuthRequiredBody,
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontWeight: FontWeight.w600),
+          style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.w600),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.notNow, style: TextStyle(color: Colors.white.withValues(alpha: 0.75))),
+            child: Text(l10n.notNow, style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75))),
           ),
           TextButton(
             onPressed: () {
@@ -58,7 +59,7 @@ class _AppShellState extends State<AppShell> {
                 MaterialPageRoute(builder: (_) => const SignInScreen()),
               );
             },
-            child: Text(l10n.signIn, style: const TextStyle(color: Color(0xFF2AFADF), fontWeight: FontWeight.w800)),
+            child: Text(l10n.signIn, style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w800)),
           ),
           TextButton(
             onPressed: () {
@@ -68,7 +69,7 @@ class _AppShellState extends State<AppShell> {
                 MaterialPageRoute(builder: (_) => const SignUpScreen()),
               );
             },
-            child: Text(l10n.signUp, style: const TextStyle(color: Color(0xFFFF4ECD), fontWeight: FontWeight.w800)),
+            child: Text(l10n.signUp, style: TextStyle(color: scheme.tertiary, fontWeight: FontWeight.w800)),
           ),
         ],
       ),

@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import '../theme/tokens.dart';
 
 class Glass extends StatelessWidget {
@@ -16,18 +17,23 @@ class Glass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final glass = Theme.of(context).extension<GlassTheme>();
+    final fill = glass?.fill ?? T.glassFill;
+    final stroke = glass?.stroke ?? T.glassStroke;
+    final shadow = glass?.shadow ?? const Color(0x7A000000);
+
     return ClipRRect(
       borderRadius: radius,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: T.glassFill,
+            color: fill,
             borderRadius: radius,
-            border: Border.all(color: T.glassStroke, width: 1),
-            boxShadow: const [
+            border: Border.all(color: stroke, width: 1),
+            boxShadow: [
               BoxShadow(
-                color: Color(0x7A000000),
+                color: shadow,
                 blurRadius: 28,
                 offset: Offset(0, 16),
               ),
