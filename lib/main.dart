@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'core/theme/tokens.dart';
 import 'features/auth/splash_screen.dart';
+import 'core/widgets/soma_background.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -83,12 +84,24 @@ class App extends StatelessWidget {
         textTheme: GoogleFonts.poppinsTextTheme(
           base.textTheme,
         ).apply(bodyColor: T.textHi, displayColor: T.textHi),
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: <TargetPlatform, PageTransitionsBuilder>{
+            TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.iOS: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.macOS: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
+            TargetPlatform.fuchsia: FadeUpwardsPageTransitionsBuilder(),
+          },
+        ),
       ),
       builder: (context, child) {
         if (child == null) return const SizedBox.shrink();
         final media = MediaQuery.of(context);
         final scale = _uiScaleFor(media);
-        if (scale == 1.0) return child;
+        if (scale == 1.0) {
+          return SomaBackground(child: child);
+        }
 
         final baseTextScale = media.textScaler.scale(1.0);
         final scaledMedia = media.copyWith(
@@ -100,15 +113,17 @@ class App extends StatelessWidget {
           textScaler: TextScaler.linear(baseTextScale * scale),
         );
 
-        return MediaQuery(
-          data: scaledMedia,
-          child: Transform.scale(
-            scale: scale,
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-              width: media.size.width / scale,
-              height: media.size.height / scale,
-              child: child,
+        return SomaBackground(
+          child: MediaQuery(
+            data: scaledMedia,
+            child: Transform.scale(
+              scale: scale,
+              alignment: Alignment.topCenter,
+              child: SizedBox(
+                width: media.size.width / scale,
+                height: media.size.height / scale,
+                child: child,
+              ),
             ),
           ),
         );

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/motion.dart';
 import '../../core/widgets/soma_background.dart';
 import '../../core/widgets/glass.dart';
+import '../../core/widgets/staggered_in.dart';
 import '../../data/chat_repository.dart';
 
 class DmChatScreen extends StatefulWidget {
@@ -55,12 +57,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
     // Stream will handle UI update.
 
     // Scroll to bottom after a bit
-    Future.delayed(const Duration(milliseconds: 300), () {
+    Future.delayed(MotionTokens.delayShort, () {
       if (mounted && _scroll.hasClients) {
         _scroll.animateTo(
           _scroll.position.maxScrollExtent + 100,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
+          duration: MotionTokens.short,
+          curve: MotionTokens.standardCurve,
         );
       }
     });
@@ -131,19 +133,22 @@ class _DmChatScreenState extends State<DmChatScreen> {
                             }
                           }
 
-                          return Column(
-                            children: [
-                              if (showTime) ...[
-                                const SizedBox(height: 6),
-                                _TimeChip(time: _fmtTime(created)),
-                                const SizedBox(height: 8),
+                          return StaggeredIn(
+                            index: i,
+                            child: Column(
+                              children: [
+                                if (showTime) ...[
+                                  const SizedBox(height: 6),
+                                  _TimeChip(time: _fmtTime(created)),
+                                  const SizedBox(height: 8),
+                                ],
+                                _Bubble(
+                                  text: m['content'] ?? "",
+                                  isMe: isMe,
+                                ),
+                                const SizedBox(height: 10),
                               ],
-                              _Bubble(
-                                text: m['content'] ?? "",
-                                isMe: isMe,
-                              ),
-                              const SizedBox(height: 10),
-                            ],
+                            ),
                           );
                         },
                       );

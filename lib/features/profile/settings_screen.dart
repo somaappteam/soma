@@ -30,11 +30,121 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _guestNotifications = true;
   String _guestThemeMode = "System";
   String _guestLanguageUi = "English";
+  int _guestTimerSeconds = 15;
+  String _guestDifficulty = "Adaptive";
+  String _guestDailyReminder = "20:00";
 
   @override
   void initState() {
     super.initState();
     _settingsStream = settingsRepository.getSettingsStream();
+  }
+
+  Future<void> _pickTimerSeconds({required int current, required ValueChanged<int> onSelected}) async {
+    final options = [10, 15, 20, 25, 30];
+    final result = await showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: const Color(0xFF1A1630),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => _BottomSheetList<int>(
+        title: AppLocalizations.of(context).settingsDefaultTimerPerQuestion,
+        options: options,
+        current: current,
+        labelBuilder: (value) => "${value}s",
+      ),
+    );
+    if (result != null) onSelected(result);
+  }
+
+  Future<void> _pickDifficulty({required String current, required ValueChanged<String> onSelected}) async {
+    final options = <_BottomSheetOption<String>>[
+      const _BottomSheetOption(value: "Adaptive", label: "Adaptive"),
+      const _BottomSheetOption(value: "Easy", label: "Easy"),
+      const _BottomSheetOption(value: "Medium", label: "Medium"),
+      const _BottomSheetOption(value: "Hard", label: "Hard"),
+    ];
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: const Color(0xFF1A1630),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => _BottomSheetList<String>(
+        title: AppLocalizations.of(context).settingsMatchDifficulty,
+        options: options.map((o) => o.value).toList(),
+        current: current,
+        labelBuilder: (value) => options.firstWhere((o) => o.value == value).label,
+      ),
+    );
+    if (result != null) onSelected(result);
+  }
+
+  Future<void> _pickDailyReminder({required String current, required ValueChanged<String> onSelected}) async {
+    final options = ["08:00", "12:00", "17:00", "20:00", "22:00"];
+    final result = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: const Color(0xFF1A1630),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => _BottomSheetList<String>(
+        title: AppLocalizations.of(context).settingsDailyReminder,
+        options: options,
+        current: current,
+        labelBuilder: _formatTime,
+      ),
+    );
+    if (result != null) onSelected(result);
+  }
+
+  void _showSupportSheet() {
+    final l10n = AppLocalizations.of(context);
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFF1A1630),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.settingsSupport,
+              style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              "Reach us any time for help, feedback, or account support.",
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              "support@soma.app",
+              style: const TextStyle(color: Color(0xFF2AFADF), fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () => Navigator.pop(ctx),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: BorderSide(color: Colors.white.withValues(alpha: 0.4)),
+                ),
+                child: const Text("Close"),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatTime(String value) {
+    final parts = value.split(':');
+    if (parts.length != 2) return value;
+    final hour = int.tryParse(parts[0]) ?? 0;
+    final minute = parts[1];
+    final period = hour >= 12 ? "PM" : "AM";
+    final normalized = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    return "$normalized:$minute $period";
   }
 
   Widget _buildGuestSettings(BuildContext context) {
@@ -83,15 +193,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _NavRow(
                 icon: Icons.timer_rounded,
                 label: l10n.settingsDefaultTimerPerQuestion,
-                trailingText: "15s",
-                onTap: () {},
+                trailingText: "${_guestTimerSeconds}s",
+                onTap: () => _pickTimerSeconds(
+                  current: _guestTimerSeconds,
+                  onSelected: (value) => setState(() => _guestTimerSeconds = value),
+                ),
               ),
               _DividerSoft(),
               _NavRow(
                 icon: Icons.bar_chart_rounded,
                 label: l10n.settingsMatchDifficulty,
-                trailingText: l10n.settingsMatchDifficultyAdaptive,
-                onTap: () {},
+                trailingText: _guestDifficulty == "Adaptive"
+                    ? l10n.settingsMatchDifficultyAdaptive
+                    : _guestDifficulty,
+                onTap: () => _pickDifficulty(
+                  current: _guestDifficulty,
+                  onSelected: (value) => setState(() => _guestDifficulty = value),
+                ),
               ),
             ],
           ),
@@ -145,8 +263,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _NavRow(
                 icon: Icons.schedule_rounded,
                 label: l10n.settingsDailyReminder,
-                trailingText: "8:00 PM",
-                onTap: () {},
+                trailingText: _formatTime(_guestDailyReminder),
+                onTap: () => _pickDailyReminder(
+                  current: _guestDailyReminder,
+                  onSelected: (value) => setState(() => _guestDailyReminder = value),
+                ),
               ),
             ],
           ),
@@ -201,7 +322,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _NavRow(
                 icon: Icons.support_agent_rounded,
                 label: l10n.settingsSupport,
-                onTap: () {},
+                onTap: _showSupportSheet,
               ),
             ],
           ),
@@ -253,6 +374,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       final haptics = data['haptics_enabled'] ?? true;
                        
                       final notifications = data['push_notifications'] ?? true;
+                      final timerSeconds = (data['default_timer_s'] as num?)?.toInt() ?? 15;
+                      final difficulty = data['match_difficulty']?.toString() ?? "Adaptive";
+                      final dailyReminder = data['daily_reminder']?.toString() ?? "20:00";
                        
                       final themeMode = data['theme_mode'] ?? "System";
                       final languageUi = data['language_ui'] ?? "English";
@@ -338,15 +462,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 _NavRow(
                                   icon: Icons.timer_rounded,
                                   label: l10n.settingsDefaultTimerPerQuestion,
-                                  trailingText: "15s",
-                                  onTap: () {},
+                                  trailingText: "${timerSeconds}s",
+                                  onTap: () => _pickTimerSeconds(
+                                    current: timerSeconds,
+                                    onSelected: (value) => settingsRepository.updateSetting('default_timer_s', value),
+                                  ),
                                 ),
                                 _DividerSoft(),
                                 _NavRow(
                                   icon: Icons.bar_chart_rounded,
                                   label: l10n.settingsMatchDifficulty,
-                                  trailingText: l10n.settingsMatchDifficultyAdaptive,
-                                  onTap: () {},
+                                  trailingText: difficulty == "Adaptive"
+                                      ? l10n.settingsMatchDifficultyAdaptive
+                                      : difficulty,
+                                  onTap: () => _pickDifficulty(
+                                    current: difficulty,
+                                    onSelected: (value) => settingsRepository.updateSetting('match_difficulty', value),
+                                  ),
                                 ),
                               ],
                             ),
@@ -402,8 +534,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 _NavRow(
                                   icon: Icons.schedule_rounded,
                                   label: l10n.settingsDailyReminder,
-                                  trailingText: "8:00 PM",
-                                  onTap: () {},
+                                  trailingText: _formatTime(dailyReminder),
+                                  onTap: () => _pickDailyReminder(
+                                    current: dailyReminder,
+                                    onSelected: (value) => settingsRepository.updateSetting('daily_reminder', value),
+                                  ),
                                 ),
                               ],
                             ),
@@ -460,7 +595,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 _NavRow(
                                   icon: Icons.support_agent_rounded,
                                   label: l10n.settingsSupport,
-                                  onTap: () {},
+                                  onTap: _showSupportSheet,
                                 ),
                               ],
                             ),
@@ -712,6 +847,63 @@ class _DropdownItem {
   final String value;
   final String label;
   const _DropdownItem(this.value, this.label);
+}
+
+class _BottomSheetOption<T> {
+  final T value;
+  final String label;
+  const _BottomSheetOption({required this.value, required this.label});
+}
+
+class _BottomSheetList<T> extends StatelessWidget {
+  final String title;
+  final List<T> options;
+  final T current;
+  final String Function(T value) labelBuilder;
+
+  const _BottomSheetList({
+    required this.title,
+    required this.options,
+    required this.current,
+    required this.labelBuilder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18),
+            ),
+            const SizedBox(height: 12),
+            ...options.map((value) {
+              final selected = value == current;
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  labelBuilder(value),
+                  style: TextStyle(
+                    color: selected ? const Color(0xFF2AFADF) : Colors.white,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                trailing: selected
+                    ? const Icon(Icons.check_rounded, color: Color(0xFF2AFADF))
+                    : const SizedBox.shrink(),
+                onTap: () => Navigator.pop(context, value),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _DangerRow extends StatelessWidget {

@@ -3,8 +3,10 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/soma_background.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
+import '../../core/widgets/reward_sparkle.dart';
 import 'settings_screen.dart';
 import '../../core/theme/tokens.dart';
+import '../../core/theme/motion.dart';
 import '../../data/auth_repository.dart';
 import '../../data/profile_repository.dart';
 import '../../data/profile_store.dart';
@@ -477,6 +479,9 @@ class _HeaderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final heroTag = profile.id != null && profile.id!.isNotEmpty
+        ? "profile-avatar-${profile.id}"
+        : "profile-avatar-${profile.username}";
     return Glass(
       radius: BorderRadius.circular(22),
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -484,11 +489,14 @@ class _HeaderCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _AvatarGlow(
-                size: 64,
-                image: (profile.avatarUrl?.isNotEmpty == true)
-                    ? NetworkImage(profile.avatarUrl!) as ImageProvider
-                    : const AssetImage("assets/avatar/avatar_1.png"),
+              Hero(
+                tag: heroTag,
+                child: _AvatarGlow(
+                  size: 64,
+                  image: (profile.avatarUrl?.isNotEmpty == true)
+                      ? NetworkImage(profile.avatarUrl!) as ImageProvider
+                      : const AssetImage("assets/avatar/avatar_1.png"),
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -547,13 +555,27 @@ class _HeaderCard extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    Text(
-                      l10n.profileXpValue(profile.totalXp),
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.75),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    Row(
+                      children: [
+                        TweenAnimationBuilder<double>(
+                          tween: Tween(begin: 0.98, end: 1.0),
+                          duration: MotionTokens.short,
+                          curve: MotionTokens.standardCurve,
+                          builder: (context, value, child) {
+                            return Transform.scale(scale: value, child: child);
+                          },
+                          child: Text(
+                            l10n.profileXpValue(profile.totalXp),
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.75),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        RewardSparkle(show: profile.totalXp > 0, size: 14),
+                      ],
                     ),
                   ],
                 ),

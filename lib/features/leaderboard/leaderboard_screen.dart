@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/soma_background.dart';
 import '../../core/widgets/glass.dart';
+import '../../core/widgets/pressable_scale.dart';
+import '../../core/widgets/staggered_in.dart';
 import '../../data/leaderboard_repository.dart';
+import '../profile/profile_screen.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({super.key});
@@ -76,65 +79,82 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           final avatarUrl = user['avatar_url']?.toString();
                           final displayName = user['display_name']?.toString();
                           final username = user['username']?.toString();
+                          final userId = user['id']?.toString() ?? user['user_id']?.toString();
                           final name = (displayName != null && displayName.trim().isNotEmpty)
                               ? displayName
                               : (username?.isNotEmpty == true ? username! : l10n.userFallbackName);
                           
-                          return Glass(
-                            radius: BorderRadius.circular(18),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            child: Row(
-                              children: [
-                                SizedBox(
-                                  width: 30,
-                                  child: Text(
-                                    "#$rank",
-                                    style: TextStyle(
-                                      color: isTop3 ? const Color(0xFF58F7B6) : Colors.white.withValues(alpha: 0.5),
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 16,
+                          return StaggeredIn(
+                            index: index,
+                            child: PressableScale(
+                              onTap: userId == null
+                                  ? null
+                                  : () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (_) => ProfileScreen(userId: userId)),
+                                      );
+                                    },
+                              child: Glass(
+                                radius: BorderRadius.circular(18),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: 30,
+                                      child: Text(
+                                        "#$rank",
+                                        style: TextStyle(
+                                          color: isTop3 ? const Color(0xFF58F7B6) : Colors.white.withValues(alpha: 0.5),
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 16,
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Container(
-                                  width: 40,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white.withValues(alpha: 0.1),
-                                  ),
-                                  child: (avatarUrl != null && avatarUrl.trim().isNotEmpty)
-                                      ? ClipOval(
-                                          child: Image.network(
-                                            avatarUrl,
-                                            width: 40,
-                                            height: 40,
-                                            fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white),
-                                          ),
-                                        )
-                                      : const Icon(Icons.person, color: Colors.white),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    name,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16,
+                                    Hero(
+                                      tag: userId == null ? "leader-avatar-$rank" : "profile-avatar-$userId",
+                                      child: Container(
+                                        width: 40,
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.white.withValues(alpha: 0.1),
+                                        ),
+                                        child: (avatarUrl != null && avatarUrl.trim().isNotEmpty)
+                                            ? ClipOval(
+                                                child: Image.network(
+                                                  avatarUrl,
+                                                  width: 40,
+                                                  height: 40,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white),
+                                                ),
+                                              )
+                                            : const Icon(Icons.person, color: Colors.white),
+                                      ),
                                     ),
-                                  ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        name,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      l10n.profileXpValue(user['xp'] ?? 0),
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.9),
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  l10n.profileXpValue(user['xp'] ?? 0),
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.9),
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           );
                         },

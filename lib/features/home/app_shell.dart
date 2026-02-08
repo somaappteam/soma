@@ -7,6 +7,8 @@ import '../auth/sign_up_screen.dart';
 import '../circles/circles_screen.dart';
 import 'home_screen.dart';
 import '../profile/profile_screen.dart';
+import '../../core/theme/motion.dart';
+import '../../core/widgets/pressable_scale.dart';
 import '../../core/widgets/responsive.dart';
 
 class AppShell extends StatefulWidget {
@@ -81,10 +83,10 @@ class _AppShellState extends State<AppShell> {
       const ProfileScreen(),
     ];
     final activePage = AnimatedSwitcher(
-      duration: const Duration(milliseconds: 420),
-      reverseDuration: const Duration(milliseconds: 300),
-      switchInCurve: Curves.easeOutCubic,
-      switchOutCurve: Curves.easeInCubic,
+      duration: MotionTokens.pageIn,
+      reverseDuration: MotionTokens.pageOut,
+      switchInCurve: MotionTokens.pageInCurve,
+      switchOutCurve: MotionTokens.pageOutCurve,
       transitionBuilder: (child, animation) {
         final slide = Tween<Offset>(
           begin: const Offset(0, 0.04),
@@ -242,8 +244,7 @@ class _NavItem extends StatelessWidget {
     final bg = selected ? Colors.white.withValues(alpha: 0.12) : Colors.transparent;
     final border = selected ? Colors.white.withValues(alpha: 0.22) : Colors.transparent;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
+    return PressableScale(
       onTap: onTap,
       child: Container(
         padding: padding,
@@ -346,8 +347,7 @@ class _RailItem extends StatelessWidget {
     final bg = selected ? Colors.white.withValues(alpha: 0.12) : Colors.transparent;
     final border = selected ? Colors.white.withValues(alpha: 0.22) : Colors.transparent;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
+    return PressableScale(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),

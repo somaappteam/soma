@@ -4,6 +4,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/soma_background.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
+import '../../core/widgets/staggered_in.dart';
 import '../../models/leaderboard_player.dart';
 import '../../data/circle_voice_service.dart';
 import '../../data/profile_store.dart';
@@ -468,19 +469,22 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               final muted = voice?.muted ?? p.isMuted;
                               final speaking = voice?.speaking ?? p.isSpeaking;
 
-                              return Padding(
-                                padding: EdgeInsets.only(bottom: i == sorted.length - 1 ? 0 : 10),
-                                child: _LeaderboardRow(
-                                  rank: rank,
-                                  name: p.name,
-                                  points: p.points,
-                                  accuracyPct: p.accuracyPct,
-                                  isMe: p.isMe,
-                                  isHost: p.isHost,
-                                  isMuted: muted,
-                                  isSpeaking: speaking,
-                                  lastAnswer: p.lastAnswer,
-                                  onToggleMute: p.isMe ? agoraVoiceService.toggleMuted : null,
+                              return StaggeredIn(
+                                index: i,
+                                child: Padding(
+                                  padding: EdgeInsets.only(bottom: i == sorted.length - 1 ? 0 : 10),
+                                  child: _LeaderboardRow(
+                                    rank: rank,
+                                    name: p.name,
+                                    points: p.points,
+                                    accuracyPct: p.accuracyPct,
+                                    isMe: p.isMe,
+                                    isHost: p.isHost,
+                                    isMuted: muted,
+                                    isSpeaking: speaking,
+                                    lastAnswer: p.lastAnswer,
+                                    onToggleMute: p.isMe ? agoraVoiceService.toggleMuted : null,
+                                  ),
                                 ),
                               );
                             }).toList(),

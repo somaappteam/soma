@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
+import '../../core/theme/motion.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/soma_background.dart';
 import '../../core/widgets/responsive.dart';
+import '../../core/widgets/pressable_scale.dart';
+import '../../core/widgets/staggered_in.dart';
+import '../../core/widgets/reward_sparkle.dart';
 import '../common/results_screen.dart';
 import '../../models/leaderboard_player.dart';
 import '../../data/circles_repository.dart';
@@ -290,6 +295,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     if (revealed || (!isParticipant && !isHost)) return;
     final meKey = _currentUserKey;
     if (meKey == null || _answersByUser.containsKey(meKey)) return;
+    HapticFeedback.selectionClick();
     setState(() => selectedIndex = idx);
     _recordAnswer(meKey, idx);
   }
@@ -325,6 +331,13 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     final meKey = _currentUserKey;
     final myAnswerIndex = _answersByUser[meKey];
     final myAnswerCorrect = myAnswerIndex != null && myAnswerIndex == _correctIndex;
+    if (myAnswerIndex != null) {
+      if (myAnswerCorrect) {
+        HapticFeedback.mediumImpact();
+      } else {
+        HapticFeedback.lightImpact();
+      }
+    }
     
     int newScore = myScore;
     if (myAnswerCorrect) {
@@ -742,16 +755,19 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                         final isCorrect = _correctIndex == i;
                         final showCorrect = revealed;
 
-                        return _AnswerTile(
-                          text: _choices[i],
-                          isSelected: isSelected,
-                          disabled: !canPlay || isLocked,
-                          state: !showCorrect
-                              ? _AnswerState.normal
-                              : (isCorrect
-                                  ? _AnswerState.correct
-                                  : (isSelected ? _AnswerState.wrong : _AnswerState.normal)),
-                          onTap: canPlay ? () => _select(i) : null,
+                        return StaggeredIn(
+                          index: i,
+                          child: _AnswerTile(
+                            text: _choices[i],
+                            isSelected: isSelected,
+                            disabled: !canPlay || isLocked,
+                            state: !showCorrect
+                                ? _AnswerState.normal
+                                : (isCorrect
+                                    ? _AnswerState.correct
+                                    : (isSelected ? _AnswerState.wrong : _AnswerState.normal)),
+                            onTap: canPlay ? () => _select(i) : null,
+                          ),
                         );
                       },
                     ),
@@ -786,18 +802,21 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                           final l = entry.value;
                           return AnimatedPositioned(
                             key: ValueKey(_leaderKey(l)),
-                            duration: const Duration(milliseconds: 350),
-                            curve: Curves.easeInOut,
+                            duration: MotionTokens.medium,
+                            curve: MotionTokens.movementCurve,
                             left: 0,
                             right: 0,
                             top: i * (_leaderRowHeight + _leaderRowSpacing),
-                            child: SizedBox(
-                              height: _leaderRowHeight,
-                              child: _LiveLeaderboardRow(
-                                rank: i + 1,
-                                leader: l,
-                                onToggleMute: l.isMe ? () => _toggleMuteFor(l.name) : null,
-                                onAvatarTap: l.userId != null ? () => _openProfileSheet(l.userId) : null,
+                            child: StaggeredIn(
+                              index: i,
+                              child: SizedBox(
+                                height: _leaderRowHeight,
+                                child: _LiveLeaderboardRow(
+                                  rank: i + 1,
+                                  leader: l,
+                                  onToggleMute: l.isMe ? () => _toggleMuteFor(l.name) : null,
+                                  onAvatarTap: l.userId != null ? () => _openProfileSheet(l.userId) : null,
+                                ),
                               ),
                             ),
                           );
@@ -853,23 +872,39 @@ class _LiveLeaderboardRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final baseColor = leader.isMe ? Colors.white.withValues(alpha: 0.14) : Colors.white.withValues(alpha: 0.08);
     final borderColor = leader.isMe ? Colors.white.withValues(alpha: 0.24) : Colors.white.withValues(alpha: 0.12);
+    final pulse = leader.lastAnswer == LeaderboardAnswer.correct;
 
-    return Container(
+    return AnimatedScale(
+      scale: pulse ? 1.02 : 1,
+      duration: MotionTokens.short,
+      curve: MotionTokens.standardCurve,
+      child: AnimatedContainer(
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: baseColor,
         border: Border.all(color: borderColor),
+        boxShadow: pulse
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF2AFADF).withValues(alpha: 0.35),
+                  blurRadius: 16,
+                  spreadRadius: 1,
+                ),
+              ]
+            : [],
       ),
       child: Row(
         children: [
           _RankChip(rank: rank),
           const SizedBox(width: 10),
-          InkWell(
-            borderRadius: BorderRadius.circular(999),
+          PressableScale(
             onTap: onAvatarTap,
-            child: _AvatarBubble(name: leader.name),
+            child: _AvatarBubble(
+              name: leader.name,
+              heroTag: leader.userId == null ? null : "profile-avatar-${leader.userId}",
+            ),
           ),
           const SizedBox(width: 10),
           if (onToggleMute != null)
@@ -957,6 +992,7 @@ class _LiveLeaderboardRow extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 }
@@ -991,14 +1027,15 @@ class _RankChip extends StatelessWidget {
 
 class _AvatarBubble extends StatelessWidget {
   final String name;
+  final String? heroTag;
 
-  const _AvatarBubble({required this.name});
+  const _AvatarBubble({required this.name, this.heroTag});
 
   @override
   Widget build(BuildContext context) {
     final trimmed = name.trim();
     final initial = trimmed.isNotEmpty ? trimmed.substring(0, 1).toUpperCase() : "?";
-    return Container(
+    final avatar = Container(
       width: 36,
       height: 36,
       decoration: BoxDecoration(
@@ -1025,6 +1062,12 @@ class _AvatarBubble extends StatelessWidget {
         ),
       ),
     );
+
+    if (heroTag == null) {
+      return avatar;
+    }
+
+    return Hero(tag: heroTag!, child: avatar);
   }
 }
 
@@ -1333,36 +1376,53 @@ class _AnswerTile extends StatelessWidget {
     }
 
     final textColor = disabled ? Colors.white.withValues(alpha: 0.65) : Colors.white;
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
+    return PressableScale(
       onTap: onTap,
-      child: Container(
-        height: 62,
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: bg,
-          border: Border.all(color: border),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: textColor,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 15,
+      child: AnimatedScale(
+        scale: state == _AnswerState.correct ? 1.02 : 1,
+        duration: MotionTokens.short,
+        curve: MotionTokens.standardCurve,
+        child: AnimatedContainer(
+          duration: MotionTokens.short,
+          curve: MotionTokens.standardCurve,
+          height: 62,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: bg,
+            border: Border.all(color: border),
+            boxShadow: state == _AnswerState.correct
+                ? [
+                    BoxShadow(
+                      color: const Color(0xFF2AFADF).withValues(alpha: 0.35),
+                      blurRadius: 16,
+                      spreadRadius: 1,
+                    ),
+                  ]
+                : [],
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    color: textColor,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15,
+                  ),
                 ),
               ),
-            ),
-            if (state == _AnswerState.correct)
-              const Icon(Icons.check_rounded, color: Color(0xFF2AFADF))
-            else if (state == _AnswerState.wrong)
-              const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8))
-            else
-              Icon(Icons.circle_outlined, color: Colors.white.withValues(alpha: 0.22)),
-          ],
+              if (state == _AnswerState.correct) ...[
+                const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
+                const SizedBox(width: 6),
+                const RewardSparkle(show: true),
+              ] else if (state == _AnswerState.wrong)
+                const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8))
+              else
+                Icon(Icons.circle_outlined, color: Colors.white.withValues(alpha: 0.22)),
+            ],
+          ),
         ),
       ),
     );
