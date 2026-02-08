@@ -8,6 +8,7 @@ import '../circles/circles_screen.dart';
 import 'home_screen.dart';
 import '../profile/profile_screen.dart';
 import '../../core/widgets/responsive.dart';
+import '../../core/widgets/motion_switcher.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -80,6 +81,10 @@ class _AppShellState extends State<AppShell> {
       const CirclesScreen(),
       const ProfileScreen(),
     ];
+    final activePage = MotionPageSwitcher(
+      pageKey: _index,
+      child: pages[_index],
+    );
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -93,10 +98,10 @@ class _AppShellState extends State<AppShell> {
                       index: _index,
                       onChanged: _handleNavChange,
                     ),
-                    Expanded(child: pages[_index]),
+                    Expanded(child: activePage),
                   ],
                 )
-              : pages[_index],
+              : activePage,
           bottomNavigationBar: isWide
               ? null
               : _SomaBottomNav(
