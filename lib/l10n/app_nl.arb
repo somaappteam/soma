@@ -1,0 +1,781 @@
+{
+  "@@locale": "nl",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Leren. Concurreren. Beheersen.",
+  "signUp": "Aanmelden",
+  "signIn": "Inloggen",
+  "skipForNow": "Nu Overslaan",
+  "authFillAllFields": "Vul alle velden in",
+  "authError": "Fout: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "E-mail",
+  "authPassword": "Wachtwoord",
+  "authUsername": "Gebruikersnaam",
+  "authContinue": "Doorgaan",
+  "authSigningIn": "Inloggen...",
+  "authCreateAccount": "Account Aanmaken",
+  "authCreating": "Aanmaken...",
+  "authNeedAccount": "Nog geen account? ",
+  "authHaveAccount": "Al een account? ",
+  "dialogAuthRequiredTitle": "Log in om Circles te openen",
+  "dialogAuthRequiredBody": "Circles zijn multiplayer ruimtes. Maak een account aan om live wedstrijden te spelen, vrienden uit te nodigen en je voortgang op te slaan.",
+  "notNow": "Niet Nu",
+  "navHome": "Home",
+  "navCircles": "Circles",
+  "navProfile": "Profiel",
+  "removeCourseTitle": "Cursus Verwijderen?",
+  "removeCourseBody": "{course} verwijderen van je startlijst.",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Annuleren",
+  "remove": "Verwijderen",
+  "welcomeBack": "Welkom terug, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Cursussen Bewerken",
+  "done": "Klaar",
+  "noCoursesToEdit": "Geen cursussen om te bewerken.",
+  "addCourse": "Cursus Toevoegen",
+  "unknown": "Onbekend",
+  "iSpeak": "Ik Spreek",
+  "iWantToLearn": "Ik Wil Leren",
+  "chooseYourLanguage": "Kies Je Taal",
+  "chooseLearningLanguage": "Kies de taal die je wilt leren",
+  "chooseTwoDifferentLanguages": "Kies twee verschillende talen.",
+  "createCourse": "Cursus Maken",
+  "soloCourseTitle": "Solo Cursus",
+  "searchLanguage": "Zoek Taal",
+  "noMatches": "Geen Resultaten",
+  "chooseCourseType": "Kies Cursustype",
+  "soloStudyDescription": "Studeer alleen met Circles-stijl quizzen - geen ruimtes, chat, toeschouwers of hostopties.",
+  "soloModeVocabulary": "Woordenschat",
+  "soloModeSentences": "Zinnen",
+  "soloModeReview": "Herhaling",
+  "soloModeVocabularySubtitle": "Meerkeuzevragen over betekenis, synoniemen, gebruik",
+  "soloModeSentencesSubtitle": "Invuloefeningen + vertalingen + uitspraak",
+  "soloModeReviewDescription": "Oefen wat je hebt geleerd: zwakke woorden, recente fouten, gespreide herhaling.",
+  "startReview": "Start Herhaling",
+  "soloSetupTitle": "{mode} Instellingen",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Moeilijkheidsgraad",
+  "numberOfQuestions": "Aantal Vragen",
+  "timerPerQuestion": "Timer per Vraag",
+  "noTimer": "Geen Timer",
+  "start": "Start",
+  "profileTitle": "Profiel",
+  "profileSignInToMessage": "Log in om te chatten",
+  "profileThatsYourProfile": "Dit is jouw profiel",
+  "profileSignInToAddFriends": "Log in om vrienden toe te voegen",
+  "profileCantAddYourself": "Je kunt jezelf niet toevoegen",
+  "profileRequestSent": "Verzoek verzonden naar @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Verzoek verzenden mislukt",
+  "profileDefaultDisplayName": "Nieuwe Gebruiker",
+  "profileDefaultBio": "Klaar om te leren!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Gast",
+  "guestUsername": "gast",
+  "guestSessionLabel": "Gastsessie",
+  "unlockFullProfile": "Ontgrendel Volledig Profiel",
+  "guestBenefitSync": "Synchroniseer voortgang op alle apparaten",
+  "guestBenefitCircles": "Doe mee aan Circles voor live spelen",
+  "guestBenefitNotifications": "Ontvang meldingen en vriendverzoeken",
+  "progressStaysOnDevice": "Totdat je inlogt, blijft je voortgang op dit apparaat.",
+  "profileGoalLabel": "Doel: {minutes} min",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP Voortgang",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Overwinningen",
+  "profileStreak": "Reeks",
+  "profileFriendsTitle": "Vrienden",
+  "profileViewAll": "Bekijk Alles",
+  "profileAchievementsTitle": "Prestaties",
+  "profileNoAchievements": "Nog geen prestaties.",
+  "profileRequested": "Verzocht",
+  "profileSending": "Verzenden...",
+  "profileAddFriend": "Vriend Toevoegen",
+  "profileConnectTitle": "Verbinden",
+  "profileMessage": "Bericht",
+  "profileSnapshot": "Profiel Snapshot",
+  "profileLocationHidden": "Locatie Verborgen",
+  "profileBioHidden": "Bio Verborgen",
+  "profileDailyGoal": "Dagelijks Doel {minutes} min",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle Uitnodiging",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Log in om deel te nemen",
+  "joiningCircle": "Deelnemen...",
+  "joinCircle": "Deelnemen aan Circle",
+  "circleJoinedAsPlayer": "Deelgenomen als speler",
+  "circleJoinedAsSpectator": "Deelgenomen als toeschouwer",
+  "accept": "Accepteren",
+  "decline": "Weigeren",
+  "open": "Openen",
+  "circleCountdownTitle": "Maak je klaar",
+  "circleCountdownSubtitle": "Circle begint...",
+  "userFallbackName": "Gebruiker",
+  "micOff": "Microfoon Uit",
+  "micOn": "Microfoon Aan",
+  "roleHost": "Host",
+  "roleSpectator": "Toeschouwer",
+  "tagHost": "Host",
+  "tagYou": "Jij",
+  "statusCorrect": "Correct",
+  "statusWrong": "Fout",
+  "statusWaiting": "Wachten",
+  "statusNone": "-",
+  "pointsAbbrev": "ptn",
+  "pointsLabel": "Punten",
+  "statCorrect": "Correct",
+  "statAnswers": "Antwoorden",
+  "statTotal": "Totaal",
+  "statQuestions": "Vragen",
+  "statAccuracy": "Nauwkeurigheid",
+  "statRate": "Percentage",
+  "statRank": "Rang",
+  "statPosition": "Positie",
+  "statMode": "Modus",
+  "statType": "Type",
+  "next": "Volgende",
+  "submit": "Verzenden",
+  "continueLabel": "Doorgaan",
+  "save": "Opslaan",
+  "playAgain": "Opnieuw Spelen",
+  "backToCourse": "Terug naar Cursus",
+  "resultsTitle": "Resultaten",
+  "shareLater": "Later Delen",
+  "delete": "Verwijderen",
+  "ok": "OK",
+  "minutesShort": "{minutes} min",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} min",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} uur",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} d",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "Zojuist",
+  "timeMinutesAgo": "{count} minuten geleden",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} uur geleden",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} dagen geleden",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Wachten op host...",
+  "liveQuizJoinRequestSent": "Deelnameaanvraag verzonden",
+  "liveQuizJoinRequestFailed": "Aanvraag mislukt: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Host Besturing",
+  "liveQuizSpectatorModeTitle": "Toeschouwermodus",
+  "liveQuizHostControlsSubtitle": "Rondes verlopen automatisch wanneer iedereen heeft geantwoord of de tijd verloopt.",
+  "liveQuizSpectatorModeSubtitle": "Bekijk vragen en scorebord live. Je kunt niet antwoorden.",
+  "liveQuizQuestionCounter": "Vraag {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Aanvraag verzonden",
+  "liveQuizRequestToJoin": "Verzoek om Deel te Nemen",
+  "liveQuizSpectatorFooter": "Je kijkt live. Geniet van vragen en scorebord.",
+  "circleNotFound": "Circle niet gevonden",
+  "resultsRematchStartFailed": "Herkansing starten mislukt: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Wedstrijdresultaten",
+  "resultsNiceWork": "Goed gedaan, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1e",
+  "resultsPlaceSecond": "2e",
+  "resultsPlaceThird": "3e",
+  "resultsPlaceNth": "{rank}e",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "van {players} spelers",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Kampioen! Je hebt deze Circle veroverd.",
+  "resultsHighlightGreatAccuracy": "Geweldige nauwkeurigheid. Je was bijna op top!",
+  "resultsHighlightKeepGoing": "Blijf doorgaan - consistentie verslaat snelheid.",
+  "resultsLeaderboardTitle": "Scorebord",
+  "resultsPlayersCount": "{count} spelers",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Terug naar Circles",
+  "resultsRematch": "Herkansing",
+  "resultsPlayAgain": "Opnieuw Spelen",
+  "leaderboardGlobalTitle": "Wereldwijd Scorebord",
+  "leaderboardEmpty": "Nog geen scorebord.",
+  "aboutTitle": "Over",
+  "aboutVersion": "Versie {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA is een gamified taalplatform dat het leren van nieuwe talen leuk en sociaal maakt. Doe mee aan Circles, oefen solo en volg je voortgang.",
+  "aboutTerms": "Servicevoorwaarden",
+  "aboutPrivacy": "Privacybeleid",
+  "aboutOpenSource": "Open Source Licenties",
+  "addFriendTitle": "Vriend Toevoegen",
+  "addFriendFindByUsername": "Zoeken op gebruikersnaam",
+  "addFriendUsernameHint": "Voer gebruikersnaam in...",
+  "addFriendTip": "Tip: QR-code + vriend-ID ondersteuning kan later worden toegevoegd.",
+  "addFriendSending": "Verzenden...",
+  "addFriendSendRequest": "Verzoek Verzenden",
+  "addFriendUserNotFound": "@{username} niet gevonden",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Actie mislukt of al verzonden: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Vrienden",
+  "searchFriendsHint": "Zoek vrienden...",
+  "somaLearnerSubtitle": "Soma Leerling",
+  "friendRequestLabel": "Verzoek",
+  "friendRequestSentLabel": "Verzoek Verzonden",
+  "friendIncomingRequestLabel": "Inkomend Verzoek",
+  "friendRequestsSection": "Verzoeken",
+  "friendPendingSection": "In Afwachting",
+  "friendAllSection": "Alle Vrienden",
+  "friendsEmptyState": "Nog geen vrienden. Voeg je eerste vriend toe!",
+  "friendsEmptyShort": "Nog geen vrienden.",
+  "noMatchForQuery": "Geen resultaten voor \\\"{query}\\\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Inbox",
+  "searchChatsHint": "Zoek chats...",
+  "inboxEmptyState": "Nog geen chats. Begin een chat met een vriend!",
+  "newMessageTitle": "Nieuw Bericht",
+  "chatCallLater": "Spraakoproepen later (Circle talen binnenkort beschikbaar)",
+  "errorWithDetails": "Fout: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Zeg hallo tegen {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Bericht...",
+  "notificationsTitle": "Meldingen",
+  "notificationsTabAll": "Alles",
+  "notificationsTabCourses": "Cursussen",
+  "notificationsTabSocial": "Sociaal",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "Systeem",
+  "notificationsEmpty": "Geen meldingen hier.",
+  "notificationsDeleted": "Melding verwijderd",
+  "notificationTitleFallback": "Melding",
+  "notificationTypeCourse": "Cursus",
+  "notificationTypeSocial": "Sociaal",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "Systeem",
+  "notificationsFriendAccepted": "Vriendverzoek geaccepteerd",
+  "notificationsFriendAcceptFailed": "Vriendverzoek accepteren mislukt: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Vriendverzoek geweigerd",
+  "notificationsFriendDeclineFailed": "Vriendverzoek weigeren mislukt: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Deelnemen aan Circle mislukt: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Openen",
+  "notificationsOpened": "Geopend",
+  "notificationsActionMessage": "{action} melding",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Instellingen",
+  "settingsSectionAccount": "Account",
+  "settingsEditProfile": "Profiel Bewerken",
+  "settingsPrivacy": "Privacy",
+  "settingsSecurity": "Beveiliging",
+  "settingsSectionGameplay": "Gameplay",
+  "settingsShowTranslationLine": "Toon vertaalregel",
+  "settingsShowReadingLine": "Toon leesregel (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "Standaard timer per vraag",
+  "settingsMatchDifficulty": "Wedstrijd Moeilijkheid",
+  "settingsMatchDifficultyAdaptive": "Adaptief",
+  "settingsSectionSoundFeel": "Geluid & Gevoel",
+  "settingsMusic": "Muziek",
+  "settingsSoundEffects": "Geluidseffecten",
+  "settingsHaptics": "Haptische Feedback",
+  "settingsSectionNotifications": "Meldingen",
+  "settingsPushNotifications": "Pushmeldingen",
+  "settingsDailyReminder": "Dagelijkse Herinnering",
+  "settingsSectionAppearance": "Uiterlijk",
+  "settingsTheme": "Thema",
+  "settingsUiLanguage": "UI Taal",
+  "settingsSectionAbout": "Over",
+  "settingsVersion": "Versie",
+  "settingsTermsPrivacy": "Voorwaarden & Privacy",
+  "settingsSupport": "Ondersteuning",
+  "settingsLogout": "Uitloggen",
+  "themeSystem": "Systeem",
+  "themeDark": "Donker",
+  "themeLight": "Licht",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Profiel bijgewerkt",
+  "editProfileTitle": "Profiel Bewerken",
+  "editProfilePhotoLabel": "Profielfoto",
+  "editProfilePhotoSubtitle": "Avatarselectie via Supabase Storage binnenkort beschikbaar.",
+  "editProfileChangePhoto": "Wijzigen",
+  "editProfileAvatarUploadSoon": "Avatar uploaden binnenkort beschikbaar",
+  "editProfileDisplayNameLabel": "Weergavenaam",
+  "editProfileDisplayNameHint": "Jouw Naam",
+  "editProfileDisplayNameRequired": "Voer een naam in",
+  "editProfileDisplayNameTooShort": "Te kort",
+  "editProfileUsernameLabel": "Gebruikersnaam",
+  "editProfileUsernameHint": "jan_leerling",
+  "editProfileUsernameRequired": "Voer een gebruikersnaam in",
+  "editProfileUsernameTooShort": "Minimaal 3 tekens",
+  "editProfileUsernameInvalid": "Alleen letters, cijfers, _",
+  "editProfileBioLabel": "Bio",
+  "editProfileBioHint": "Korte bio...",
+  "editProfileBioTooLong": "Maximaal 120 tekens",
+  "editProfileLocationLabel": "Locatie",
+  "editProfileLocationHint": "Stad / Land",
+  "editProfileDailyGoalTitle": "Dagelijks Doel",
+  "editProfileDailyGoalSubtitle": "Kies hoeveel minuten je elke dag wilt studeren.",
+  "securityTitle": "Beveiliging",
+  "securitySectionPassword": "Wachtwoord",
+  "securityChangePasswordTitle": "Wachtwoord Wijzigen",
+  "securityChangePasswordSubtitle": "Werk je wachtwoord regelmatig bij.",
+  "securitySectionTwoFactor": "Tweefactorauthenticatie",
+  "securityEnable2faTitle": "2FA Inschakelen",
+  "securityEnable2faSubtitle": "Extra beveiliging bij inloggen.",
+  "securitySectionAppLock": "App Vergrendeling",
+  "securityBiometricTitle": "Biometrisch Ontgrendelen",
+  "securityBiometricSubtitle": "Gebruik FaceID/TouchID om SOMA te ontgrendelen.",
+  "securityAppLockTitle": "App Vergrendeling",
+  "securityAppLockSubtitle": "Vergrendel SOMA bij uitloggen.",
+  "securitySectionSessions": "Actieve Sessies",
+  "securityNoSessions": "Geen actieve sessies gevonden.",
+  "securityThisDevice": "Dit Apparaat",
+  "securityDevice": "Apparaat",
+  "securityActiveLabel": "Actief",
+  "securitySignInToEnable2fa": "Log in om 2FA in te schakelen",
+  "securityEnable2faFailed": "2FA inschakelen mislukt: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FA uitschakelen mislukt: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA Instellingen",
+  "securitySecretKeyLabel": "Geheime Sleutel",
+  "securityCodeHint": "6-cijferige code",
+  "security2faEnabled": "2FA ingeschakeld",
+  "securityVerifyCodeFailed": "Code verifiëren mislukt: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Verifiëren...",
+  "securityVerify": "Verifiëren",
+  "securityCurrentPasswordHint": "Huidig wachtwoord",
+  "securityNewPasswordHint": "Nieuw wachtwoord (min. 8 tekens)",
+  "securityConfirmPasswordHint": "Bevestig nieuw wachtwoord",
+  "securitySignInToChangePassword": "Log in om wachtwoord te wijzigen",
+  "securityEnterCurrentPassword": "Voer huidig wachtwoord in",
+  "securityPasswordMinLength": "Nieuw wachtwoord moet minimaal 8 tekens zijn",
+  "securityPasswordsDoNotMatch": "Wachtwoorden komen niet overeen",
+  "securityPasswordUpdated": "Wachtwoord bijgewerkt",
+  "securityPasswordUpdateFailed": "Wachtwoord bijwerken mislukt: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Automatisch vergrendelen na",
+  "privacyTitle": "Privacy",
+  "privacySectionVisibility": "Zichtbaarheid",
+  "privacyProfileVisibilityTitle": "Profielzichtbaarheid",
+  "privacyVisibilityPublic": "Openbaar",
+  "privacyVisibilityFriends": "Vrienden",
+  "privacyVisibilityPrivate": "Privé",
+  "privacyVisibilityPublicSubtitle": "Iedereen kan je profiel zien.",
+  "privacyVisibilityFriendsSubtitle": "Alleen vrienden kunnen je profiel zien.",
+  "privacyVisibilityPrivateSubtitle": "Alleen jij kunt je profiel zien.",
+  "privacySectionActivity": "Activiteit",
+  "privacyShowOnlineTitle": "Online Status Tonen",
+  "privacyShowOnlineSubtitle": "Laat anderen zien dat je online bent.",
+  "privacyShowActivityTitle": "Leeractiviteit Tonen",
+  "privacyShowActivitySubtitle": "Toon reeks, XP en huidige voortgang.",
+  "privacySectionSocial": "Sociaal",
+  "privacyAllowRequestsTitle": "Vriendverzoeken Toestaan",
+  "privacyAllowRequestsSubtitle": "Sta anderen toe om vriendverzoeken te sturen.",
+  "privacyWhoCanDmTitle": "Wie Kan DM Sturen",
+  "privacyDmEveryone": "Iedereen",
+  "privacyDmFriends": "Vrienden",
+  "privacyDmNoOne": "Niemand",
+  "privacyDmEveryoneSubtitle": "Iedereen kan je DM sturen.",
+  "privacyDmFriendsSubtitle": "Alleen vrienden kunnen je DM sturen.",
+  "privacyDmNoOneSubtitle": "Niemand kan je DM sturen.",
+  "privacySectionBlockedUsers": "Geblokkeerde Gebruikers",
+  "privacyBlockedUsersComingSoon": "Beheer geblokkeerde gebruikers binnenkort beschikbaar.",
+  "privacySectionDataControls": "Gegevenscontrole",
+  "privacyExportDataTitle": "Gegevens Exporteren",
+  "privacyExportDataSubtitle": "Download je activiteit en cursussen.",
+  "privacyExportInfoTitle": "Gegevens Exporteren",
+  "privacyExportInfoBody": "Volgende stappen: JSON/CSV export maken en via e-mail verzenden of lokaal downloaden.",
+  "privacyDeleteAccountTitle": "Account Verwijderen",
+  "privacyDeleteAccountSubtitle": "Dit verwijdert je account en gegevens permanent.",
+  "privacyDeleteConfirmTitle": "Account Verwijderen?",
+  "privacyDeleteConfirmBody": "Deze actie is permanent. Je profiel, cursussen, vrienden en berichten worden verwijderd.",
+  "privacyDeleteComingSoon": "Verwijdering wordt later verbonden met Supabase",
+  "soloLabel": "Solo",
+  "soloResultsCompletedTitle": "Solo Sessie Voltooid",
+  "soloResultsFeedbackElite": "Elite prestatie. Behoud je reeks.",
+  "soloResultsFeedbackStrong": "Sterk. Je groeit snel.",
+  "soloResultsFeedbackProgress": "Goede vooruitgang. Bekijk fouten en herhaal.",
+  "soloResultsFeedbackTryAgain": "Geen stress. Probeer opnieuw met minder vragen en focus.",
+  "soloResultsPerfectScore": "Perfecte score! Geen fouten om te bekijken.",
+  "soloResultsReviewPrompt": "Bekijk fouten om sneller te leren. Je foute antwoorden staan hieronder.",
+  "soloResultsReviewMistakes": "Fouten Bekijken ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Niet ingelogd",
+  "genericUser": "Gebruiker",
+  "loading": "Laden...",
+  "edit": "Bewerken",
+  "send": "Verzenden",
+  "join": "Deelnemen",
+  "leave": "Verlaten",
+  "ready": "Klaar",
+  "levelBeginner": "Beginner",
+  "levelIntermediate": "Gemiddeld",
+  "levelAdvanced": "Gevorderd",
+  "questionsShort": "{count} vr.",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} sec",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Alle Cursussen",
+  "circlesAllModes": "Alle Modi",
+  "circlesAllLevels": "Alle Niveaus",
+  "circlesAddNewCourse": "Nieuwe Cursus Toevoegen",
+  "circlesCoursesTitle": "Cursussen",
+  "circlesModeTitle": "Modus",
+  "circlesLevelTitle": "Niveau",
+  "circlesNoActiveForFilters": "Geen actieve Circles voor deze filters.",
+  "circlesUnknownRoom": "Onbekende Ruimte",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Circle Maken",
+  "circlesCircleName": "Circle Naam",
+  "circlesEnterName": "Voer naam in",
+  "circlesLanguages": "Talen",
+  "circlesRoomSetup": "Ruimte Instelling",
+  "circlesPlayers": "Spelers",
+  "circlesEmptySlot": "Lege Plek",
+  "circlesPlayersRange": "1-5 spelers",
+  "circlesQuestions": "Vragen",
+  "circlesQuestionsSubtitle": "Aantal vragen",
+  "circlesTimePerQuestion": "Tijd per Vraag",
+  "circlesSecondsPerQuestion": "Seconden per vraag",
+  "circlesAdvanced": "Geavanceerd",
+  "circlesAllowSpectators": "Toeschouwers Toestaan",
+  "circlesAllowSpectatorsSubtitle": "Sta anderen toe om te kijken zonder te spelen.",
+  "circlesLiveVoiceChat": "Live Spraakchat",
+  "circlesLiveVoiceChatSubtitle": "Schakel live spraak in tijdens wedstrijden.",
+  "circlesLiveTextChat": "Live Tekstchat",
+  "circlesLiveTextChatSubtitle": "Schakel chat in tijdens wedstrijden.",
+  "circlesCreatedSuccess": "Circle gemaakt",
+  "circlesCreateError": "Circle maken mislukt: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Tip: Je kunt vrienden uitnodigen na het aanmaken.",
+  "circlesJoinError": "Deelnemen aan Circle mislukt: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Circle Lobby",
+  "circlesCodeLine": "Code: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Wedstrijd Instellingen",
+  "circlesLevelWithValue": "Niveau {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Moeilijkheid",
+  "circlesPerQuestionShort": "per vr.",
+  "circlesInvite": "Uitnodigen",
+  "circlesCopyId": "ID Kopiëren",
+  "circlesCopiedId": "ID gekopieerd",
+  "circlesMatchInProgress": "Wedstrijd Bezig",
+  "circlesSpectatorQueuedBody": "Wedstrijd bezig. Deelnemen als toeschouwer.",
+  "circlesHostStartWhenReady": "Host start wanneer iedereen klaar is.",
+  "circlesSpectators": "Toeschouwers",
+  "circlesSpectator": "Toeschouwer",
+  "circlesSpectatorCanWatch": "Toeschouwers kunnen live kijken.",
+  "circlesJoinRequests": "Deelnameverzoeken",
+  "circlesAcceptSpectatorsHint": "Keur toeschouwers goed voordat je de wedstrijd start.",
+  "circlesStartGame": "Spel Starten",
+  "circlesWaitingForPlayers": "Wachten op Spelers",
+  "circlesLeaveCircle": "Circle Verlaten",
+  "circlesRequestSent": "Verzoek verzonden",
+  "circlesRequestToJoin": "Verzoek om Deel te Nemen",
+  "circlesWatchLive": "Live Kijken",
+  "circlesPlayerTip": "Tik op klaar wanneer je klaar bent. De host start de wedstrijd.",
+  "circlesSpectatorTip": "Je bent aan het kijken. Kijk live wanneer de host begint.",
+  "circlesHostControls": "Host Besturing",
+  "circlesTransferHostFailed": "Host overdragen mislukt: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Circle beëindigen mislukt: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "@{username} niet gevonden",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Ongeldige gebruiker",
+  "circlesCantInviteSelf": "Je kunt jezelf niet uitnodigen",
+  "circlesUserAlreadyInCircle": "@{username} is al in de Circle",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Host",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "Uitnodigen via gebruikersnaam",
+  "circlesInviteSent": "Uitnodiging verzonden naar @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Uitnodiging verzenden mislukt: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Deelnameverzoek verzonden",
+  "circlesJoinRequestFailed": "Verzoek mislukt: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle vol",
+  "circlesSpectatorAdded": "Toeschouwer toegevoegd",
+  "circlesApproveFailed": "Verzoek goedkeuren mislukt: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Verzoek geweigerd",
+  "circlesDeclineFailed": "Verzoek weigeren mislukt: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Deelnemer",
+  "circlesLeavePromptTitle": "Circle Verlaten?",
+  "circlesLeavePromptTransfer": "Draag de host over voordat je vertrekt.",
+  "circlesLeavePromptEndOnly": "Beëindig de Circle en vertrek.",
+  "circlesTransferHost": "Host Overdragen",
+  "circlesEndCircle": "Circle Beëindigen",
+  "circlesTransferHostTitle": "Host Overdragen",
+  "circlesShareId": "Circle ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

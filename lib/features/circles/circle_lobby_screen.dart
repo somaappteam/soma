@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/responsive.dart';
-import 'circles_screen.dart';
 import 'circle_countdown_screen.dart';
 import 'live_quiz_screen.dart';
+import '../../core/theme/tokens.dart';
 import '../../data/circles_repository.dart';
 import '../../data/profile_repository.dart';
 import '../../data/social_repository.dart';
@@ -109,7 +109,6 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     _circleSub = circlesRepository.getCircleStream(widget.circleId).listen((data) {
       if (!mounted || _hasNavigated) return;
       
-      final oldStatus = circleData?['status']?.toString();
       final newStatus = data['status']?.toString();
 
       setState(() => circleData = data);
@@ -153,7 +152,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   Future<void> _handleHostExit() async {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     final candidates = _hostCandidates();
     final canTransfer = candidates.isNotEmpty;
     final action = await _promptHostExit(canTransfer: canTransfer);
@@ -200,7 +199,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   Future<void> _connectVoice() async {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     final profile = profileStore.profile;
     final name = profile.displayName.isNotEmpty
         ? profile.displayName
@@ -223,12 +222,14 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   Future<void> _inviteByUsername() async {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     final username = await _promptInviteUsername();
     if (username == null || username.isEmpty) return;
 
     try {
       final users = await socialRepository.searchUsers(username);
+      if (!mounted) return;
+
       final target = users.firstWhere(
         (u) =>
             (u['username'] as String?)?.toLowerCase() == username.toLowerCase(),
@@ -259,6 +260,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       }
 
       final hostProfile = await profileRepository.fetchProfile();
+      if (!mounted) return;
+
       final hostName = hostProfile?.displayName.isNotEmpty == true
           ? hostProfile!.displayName
           : (hostProfile?.username.isNotEmpty == true
@@ -281,9 +284,11 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
         fromUserId: hostId,
         fromUserName: hostName,
       );
+      if (!mounted) return;
 
       _toast(context, l10n.circlesInviteSent(username));
     } catch (e) {
+      if (!mounted) return;
       _toast(context, l10n.circlesInviteFailed(e.toString()));
     }
   }
@@ -312,7 +317,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     return showDialog<String>(
       context: context,
       builder: (ctx) {
-        final l10n = AppLocalizations.of(ctx)!;
+        final l10n = AppLocalizations.of(ctx);
         return AlertDialog(
           backgroundColor: const Color(0xFF1C1C1C),
           title: Text(
@@ -327,14 +332,14 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
             cursorColor: Colors.white,
             decoration: InputDecoration(
               hintText: l10n.authUsername,
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: Text(l10n.cancel,
-                  style: TextStyle(color: Colors.white.withOpacity(0.75))),
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.75))),
             ),
             TextButton(
               onPressed: () {
@@ -355,7 +360,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   Future<void> _requestJoin() async {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     if (isPendingJoin) return;
     try {
       await circlesRepository.requestToJoin(widget.circleId);
@@ -370,7 +375,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   Future<void> _approveJoin(String userId, {required bool hasCapacity}) async {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     if (!hasCapacity) {
       _toast(context, l10n.circlesFull);
       return;
@@ -389,7 +394,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   Future<void> _declineJoin(String userId) async {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     try {
       await circlesRepository.declineJoinRequest(
           circleId: widget.circleId, userId: userId);
@@ -404,7 +409,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   List<_HostCandidate> _hostCandidates() {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     final currentId = circlesRepository.currentUserId;
     return participants
         .where((p) => p['user_id'] != null && p['user_id'] != currentId)
@@ -422,7 +427,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     return showDialog<_HostExitAction>(
       context: context,
       builder: (ctx) {
-        final l10n = AppLocalizations.of(ctx)!;
+        final l10n = AppLocalizations.of(ctx);
         return AlertDialog(
           backgroundColor: const Color(0xFF1C1C1C),
           title: Text(
@@ -435,14 +440,14 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                 ? l10n.circlesLeavePromptTransfer
                 : l10n.circlesLeavePromptEndOnly,
             style: TextStyle(
-                color: Colors.white.withOpacity(0.78),
+                color: Colors.white.withValues(alpha: 0.78),
                 fontWeight: FontWeight.w600),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
               child: Text(l10n.cancel,
-                  style: TextStyle(color: Colors.white.withOpacity(0.75))),
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.75))),
             ),
             if (canTransfer)
               TextButton(
@@ -470,7 +475,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (ctx) {
-        final l10n = AppLocalizations.of(ctx)!;
+        final l10n = AppLocalizations.of(ctx);
         final maxHeight = MediaQuery.of(ctx).size.height * 0.65;
         return SafeArea(
           child: Padding(
@@ -496,7 +501,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                         IconButton(
                           onPressed: () => Navigator.pop(ctx),
                           icon: Icon(Icons.close_rounded,
-                              color: Colors.white.withOpacity(0.85)),
+                              color: Colors.white.withValues(alpha: 0.85)),
                         ),
                       ],
                     ),
@@ -511,9 +516,9 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 14),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
-                            color: Colors.black.withOpacity(0.12),
+                            color: Colors.black.withValues(alpha: 0.12),
                             border: Border.all(
-                                color: Colors.white.withOpacity(0.14)),
+                                color: Colors.white.withValues(alpha: 0.14)),
                           ),
                           child: Row(
                             children: [
@@ -529,7 +534,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                 ),
                               ),
                               Icon(Icons.chevron_right_rounded,
-                                  color: Colors.white.withOpacity(0.6)),
+                                  color: Colors.white.withValues(alpha: 0.6)),
                             ],
                           ),
                         ),
@@ -563,7 +568,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
             Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF))),
       );
     }
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
 
     // Construct display players
     final maxPlayers = circleData!['max_players'] ?? 5;
@@ -625,15 +630,16 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     final allReady =
         displayPlayers.where((p) => !p.isEmpty).every((p) => p.isReady);
 
-    return WillPopScope(
-      onWillPop: () async {
-        if (!isHost) return true;
-        await _handleHostExit();
-        return false;
+    return PopScope(
+      canPop: !isHost,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        if (isHost) {
+          await _handleHostExit();
+        }
       },
       child: Scaffold(
-        body: SomaBackground(
-          child: SafeArea(
+        body: SafeArea(
             child: ResponsiveFrame(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
@@ -791,7 +797,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                     Text(
                                       "${playerParticipants.length}/$maxPlayers",
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.70),
+                                        color: Colors.white.withValues(alpha: 0.70),
                                         fontWeight: FontWeight.w800,
                                       ),
                                     ),
@@ -826,7 +832,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                 Text(
                                   l10n.circlesHostStartWhenReady,
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.62),
+                                    color: Colors.white.withValues(alpha: 0.62),
                                     fontWeight: FontWeight.w700,
                                     fontSize: 12,
                                   ),
@@ -852,7 +858,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                       Text(
                                         "${spectatorParticipants.length}",
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.70),
+                                          color: Colors.white.withValues(alpha: 0.70),
                                           fontWeight: FontWeight.w800,
                                         ),
                                       ),
@@ -881,7 +887,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                   Text(
                                     l10n.circlesSpectatorCanWatch,
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.62),
+                                      color: Colors.white.withValues(alpha: 0.62),
                                       fontWeight: FontWeight.w700,
                                       fontSize: 12,
                                     ),
@@ -907,7 +913,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                       Text(
                                         "${pendingParticipants.length}",
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.70),
+                                          color: Colors.white.withValues(alpha: 0.70),
                                           fontWeight: FontWeight.w800,
                                         ),
                                       ),
@@ -940,7 +946,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                   Text(
                                     l10n.circlesAcceptSpectatorsHint,
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.62),
+                                      color: Colors.white.withValues(alpha: 0.62),
                                       fontWeight: FontWeight.w700,
                                       fontSize: 12,
                                     ),
@@ -1020,7 +1026,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                           .disconnectIfCircle(widget.circleId);
                                       await agoraVoiceService
                                           .disconnectIfCircle(widget.circleId);
-                                      if (mounted) Navigator.pop(context);
+                                      if (!context.mounted) return;
+                                      Navigator.pop(context);
                                     },
                                   ),
                                 ),
@@ -1066,7 +1073,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                           .disconnectIfCircle(widget.circleId);
                                       await agoraVoiceService
                                           .disconnectIfCircle(widget.circleId);
-                                      if (mounted) Navigator.pop(context);
+                                      if (!context.mounted) return;
+                                      Navigator.pop(context);
                                     },
                                   ),
                                 ),
@@ -1104,7 +1112,6 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
               ),
             ),
           ),
-        ),
       ),
     );
   }
@@ -1190,7 +1197,7 @@ class _TopBar extends StatelessWidget {
               Text(
                 subtitle,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.70),
+                  color: Colors.white.withValues(alpha: 0.70),
                   fontWeight: FontWeight.w700,
                   fontSize: 12.5,
                 ),
@@ -1223,7 +1230,7 @@ class _IconGlassButton extends StatelessWidget {
           width: 46,
           height: 46,
           child: Center(
-            child: Icon(icon, color: Colors.white.withOpacity(0.92), size: 22),
+            child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 22),
           ),
         ),
       ),
@@ -1240,7 +1247,7 @@ class _SectionTitle extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        color: Colors.white.withOpacity(0.92),
+        color: Colors.white.withValues(alpha: 0.92),
         fontWeight: FontWeight.w900,
         fontSize: 14,
         letterSpacing: 0.2,
@@ -1267,12 +1274,12 @@ class _PillInfo extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.black.withOpacity(0.14),
-        border: Border.all(color: Colors.white.withOpacity(0.14)),
+        color: Colors.black.withValues(alpha: 0.14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white.withOpacity(0.9), size: 22),
+          Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 22),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -1292,7 +1299,7 @@ class _PillInfo extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.65),
+                    color: Colors.white.withValues(alpha: 0.65),
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
@@ -1326,13 +1333,13 @@ class _QuickAction extends StatelessWidget {
         height: 58,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.black.withOpacity(0.12),
-          border: Border.all(color: Colors.white.withOpacity(0.14)),
+          color: Colors.black.withValues(alpha: 0.12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Colors.white.withOpacity(0.9), size: 20),
+            Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 20),
             const SizedBox(width: 8),
             Text(
               label,
@@ -1362,13 +1369,13 @@ class _HostControlsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.black.withOpacity(0.14),
-        border: Border.all(color: Colors.white.withOpacity(0.14)),
+        color: Colors.black.withValues(alpha: 0.14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
@@ -1379,7 +1386,7 @@ class _HostControlsRow extends StatelessWidget {
             child: Text(
               l10n.circlesHostControls,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
+                color: Colors.white.withValues(alpha: 0.9),
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -1395,14 +1402,14 @@ class _HostControlsRow extends StatelessWidget {
           Row(
             children: [
               Icon(Icons.lock_rounded,
-                  color: Colors.white.withOpacity(0.75), size: 18),
+                  color: Colors.white.withValues(alpha: 0.75), size: 18),
               Switch(
                 value: roomLocked,
                 onChanged: onToggleLock,
                 activeThumbColor: const Color(0xFF2AFADF),
-                activeTrackColor: const Color(0xFF7C7CFF).withOpacity(0.45),
-                inactiveThumbColor: Colors.white.withOpacity(0.70),
-                inactiveTrackColor: Colors.white.withOpacity(0.18),
+                activeTrackColor: T.neonA.withValues(alpha: 0.25),
+                inactiveThumbColor: Colors.white.withValues(alpha: 0.70),
+                inactiveTrackColor: Colors.white.withValues(alpha: 0.18),
               ),
             ],
           ),
@@ -1419,19 +1426,19 @@ class _PlayerTip extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.black.withOpacity(0.12),
-        border: Border.all(color: Colors.white.withOpacity(0.14)),
+        color: Colors.black.withValues(alpha: 0.12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
           Icon(Icons.info_outline_rounded,
-              color: Colors.white.withOpacity(0.85), size: 20),
+              color: Colors.white.withValues(alpha: 0.85), size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               "Tap Ready when you’re set. Host will start the match.",
               style: TextStyle(
-                color: Colors.white.withOpacity(0.80),
+                color: Colors.white.withValues(alpha: 0.80),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -1445,24 +1452,23 @@ class _PlayerTip extends StatelessWidget {
 class _SpectatorTip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.black.withOpacity(0.12),
-        border: Border.all(color: Colors.white.withOpacity(0.14)),
+        color: Colors.black.withValues(alpha: 0.12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
           Icon(Icons.visibility_rounded,
-              color: Colors.white.withOpacity(0.85), size: 20),
+              color: Colors.white.withValues(alpha: 0.85), size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               "You're spectating. Watch live once the host starts.",
               style: TextStyle(
-                color: Colors.white.withOpacity(0.80),
+                color: Colors.white.withValues(alpha: 0.80),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -1491,11 +1497,11 @@ class _StatusCallout extends StatelessWidget {
             height: 36,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: Colors.white.withOpacity(0.10),
-              border: Border.all(color: Colors.white.withOpacity(0.14)),
+              color: Colors.white.withValues(alpha: 0.10),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
             ),
             child: Icon(Icons.hourglass_top_rounded,
-                color: Colors.white.withOpacity(0.9), size: 20),
+                color: Colors.white.withValues(alpha: 0.9), size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1514,7 +1520,7 @@ class _StatusCallout extends StatelessWidget {
                 Text(
                   body,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.68),
+                    color: Colors.white.withValues(alpha: 0.68),
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
@@ -1547,15 +1553,15 @@ class _PlayerRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final readyColor = player.isReady
         ? const Color(0xFF2AFADF)
-        : Colors.white.withOpacity(0.35);
+        : Colors.white.withValues(alpha: 0.35);
 
     return Container(
       height: 66,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.black.withOpacity(player.isEmpty ? 0.08 : 0.14),
-        border: Border.all(color: Colors.white.withOpacity(0.14)),
+        color: Colors.black.withValues(alpha: player.isEmpty ? 0.08 : 0.14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
@@ -1581,7 +1587,7 @@ class _PlayerRow extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: Colors.white
-                              .withOpacity(player.isEmpty ? 0.55 : 1),
+                              .withValues(alpha: player.isEmpty ? 0.55 : 1),
                           fontWeight: FontWeight.w900,
                           fontSize: 14,
                         ),
@@ -1593,9 +1599,9 @@ class _PlayerRow extends StatelessWidget {
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(999),
-                          color: Colors.white.withOpacity(0.10),
+                          color: Colors.white.withValues(alpha: 0.10),
                           border:
-                              Border.all(color: Colors.white.withOpacity(0.18)),
+                              Border.all(color: Colors.white.withValues(alpha: 0.18)),
                         ),
                         child: const Text(
                           "HOST",
@@ -1620,8 +1626,8 @@ class _PlayerRow extends StatelessWidget {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: readyColor.withOpacity(0.5),
-                            blurRadius: 10,
+                            color: readyColor.withValues(alpha: 0.25),
+                            blurRadius: 4,
                           ),
                         ],
                       ),
@@ -1632,7 +1638,7 @@ class _PlayerRow extends StatelessWidget {
                           ? "Waiting for player"
                           : (player.isReady ? "Ready" : "Not ready"),
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.70),
+                        color: Colors.white.withValues(alpha: 0.70),
                         fontWeight: FontWeight.w700,
                         fontSize: 12,
                       ),
@@ -1661,14 +1667,14 @@ class _PlayerRow extends StatelessWidget {
                 height: 46,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
-                  color: Colors.black.withOpacity(0.12),
-                  border: Border.all(color: Colors.white.withOpacity(0.12)),
+                  color: Colors.black.withValues(alpha: 0.12),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
                 ),
                 child: Icon(
                   player.isReady
                       ? Icons.check_rounded
                       : Icons.hourglass_bottom_rounded,
-                  color: Colors.white.withOpacity(0.88),
+                  color: Colors.white.withValues(alpha: 0.88),
                 ),
               ),
             ),
@@ -1683,11 +1689,11 @@ class _PlayerRow extends StatelessWidget {
                 height: 46,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
-                  color: Colors.black.withOpacity(0.12),
-                  border: Border.all(color: Colors.white.withOpacity(0.12)),
+                  color: Colors.black.withValues(alpha: 0.12),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
                 ),
                 child: Icon(Icons.close_rounded,
-                    color: Colors.white.withOpacity(0.85)),
+                    color: Colors.white.withValues(alpha: 0.85)),
               ),
             ),
           ],
@@ -1706,9 +1712,9 @@ class _MicBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color =
-        muted ? Colors.white.withOpacity(0.55) : Colors.white.withOpacity(0.92);
+        muted ? Colors.white.withValues(alpha: 0.55) : Colors.white.withValues(alpha: 0.92);
     final bg =
-        muted ? Colors.white.withOpacity(0.08) : Colors.white.withOpacity(0.12);
+        muted ? Colors.white.withValues(alpha: 0.08) : Colors.white.withValues(alpha: 0.12);
 
     return Stack(
       alignment: Alignment.center,
@@ -1719,13 +1725,13 @@ class _MicBadge extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             color: bg,
-            border: Border.all(color: Colors.white.withOpacity(0.14)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
             boxShadow: speaking
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF2AFADF).withOpacity(0.45),
-                      blurRadius: 12,
-                      spreadRadius: 1,
+                      color: const Color(0xFF2AFADF).withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      spreadRadius: 0,
                     ),
                   ]
                 : null,
@@ -1775,8 +1781,8 @@ class _JoinRequestRow extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.black.withOpacity(0.12),
-          border: Border.all(color: Colors.white.withOpacity(0.14)),
+          color: Colors.black.withValues(alpha: 0.12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
@@ -1827,10 +1833,10 @@ class _MiniAction extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            color: Colors.white.withOpacity(0.08),
-            border: Border.all(color: Colors.white.withOpacity(0.14)),
+            color: Colors.white.withValues(alpha: 0.08),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
           ),
-          child: Icon(icon, color: Colors.white.withOpacity(0.92), size: 20),
+          child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 20),
         ),
       ),
     );
@@ -1846,7 +1852,7 @@ class _AvatarDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color =
-        empty ? Colors.white.withOpacity(0.18) : Colors.white.withOpacity(0.85);
+        empty ? Colors.white.withValues(alpha: 0.18) : Colors.white.withValues(alpha: 0.85);
 
     return Container(
       width: 44,
@@ -1857,9 +1863,9 @@ class _AvatarDot extends StatelessWidget {
         boxShadow: glow
             ? [
                 BoxShadow(
-                  color: const Color(0xFF7C7CFF).withOpacity(0.45),
-                  blurRadius: 18,
-                  spreadRadius: 1,
+                  color: T.neonA.withValues(alpha: 0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
                 )
               ]
             : null,
@@ -1867,7 +1873,7 @@ class _AvatarDot extends StatelessWidget {
       child: Center(
         child: Icon(
           empty ? Icons.person_outline_rounded : Icons.person_rounded,
-          color: Colors.black.withOpacity(0.70),
+          color: Colors.black.withValues(alpha: 0.70),
         ),
       ),
     );
@@ -1889,8 +1895,8 @@ class _SpectatorChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: Colors.black.withOpacity(0.12),
-          border: Border.all(color: Colors.white.withOpacity(0.14)),
+          color: Colors.black.withValues(alpha: 0.12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -1899,7 +1905,7 @@ class _SpectatorChip extends StatelessWidget {
               width: 10,
               height: 10,
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.55),
+                color: Colors.white.withValues(alpha: 0.55),
                 shape: BoxShape.circle,
               ),
             ),
@@ -1937,8 +1943,8 @@ class _SecondaryButton extends StatelessWidget {
         height: 56,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: Colors.black.withOpacity(0.16),
-          border: Border.all(color: Colors.white.withOpacity(0.16)),
+          color: Colors.black.withValues(alpha: 0.16),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
         ),
         child: Center(
           child: Text(

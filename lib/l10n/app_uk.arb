@@ -1,0 +1,781 @@
+{
+  "@@locale": "uk",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Вчись. Змагайся. Панuj",
+  "signUp": "Зареєструватися",
+  "signIn": "Увійти",
+  "skipForNow": "Пропустити зараз",
+  "authFillAllFields": "Будь ласка, заповніть усі поля",
+  "authError": "Помилка: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "Електронна пошта",
+  "authPassword": "Пароль",
+  "authUsername": "Ім'я користувача",
+  "authContinue": "Продовжити",
+  "authSigningIn": "Вхід...",
+  "authCreateAccount": "Створити обліковий запис",
+  "authCreating": "Створення...",
+  "authNeedAccount": "Немає облікового запису? ",
+  "authHaveAccount": "Вже є обліковий запис? ",
+  "dialogAuthRequiredTitle": "Увійдіть для доступу до Circles",
+  "dialogAuthRequiredBody": "Circles — це багатокористувацькі кімнати. Створіть обліковий запис, щоб приєднатися до живих матчів, запросити друзів і зберегти прогрес.",
+  "notNow": "Не зараз",
+  "navHome": "Головна",
+  "navCircles": "Circles",
+  "navProfile": "Профіль",
+  "removeCourseTitle": "Видалити курс?",
+  "removeCourseBody": "{course} буде видалено з вашого списку",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Скасувати",
+  "remove": "Видалити",
+  "welcomeBack": "З поверненням, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Редагувати курси",
+  "done": "Готово",
+  "noCoursesToEdit": "Немає курсів для редагування",
+  "addCourse": "Додати курс",
+  "unknown": "Невідомо",
+  "iSpeak": "Я розмовляю",
+  "iWantToLearn": "Я хочу вивчити",
+  "chooseYourLanguage": "Оберіть свою мову",
+  "chooseLearningLanguage": "Оберіть мову для вивчення",
+  "chooseTwoDifferentLanguages": "Будь ласка, оберіть дві різні мови",
+  "createCourse": "Створити курс",
+  "soloCourseTitle": "Соло курс",
+  "searchLanguage": "Пошук мови",
+  "noMatches": "Немає збігів",
+  "chooseCourseType": "Оберіть тип курсу",
+  "soloStudyDescription": "Навчайтеся самостійно з такими ж тестами, як у Circles - але без кімнат, чату, глядачів або опцій хоста",
+  "soloModeVocabulary": "Лексика",
+  "soloModeSentences": "Речення",
+  "soloModeReview": "Повторення",
+  "soloModeVocabularySubtitle": "Множинний вибір, значення, синоніми, використання",
+  "soloModeSentencesSubtitle": "Заповнення пропусків + переклад + читання",
+  "soloModeReviewDescription": "Практикуйте вивчене: слабкі слова, нещодавні помилки та інтервальне повторення",
+  "startReview": "Почати повторення",
+  "soloSetupTitle": "Налаштування {mode}",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Складність",
+  "numberOfQuestions": "Кількість питань",
+  "timerPerQuestion": "Таймер на питання",
+  "noTimer": "Без таймера",
+  "start": "Почати",
+  "profileTitle": "Профіль",
+  "profileSignInToMessage": "Увійдіть, щоб надіслати повідомлення",
+  "profileThatsYourProfile": "Це ваш профіль",
+  "profileSignInToAddFriends": "Увійдіть, щоб додати друзів",
+  "profileCantAddYourself": "Ви не можете додати себе",
+  "profileRequestSent": "Запит надіслано @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Не вдалося надіслати запит",
+  "profileDefaultDisplayName": "Новий користувач",
+  "profileDefaultBio": "Готовий вчитися!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Гість",
+  "guestUsername": "гість",
+  "guestSessionLabel": "Гостьовий сеанс",
+  "unlockFullProfile": "Розблокуйте повний профіль",
+  "guestBenefitSync": "Синхронізуйте прогрес на всіх пристроях",
+  "guestBenefitCircles": "Приєднуйтесь до Circles і грайте наживо",
+  "guestBenefitNotifications": "Отримуйте сповіщення та запити дружби",
+  "progressStaysOnDevice": "Прогрес залишається на цьому пристрої, поки ви не ввійдете",
+  "profileGoalLabel": "Ціль: {minutes} хв",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "Прогрес XP",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Перемоги",
+  "profileStreak": "Серія",
+  "profileFriendsTitle": "Друзі",
+  "profileViewAll": "Переглянути все",
+  "profileAchievementsTitle": "Досягнення",
+  "profileNoAchievements": "Поки немає досягнень",
+  "profileRequested": "Запит надіслано",
+  "profileSending": "Надсилання...",
+  "profileAddFriend": "Додати друга",
+  "profileConnectTitle": "Підключитися",
+  "profileMessage": "Повідомлення",
+  "profileSnapshot": "Знімок профілю",
+  "profileLocationHidden": "Місцезнаходження приховано",
+  "profileBioHidden": "Біографія прихована",
+  "profileDailyGoal": "Щоденна ціль {minutes} хв",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Запрошення в Circle",
+  "circleIdLabel": "ID Circle: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Увійдіть, щоб приєднатися",
+  "joiningCircle": "Приєднання...",
+  "joinCircle": "Приєднатися до Circle",
+  "circleJoinedAsPlayer": "Приєдналися як гравець",
+  "circleJoinedAsSpectator": "Приєдналися як глядач",
+  "accept": "Прийняти",
+  "decline": "Відхилити",
+  "open": "Відкрити",
+  "circleCountdownTitle": "Приготуйтесь",
+  "circleCountdownSubtitle": "Circle починається...",
+  "userFallbackName": "Користувач",
+  "micOff": "Мікрофон вимкнено",
+  "micOn": "Мікрофон увімкнено",
+  "roleHost": "Хост",
+  "roleSpectator": "Глядач",
+  "tagHost": "ХОСТ",
+  "tagYou": "ВИ",
+  "statusCorrect": "Правильно",
+  "statusWrong": "Неправильно",
+  "statusWaiting": "Очікування",
+  "statusNone": "-",
+  "pointsAbbrev": "бали",
+  "pointsLabel": "Бали",
+  "statCorrect": "Правильно",
+  "statAnswers": "відповідей",
+  "statTotal": "Всього",
+  "statQuestions": "питань",
+  "statAccuracy": "Точність",
+  "statRate": "рівень",
+  "statRank": "Ранг",
+  "statPosition": "позиція",
+  "statMode": "Режим",
+  "statType": "тип",
+  "next": "Далі",
+  "submit": "Надіслати",
+  "continueLabel": "Продовжити",
+  "save": "Зберегти",
+  "playAgain": "Грати знову",
+  "backToCourse": "Назад до курсу",
+  "resultsTitle": "Результати",
+  "shareLater": "Поділитися пізніше",
+  "delete": "Видалити",
+  "ok": "Гаразд",
+  "minutesShort": "{minutes} хв",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} хв",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} год",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} дн",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "щойно",
+  "timeMinutesAgo": "{count} хв тому",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} год тому",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} дн тому",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Очікування хоста...",
+  "liveQuizJoinRequestSent": "Запит на приєднання надіслано",
+  "liveQuizJoinRequestFailed": "Не вдалося надіслати запит: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Керування хоста",
+  "liveQuizSpectatorModeTitle": "Режим глядача",
+  "liveQuizHostControlsSubtitle": "Раунди автоматично переходять, коли всі відповідають або закінчується час",
+  "liveQuizSpectatorModeSubtitle": "Дивіться питання та таблицю лідерів наживо. Ви не можете відповідати",
+  "liveQuizQuestionCounter": "Питання {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Запит надіслано",
+  "liveQuizRequestToJoin": "Запит на приєднання",
+  "liveQuizSpectatorFooter": "Ви дивитесь наживо. Насолоджуйтесь питаннями та таблицею лідерів",
+  "circleNotFound": "Circle не знайдено",
+  "resultsRematchStartFailed": "Не вдалося розпочати реванш: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Результати матчу",
+  "resultsNiceWork": "Гарна робота, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1-е місце",
+  "resultsPlaceSecond": "2-е місце",
+  "resultsPlaceThird": "3-є місце",
+  "resultsPlaceNth": "Місце {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "З {players} гравців",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Чемпіон! Ви домінували в цьому колі",
+  "resultsHighlightGreatAccuracy": "Чудова точність - ви близькі до вершини!",
+  "resultsHighlightKeepGoing": "Продовжуйте - постійність перемагає швидкість",
+  "resultsLeaderboardTitle": "Таблиця лідерів",
+  "resultsPlayersCount": "{count} гравців",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Назад до Circles",
+  "resultsRematch": "Реванш",
+  "resultsPlayAgain": "Грати знову",
+  "leaderboardGlobalTitle": "Глобальний рейтинг",
+  "leaderboardEmpty": "Поки немає рейтингу",
+  "aboutTitle": "Про додаток",
+  "aboutVersion": "Версія {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA — це ігрова платформа для вивчення мов, яка робить опанування нових мов захоплюючим і соціальним. Змагайтеся в Circles, практикуйтесь наодинці та відстежуйте свій прогрес.",
+  "aboutTerms": "Умови використання",
+  "aboutPrivacy": "Політика конфіденційності",
+  "aboutOpenSource": "Ліцензії відкритого коду",
+  "addFriendTitle": "Додати друга",
+  "addFriendFindByUsername": "Знайти за іменем користувача",
+  "addFriendUsernameHint": "Введіть ім'я користувача...",
+  "addFriendTip": "Порада: підтримка QR-коду + ID друга буде додана пізніше",
+  "addFriendSending": "Надсилання...",
+  "addFriendSendRequest": "Надіслати запит",
+  "addFriendUserNotFound": "Користувача @{username} не знайдено",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Дія не вдалася або вже надіслано: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Друзі",
+  "searchFriendsHint": "Пошук друзів...",
+  "somaLearnerSubtitle": "Учень Soma",
+  "friendRequestLabel": "Запит",
+  "friendRequestSentLabel": "Запит надіслано",
+  "friendIncomingRequestLabel": "Вхідний запит",
+  "friendRequestsSection": "Запити",
+  "friendPendingSection": "Очікування",
+  "friendAllSection": "Усі друзі",
+  "friendsEmptyState": "Поки немає друзів. Додайте свого першого друга!",
+  "friendsEmptyShort": "Поки немає друзів",
+  "noMatchForQuery": "Немає збігів для \\\"{query}\\\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Вхідні",
+  "searchChatsHint": "Пошук чатів...",
+  "inboxEmptyState": "Поки немає розмов. Почніть чат з другом!",
+  "newMessageTitle": "Нове повідомлення",
+  "chatCallLater": "Голосовий дзвінок пізніше (Circle voice наступний)",
+  "errorWithDetails": "Помилка: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Привітайтеся з {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Повідомлення...",
+  "notificationsTitle": "Сповіщення",
+  "notificationsTabAll": "Усі",
+  "notificationsTabCourses": "Курси",
+  "notificationsTabSocial": "Соціальні",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "Система",
+  "notificationsEmpty": "Немає сповіщень",
+  "notificationsDeleted": "Сповіщення видалено",
+  "notificationTitleFallback": "Сповіщення",
+  "notificationTypeCourse": "Курс",
+  "notificationTypeSocial": "Соціальне",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "Система",
+  "notificationsFriendAccepted": "Запит дружби прийнято",
+  "notificationsFriendAcceptFailed": "Не вдалося прийняти запит дружби: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Запит дружби відхилено",
+  "notificationsFriendDeclineFailed": "Не вдалося відхилити запит дружби: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Не вдалося приєднатися до Circle: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Відкривається",
+  "notificationsOpened": "Відкрито",
+  "notificationsActionMessage": "{action} сповіщення",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Налаштування",
+  "settingsSectionAccount": "Обліковий запис",
+  "settingsEditProfile": "Редагувати профіль",
+  "settingsPrivacy": "Конфіденційність",
+  "settingsSecurity": "Безпека",
+  "settingsSectionGameplay": "Геймплей",
+  "settingsShowTranslationLine": "Показати рядок перекладу",
+  "settingsShowReadingLine": "Показати читання (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "Стандартний таймер на питання",
+  "settingsMatchDifficulty": "Складність матчу",
+  "settingsMatchDifficultyAdaptive": "Адаптивна",
+  "settingsSectionSoundFeel": "Звук і відчуття",
+  "settingsMusic": "Музика",
+  "settingsSoundEffects": "Звукові ефекти",
+  "settingsHaptics": "Вібрація",
+  "settingsSectionNotifications": "Сповіщення",
+  "settingsPushNotifications": "Push-сповіщення",
+  "settingsDailyReminder": "Щоденне нагадування",
+  "settingsSectionAppearance": "Зовнішній вигляд",
+  "settingsTheme": "Тема",
+  "settingsUiLanguage": "Мова інтерфейсу",
+  "settingsSectionAbout": "Про додаток",
+  "settingsVersion": "Версія",
+  "settingsTermsPrivacy": "Умови та конфіденційність",
+  "settingsSupport": "Підтримка",
+  "settingsLogout": "Вийти",
+  "themeSystem": "Системна",
+  "themeDark": "Темна",
+  "themeLight": "Світла",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Профіль оновлено",
+  "editProfileTitle": "Редагувати профіль",
+  "editProfilePhotoLabel": "Фото профілю",
+  "editProfilePhotoSubtitle": "Вибір аватара через Supabase Storage незабаром",
+  "editProfileChangePhoto": "Змінити",
+  "editProfileAvatarUploadSoon": "Завантаження аватара незабаром",
+  "editProfileDisplayNameLabel": "Ім'я для відображення",
+  "editProfileDisplayNameHint": "Ваше ім'я",
+  "editProfileDisplayNameRequired": "Введіть своє ім'я",
+  "editProfileDisplayNameTooShort": "Занадто коротке",
+  "editProfileUsernameLabel": "Ім'я користувача",
+  "editProfileUsernameHint": "іван_учень",
+  "editProfileUsernameRequired": "Введіть ім'я користувача",
+  "editProfileUsernameTooShort": "Мінімум 3 символи",
+  "editProfileUsernameInvalid": "Тільки літери, цифри, _",
+  "editProfileBioLabel": "Біографія",
+  "editProfileBioHint": "Коротка біографія...",
+  "editProfileBioTooLong": "Максимум 120 символів",
+  "editProfileLocationLabel": "Місцезнаходження",
+  "editProfileLocationHint": "Місто / Країна",
+  "editProfileDailyGoalTitle": "Щоденна ціль",
+  "editProfileDailyGoalSubtitle": "Оберіть, скільки хвилин ви хочете навчатися щодня",
+  "securityTitle": "Безпека",
+  "securitySectionPassword": "Пароль",
+  "securityChangePasswordTitle": "Змінити пароль",
+  "securityChangePasswordSubtitle": "Регулярно оновлюйте свій пароль",
+  "securitySectionTwoFactor": "Двофакторна автентифікація",
+  "securityEnable2faTitle": "Увімкнути 2FA",
+  "securityEnable2faSubtitle": "Додатковий захист при вході",
+  "securitySectionAppLock": "Блокування додатка",
+  "securityBiometricTitle": "Біометричне розблокування",
+  "securityBiometricSubtitle": "Використовуйте FaceID/TouchID для розблокування SOMA",
+  "securityAppLockTitle": "Блокування додатка",
+  "securityAppLockSubtitle": "Блокувати SOMA при виході з додатка",
+  "securitySectionSessions": "Активні сеанси",
+  "securityNoSessions": "Активних сеансів не знайдено",
+  "securityThisDevice": "Цей пристрій",
+  "securityDevice": "Пристрій",
+  "securityActiveLabel": "Активний",
+  "securitySignInToEnable2fa": "Увійдіть, щоб увімкнути 2FA",
+  "securityEnable2faFailed": "Не вдалося увімкнути 2FA: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "Не вдалося вимкнути 2FA: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "Налаштування 2FA",
+  "securitySecretKeyLabel": "Секретний ключ",
+  "securityCodeHint": "6-значний код",
+  "security2faEnabled": "2FA увімкнено",
+  "securityVerifyCodeFailed": "Не вдалося перевірити код: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Перевірка...",
+  "securityVerify": "Перевірити",
+  "securityCurrentPasswordHint": "Поточний пароль",
+  "securityNewPasswordHint": "Новий пароль (мінімум 8 символів)",
+  "securityConfirmPasswordHint": "Підтвердіть новий пароль",
+  "securitySignInToChangePassword": "Увійдіть, щоб змінити пароль",
+  "securityEnterCurrentPassword": "Введіть свій поточний пароль",
+  "securityPasswordMinLength": "Новий пароль має містити принаймні 8 символів",
+  "securityPasswordsDoNotMatch": "Паролі не збігаються",
+  "securityPasswordUpdated": "Пароль оновлено",
+  "securityPasswordUpdateFailed": "Не вдалося оновити пароль: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Автоблокування через",
+  "privacyTitle": "Конфіденційність",
+  "privacySectionVisibility": "Видимість",
+  "privacyProfileVisibilityTitle": "Видимість профілю",
+  "privacyVisibilityPublic": "Публічний",
+  "privacyVisibilityFriends": "Друзі",
+  "privacyVisibilityPrivate": "Приватний",
+  "privacyVisibilityPublicSubtitle": "Усі можуть бачити ваш профіль",
+  "privacyVisibilityFriendsSubtitle": "Тільки друзі можуть бачити ваш профіль",
+  "privacyVisibilityPrivateSubtitle": "Тільки ви можете бачити свій профіль",
+  "privacySectionActivity": "Активність",
+  "privacyShowOnlineTitle": "Показувати онлайн-статус",
+  "privacyShowOnlineSubtitle": "Дозволити іншим бачити, коли ви в мережі",
+  "privacyShowActivityTitle": "Показувати навчальну активність",
+  "privacyShowActivitySubtitle": "Показувати серію, XP та останній прогрес",
+  "privacySectionSocial": "Соціальні мережі",
+  "privacyAllowRequestsTitle": "Дозволити запити дружби",
+  "privacyAllowRequestsSubtitle": "Дозволити людям надсилати вам запити дружби",
+  "privacyWhoCanDmTitle": "Хто може надсилати особисті повідомлення",
+  "privacyDmEveryone": "Усі",
+  "privacyDmFriends": "Друзі",
+  "privacyDmNoOne": "Ніхто",
+  "privacyDmEveryoneSubtitle": "Будь-хто може надсилати вам повідомлення",
+  "privacyDmFriendsSubtitle": "Тільки друзі можуть надсилати вам повідомлення",
+  "privacyDmNoOneSubtitle": "Ніхто не може надсилати вам повідомлення",
+  "privacySectionBlockedUsers": "Заблоковані користувачі",
+  "privacyBlockedUsersComingSoon": "Керування заблокованими користувачами незабаром",
+  "privacySectionDataControls": "Керування даними",
+  "privacyExportDataTitle": "Експортувати мої дані",
+  "privacyExportDataSubtitle": "Завантажте свою активність та курси",
+  "privacyExportInfoTitle": "Експорт даних",
+  "privacyExportInfoBody": "Наступний крок: створити експорт JSON/CSV і надіслати електронною поштою або завантажити локально",
+  "privacyDeleteAccountTitle": "Видалити обліковий запис",
+  "privacyDeleteAccountSubtitle": "Це назавжди видалить ваш обліковий запис і дані",
+  "privacyDeleteConfirmTitle": "Видалити обліковий запис?",
+  "privacyDeleteConfirmBody": "Ця дія незворотна. Ваш профіль, курси, друзі та повідомлення будуть видалені",
+  "privacyDeleteComingSoon": "Видалення буде підключено до Supabase пізніше",
+  "soloLabel": "Соло",
+  "soloResultsCompletedTitle": "Соло-сеанс завершено",
+  "soloResultsFeedbackElite": "Елітне виконання - зберігайте серію",
+  "soloResultsFeedbackStrong": "Сильна робота - ви швидко вдосконалюєтесь",
+  "soloResultsFeedbackProgress": "Гарний прогрес - перегляньте помилки і повторіть",
+  "soloResultsFeedbackTryAgain": "Без напруження - спробуйте ще раз з меншою кількістю питань і зосередьтесь",
+  "soloResultsPerfectScore": "Ідеальний результат! Немає помилок для перегляду",
+  "soloResultsReviewPrompt": "Переглядайте помилки, щоб вчитися швидше. Ваші неправильні відповіді нижче",
+  "soloResultsReviewMistakes": "Переглянути помилки ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Ви не ввійшли в систему",
+  "genericUser": "Користувач",
+  "loading": "Завантаження...",
+  "edit": "Редагувати",
+  "send": "Надіслати",
+  "join": "Приєднатися",
+  "leave": "Вийти",
+  "ready": "Готовий",
+  "levelBeginner": "Початківець",
+  "levelIntermediate": "Середній",
+  "levelAdvanced": "Просунутий",
+  "questionsShort": "{count} питань",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} с",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Усі курси",
+  "circlesAllModes": "Усі режими",
+  "circlesAllLevels": "Усі рівні",
+  "circlesAddNewCourse": "Додати новий курс",
+  "circlesCoursesTitle": "Курси",
+  "circlesModeTitle": "Режим",
+  "circlesLevelTitle": "Рівень",
+  "circlesNoActiveForFilters": "Немає активних Circles для цих фільтрів",
+  "circlesUnknownRoom": "Невідома кімната",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Створити Circle",
+  "circlesCircleName": "Назва Circle",
+  "circlesEnterName": "Введіть назву",
+  "circlesLanguages": "Мови",
+  "circlesRoomSetup": "Налаштування кімнати",
+  "circlesPlayers": "Гравці",
+  "circlesEmptySlot": "Порожнє місце",
+  "circlesPlayersRange": "1-5 гравців",
+  "circlesQuestions": "Питання",
+  "circlesQuestionsSubtitle": "Кількість питань",
+  "circlesTimePerQuestion": "Час на питання",
+  "circlesSecondsPerQuestion": "секунд на питання",
+  "circlesAdvanced": "Розширені",
+  "circlesAllowSpectators": "Дозволити глядачів",
+  "circlesAllowSpectatorsSubtitle": "Дозволити іншим дивитися без гри",
+  "circlesLiveVoiceChat": "Голосовий чат наживо",
+  "circlesLiveVoiceChatSubtitle": "Увімкнути голосовий зв'язок під час матчів",
+  "circlesLiveTextChat": "Текстовий чат наживо",
+  "circlesLiveTextChatSubtitle": "Увімкнути чат під час матчів",
+  "circlesCreatedSuccess": "Circle створено",
+  "circlesCreateError": "Не вдалося створити Circle: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Порада: ви можете запросити друзів після створення",
+  "circlesJoinError": "Не вдалося приєднатися до Circle: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Лобі Circle",
+  "circlesCodeLine": "Код: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Налаштування матчу",
+  "circlesLevelWithValue": "Рівень {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Складність",
+  "circlesPerQuestionShort": "на питання",
+  "circlesInvite": "Запросити",
+  "circlesCopyId": "Копіювати ID",
+  "circlesCopiedId": "ID скопійовано",
+  "circlesMatchInProgress": "Матч триває",
+  "circlesSpectatorQueuedBody": "Матч триває. Ви приєднаєтеся як глядач",
+  "circlesHostStartWhenReady": "Хост почне, коли всі будуть готові",
+  "circlesSpectators": "Глядачі",
+  "circlesSpectator": "Глядач",
+  "circlesSpectatorCanWatch": "Глядачі можуть дивитися наживо",
+  "circlesJoinRequests": "Запити на приєднання",
+  "circlesAcceptSpectatorsHint": "Прийміть глядачів перед початком матчу",
+  "circlesStartGame": "Почати гру",
+  "circlesWaitingForPlayers": "Очікування гравців",
+  "circlesLeaveCircle": "Вийти з Circle",
+  "circlesRequestSent": "Запит надіслано",
+  "circlesRequestToJoin": "Запит на приєднання",
+  "circlesWatchLive": "Дивитись наживо",
+  "circlesPlayerTip": "Натисніть Готовий, коли будете готові. Хост почне матч",
+  "circlesSpectatorTip": "Ви спостерігаєте. Дивіться наживо, коли хост почне",
+  "circlesHostControls": "Керування хоста",
+  "circlesTransferHostFailed": "Не вдалося передати хоста: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Не вдалося завершити Circle: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "Користувача @{username} не знайдено",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Недійсний користувач",
+  "circlesCantInviteSelf": "Ви не можете запросити себе",
+  "circlesUserAlreadyInCircle": "@{username} вже в Circle",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Хост",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "Запросити за іменем користувача",
+  "circlesInviteSent": "Запрошення надіслано @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Не вдалося надіслати запрошення: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Запит на приєднання надіслано",
+  "circlesJoinRequestFailed": "Не вдалося надіслати запит: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle заповнено",
+  "circlesSpectatorAdded": "Глядача додано",
+  "circlesApproveFailed": "Не вдалося схвалити запит: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Запит відхилено",
+  "circlesDeclineFailed": "Не вдалося відхилити запит: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Учасник",
+  "circlesLeavePromptTitle": "Вийти з Circle?",
+  "circlesLeavePromptTransfer": "Будь ласка, передайте хоста перед виходом",
+  "circlesLeavePromptEndOnly": "Завершити Circle і вийти",
+  "circlesTransferHost": "Передати хоста",
+  "circlesEndCircle": "Завершити Circle",
+  "circlesTransferHostTitle": "Передати хоста",
+  "circlesShareId": "ID Circle: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

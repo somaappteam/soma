@@ -6,7 +6,7 @@ import '../../data/profile_store.dart';
 import '../../data/agora_voice_service.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/responsive.dart';
-import '../../core/widgets/soma_background.dart';
+
 
 class CircleCountdownScreen extends StatefulWidget {
   final int seconds;
@@ -54,8 +54,7 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: ResponsiveFrame(
             alignment: Alignment.center,
             maxWidth: 420,
@@ -114,7 +113,6 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
               ),
             ),
           ),
-        ),
       ),
     );
   }

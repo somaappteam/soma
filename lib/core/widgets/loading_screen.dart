@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/tokens.dart';
-import 'soma_background.dart';
+
 
 class LoadingScreen extends StatelessWidget {
   final String? message;
@@ -9,8 +9,7 @@ class LoadingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SomaBackground(
-        child: Center(
+      body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -30,7 +29,6 @@ class LoadingScreen extends StatelessWidget {
               ],
             ],
           ),
-        ),
       ),
     );
   }

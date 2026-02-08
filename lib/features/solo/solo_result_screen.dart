@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../models/solo_course.dart';
@@ -79,68 +79,67 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
     final p = accuracyPct.clamp(0, 100);
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              children: [
-                // Top bar
-                Row(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+          child: ListView(
+            physics: const BouncingScrollPhysics(),
+            children: [
+              // Top bar
+              Row(
+                children: [
+                  _IconGlass(
+                    icon: Icons.close_rounded,
+                    onTap: () => Navigator.popUntil(context, (r) => r.isFirst),
+                  ),
+                  const Spacer(),
+                  Text(
+                    l10n.resultsTitle,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                    ),
+                  ),
+                  const Spacer(),
+                  _IconGlass(
+                    icon: Icons.ios_share_rounded,
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.shareLater)),
+                      );
+                    },
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              // Summary card
+              Glass(
+                radius: BorderRadius.circular(24),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _IconGlass(
-                      icon: Icons.close_rounded,
-                      onTap: () => Navigator.popUntil(context, (r) => r.isFirst),
-                    ),
-                    const Spacer(),
                     Text(
-                      l10n.resultsTitle,
+                      "${widget.course.subtitle} • ${_modeLabel(l10n)}",
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.92),
-                        fontWeight: FontWeight.w900,
-                        fontSize: 18,
+                        color: Colors.white.withValues(alpha: 0.70),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12.5,
                       ),
                     ),
-                    const Spacer(),
-                    _IconGlass(
-                      icon: Icons.ios_share_rounded,
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.shareLater)),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                    const SizedBox(height: 8),
 
-                const SizedBox(height: 14),
-
-                // Summary card
-                Glass(
-                  radius: BorderRadius.circular(24),
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "${widget.course.subtitle} • ${_modeLabel(l10n)}",
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.70),
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12.5,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-
-                      Row(
-                        children: [
-                          _Badge(level: widget.level),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                    Row(
+                      children: [
+                        _Badge(level: widget.level),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                                 Text(
                                   l10n.soloResultsCompletedTitle,
                                   style: const TextStyle(
@@ -320,7 +319,6 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 }

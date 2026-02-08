@@ -7,7 +7,7 @@ import '../../core/theme/tokens.dart';
 import '../../data/content_sync_service.dart';
 import '../../data/auth_repository.dart';
 import '../home/app_shell.dart';
-import '../../core/widgets/soma_background.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -77,43 +77,42 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: SomaBackground(
-        child: Center(
-          child: FadeTransition(
-            opacity: _fade,
-            child: ScaleTransition(
-              scale: _scale,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Glowing Text
-                  Text(
-                    l10n.appTitle,
-                    style: GoogleFonts.orbitron(
-                      fontSize: 64,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 8,
-                      color: Colors.white,
-                      shadows: [
-                        BoxShadow(
-                          color: T.neonA.withValues(alpha: 0.6),
-                          blurRadius: 40,
-                          spreadRadius: 10,
-                        ),
-                        BoxShadow(
-                          color: T.neonB.withValues(alpha: 0.4),
-                          blurRadius: 80,
-                          spreadRadius: 20,
-                        ),
-                      ],
-                    ),
+      body: Center(
+        child: FadeTransition(
+          opacity: _fade,
+          child: ScaleTransition(
+            scale: _scale,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Glowing Text
+                Text(
+                  l10n.appTitle,
+                  style: GoogleFonts.orbitron(
+                    fontSize: 64,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 8,
+                    color: Colors.white,
+                    shadows: [
+                      BoxShadow(
+                        color: T.neonA.withValues(alpha: 0.6),
+                        blurRadius: 40,
+                        spreadRadius: 10,
+                      ),
+                      BoxShadow(
+                        color: T.neonB.withValues(alpha: 0.4),
+                        blurRadius: 80,
+                        spreadRadius: 20,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
       ),
     );
+
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/pressable_scale.dart';
 import '../../core/widgets/staggered_in.dart';
@@ -27,8 +27,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
             child: Column(
@@ -165,7 +164,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               ],
             ),
           ),
-        ),
       ),
     );
   }

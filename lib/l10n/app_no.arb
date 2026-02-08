@@ -1,0 +1,781 @@
+{
+  "@@locale": "no",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Learn. Compete. Master.",
+  "signUp": "Sign Up",
+  "signIn": "Sign In",
+  "skipForNow": "Skip for Now",
+  "authFillAllFields": "Please fill in all fields",
+  "authError": "Error: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "Email",
+  "authPassword": "Password",
+  "authUsername": "Username",
+  "authContinue": "Continue",
+  "authSigningIn": "Signing In...",
+  "authCreateAccount": "Create Account",
+  "authCreating": "Creating...",
+  "authNeedAccount": "Don't have an account? ",
+  "authHaveAccount": "Already have an account? ",
+  "dialogAuthRequiredTitle": "Sign in to access Circles",
+  "dialogAuthRequiredBody": "Circles are multiplayer rooms. Create an account to join live matches, invite friends, and save progress.",
+  "notNow": "Not now",
+  "navHome": "Home",
+  "navCircles": "Circles",
+  "navProfile": "Profile",
+  "removeCourseTitle": "Remove course?",
+  "removeCourseBody": "{course} will be removed from your home list.",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Cancel",
+  "remove": "Remove",
+  "welcomeBack": "Welcome back, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Edit courses",
+  "done": "Done",
+  "noCoursesToEdit": "No courses to edit.",
+  "addCourse": "Add Course",
+  "unknown": "Unknown",
+  "iSpeak": "I speak",
+  "iWantToLearn": "I want to learn",
+  "chooseYourLanguage": "Choose your language",
+  "chooseLearningLanguage": "Choose learning language",
+  "chooseTwoDifferentLanguages": "Choose two different languages.",
+  "createCourse": "Create Course",
+  "soloCourseTitle": "Solo Course",
+  "searchLanguage": "Search language",
+  "noMatches": "No matches",
+  "chooseCourseType": "Choose a course type",
+  "soloStudyDescription": "Study alone with the same quiz style as circles - but without rooms, chat, spectators, or host options.",
+  "soloModeVocabulary": "Vocabulary",
+  "soloModeSentences": "Sentences",
+  "soloModeReview": "Review",
+  "soloModeVocabularySubtitle": "Multiple choice meanings, synonyms, usage",
+  "soloModeSentencesSubtitle": "Fill in the blank + translation + reading",
+  "soloModeReviewDescription": "Practice what you learned: weak words, recent mistakes, and spaced repetition.",
+  "startReview": "Start Review",
+  "soloSetupTitle": "{mode} Setup",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Difficulty",
+  "numberOfQuestions": "Number of questions",
+  "timerPerQuestion": "Timer per question",
+  "noTimer": "No timer",
+  "start": "Start",
+  "profileTitle": "Profile",
+  "profileSignInToMessage": "Sign in to message",
+  "profileThatsYourProfile": "That's your profile",
+  "profileSignInToAddFriends": "Sign in to add friends",
+  "profileCantAddYourself": "You can't add yourself",
+  "profileRequestSent": "Request sent to @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Couldn't send request",
+  "profileDefaultDisplayName": "New User",
+  "profileDefaultBio": "Ready to learn!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Guest",
+  "guestUsername": "guest",
+  "guestSessionLabel": "Guest session",
+  "unlockFullProfile": "Unlock your full profile",
+  "guestBenefitSync": "Sync progress across devices",
+  "guestBenefitCircles": "Join Circles and play live",
+  "guestBenefitNotifications": "Get notifications and friend requests",
+  "progressStaysOnDevice": "Progress stays on this device until you sign in.",
+  "profileGoalLabel": "Goal: {minutes}m",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP Progress",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Wins",
+  "profileStreak": "Streak",
+  "profileFriendsTitle": "My Friends",
+  "profileViewAll": "View all",
+  "profileAchievementsTitle": "Achievements",
+  "profileNoAchievements": "Ingen prestasjoner ennå",
+  "profileRequested": "Requested",
+  "profileSending": "Sending...",
+  "profileAddFriend": "Add Friend",
+  "profileConnectTitle": "Connect",
+  "profileMessage": "Message",
+  "profileSnapshot": "Profile Snapshot",
+  "profileLocationHidden": "Location hidden",
+  "profileBioHidden": "Bio hidden",
+  "profileDailyGoal": "Daily goal {minutes}m",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle invite",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Sign In to Join",
+  "joiningCircle": "Joining...",
+  "joinCircle": "Join Circle",
+  "circleJoinedAsPlayer": "Joined as player",
+  "circleJoinedAsSpectator": "Joined as spectator",
+  "accept": "Accept",
+  "decline": "Decline",
+  "open": "Open",
+  "circleCountdownTitle": "Get Ready",
+  "circleCountdownSubtitle": "Circle is starting...",
+  "userFallbackName": "User",
+  "micOff": "Mic Off",
+  "micOn": "Mic On",
+  "roleHost": "Host",
+  "roleSpectator": "Spectator",
+  "tagHost": "HOST",
+  "tagYou": "YOU",
+  "statusCorrect": "Correct",
+  "statusWrong": "Wrong",
+  "statusWaiting": "Waiting",
+  "statusNone": "-",
+  "pointsAbbrev": "pts",
+  "pointsLabel": "Points",
+  "statCorrect": "Correct",
+  "statAnswers": "answers",
+  "statTotal": "Total",
+  "statQuestions": "questions",
+  "statAccuracy": "Accuracy",
+  "statRate": "rate",
+  "statRank": "Rank",
+  "statPosition": "position",
+  "statMode": "Mode",
+  "statType": "type",
+  "next": "Next",
+  "submit": "Submit",
+  "continueLabel": "Continue",
+  "save": "Save",
+  "playAgain": "Play Again",
+  "backToCourse": "Back to Course",
+  "resultsTitle": "Results",
+  "shareLater": "Share later",
+  "delete": "Delete",
+  "ok": "OK",
+  "minutesShort": "{minutes}m",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}m",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}h",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}d",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "just now",
+  "timeMinutesAgo": "{count}m ago",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count}h ago",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count}d ago",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Waiting for host...",
+  "liveQuizJoinRequestSent": "Join request sent",
+  "liveQuizJoinRequestFailed": "Failed to request join: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Host controls",
+  "liveQuizSpectatorModeTitle": "Spectator mode",
+  "liveQuizHostControlsSubtitle": "Rounds auto-advance when everyone answers or time runs out.",
+  "liveQuizSpectatorModeSubtitle": "Watch questions and the live leaderboard. You can't answer.",
+  "liveQuizQuestionCounter": "Question {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Request Sent",
+  "liveQuizRequestToJoin": "Request to Join",
+  "liveQuizSpectatorFooter": "You're watching live. Enjoy the questions and leaderboard.",
+  "circleNotFound": "Circle not found",
+  "resultsRematchStartFailed": "Failed to start rematch: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Match Results",
+  "resultsNiceWork": "Nice work, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1st Place",
+  "resultsPlaceSecond": "2nd Place",
+  "resultsPlaceThird": "3rd Place",
+  "resultsPlaceNth": "Place {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "Out of {players} players",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Champion! You dominated this circle.",
+  "resultsHighlightGreatAccuracy": "Great accuracy. You're close to the top!",
+  "resultsHighlightKeepGoing": "Keep going - consistency beats speed.",
+  "resultsLeaderboardTitle": "Leaderboard",
+  "resultsPlayersCount": "{count} players",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Back to Circles",
+  "resultsRematch": "Rematch",
+  "resultsPlayAgain": "Play Again",
+  "leaderboardGlobalTitle": "Global Ranking",
+  "leaderboardEmpty": "No rankings yet.",
+  "aboutTitle": "Info",
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA is a gamified language learning platform designed to make mastering new languages engaging and social. Compete in circles, practice solo, and track your progress.",
+  "aboutTerms": "Terms of Service",
+  "aboutPrivacy": "Privacy Policy",
+  "aboutOpenSource": "Open Source Licenses",
+  "addFriendTitle": "Add Friend",
+  "addFriendFindByUsername": "Find by username",
+  "addFriendUsernameHint": "Type username...",
+  "addFriendTip": "Tip: later we can support QR code + friend ID.",
+  "addFriendSending": "Sending...",
+  "addFriendSendRequest": "Send Request",
+  "addFriendUserNotFound": "User @{username} not found",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Action failed or already sent: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Friends",
+  "searchFriendsHint": "Search friends...",
+  "somaLearnerSubtitle": "Soma Learner",
+  "friendRequestLabel": "Request",
+  "friendRequestSentLabel": "Request sent",
+  "friendIncomingRequestLabel": "Incoming Request",
+  "friendRequestsSection": "Requests",
+  "friendPendingSection": "Pending",
+  "friendAllSection": "All Friends",
+  "friendsEmptyState": "No friends yet. Add your first friend!",
+  "friendsEmptyShort": "No friends yet.",
+  "noMatchForQuery": "No match for \"{query}\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Inbox",
+  "searchChatsHint": "Search chats...",
+  "inboxEmptyState": "No conversations yet. Start chatting with a friend!",
+  "newMessageTitle": "New message",
+  "chatCallLater": "Voice call later (Circle voice is next)",
+  "errorWithDetails": "Error: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Say hi to {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Message...",
+  "notificationsTitle": "Varsler",
+  "notificationsTabAll": "All",
+  "notificationsTabCourses": "Courses",
+  "notificationsTabSocial": "Social",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "System",
+  "notificationsEmpty": "Ingen varsler ennå",
+  "notificationsDeleted": "Notification deleted",
+  "notificationTitleFallback": "Notification",
+  "notificationTypeCourse": "Course",
+  "notificationTypeSocial": "Social",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "System",
+  "notificationsFriendAccepted": "Friend request accepted",
+  "notificationsFriendAcceptFailed": "Couldn't accept friend request: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Friend request declined",
+  "notificationsFriendDeclineFailed": "Couldn't decline friend request: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Kunne ikke bli med i Sirkel: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Åpner",
+  "notificationsOpened": "Åpnet",
+  "notificationsActionMessage": "{action} varsel",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Innstillinger",
+  "settingsSectionAccount": "Konto",
+  "settingsEditProfile": "Rediger Profil",
+  "settingsPrivacy": "Personvern",
+  "settingsSecurity": "Sikkerhet",
+  "settingsSectionGameplay": "Spillopplevelse",
+  "settingsShowTranslationLine": "Vis Oversettelseslinje",
+  "settingsShowReadingLine": "Vis Leselinje (Pinyin/Romanji)",
+  "settingsDefaultTimerPerQuestion": "Tid per Spørsmål",
+  "settingsMatchDifficulty": "Kampvanskelighet",
+  "settingsMatchDifficultyAdaptive": "Tilpasset",
+  "settingsSectionSoundFeel": "Lyd og Følelse",
+  "settingsMusic": "Musikk",
+  "settingsSoundEffects": "Lydeffekter",
+  "settingsHaptics": "Haptikk",
+  "settingsSectionNotifications": "Varsler",
+  "settingsPushNotifications": "Push-varsler",
+  "settingsDailyReminder": "Daglig Påminnelse",
+  "settingsSectionAppearance": "Utseende",
+  "settingsTheme": "Tema",
+  "settingsUiLanguage": "Grensesnittspråk",
+  "settingsSectionAbout": "Om",
+  "settingsVersion": "Versjon",
+  "settingsTermsPrivacy": "Vilkår og Personvern",
+  "settingsSupport": "Support",
+  "settingsLogout": "Logg ut",
+  "themeSystem": "System",
+  "themeDark": "Mørk",
+  "themeLight": "Lys",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "فارسی",
+  "languagePunjabi": "ਪੰਜਾਬੀ",
+  "languageTamil": "தமிழ்",
+  "languageTelugu": "తెలుగు",
+  "languageSwahili": "Kiswahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Profil Oppdatert",
+  "editProfileTitle": "Rediger Profil",
+  "editProfilePhotoLabel": "Profilbilde",
+  "editProfilePhotoSubtitle": "Supabase Storage Avatarvelger kommer snart",
+  "editProfileChangePhoto": "Endre",
+  "editProfileAvatarUploadSoon": "Avataropplasting kommer snart",
+  "editProfileDisplayNameLabel": "Visningsnavn",
+  "editProfileDisplayNameHint": "Ditt navn",
+  "editProfileDisplayNameRequired": "Vennligst skriv inn navnet ditt",
+  "editProfileDisplayNameTooShort": "For kort",
+  "editProfileUsernameLabel": "Brukernavn",
+  "editProfileUsernameHint": "learner_ali",
+  "editProfileUsernameRequired": "Vennligst skriv inn et brukernavn",
+  "editProfileUsernameTooShort": "Minst 3 tegn",
+  "editProfileUsernameInvalid": "Kun bokstaver, tall, _",
+  "editProfileBioLabel": "Bio",
+  "editProfileBioHint": "En kort beskrivelse om deg...",
+  "editProfileBioTooLong": "Maks 120 tegn",
+  "editProfileLocationLabel": "Sted",
+  "editProfileLocationHint": "By / Land",
+  "editProfileDailyGoalTitle": "Daglig Mål",
+  "editProfileDailyGoalSubtitle": "Velg hvor mange minutter du vil lære hver dag",
+  "securityTitle": "Sikkerhet",
+  "securitySectionPassword": "Passord",
+  "securityChangePasswordTitle": "Endre Passord",
+  "securityChangePasswordSubtitle": "Oppdater passordet ditt regelmessig",
+  "securitySectionTwoFactor": "To-faktor Autentisering",
+  "securityEnable2faTitle": "Aktiver 2FA",
+  "securityEnable2faSubtitle": "Ekstra sikkerhet ved innlogging",
+  "securitySectionAppLock": "Applås",
+  "securityBiometricTitle": "Biometrisk Opplåsing",
+  "securityBiometricSubtitle": "Bruk FaceID/TouchID for å låse opp SOMA",
+  "securityAppLockTitle": "Applås",
+  "securityAppLockSubtitle": "Lås SOMA når du forlater",
+  "securitySectionSessions": "Aktive Økter",
+  "securityNoSessions": "Ingen aktive økter",
+  "securityThisDevice": "Denne Enheten",
+  "securityDevice": "Enhet",
+  "securityActiveLabel": "Aktiv",
+  "securitySignInToEnable2fa": "Logg inn for å aktivere 2FA",
+  "securityEnable2faFailed": "Kunne ikke aktivere 2FA: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "Kunne ikke deaktivere 2FA: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "Oppsett av 2FA",
+  "securitySecretKeyLabel": "Hemmelig Nøkkel",
+  "securityCodeHint": "6-sifret kode",
+  "security2faEnabled": "2FA Aktivert",
+  "securityVerifyCodeFailed": "Kodeverifisering mislyktes: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Verifiserer...",
+  "securityVerify": "Verifiser",
+  "securityCurrentPasswordHint": "Nåværende Passord",
+  "securityNewPasswordHint": "Nytt Passord (min 8 tegn)",
+  "securityConfirmPasswordHint": "Bekreft nytt passord",
+  "securitySignInToChangePassword": "Logg inn for å endre passord",
+  "securityEnterCurrentPassword": "Skriv inn ditt nåværende passord",
+  "securityPasswordMinLength": "Nytt passord må være minst 8 tegn",
+  "securityPasswordsDoNotMatch": "Passordene samsvarer ikke",
+  "securityPasswordUpdated": "Passord oppdatert",
+  "securityPasswordUpdateFailed": "Kunne ikke oppdatere passord: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Automatisk Lås Etter",
+  "privacyTitle": "Personvern",
+  "privacySectionVisibility": "Synlighet",
+  "privacyProfileVisibilityTitle": "Profilsynlighet",
+  "privacyVisibilityPublic": "Helt Offentlig",
+  "privacyVisibilityFriends": "Venner",
+  "privacyVisibilityPrivate": "Privat",
+  "privacyVisibilityPublicSubtitle": "Alle kan se profilen din",
+  "privacyVisibilityFriendsSubtitle": "Kun venner kan se profilen din",
+  "privacyVisibilityPrivateSubtitle": "Kun du kan se profilen din",
+  "privacySectionActivity": "Aktivitet",
+  "privacyShowOnlineTitle": "Vis Online Status",
+  "privacyShowOnlineSubtitle": "La spillere se når du er online",
+  "privacyShowActivityTitle": "Vis Læringsaktivitet",
+  "privacyShowActivitySubtitle": "Vis serie, XP og nylig fremgang",
+  "privacySectionSocial": "Sosialt",
+  "privacyAllowRequestsTitle": "Tillat Venneforespørsler",
+  "privacyAllowRequestsSubtitle": "La folk sende deg venneforespørsler",
+  "privacyWhoCanDmTitle": "Hvem Kan Sende DM",
+  "privacyDmEveryone": "Alle",
+  "privacyDmFriends": "Venner",
+  "privacyDmNoOne": "Ingen",
+  "privacyDmEveryoneSubtitle": "Alle kan sende deg meldinger",
+  "privacyDmFriendsSubtitle": "Kun venner kan sende deg meldinger",
+  "privacyDmNoOneSubtitle": "Ingen kan sende deg meldinger",
+  "privacySectionBlockedUsers": "Blokkerte Brukere",
+  "privacyBlockedUsersComingSoon": "Håndtering av blokkerte brukere kommer snart",
+  "privacySectionDataControls": "Datakontroll",
+  "privacyExportDataTitle": "Eksporter Mine Data",
+  "privacyExportDataSubtitle": "Last ned din aktivitet og kurs",
+  "privacyExportInfoTitle": "Dataeksport",
+  "privacyExportInfoBody": "Annet: Generer JSON/CSV eksport og send på e-post eller last ned direkte",
+  "privacyDeleteAccountTitle": "Slett Konto",
+  "privacyDeleteAccountSubtitle": "Dette sletter kontoen og dataene dine permanent",
+  "privacyDeleteConfirmTitle": "Slett Konto?",
+  "privacyDeleteConfirmBody": "Dette kan ikke angres. Din profil, kurs, venner og meldinger vil bli slettet",
+  "privacyDeleteComingSoon": "Sletting vil bli integrert med Supabase senere",
+  "soloLabel": "Solo",
+  "soloResultsCompletedTitle": "Solo Økt Fullført",
+  "soloResultsFeedbackElite": "Eliteprestasjon - hold serien i gang",
+  "soloResultsFeedbackStrong": "Bra jobbet - du forbedrer deg raskt",
+  "soloResultsFeedbackProgress": "God fremgang - gå gjennom feil og prøv igjen",
+  "soloResultsFeedbackTryAgain": "Ikke noe stress - prøv igjen med færre spørsmål og fokuser",
+  "soloResultsPerfectScore": "Perfekt score! Ingenting å gjennomgå",
+  "soloResultsReviewPrompt": "Gjennomgå feilene dine for raskere læring. Dine feil svar er nedenfor",
+  "soloResultsReviewMistakes": "Gjennomgå Feil ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Ikke logget inn",
+  "genericUser": "Bruker",
+  "loading": "Laster...",
+  "edit": "Rediger",
+  "send": "Send",
+  "join": "Bli med",
+  "leave": "Forlat",
+  "ready": "Klar",
+  "levelBeginner": "Nybegynner",
+  "levelIntermediate": "Viderekommen",
+  "levelAdvanced": "Ekspert",
+  "questionsShort": "{count} Spørsmål",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} Sekunder",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Alle Kurs",
+  "circlesAllModes": "Alle Moduser",
+  "circlesAllLevels": "Alle Nivåer",
+  "circlesAddNewCourse": "Legg til Nytt Kurs",
+  "circlesCoursesTitle": "Kurs",
+  "circlesModeTitle": "Modus",
+  "circlesLevelTitle": "Nivå",
+  "circlesNoActiveForFilters": "Ingen aktiv Sirkel for disse filtrene",
+  "circlesUnknownRoom": "Ukjent Rom",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Opprett Sirkel",
+  "circlesCircleName": "Sirkelnavn",
+  "circlesEnterName": "Skriv inn et navn",
+  "circlesLanguages": "Språk",
+  "circlesRoomSetup": "romoppsett",
+  "circlesPlayers": "Spillere",
+  "circlesEmptySlot": "Ledig Plass",
+  "circlesPlayersRange": "1-5 Spillere",
+  "circlesQuestions": "Spørsmål",
+  "circlesQuestionsSubtitle": "Antall spørsmål",
+  "circlesTimePerQuestion": "Tid per Spørsmål",
+  "circlesSecondsPerQuestion": "Sek/Spm",
+  "circlesAdvanced": "Ekspert",
+  "circlesAllowSpectators": "Tillat Tilskuere",
+  "circlesAllowSpectatorsSubtitle": "La andre se på uten å spille",
+  "circlesLiveVoiceChat": "Live Talechat",
+  "circlesLiveVoiceChatSubtitle": "Tillat taleinteraksjon under kamp",
+  "circlesLiveTextChat": "Live Tekstchat",
+  "circlesLiveTextChatSubtitle": "Tillat meldinger under kamp",
+  "circlesCreatedSuccess": "Sirkel opprettet",
+  "circlesCreateError": "Kunne ikke opprette Sirkel: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Tips: Du kan invitere venner etter opprettelse",
+  "circlesJoinError": "Kunne ikke bli med i Sirkel: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Sirkel Lobby",
+  "circlesCodeLine": "Kode: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Kampinnstillinger",
+  "circlesLevelWithValue": "Nivå {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Vanskelighetsgrad",
+  "circlesPerQuestionShort": "Per Spørsmål",
+  "circlesInvite": "Inviter",
+  "circlesCopyId": "Kopier ID",
+  "circlesCopiedId": "ID kopiert",
+  "circlesMatchInProgress": "Kamp pågår",
+  "circlesSpectatorQueuedBody": "Kamp pågår. Du vil bli med som tilskuer",
+  "circlesHostStartWhenReady": "Verten starter når alle er klare",
+  "circlesSpectators": "Tilskuere",
+  "circlesSpectator": "Tilskuer",
+  "circlesSpectatorCanWatch": "Tilskuere kan se live",
+  "circlesJoinRequests": "Forespørsler om å bli med",
+  "circlesAcceptSpectatorsHint": "Godta tilskuere før kampen starter",
+  "circlesStartGame": "Start Spill",
+  "circlesWaitingForPlayers": "Venter på spillere",
+  "circlesLeaveCircle": "Forlat Sirkel",
+  "circlesRequestSent": "Forespørsel sendt",
+  "circlesRequestToJoin": "Be om å bli med",
+  "circlesWatchLive": "Se Live",
+  "circlesPlayerTip": "Trykk 'Klar' når du er ferdig. Verten starter kampen",
+  "circlesSpectatorTip": "Du ser på. Se handlingen live når verten starter",
+  "circlesHostControls": "Vertskontroller",
+  "circlesTransferHostFailed": "Feil ved overføring av vert: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Feil ved avslutning av Sirkel: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "Bruker @{username} ikke funnet",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Ugyldig bruker",
+  "circlesCantInviteSelf": "Du kan ikke invitere deg selv",
+  "circlesUserAlreadyInCircle": "@{username} er allerede i Sirkelen",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Vert",
+  "circlesDefaultTitle": "Sirkel",
+  "circlesInviteByUsername": "Via Brukernavn",
+  "circlesInviteSent": "Invitasjon sendt til @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Kunne ikke sende invitasjon: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Forespørsel om å bli med sendt",
+  "circlesJoinRequestFailed": "Forespørsel feilet: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Sirkelen er full",
+  "circlesSpectatorAdded": "Tilskuer lagt til",
+  "circlesApproveFailed": "Godkjenning feilet: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Forespørsel avslått",
+  "circlesDeclineFailed": "Avslag feilet: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Deltaker",
+  "circlesLeavePromptTitle": "Forlate Sirkelen?",
+  "circlesLeavePromptTransfer": "Overfør vert før du forlater",
+  "circlesLeavePromptEndOnly": "Avslutt Sirkel og forlat",
+  "circlesTransferHost": "Overfør Vert",
+  "circlesEndCircle": "Avslutt Sirkel",
+  "circlesTransferHostTitle": "Overfør Vert",
+  "circlesShareId": "Sirkel ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

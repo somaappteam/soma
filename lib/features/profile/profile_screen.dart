@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/soma_background.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/reward_sparkle.dart';
@@ -171,8 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
             child: Column(
@@ -237,8 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -301,8 +298,7 @@ class _GuestProfileView extends StatelessWidget {
     final username = profile.username.isNotEmpty ? profile.username : l10n.guestUsername;
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
             child: Column(
@@ -440,8 +436,7 @@ class _GuestProfileView extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -623,7 +618,6 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Glass(
       radius: BorderRadius.circular(20),
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),

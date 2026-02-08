@@ -1,0 +1,781 @@
+{
+  "@@locale": "zh",
+  "appTitle": "SOMA",
+  "welcomeTagline": "学习。竞技。掌握。",
+  "signUp": "注册",
+  "signIn": "登录",
+  "skipForNow": "暂时跳过",
+  "authFillAllFields": "请填写所有字段",
+  "authError": "错误：{error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "邮箱",
+  "authPassword": "密码",
+  "authUsername": "用户名",
+  "authContinue": "继续",
+  "authSigningIn": "登录中...",
+  "authCreateAccount": "创建账户",
+  "authCreating": "创建中...",
+  "authNeedAccount": "还没有账户？",
+  "authHaveAccount": "已有账户？",
+  "dialogAuthRequiredTitle": "登录以访问Circles",
+  "dialogAuthRequiredBody": "Circles是多人房间。创建账户以加入实时对战、邀请好友并保存您的进度。",
+  "notNow": "稍后",
+  "navHome": "首页",
+  "navCircles": "Circles",
+  "navProfile": "个人资料",
+  "removeCourseTitle": "删除课程？",
+  "removeCourseBody": "从您的首页中删除{course}。",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "取消",
+  "remove": "删除",
+  "welcomeBack": "欢迎回来，{name}！",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "编辑课程",
+  "done": "完成",
+  "noCoursesToEdit": "没有可编辑的课程。",
+  "addCourse": "添加课程",
+  "unknown": "未知",
+  "iSpeak": "我会说",
+  "iWantToLearn": "我想学习",
+  "chooseYourLanguage": "选择您的语言",
+  "chooseLearningLanguage": "选择您要学习的语言",
+  "chooseTwoDifferentLanguages": "请选择两种不同的语言。",
+  "createCourse": "创建课程",
+  "soloCourseTitle": "单人课程",
+  "searchLanguage": "搜索语言",
+  "noMatches": "无匹配结果",
+  "chooseCourseType": "选择课程类型",
+  "soloStudyDescription": "通过Circles风格的测验独自学习 - 无房间、无聊天、无观众、无主持选项。",
+  "soloModeVocabulary": "词汇",
+  "soloModeSentences": "句子",
+  "soloModeReview": "复习",
+  "soloModeVocabularySubtitle": "词义、同义词、用法的选择题",
+  "soloModeSentencesSubtitle": "填空 + 翻译 + 阅读",
+  "soloModeReviewDescription": "练习所学内容：薄弱的单词、最近的错误、间隔重复。",
+  "startReview": "开始复习",
+  "soloSetupTitle": "{mode}设置",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "难度",
+  "numberOfQuestions": "题目数量",
+  "timerPerQuestion": "每题计时",
+  "noTimer": "无计时",
+  "start": "开始",
+  "profileTitle": "个人资料",
+  "profileSignInToMessage": "登录以发送消息",
+  "profileThatsYourProfile": "这是您的个人资料",
+  "profileSignInToAddFriends": "登录以添加好友",
+  "profileCantAddYourself": "不能添加自己",
+  "profileRequestSent": "已向@{username}发送请求",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "请求发送失败",
+  "profileDefaultDisplayName": "新用户",
+  "profileDefaultBio": "准备好学习了！",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "访客",
+  "guestUsername": "访客",
+  "guestSessionLabel": "访客会话",
+  "unlockFullProfile": "解锁完整资料",
+  "guestBenefitSync": "在所有设备间同步进度",
+  "guestBenefitCircles": "加入Circles进行实时游戏",
+  "guestBenefitNotifications": "接收通知和好友请求",
+  "progressStaysOnDevice": "登录前，您的进度将保留在此设备上。",
+  "profileGoalLabel": "目标：{minutes}分钟",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "经验值进度",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "胜利",
+  "profileStreak": "连续天数",
+  "profileFriendsTitle": "好友",
+  "profileViewAll": "查看全部",
+  "profileAchievementsTitle": "成就",
+  "profileNoAchievements": "暂无成就。",
+  "profileRequested": "已请求",
+  "profileSending": "发送中...",
+  "profileAddFriend": "添加好友",
+  "profileConnectTitle": "连接",
+  "profileMessage": "消息",
+  "profileSnapshot": "资料快照",
+  "profileLocationHidden": "位置已隐藏",
+  "profileBioHidden": "简介已隐藏",
+  "profileDailyGoal": "每日目标 {minutes}分钟",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle邀请",
+  "circleIdLabel": "Circle ID：{id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "登录以加入",
+  "joiningCircle": "加入中...",
+  "joinCircle": "加入Circle",
+  "circleJoinedAsPlayer": "已作为玩家加入",
+  "circleJoinedAsSpectator": "已作为观众加入",
+  "accept": "接受",
+  "decline": "拒绝",
+  "open": "打开",
+  "circleCountdownTitle": "准备就绪",
+  "circleCountdownSubtitle": "Circle即将开始...",
+  "userFallbackName": "用户",
+  "micOff": "麦克风关闭",
+  "micOn": "麦克风开启",
+  "roleHost": "主持人",
+  "roleSpectator": "观众",
+  "tagHost": "主持",
+  "tagYou": "你",
+  "statusCorrect": "正确",
+  "statusWrong": "错误",
+  "statusWaiting": "等待中",
+  "statusNone": "-",
+  "pointsAbbrev": "分",
+  "pointsLabel": "分数",
+  "statCorrect": "正确",
+  "statAnswers": "回答",
+  "statTotal": "总计",
+  "statQuestions": "题目",
+  "statAccuracy": "准确率",
+  "statRate": "比率",
+  "statRank": "排名",
+  "statPosition": "位置",
+  "statMode": "模式",
+  "statType": "类型",
+  "next": "下一个",
+  "submit": "提交",
+  "continueLabel": "继续",
+  "save": "保存",
+  "playAgain": "再玩一次",
+  "backToCourse": "返回课程",
+  "resultsTitle": "结果",
+  "shareLater": "稍后分享",
+  "delete": "删除",
+  "ok": "确定",
+  "minutesShort": "{minutes}分钟",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}分钟",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}小时",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}天",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "刚刚",
+  "timeMinutesAgo": "{count}分钟前",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count}小时前",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count}天前",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "等待主持人...",
+  "liveQuizJoinRequestSent": "已发送加入请求",
+  "liveQuizJoinRequestFailed": "请求失败：{error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "主持控制",
+  "liveQuizSpectatorModeTitle": "观众模式",
+  "liveQuizHostControlsSubtitle": "当所有人答题或时间用尽时，回合会自动进行。",
+  "liveQuizSpectatorModeSubtitle": "实时观看问题和排行榜。您无法回答。",
+  "liveQuizQuestionCounter": "问题{current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "已发送请求",
+  "liveQuizRequestToJoin": "请求加入",
+  "liveQuizSpectatorFooter": "您正在实时观看。享受问题和排行榜。",
+  "circleNotFound": "未找到Circle",
+  "resultsRematchStartFailed": "重赛开始失败：{error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "比赛结果",
+  "resultsNiceWork": "干得好，{name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "第1名",
+  "resultsPlaceSecond": "第2名",
+  "resultsPlaceThird": "第3名",
+  "resultsPlaceNth": "第{rank}名",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "共{players}名玩家",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "冠军！您征服了这个Circle。",
+  "resultsHighlightGreatAccuracy": "出色的准确率。您已接近榜首！",
+  "resultsHighlightKeepGoing": "坚持不懈 - 稳定性胜过速度。",
+  "resultsLeaderboardTitle": "排行榜",
+  "resultsPlayersCount": "{count}名玩家",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "返回Circles",
+  "resultsRematch": "重赛",
+  "resultsPlayAgain": "再玩一次",
+  "leaderboardGlobalTitle": "全球排行榜",
+  "leaderboardEmpty": "暂无排行榜。",
+  "aboutTitle": "关于",
+  "aboutVersion": "版本 {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA是一个游戏化语言学习平台，让学习新语言变得有趣且社交化。加入Circles，独自练习，追踪您的进度。",
+  "aboutTerms": "服务条款",
+  "aboutPrivacy": "隐私政策",
+  "aboutOpenSource": "开源许可",
+  "addFriendTitle": "添加好友",
+  "addFriendFindByUsername": "通过用户名查找",
+  "addFriendUsernameHint": "输入用户名...",
+  "addFriendTip": "提示：稍后可支持二维码+好友ID。",
+  "addFriendSending": "发送中...",
+  "addFriendSendRequest": "发送请求",
+  "addFriendUserNotFound": "未找到@{username}",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "操作失败或已发送：{error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "好友",
+  "searchFriendsHint": "搜索好友...",
+  "somaLearnerSubtitle": "Soma学习者",
+  "friendRequestLabel": "请求",
+  "friendRequestSentLabel": "已发送请求",
+  "friendIncomingRequestLabel": "收到的请求",
+  "friendRequestsSection": "请求",
+  "friendPendingSection": "待处理",
+  "friendAllSection": "所有好友",
+  "friendsEmptyState": "还没有好友。添加您的第一位好友吧！",
+  "friendsEmptyShort": "还没有好友。",
+  "noMatchForQuery": "无匹配\"{query}\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "收件箱",
+  "searchChatsHint": "搜索聊天...",
+  "inboxEmptyState": "还没有聊天。开始与好友聊天吧！",
+  "newMessageTitle": "新消息",
+  "chatCallLater": "稍后进行语音通话（Circle语言即将推出）",
+  "errorWithDetails": "错误：{error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "向{name}打个招呼吧！",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "消息...",
+  "notificationsTitle": "通知",
+  "notificationsTabAll": "全部",
+  "notificationsTabCourses": "课程",
+  "notificationsTabSocial": "社交",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "系统",
+  "notificationsEmpty": "这里没有通知。",
+  "notificationsDeleted": "已删除通知",
+  "notificationTitleFallback": "通知",
+  "notificationTypeCourse": "课程",
+  "notificationTypeSocial": "社交",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "系统",
+  "notificationsFriendAccepted": "已接受好友请求",
+  "notificationsFriendAcceptFailed": "好友请求接受失败：{error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "已拒绝好友请求",
+  "notificationsFriendDeclineFailed": "好友请求拒绝失败：{error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "加入Circle失败：{error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "打开中",
+  "notificationsOpened": "已打开",
+  "notificationsActionMessage": "{action}通知",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "设置",
+  "settingsSectionAccount": "账户",
+  "settingsEditProfile": "编辑资料",
+  "settingsPrivacy": "隐私",
+  "settingsSecurity": "安全",
+  "settingsSectionGameplay": "游戏玩法",
+  "settingsShowTranslationLine": "显示翻译行",
+  "settingsShowReadingLine": "显示读音（拼音/罗马字）",
+  "settingsDefaultTimerPerQuestion": "每题默认计时",
+  "settingsMatchDifficulty": "匹配难度",
+  "settingsMatchDifficultyAdaptive": "自适应",
+  "settingsSectionSoundFeel": "声音与感觉",
+  "settingsMusic": "音乐",
+  "settingsSoundEffects": "音效",
+  "settingsHaptics": "触觉反馈",
+  "settingsSectionNotifications": "通知",
+  "settingsPushNotifications": "推送通知",
+  "settingsDailyReminder": "每日提醒",
+  "settingsSectionAppearance": "外观",
+  "settingsTheme": "主题",
+  "settingsUiLanguage": "界面语言",
+  "settingsSectionAbout": "关于",
+  "settingsVersion": "版本",
+  "settingsTermsPrivacy": "条款与隐私",
+  "settingsSupport": "支持",
+  "settingsLogout": "登出",
+  "themeSystem": "系统",
+  "themeDark": "暗色",
+  "themeLight": "亮色",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "已更新资料",
+  "editProfileTitle": "编辑资料",
+  "editProfilePhotoLabel": "资料照片",
+  "editProfilePhotoSubtitle": "通过Supabase Storage选择头像即将推出。",
+  "editProfileChangePhoto": "更改",
+  "editProfileAvatarUploadSoon": "头像上传即将推出",
+  "editProfileDisplayNameLabel": "显示名称",
+  "editProfileDisplayNameHint": "您的名字",
+  "editProfileDisplayNameRequired": "请输入名字",
+  "editProfileDisplayNameTooShort": "太短",
+  "editProfileUsernameLabel": "用户名",
+  "editProfileUsernameHint": "zhang_learner",
+  "editProfileUsernameRequired": "请输入用户名",
+  "editProfileUsernameTooShort": "至少3个字符",
+  "editProfileUsernameInvalid": "仅限字母、数字、_",
+  "editProfileBioLabel": "简介",
+  "editProfileBioHint": "简短的自我介绍...",
+  "editProfileBioTooLong": "最多120个字符",
+  "editProfileLocationLabel": "位置",
+  "editProfileLocationHint": "城市/国家",
+  "editProfileDailyGoalTitle": "每日目标",
+  "editProfileDailyGoalSubtitle": "选择您每天想学习多少分钟。",
+  "securityTitle": "安全",
+  "securitySectionPassword": "密码",
+  "securityChangePasswordTitle": "更改密码",
+  "securityChangePasswordSubtitle": "定期更新您的密码。",
+  "securitySectionTwoFactor": "双因素认证",
+  "securityEnable2faTitle": "启用2FA",
+  "securityEnable2faSubtitle": "登录时的额外安全保护。",
+  "securitySectionAppLock": "应用锁",
+  "securityBiometricTitle": "生物识别解锁",
+  "securityBiometricSubtitle": "使用面容ID/指纹ID解锁SOMA。",
+  "securityAppLockTitle": "应用锁",
+  "securityAppLockSubtitle": "退出时锁定SOMA。",
+  "securitySectionSessions": "活动会话",
+  "securityNoSessions": "未找到活动会话。",
+  "securityThisDevice": "此设备",
+  "securityDevice": "设备",
+  "securityActiveLabel": "活动",
+  "securitySignInToEnable2fa": "登录以启用2FA",
+  "securityEnable2faFailed": "启用2FA失败：{error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "禁用2FA失败：{error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA设置",
+  "securitySecretKeyLabel": "密钥",
+  "securityCodeHint": "6位数字代码",
+  "security2faEnabled": "已启用2FA",
+  "securityVerifyCodeFailed": "代码验证失败：{error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "验证中...",
+  "securityVerify": "验证",
+  "securityCurrentPasswordHint": "当前密码",
+  "securityNewPasswordHint": "新密码（至少8个字符）",
+  "securityConfirmPasswordHint": "确认新密码",
+  "securitySignInToChangePassword": "登录以更改密码",
+  "securityEnterCurrentPassword": "请输入当前密码",
+  "securityPasswordMinLength": "新密码必须至少8个字符",
+  "securityPasswordsDoNotMatch": "密码不匹配",
+  "securityPasswordUpdated": "已更新密码",
+  "securityPasswordUpdateFailed": "密码更新失败：{error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "自动锁定于",
+  "privacyTitle": "隐私",
+  "privacySectionVisibility": "可见性",
+  "privacyProfileVisibilityTitle": "资料可见性",
+  "privacyVisibilityPublic": "公开",
+  "privacyVisibilityFriends": "好友",
+  "privacyVisibilityPrivate": "私密",
+  "privacyVisibilityPublicSubtitle": "任何人都可以查看您的资料。",
+  "privacyVisibilityFriendsSubtitle": "仅好友可以查看您的资料。",
+  "privacyVisibilityPrivateSubtitle": "只有您可以查看资料。",
+  "privacySectionActivity": "活动",
+  "privacyShowOnlineTitle": "显示在线状态",
+  "privacyShowOnlineSubtitle": "让其他人看到您在线。",
+  "privacyShowActivityTitle": "显示学习活动",
+  "privacyShowActivitySubtitle": "显示连续天数、XP和当前进度。",
+  "privacySectionSocial": "社交",
+  "privacyAllowRequestsTitle": "允许好友请求",
+  "privacyAllowRequestsSubtitle": "允许其他人发送好友请求。",
+  "privacyWhoCanDmTitle": "谁可以发送私信",
+  "privacyDmEveryone": "所有人",
+  "privacyDmFriends": "好友",
+  "privacyDmNoOne": "无人",
+  "privacyDmEveryoneSubtitle": "任何人都可以给您发送私信。",
+  "privacyDmFriendsSubtitle": "仅好友可以给您发送私信。",
+  "privacyDmNoOneSubtitle": "无人可以给您发送私信。",
+  "privacySectionBlockedUsers": "已屏蔽用户",
+  "privacyBlockedUsersComingSoon": "管理已屏蔽用户即将推出。",
+  "privacySectionDataControls": "数据控制",
+  "privacyExportDataTitle": "导出数据",
+  "privacyExportDataSubtitle": "下载您的活动和课程。",
+  "privacyExportInfoTitle": "数据导出",
+  "privacyExportInfoBody": "下一步：创建JSON/CSV导出并通过邮件发送或本地下载。",
+  "privacyDeleteAccountTitle": "删除账户",
+  "privacyDeleteAccountSubtitle": "这将永久删除您的账户和数据。",
+  "privacyDeleteConfirmTitle": "删除账户？",
+  "privacyDeleteConfirmBody": "此操作是永久性的。您的资料、课程、好友和消息将被删除。",
+  "privacyDeleteComingSoon": "删除功能稍后将连接到Supabase",
+  "soloLabel": "单人",
+  "soloResultsCompletedTitle": "单人练习完成",
+  "soloResultsFeedbackElite": "精英表现。保持连续记录。",
+  "soloResultsFeedbackStrong": "表现强劲。正在快速进步。",
+  "soloResultsFeedbackProgress": "进步不错。复习错误并重复练习。",
+  "soloResultsFeedbackTryAgain": "别紧张。用更少的问题和专注再试一次。",
+  "soloResultsPerfectScore": "完美得分！没有错误需要复习。",
+  "soloResultsReviewPrompt": "复习错误以更快学习。您的错误答案如下。",
+  "soloResultsReviewMistakes": "复习错误（{count}）",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "未登录",
+  "genericUser": "用户",
+  "loading": "加载中...",
+  "edit": "编辑",
+  "send": "发送",
+  "join": "加入",
+  "leave": "离开",
+  "ready": "准备",
+  "levelBeginner": "初级",
+  "levelIntermediate": "中级",
+  "levelAdvanced": "高级",
+  "questionsShort": "{count}题",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count}秒",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "所有课程",
+  "circlesAllModes": "所有模式",
+  "circlesAllLevels": "所有级别",
+  "circlesAddNewCourse": "添加新课程",
+  "circlesCoursesTitle": "课程",
+  "circlesModeTitle": "模式",
+  "circlesLevelTitle": "级别",
+  "circlesNoActiveForFilters": "此筛选器没有活动的Circles。",
+  "circlesUnknownRoom": "未知房间",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "创建Circle",
+  "circlesCircleName": "Circle名称",
+  "circlesEnterName": "输入名称",
+  "circlesLanguages": "语言",
+  "circlesRoomSetup": "房间设置",
+  "circlesPlayers": "玩家",
+  "circlesEmptySlot": "空位",
+  "circlesPlayersRange": "1-5名玩家",
+  "circlesQuestions": "题目",
+  "circlesQuestionsSubtitle": "题目数量",
+  "circlesTimePerQuestion": "每题时间",
+  "circlesSecondsPerQuestion": "每题秒数",
+  "circlesAdvanced": "高级",
+  "circlesAllowSpectators": "允许观众",
+  "circlesAllowSpectatorsSubtitle": "允许其他人不参与游戏而观看。",
+  "circlesLiveVoiceChat": "实时语音聊天",
+  "circlesLiveVoiceChatSubtitle": "在比赛中启用实时语音。",
+  "circlesLiveTextChat": "实时文字聊天",
+  "circlesLiveTextChatSubtitle": "在比赛中启用聊天。",
+  "circlesCreatedSuccess": "已创建Circle",
+  "circlesCreateError": "创建Circle失败：{error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "提示：创建后可以邀请好友。",
+  "circlesJoinError": "加入Circle失败：{error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Circle大厅",
+  "circlesCodeLine": "代码：{code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "比赛设置",
+  "circlesLevelWithValue": "{level}级",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "难度",
+  "circlesPerQuestionShort": "每题",
+  "circlesInvite": "邀请",
+  "circlesCopyId": "复制ID",
+  "circlesCopiedId": "已复制ID",
+  "circlesMatchInProgress": "比赛进行中",
+  "circlesSpectatorQueuedBody": "比赛进行中。作为观众加入。",
+  "circlesHostStartWhenReady": "所有人准备好后主持人开始。",
+  "circlesSpectators": "观众",
+  "circlesSpectator": "观众",
+  "circlesSpectatorCanWatch": "观众可以实时观看。",
+  "circlesJoinRequests": "加入请求",
+  "circlesAcceptSpectatorsHint": "在比赛开始前批准观众。",
+  "circlesStartGame": "开始游戏",
+  "circlesWaitingForPlayers": "等待玩家",
+  "circlesLeaveCircle": "离开Circle",
+  "circlesRequestSent": "已发送请求",
+  "circlesRequestToJoin": "请求加入",
+  "circlesWatchLive": "实时观看",
+  "circlesPlayerTip": "准备好后点击准备。主持人将开始比赛。",
+  "circlesSpectatorTip": "您正在观看。主持人开始后实时观看。",
+  "circlesHostControls": "主持控制",
+  "circlesTransferHostFailed": "转移主持人失败：{error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "结束Circle失败：{error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "未找到@{username}",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "无效用户",
+  "circlesCantInviteSelf": "不能邀请自己",
+  "circlesUserAlreadyInCircle": "@{username}已在Circle中",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "主持人",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "通过用户名邀请",
+  "circlesInviteSent": "已向@{username}发送邀请",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "邀请发送失败：{error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "已发送加入请求",
+  "circlesJoinRequestFailed": "请求失败：{error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle已满",
+  "circlesSpectatorAdded": "已添加观众",
+  "circlesApproveFailed": "请求批准失败：{error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "已拒绝请求",
+  "circlesDeclineFailed": "请求拒绝失败：{error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "参与者",
+  "circlesLeavePromptTitle": "离开Circle？",
+  "circlesLeavePromptTransfer": "离开前请转移主持人。",
+  "circlesLeavePromptEndOnly": "结束Circle并离开。",
+  "circlesTransferHost": "转移主持人",
+  "circlesEndCircle": "结束Circle",
+  "circlesTransferHostTitle": "转移主持人",
+  "circlesShareId": "Circle ID：{id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

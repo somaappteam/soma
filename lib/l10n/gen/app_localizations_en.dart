@@ -869,13 +869,109 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languageEnglish => 'English';
 
   @override
-  String get languageFrench => 'French';
+  String get languageFrench => 'Français';
 
   @override
-  String get languageSpanish => 'Spanish';
+  String get languageSpanish => 'Español';
 
   @override
-  String get languagePortuguese => 'Portuguese';
+  String get languageGerman => 'Deutsch';
+
+  @override
+  String get languageItalian => 'Italiano';
+
+  @override
+  String get languagePortuguese => 'Português';
+
+  @override
+  String get languageRussian => 'Русский';
+
+  @override
+  String get languageJapanese => '日本語';
+
+  @override
+  String get languageChinese => '中文';
+
+  @override
+  String get languageArabic => 'العربية';
+
+  @override
+  String get languageHindi => 'हिन्दी';
+
+  @override
+  String get languageIndonesian => 'Bahasa Indonesia';
+
+  @override
+  String get languageBengali => 'বাংলা';
+
+  @override
+  String get languageUrdu => 'اردو';
+
+  @override
+  String get languageVietnamese => 'Tiếng Việt';
+
+  @override
+  String get languageTurkish => 'Türkçe';
+
+  @override
+  String get languageKorean => '한국어';
+
+  @override
+  String get languageThai => 'ไทย';
+
+  @override
+  String get languagePolish => 'Polski';
+
+  @override
+  String get languageUkrainian => 'Українська';
+
+  @override
+  String get languageDutch => 'Nederlands';
+
+  @override
+  String get languagePersian => 'Persian';
+
+  @override
+  String get languagePunjabi => 'Punjabi';
+
+  @override
+  String get languageTamil => 'Tamil';
+
+  @override
+  String get languageTelugu => 'Telugu';
+
+  @override
+  String get languageSwahili => 'Swahili';
+
+  @override
+  String get languageMalay => 'Malay';
+
+  @override
+  String get languageRomanian => 'Romanian';
+
+  @override
+  String get languageGreek => 'Greek';
+
+  @override
+  String get languageHungarian => 'Hungarian';
+
+  @override
+  String get languageCzech => 'Czech';
+
+  @override
+  String get languageSwedish => 'Swedish';
+
+  @override
+  String get languageHebrew => 'Hebrew';
+
+  @override
+  String get languageNorwegian => 'Norwegian';
+
+  @override
+  String get languageDanish => 'Danish';
+
+  @override
+  String get languageFinnish => 'Finnish';
 
   @override
   String get editProfileUpdated => 'Profile updated';

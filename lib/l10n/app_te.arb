@@ -1,0 +1,781 @@
+{
+  "@@locale": "te",
+  "appTitle": "SOMA",
+  "welcomeTagline": "నేర్చుకోండి. పోటీపడండి. నైపుణ్యం సాధించండి.",
+  "signUp": "సైన్ అప్",
+  "signIn": "సైన్ ఇన్",
+  "skipForNow": "ప్రస్తుతానికి వదిలేయండి",
+  "authFillAllFields": "దయచేసి అన్ని వివరాలను పూరించండి",
+  "authError": "లోపం: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "ఇమెయిల్",
+  "authPassword": "పాస్‌వర్డ్",
+  "authUsername": "యూజర్ పేరు",
+  "authContinue": "కొనసాగించండి",
+  "authSigningIn": "సైన్ ఇన్ అవుతోంది...",
+  "authCreateAccount": "ఖాతాను సృష్టించండి",
+  "authCreating": "సృష్టిస్తోంది...",
+  "authNeedAccount": "ఖాతా లేదా? ",
+  "authHaveAccount": "ఇప్పటికే ఖాతా ఉందా? ",
+  "dialogAuthRequiredTitle": "Circlesలో చేరడానికి సైన్ ఇన్ చేయండి",
+  "dialogAuthRequiredBody": "Circles మల్టీప్లేయర్ గదులు. లైవ్ మ్యాచ్‌లలో చేరడానికి, స్నేహితులను ఆహ్వానించడానికి మరియు ప్రగతిని సేవ్ చేయడానికి ఖాతాను సృష్టించండి.",
+  "notNow": "ఇప్పుడు కాదు",
+  "navHome": "హోమ్",
+  "navCircles": "సర్కిల్స్",
+  "navProfile": "ప్రొఫైల్",
+  "removeCourseTitle": "కోర్సును తొలగించాలా?",
+  "removeCourseBody": "{course} మీ జాబితా నుండి తొలగించబడుతుంది",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "రద్దు చేయండి",
+  "remove": "తొలగించు",
+  "welcomeBack": "స్వాగతం, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "కోర్సులను సవరించండి",
+  "done": "పూర్తయింది",
+  "noCoursesToEdit": "సవరించడానికి కోర్సులు లేవు",
+  "addCourse": "కోర్సును జోడించండి",
+  "unknown": "తెలియదు",
+  "iSpeak": "నేను మాట్లాడేది",
+  "iWantToLearn": "నేను నేర్చుకోవాలనుకుంటున్నది",
+  "chooseYourLanguage": "మీ భాషను ఎంచుకోండి",
+  "chooseLearningLanguage": "నేర్చుకునే భాషను ఎంచుకోండి",
+  "chooseTwoDifferentLanguages": "దయచేసి రెండు వేర్వేరు భాషలను ఎంచుకోండి",
+  "createCourse": "కోర్సును సృష్టించండి",
+  "soloCourseTitle": "సోలో కోర్సు",
+  "searchLanguage": "భాషను శోధించండి",
+  "noMatches": "ఫలితాలు లేవు",
+  "chooseCourseType": "కోర్సు రకాన్ని ఎంచుకోండి",
+  "soloStudyDescription": "సర్కిల్స్ క్విజ్‌ల లాగ, ఒంటరిగా ప్రాక్టీస్ చేయండి - కానీ గదులు, చాట్ లేదా హోస్ట్ లేకుండా",
+  "soloModeVocabulary": "పదజాలం",
+  "soloModeSentences": "వాక్యాలు",
+  "soloModeReview": "సమీక్ష",
+  "soloModeVocabularySubtitle": "మల్టిపుల్ ఛాయిస్, అర్థాలు, పర్యాయపదాలు, ఉపయోగం",
+  "soloModeSentencesSubtitle": "ఖాళీలను పూరించండి + అనువాదం + పఠనం",
+  "soloModeReviewDescription": "నేర్చుకున్నవాటిని ప్రాక్టీస్ చేయండి: బలహీనమైన పదాలు, ఇటీవల చేసిన తప్పులు",
+  "startReview": "సమీక్షను ప్రారంభించండి",
+  "soloSetupTitle": "{mode} సెటప్",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "కఠినత",
+  "numberOfQuestions": "ప్రశ్నల సంఖ్య",
+  "timerPerQuestion": "ప్రశ్నకు సమయం",
+  "noTimer": "సమయం లేదు",
+  "start": "ప్రారంభించు",
+  "profileTitle": "ప్రొఫైల్",
+  "profileSignInToMessage": "సందేశం పంపడానికి సైన్ ఇన్ చేయండి",
+  "profileThatsYourProfile": "ఇది మీ ప్రొఫైల్",
+  "profileSignInToAddFriends": "స్నేహితులను జోడించడానికి సైన్ ఇన్ చేయండి",
+  "profileCantAddYourself": "మిమ్మల్ని మీరు జోడించుకోలేరు",
+  "profileRequestSent": "@{username}కి అభ్యర్థన పంపబడింది",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "అభ్యర్థన పంపడంలో విఫలమైంది",
+  "profileDefaultDisplayName": "కొత్త యూజర్",
+  "profileDefaultBio": "నేర్చుకోవడానికి సిద్ధం!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "అతిథి",
+  "guestUsername": "అతిథి",
+  "guestSessionLabel": "అతిథి సెషన్",
+  "unlockFullProfile": "పూర్తి ప్రొఫైల్‌ను అన్‌లాక్ చేయండి",
+  "guestBenefitSync": "అన్ని పరికరాల్లో ప్రగతిని సేవ్ చేయండి",
+  "guestBenefitCircles": "సర్కిల్స్‌లో చేరండి మరియు లైవ్‌లో ఆడండి",
+  "guestBenefitNotifications": "నోటిఫికేషన్లు మరియు స్నేహ అభ్యర్థనలను పొందండి",
+  "progressStaysOnDevice": "మీరు సైన్ ఇన్ చేసే వరకు ప్రగతి ఈ పరికరంలోనే ఉంటుంది",
+  "profileGoalLabel": "లక్ష్యం: {minutes} నిమి",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP ప్రగతి",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "విజయాలు",
+  "profileStreak": "స్ట్రీక్",
+  "profileFriendsTitle": "స్నేహితులు",
+  "profileViewAll": "అన్నీ చూడండి",
+  "profileAchievementsTitle": "విజయాలు",
+  "profileNoAchievements": "ఇంకా విజయాలు లేవు",
+  "profileRequested": "అభ్యర్థించబడింది",
+  "profileSending": "పంపుతోంది...",
+  "profileAddFriend": "స్నేహితుడిని జోడించండి",
+  "profileConnectTitle": "కనెక్ట్",
+  "profileMessage": "సందేశం",
+  "profileSnapshot": "ప్రొఫైల్ చిత్రం",
+  "profileLocationHidden": "స్థానం దాచబడింది",
+  "profileBioHidden": "బయో దాచబడింది",
+  "profileDailyGoal": "రోజువారీ లక్ష్యం {minutes} నిమి",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "సర్కిల్ ఆహ్వానం",
+  "circleIdLabel": "సర్కిల్ ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "చేరడానికి సైన్ ఇన్ చేయండి",
+  "joiningCircle": "చేరుతోంది...",
+  "joinCircle": "సర్కిల్స్‌లో చేరండి",
+  "circleJoinedAsPlayer": "ప్లేయర్‌గా చేరారు",
+  "circleJoinedAsSpectator": "వీక్షకుడిగా చేరారు",
+  "accept": "అంగీకరించు",
+  "decline": "తిరస్కరించు",
+  "open": "తెరువు",
+  "circleCountdownTitle": "సిద్ధంగా ఉండండి",
+  "circleCountdownSubtitle": "సర్కిల్ ప్రారంభమవుతోంది...",
+  "userFallbackName": "యూజర్",
+  "micOff": "మైక్ ఆఫ్",
+  "micOn": "మైక్ ఆన్",
+  "roleHost": "హోస్ట్",
+  "roleSpectator": "వీక్షకుడు",
+  "tagHost": "హోస్ట్",
+  "tagYou": "మీరు",
+  "statusCorrect": "సరైనది",
+  "statusWrong": "తప్పు",
+  "statusWaiting": "వేచి ఉంది",
+  "statusNone": "-",
+  "pointsAbbrev": "పాయింట్లు",
+  "pointsLabel": "పాయింట్లు",
+  "statCorrect": "సరైనవి",
+  "statAnswers": "సమాధానాలు",
+  "statTotal": "మొత్తం",
+  "statQuestions": "ప్రశ్నలు",
+  "statAccuracy": "ఖచ్చితత్వం",
+  "statRate": "రేటు",
+  "statRank": "ర్యాంక్",
+  "statPosition": "స్థానం",
+  "statMode": "మోడ్",
+  "statType": "రకం",
+  "next": "తరువాత",
+  "submit": "సమర్పించు",
+  "continueLabel": "కొనసాగించు",
+  "save": "సేవ్ చేయి",
+  "playAgain": "మళ్ళీ ఆడు",
+  "backToCourse": "కోర్సుకి తిరిగి వెళ్లు",
+  "resultsTitle": "ఫలితాలు",
+  "shareLater": "తర్వాత షేర్ చేయండి",
+  "delete": "తొలగించు",
+  "ok": "సరే",
+  "minutesShort": "{minutes} నిమి",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} నిమి",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} గం",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} రోజులు",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "ఇప్పుడే",
+  "timeMinutesAgo": "{count} నిమి క్రితం",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} గం క్రితం",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} రోజుల క్రితం",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "హోస్ట్ కోసం వేచి ఉంది...",
+  "liveQuizJoinRequestSent": "చేరడానికి అభ్యర్థన పంపబడింది",
+  "liveQuizJoinRequestFailed": "అభ్యర్థన విఫలమైంది: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "హోస్ట్ నియంత్రణలు",
+  "liveQuizSpectatorModeTitle": "వీక్షక మోడ్",
+  "liveQuizHostControlsSubtitle": "అందరూ సమాధానం ఇచ్చినప్పుడు లేదా సమయం ముగిసినప్పుడు రౌండ్‌లు ఆటోమేటిక్‌గా ముందుకు వెళ్తాయి",
+  "liveQuizSpectatorModeSubtitle": "ప్రశ్నలు మరియు లీడర్‌బోర్డ్‌లను లైవ్‌లో చూడండి. మీరు సమాధానం ఇవ్వలేరు",
+  "liveQuizQuestionCounter": "ప్రశ్న {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "అభ్యర్థన పంపబడింది",
+  "liveQuizRequestToJoin": "చేరడానికి అభ్యర్థన",
+  "liveQuizSpectatorFooter": "మీరు లైవ్ చూస్తున్నారు. ప్రశ్నలు మరియు లీడర్‌బోర్డ్‌లను ఆస్వాదించండి",
+  "circleNotFound": "సర్కిల్ కనుగొనబడలేదు",
+  "resultsRematchStartFailed": "రీమాచ్ ప్రారంభించడం విఫలమైంది: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "మ్యాచ్ ఫలితాలు",
+  "resultsNiceWork": "చాలా బాగుంది, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1వ స్థానం",
+  "resultsPlaceSecond": "2వ స్థానం",
+  "resultsPlaceThird": "3వ స్థానం",
+  "resultsPlaceNth": "{rank}వ స్థానం",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "{players} ప్లేయర్లలో",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "ఛాంపియన్! ఈ రౌండ్‌లో మీరు అద్భుతంగా ఆడారు",
+  "resultsHighlightGreatAccuracy": "గొప్ప ఖచ్చితత్వం - చాలా వరకు సరిగ్గా!",
+  "resultsHighlightKeepGoing": "కొనసాగించండి - నిలకడ వేగాన్ని జయిస్తుంది",
+  "resultsLeaderboardTitle": "లీడర్‌బోర్డ్",
+  "resultsPlayersCount": "{count} ప్లేయర్లు",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "సర్కిల్స్‌కి తిరిగి వెళ్లు",
+  "resultsRematch": "రీమాచ్",
+  "resultsPlayAgain": "మళ్ళీ ఆడు",
+  "leaderboardGlobalTitle": "గ్లోబల్ లీడర్‌బోర్డ్",
+  "leaderboardEmpty": "ఇంకా ర్యాంకింగ్‌లు లేవు",
+  "aboutTitle": "గురించి",
+  "aboutVersion": "వెర్షన్ {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA ఒక గేమ్ ఆధారిత భాషా అభ్యాస వేదిక, కొత్త భాషల్లో నైపుణ్యం సాధించడాన్ని సరదాగా మరియు సామాజికంగా మారుస్తుంది. సర్కిల్స్‌లో పోటీపడండి, ఒంటరిగా ప్రాక్టీస్ చేయండి మరియు మీ ప్రగతిని ట్రాక్ చేయండి.",
+  "aboutTerms": "సేవా నిబంధనలు",
+  "aboutPrivacy": "గోప్యతా విధానం",
+  "aboutOpenSource": "ఓపెన్ సోర్స్ లైసెన్సులు",
+  "addFriendTitle": "స్నేహితుడిని జోడించండి",
+  "addFriendFindByUsername": "యూజర్ పేరు ద్వారా కనుగొనండి",
+  "addFriendUsernameHint": "యూజర్ పేరు టైప్ చేయండి...",
+  "addFriendTip": "చిట్కా: QR కోడ్ + ఫ్రెండ్ ID మద్దతు త్వరలో రాబోతోంది",
+  "addFriendSending": "పంపుతోంది...",
+  "addFriendSendRequest": "అభ్యర్థన పంపండి",
+  "addFriendUserNotFound": "యూజర్ @{username} కనుగొనబడలేదు",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "చర్య విఫలమైంది లేదా ఇప్పటికే పంపబడింది: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "స్నేహితులు",
+  "searchFriendsHint": "స్నేహితులను శోధించండి...",
+  "somaLearnerSubtitle": "Soma విద్యార్థి",
+  "friendRequestLabel": "అభ్యర్థన",
+  "friendRequestSentLabel": "అభ్యర్థన పంపబడింది",
+  "friendIncomingRequestLabel": "వస్తున్న అభ్యర్థన",
+  "friendRequestsSection": "అభ్యర్థనలు",
+  "friendPendingSection": "పెండింగ్‌లో ఉంది",
+  "friendAllSection": "అందరూ స్నేహితులు",
+  "friendsEmptyState": "ఇంకా స్నేహితులు లేరు. మీ మొదటి స్నేహితుడిని జోడించండి!",
+  "friendsEmptyShort": "ఇంకా స్నేహితులు లేరు",
+  "noMatchForQuery": "\\\"{query}\\\"కి ఫలితాలు లేవు",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "ఇన్‌ బాక్స్",
+  "searchChatsHint": "చాట్‌లను శోధించండి...",
+  "inboxEmptyState": "ఇంకా చాట్‌లు లేవు. స్నేహితుడితో సంభాషణను ప్రారంభించండి!",
+  "newMessageTitle": "కొత్త సందేశం",
+  "chatCallLater": "వాయిస్ కాల్ త్వరలో (తదుపరి సర్కిల్ వాయిస్)",
+  "errorWithDetails": "లోపం: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "{name}కి హలో చెప్పండి!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "సందేశం...",
+  "notificationsTitle": "నోటిఫికేషన్లు",
+  "notificationsTabAll": "అన్నీ",
+  "notificationsTabCourses": "కోర్సులు",
+  "notificationsTabSocial": "సోషల్",
+  "notificationsTabCircles": "సర్కిల్స్",
+  "notificationsTabSystem": "సిస్టమ్",
+  "notificationsEmpty": "నోటిఫికేషన్లు లేవు",
+  "notificationsDeleted": "నోటిఫికేషన్ తొలగించబడింది",
+  "notificationTitleFallback": "నోటిఫికేషన్",
+  "notificationTypeCourse": "కోర్సు",
+  "notificationTypeSocial": "సోషల్",
+  "notificationTypeCircle": "సర్కిల్",
+  "notificationTypeSystem": "సిస్టమ్",
+  "notificationsFriendAccepted": "స్నేహ అభ్యర్థన అంగీకరించబడింది",
+  "notificationsFriendAcceptFailed": "స్నేహ అభ్యర్థనను అంగీకరించడం విఫలమైంది: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "స్నేహ అభ్యర్థన తిరస్కరించబడింది",
+  "notificationsFriendDeclineFailed": "స్నేహ అభ్యర్థనను తిరస్కరించడం విఫలమైంది: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "సర్కిల్‌లో చేరడం విఫలమైంది: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "తెరుస్తోంది",
+  "notificationsOpened": "తెరవబడింది",
+  "notificationsActionMessage": "{action} నోటిఫికేషన్",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "సెట్టింగ్స్",
+  "settingsSectionAccount": "ఖాతా",
+  "settingsEditProfile": "ప్రొఫైల్ సవరించండి",
+  "settingsPrivacy": "గోప్యత",
+  "settingsSecurity": "భద్రత",
+  "settingsSectionGameplay": "గేమ్‌ప్లే",
+  "settingsShowTranslationLine": "అనువాద లైన్ చూపించు",
+  "settingsShowReadingLine": "పఠనం చూపించు (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "ప్రశ్నకు డిఫాల్ట్ టైమర్",
+  "settingsMatchDifficulty": "మ్యాచ్ కఠినత",
+  "settingsMatchDifficultyAdaptive": "అడాప్టివ్",
+  "settingsSectionSoundFeel": "సౌండ్ & ఫీల్",
+  "settingsMusic": "మ్యూజిక్",
+  "settingsSoundEffects": "సౌండ్ ఎఫెక్ట్స్",
+  "settingsHaptics": "హాప్టిక్స్",
+  "settingsSectionNotifications": "నోటిఫికేషన్లు",
+  "settingsPushNotifications": "పుష్ నోటిఫికేషన్లు",
+  "settingsDailyReminder": "రోజువారీ రిమైండర్",
+  "settingsSectionAppearance": "కనిపించే విధానం",
+  "settingsTheme": "థీమ్",
+  "settingsUiLanguage": "UI భాష",
+  "settingsSectionAbout": "గురించి",
+  "settingsVersion": "వెర్షన్",
+  "settingsTermsPrivacy": "నిబంధనలు & గోప్యత",
+  "settingsSupport": "సపోర్ట్",
+  "settingsLogout": "లాగ్ అవుట్",
+  "themeSystem": "సిస్టమ్",
+  "themeDark": "డార్క్",
+  "themeLight": "లైట్",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "فارسی",
+  "languagePunjabi": "ਪੰਜਾਬੀ",
+  "languageTamil": "தமிழ்",
+  "languageTelugu": "తెలుగు",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "ప్రొఫైల్ సేవ్ చేయబడింది",
+  "editProfileTitle": "ప్రొఫైల్ సవరించండి",
+  "editProfilePhotoLabel": "ప్రొఫైల్ ఫోటో",
+  "editProfilePhotoSubtitle": "Supabase Storage అవతార్ ఎంపిక త్వరలో",
+  "editProfileChangePhoto": "మార్చు",
+  "editProfileAvatarUploadSoon": "అవతార్ అప్‌లోడ్ త్వరలో",
+  "editProfileDisplayNameLabel": "డిస్‌ప్లే పేరు",
+  "editProfileDisplayNameHint": "మీ పేరు",
+  "editProfileDisplayNameRequired": "దయచేసి మీ పేరును నమోదు చేయండి",
+  "editProfileDisplayNameTooShort": "మరీ చిన్నగా ఉంది",
+  "editProfileUsernameLabel": "యూజర్ పేరు",
+  "editProfileUsernameHint": "learner_ali",
+  "editProfileUsernameRequired": "దయచేసి యూజర్ పేరును నమోదు చేయండి",
+  "editProfileUsernameTooShort": "కనీసం 3 అక్షరాలు",
+  "editProfileUsernameInvalid": "అక్షరాలు, సంఖ్యలు, _ మాత్రమే",
+  "editProfileBioLabel": "బయో",
+  "editProfileBioHint": "మీ గురించి చిన్న పరిచయం...",
+  "editProfileBioTooLong": "గరిష్టంగా 120 అక్షరాలు",
+  "editProfileLocationLabel": "స్థానం",
+  "editProfileLocationHint": "నగరం / దేశం",
+  "editProfileDailyGoalTitle": "రోజువారీ లక్ష్యం",
+  "editProfileDailyGoalSubtitle": "రోజుకు ఎన్ని నిమిషాలు నేర్చుకోవాలనుకుంటున్నారో ఎంచుకోండి",
+  "securityTitle": "భద్రత",
+  "securitySectionPassword": "పాస్‌వర్డ్",
+  "securityChangePasswordTitle": "పాస్‌వర్డ్ మార్చండి",
+  "securityChangePasswordSubtitle": "మీ పాస్‌వర్డ్‌ను క్రమం తప్పకుండా అప్‌డేట్ చేయండి",
+  "securitySectionTwoFactor": "టూ-ఫ్యాక్టర్ అథెంటికేషన్",
+  "securityEnable2faTitle": "2FAని ఎనేబుల్ చేయండి",
+  "securityEnable2faSubtitle": "సైన్ ఇన్ కోసం అదనపు భద్రత",
+  "securitySectionAppLock": "యాప్ లాక్",
+  "securityBiometricTitle": "బయోమెట్రిక్ అన్‌లాక్",
+  "securityBiometricSubtitle": "SOMAని తెరవడానికి FaceID/TouchIDని వాడండి",
+  "securityAppLockTitle": "యాప్ లాక్",
+  "securityAppLockSubtitle": "మీరు బయటకు వెళ్ళినప్పుడు SOMAని లాక్ చేయండి",
+  "securitySectionSessions": "యాక్టివ్ సెషన్‌లు",
+  "securityNoSessions": "యాక్టివ్ సెషన్‌లు లేవు",
+  "securityThisDevice": "ఈ పరికరం",
+  "securityDevice": "పరికరం",
+  "securityActiveLabel": "యాక్టివ్",
+  "securitySignInToEnable2fa": "2FAని ఎనేబుల్ చేయడానికి సైన్ ఇన్ చేయండి",
+  "securityEnable2faFailed": "2FAని ఎనేబుల్ చేయడం విఫలమైంది: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FAని డిజేబుల్ చేయడం విఫలమైంది: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA సెటప్",
+  "securitySecretKeyLabel": "సీక్రెట్ కీ",
+  "securityCodeHint": "6-అంకెల కోడ్",
+  "security2faEnabled": "2FA ఎనేబుల్ చేయబడింది",
+  "securityVerifyCodeFailed": "కోడ్‌ని వెరిఫై చేయడం విఫలమైంది: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "వెరిఫై చేస్తోంది...",
+  "securityVerify": "వెరిఫై",
+  "securityCurrentPasswordHint": "ప్రస్తుత పాస్‌వర్డ్",
+  "securityNewPasswordHint": "కొత్త పాస్‌వర్డ్ (కనీసం 8 అక్షరాలు)",
+  "securityConfirmPasswordHint": "కొత్త పాస్‌వర్డ్‌ని నిర్ధారించండి",
+  "securitySignInToChangePassword": "పాస్‌వర్డ్ మార్చడానికి సైన్ ఇన్ చేయండి",
+  "securityEnterCurrentPassword": "మీ ప్రస్తుత పాస్‌వర్డ్‌ను నమోదు చేయండి",
+  "securityPasswordMinLength": "కొత్త పాస్‌వర్డ్ కనీసం 8 అక్షరాలు ఉండాలి",
+  "securityPasswordsDoNotMatch": "పాస్‌వర్డ్‌లు సరిపోలలేదు",
+  "securityPasswordUpdated": "పాస్‌వర్డ్ అప్‌డేట్ చేయబడింది",
+  "securityPasswordUpdateFailed": "పాస్‌వర్డ్ అప్‌డేట్ చేయడం విఫలమైంది: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "ఆటో-లాక్ సమయం",
+  "privacyTitle": "గోప్యత",
+  "privacySectionVisibility": "విజిబిలిటీ",
+  "privacyProfileVisibilityTitle": "ప్రొఫైల్ విజిబిలిటీ",
+  "privacyVisibilityPublic": "పబ్లిక్",
+  "privacyVisibilityFriends": "స్నేహితులు",
+  "privacyVisibilityPrivate": "ప్రైవేట్",
+  "privacyVisibilityPublicSubtitle": "ఎవరైనా మీ ప్రొఫైల్‌ను చూడవచ్చు",
+  "privacyVisibilityFriendsSubtitle": "కేవలం స్నేహితులు మాత్రమే మీ ప్రొఫైల్‌ను చూడగలరు",
+  "privacyVisibilityPrivateSubtitle": "మీరు మాత్రమే మీ ప్రొఫైల్‌ను చూడగలరు",
+  "privacySectionActivity": "యాక్టివిటీ",
+  "privacyShowOnlineTitle": "ఆన్‌లైన్ స్టేటస్ చూపించు",
+  "privacyShowOnlineSubtitle": "మీరు ఆన్‌లైన్‌లో ఉన్నారని ప్లేయర్లకు తెలియజేయండి",
+  "privacyShowActivityTitle": "లెర్నింగ్ యాక్టివిటీ చూపించు",
+  "privacyShowActivitySubtitle": "స్ట్రీక్, XP మరియు ఇటీవలి ప్రగతిని చూపించు",
+  "privacySectionSocial": "సోషల్",
+  "privacyAllowRequestsTitle": "స్నేహ అభ్యర్థనలను అనుమతించు",
+  "privacyAllowRequestsSubtitle": "ప్రజలు మీకు స్నేహ అభ్యర్థనలు పంపడాన్ని అనుమతించండి",
+  "privacyWhoCanDmTitle": "ఎవరు DM పంపగలరు",
+  "privacyDmEveryone": "ఎవరైనా",
+  "privacyDmFriends": "స్నేహితులు",
+  "privacyDmNoOne": "ఎవరూ కాదు",
+  "privacyDmEveryoneSubtitle": "ఎవరైనా మీకు మెసేజ్ చేయవచ్చు",
+  "privacyDmFriendsSubtitle": "స్నేహితులు మాత్రమే మీకు మెసేజ్ చేయగలరు",
+  "privacyDmNoOneSubtitle": "ఎవరూ మీకు మెసేజ్ చేయలేరు",
+  "privacySectionBlockedUsers": "బ్లాక్ చేయబడిన యూజర్లు",
+  "privacyBlockedUsersComingSoon": "బ్లాక్ చేయబడిన యూజర్ల నిర్వహణ త్వరలో",
+  "privacySectionDataControls": "డేటా నియంత్రణలు",
+  "privacyExportDataTitle": "నా డేటాను ఎగుమతి చేయి",
+  "privacyExportDataSubtitle": "మీ యాక్టివిటీ మరియు కోర్సులను డౌన్‌లోడ్ చేయండి",
+  "privacyExportInfoTitle": "డేటా ఎగుమతి",
+  "privacyExportInfoBody": "తదుపరి దశ: JSON/CSV ఎగుమతిని రూపొందించడం మరియు ఇమెయిల్ లేదా లోకల్ డౌన్‌లోడ్",
+  "privacyDeleteAccountTitle": "ఖాతాను తొలగించు",
+  "privacyDeleteAccountSubtitle": "ఇది మీ ఖాతా మరియు డేటాను శాశ్వతంగా తొలగిస్తుంది",
+  "privacyDeleteConfirmTitle": "ఖాతాను తొలగించాలా?",
+  "privacyDeleteConfirmBody": "దీన్ని వెనక్కి తీసుకోలేము. మీ ప్రొఫైల్, కోర్సులు, స్నేహితులు మరియు మెసేజ్‌లు తొలగించబడతాయి",
+  "privacyDeleteComingSoon": "తొలగింపు తర్వాత Supabaseతో లింక్ చేయబడుతుంది",
+  "soloLabel": "సోలో",
+  "soloResultsCompletedTitle": "సోలో సెషన్ పూర్తయింది",
+  "soloResultsFeedbackElite": "అద్భుతమైన పనితీరు - స్ట్రీక్‌ను కొనసాగించండి",
+  "soloResultsFeedbackStrong": "మంచి పని - వేగంగా మెరుగుపడుతోంది",
+  "soloResultsFeedbackProgress": "మంచి ప్రగతి - తప్పులను సమీక్షించి మళ్లీ ప్రయత్నించండి",
+  "soloResultsFeedbackTryAgain": "ఒత్తిడి లేదు - తక్కువ ప్రశ్నలతో మళ్లీ ప్రయత్నించండి",
+  "soloResultsPerfectScore": "పూర్తి స్కోర్! సమీక్షించడానికి తప్పులు లేవు",
+  "soloResultsReviewPrompt": "వేగంగా నేర్చుకోవడానికి తప్పులను సమీక్షించండి. మీ తప్పు సమాధానాలు క్రింద ఉన్నాయి",
+  "soloResultsReviewMistakes": "తప్పులను సమీక్షించండి ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "సైన్ ఇన్ చేయలేదు",
+  "genericUser": "యూజర్",
+  "loading": "లోడ్ అవుతోంది...",
+  "edit": "ఎడిట్",
+  "send": "పంపు",
+  "join": "చేరండి",
+  "leave": "వదిలేయండి",
+  "ready": "సిద్ధం",
+  "levelBeginner": "బిగినర్",
+  "levelIntermediate": "ఇంటర్మీడియట్",
+  "levelAdvanced": "అడ్వాన్స్‌డ్",
+  "questionsShort": "{count} ప్రశ్నలు",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} సెకన్లు",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "అన్ని కోర్సులు",
+  "circlesAllModes": "అన్ని మోడ్‌లు",
+  "circlesAllLevels": "అన్ని స్థాయిలు",
+  "circlesAddNewCourse": "కొత్త కోర్సును జోడించండి",
+  "circlesCoursesTitle": "కోర్సులు",
+  "circlesModeTitle": "మోడ్",
+  "circlesLevelTitle": "స్థాయి",
+  "circlesNoActiveForFilters": "ఈ ఫిల్టర్‌లకు యాక్టివ్ సర్కిల్ లేదు",
+  "circlesUnknownRoom": "తెలియని గది",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "సర్కిల్‌ని సృష్టించండి",
+  "circlesCircleName": "సర్కిల్ పేరు",
+  "circlesEnterName": "పేరును నమోదు చేయండి",
+  "circlesLanguages": "భాషలు",
+  "circlesRoomSetup": "గది సెటప్",
+  "circlesPlayers": "ప్లేయర్లు",
+  "circlesEmptySlot": "ఖాళీ",
+  "circlesPlayersRange": "1-5 ప్లేయర్లు",
+  "circlesQuestions": "ప్రశ్నలు",
+  "circlesQuestionsSubtitle": "ప్రశ్నల పరిమాణం",
+  "circlesTimePerQuestion": "ప్రశ్నకు సమయం",
+  "circlesSecondsPerQuestion": "సెకను/ప్రశ్న",
+  "circlesAdvanced": "అడ్వాన్స్‌డ్",
+  "circlesAllowSpectators": "వీక్షకులను అనుమతించు",
+  "circlesAllowSpectatorsSubtitle": "ఆడకుండా ఇతరులను చూడటానికి అనుమతించండి",
+  "circlesLiveVoiceChat": "లైవ్ వాయిస్ చాట్",
+  "circlesLiveVoiceChatSubtitle": "మ్యాచ్‌ల సమయంలో వాయిస్ ఇంటరాక్షన్ ఎనేబుల్ చేయండి",
+  "circlesLiveTextChat": "లైవ్ టెక్స్ట్ చాట్",
+  "circlesLiveTextChatSubtitle": "మ్యాచ్‌ల సమయంలో మెసేజింగ్ ఎనేబుల్ చేయండి",
+  "circlesCreatedSuccess": "సర్కిల్ సృష్టించబడింది",
+  "circlesCreateError": "సర్కిల్‌ని సృష్టించడం విఫలమైంది: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "చిట్కా: సృష్టించిన తర్వాత మీరు స్నేహితులను ఆహ్వానించవచ్చు",
+  "circlesJoinError": "సర్కిల్‌లో చేరడం విఫలమైంది: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "సర్కిల్ లాబీ",
+  "circlesCodeLine": "కోడ్: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "మ్యాచ్ సెట్టింగ్‌లు",
+  "circlesLevelWithValue": "స్థాయి {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "కఠినత",
+  "circlesPerQuestionShort": "ప్రతి ప్రశ్నకు",
+  "circlesInvite": "ఆహ్వానించండి",
+  "circlesCopyId": "IDని కాపీ చేయండి",
+  "circlesCopiedId": "ID కాపీ చేయబడింది",
+  "circlesMatchInProgress": "మ్యాచ్ జరుగుతోంది",
+  "circlesSpectatorQueuedBody": "మ్యాచ్ జరుగుతోంది. మీరు వీక్షకుడిగా చేరతారు",
+  "circlesHostStartWhenReady": "అందరూ సిద్ధంగా ఉన్నప్పుడు హోస్ట్ ప్రారంభిస్తారు",
+  "circlesSpectators": "వీక్షకులు",
+  "circlesSpectator": "వీక్షకుడు",
+  "circlesSpectatorCanWatch": "వీక్షకులు లైవ్ చూడవచ్చు",
+  "circlesJoinRequests": "చేరడానికి అభ్యర్థనలు",
+  "circlesAcceptSpectatorsHint": "మ్యాచ్ ప్రారంభించే ముందు వీక్షకులను అంగీకరించండి",
+  "circlesStartGame": "గేమ్ ప్రారంభించండి",
+  "circlesWaitingForPlayers": "ప్లేయర్ల కోసం వేచి ఉంది",
+  "circlesLeaveCircle": "సర్కిల్‌ని వదిలేయండి",
+  "circlesRequestSent": "అభ్యర్థన పంపబడింది",
+  "circlesRequestToJoin": "చేరడానికి అభ్యర్థన",
+  "circlesWatchLive": "లైవ్ చూడండి",
+  "circlesPlayerTip": "మీరు సిద్ధమైనప్పుడు 'రెడీ' నొక్కండి. హోస్ట్ మ్యాచ్‌ను ప్రారంభిస్తారు",
+  "circlesSpectatorTip": "మీరు చూస్తున్నారు. హోస్ట్ ప్రారంభించినప్పుడు లైవ్ యాక్షన్‌ను చూడండి",
+  "circlesHostControls": "హోస్ట్ నియంత్రణలు",
+  "circlesTransferHostFailed": "హోస్ట్‌ను మార్చడం విఫలమైంది: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "సర్కిల్‌ని ముగించడం విఫలమైంది: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "యూజర్ @{username} కనుగొనబడలేదు",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "చెల్లని యూజర్",
+  "circlesCantInviteSelf": "మిమ్మల్ని మీరు ఆహ్వానించుకోలేరు",
+  "circlesUserAlreadyInCircle": "@{username} ఇప్పటికే సర్కిల్‌లో ఉన్నారు",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "హోస్ట్",
+  "circlesDefaultTitle": "సర్కిల్",
+  "circlesInviteByUsername": "యూజర్ పేరు ద్వారా",
+  "circlesInviteSent": "@{username}కి ఆహ్వానం పంపబడింది",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "ఆహ్వానం పంపడం విఫలమైంది: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "చేరడానికి అభ్యర్థన పంపబడింది",
+  "circlesJoinRequestFailed": "అభ్యర్థన విఫలమైంది: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "సర్కిల్ నిండిపోయింది",
+  "circlesSpectatorAdded": "వీక్షకుడు జోడించబడ్డారు",
+  "circlesApproveFailed": "ఆమోదించడం విఫలమైంది: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "అభ్యర్థన తిరస్కరించబడింది",
+  "circlesDeclineFailed": "తిరస్కరించడం విఫలమైంది: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "పాల్గొనేవారు",
+  "circlesLeavePromptTitle": "సర్కిల్‌ని వదిలేయాలా?",
+  "circlesLeavePromptTransfer": "వదిలేసే ముందు హోస్ట్‌ను బదిలీ చేయండి",
+  "circlesLeavePromptEndOnly": "సర్కిల్‌ని ముగించి నిష్క్రమించు",
+  "circlesTransferHost": "హోస్ట్‌ను మార్చండి",
+  "circlesEndCircle": "సర్కిల్‌ని ముగించు",
+  "circlesTransferHostTitle": "హోస్ట్ బదిలీ",
+  "circlesShareId": "సర్కిల్ ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

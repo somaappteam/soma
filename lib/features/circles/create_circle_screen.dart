@@ -3,12 +3,12 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import 'circle_lobby_screen.dart';
+import '../../core/theme/tokens.dart';
 import '../../data/circles_repository.dart';
 import '../../core/widgets/responsive.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../data/languages.dart';
 import '../../data/quiz_repository.dart';
-import 'package:flutter/foundation.dart';
 
 class CreateCircleScreen extends StatefulWidget {
   const CreateCircleScreen({super.key});
@@ -48,8 +48,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
     final canCreate = circleName.trim().isNotEmpty;
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: ResponsiveFrame(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
@@ -258,7 +257,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                           onTap: !canCreate ? null : () async {
                             try {
                               // Fetch questions from Supabase-backed CSV tables
-                              String courseId = "${speakLang}-${learnLang}"; 
+                              String courseId = "$speakLang-$learnLang"; 
                               
                               List<Map<String, dynamic>> quizQuestions = [];
                               try {
@@ -339,7 +338,6 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
               ),
             ),
           ),
-        ),
       ),
     );
   }
@@ -545,11 +543,7 @@ class _SegButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gradient = const LinearGradient(
-      begin: Alignment.centerLeft,
-      end: Alignment.centerRight,
-      colors: [Color(0xFF2AFADF), Color(0xFF7C7CFF), Color(0xFFFF4ECD)],
-    );
+    final gradient = T.neonGradient;
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -564,9 +558,9 @@ class _SegButton extends StatelessWidget {
           boxShadow: selected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF7C7CFF).withValues(alpha: 0.35),
-                    blurRadius: 16,
-                    spreadRadius: 1,
+                    color: T.neonA.withValues(alpha: 0.12),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
                 ]
               : null,
@@ -794,7 +788,7 @@ class _ToggleRow extends StatelessWidget {
             value: value,
             onChanged: onChanged,
             activeThumbColor: const Color(0xFF2AFADF),
-            activeTrackColor: const Color(0xFF7C7CFF).withValues(alpha: 0.45),
+            activeTrackColor: T.neonA.withValues(alpha: 0.35),
             inactiveThumbColor: Colors.white.withValues(alpha: 0.70),
             inactiveTrackColor: Colors.white.withValues(alpha: 0.18),
           ),

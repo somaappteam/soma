@@ -1,0 +1,781 @@
+{
+  "@@locale": "ur",
+  "appTitle": "SOMA",
+  "welcomeTagline": "سیکھیں۔ مقابلہ کریں۔ حکمرانی کریں",
+  "signUp": "سائن اپ",
+  "signIn": "سائن ان",
+  "skipForNow": "ابھی چھوڑ دیں",
+  "authFillAllFields": "براہ کرم تمام خانے پُر کریں",
+  "authError": "خرابی: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "ای میل",
+  "authPassword": "پاس ورڈ",
+  "authUsername": "صارف نام",
+  "authContinue": "جاری رکھیں",
+  "authSigningIn": "سائن ان ہو رہا ہے...",
+  "authCreateAccount": "اکاؤنٹ بنائیں",
+  "authCreating": "بنایا جا رہا ہے...",
+  "authNeedAccount": "اکاؤنٹ نہیں ہے؟ ",
+  "authHaveAccount": "پہلے سے اکاؤنٹ ہے؟ ",
+  "dialogAuthRequiredTitle": "Circles تک رسائی کے لیے سائن ان کریں",
+  "dialogAuthRequiredBody": "Circles کثیر صارف کمرے ہیں۔ لائیو میچز میں شامل ہونے، دوستوں کو مدعو کرنے اور پیشرفت محفوظ کرنے کے لیے اکاؤنٹ بنائیں۔",
+  "notNow": "ابھی نہیں",
+  "navHome": "ہوم",
+  "navCircles": "Circles",
+  "navProfile": "پروفائل",
+  "removeCourseTitle": "کورس ہٹائیں؟",
+  "removeCourseBody": "{course} آپ کی فہرست سے ہٹایا جائے گا",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "منسوخ کریں",
+  "remove": "ہٹائیں",
+  "welcomeBack": "خوش آمدید، {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "کورسز میں ترمیم کریں",
+  "done": "مکمل",
+  "noCoursesToEdit": "ترمیم کے لیے کوئی کورس نہیں",
+  "addCourse": "کورس شامل کریں",
+  "unknown": "نامعلوم",
+  "iSpeak": "میں بولتا ہوں",
+  "iWantToLearn": "میں سیکھنا چاہتا ہوں",
+  "chooseYourLanguage": "اپنی زبان منتخب کریں",
+  "chooseLearningLanguage": "سیکھنے کی زبان منتخب کریں",
+  "chooseTwoDifferentLanguages": "براہ کرم دو مختلف زبانیں منتخب کریں",
+  "createCourse": "کورس بنائیں",
+  "soloCourseTitle": "سولو کورس",
+  "searchLanguage": "زبان تلاش کریں",
+  "noMatches": "کوئی مماثلت نہیں",
+  "chooseCourseType": "کورس کی قسم منتخب کریں",
+  "soloStudyDescription": "Circles جیسے ہی کوئزز کے ساتھ اکیلے مطالعہ کریں - لیکن کمروں، چیٹ، ناظرین یا میزبان کے اختیارات کے بغیر",
+  "soloModeVocabulary": "الفاظ",
+  "soloModeSentences": "جملے",
+  "soloModeReview": "نظرثانی",
+  "soloModeVocabularySubtitle": "کثیر انتخاب، معنی، مترادفات، استعمال",
+  "soloModeSentencesSubtitle": "خالی جگہ پُر کریں + ترجمہ + پڑھنا",
+  "soloModeReviewDescription": "سیکھے ہوئے کی مشق کریں: کمزور الفاظ، حالیہ غلطیاں، اور وقفہ دہرائی",
+  "startReview": "نظرثانی شروع کریں",
+  "soloSetupTitle": "{mode} سیٹ اپ",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "مشکل",
+  "numberOfQuestions": "سوالات کی تعداد",
+  "timerPerQuestion": "فی سوال ٹائمر",
+  "noTimer": "کوئی ٹائمر نہیں",
+  "start": "شروع کریں",
+  "profileTitle": "پروفائل",
+  "profileSignInToMessage": "پیغام بھیجنے کے لیے سائن ان کریں",
+  "profileThatsYourProfile": "یہ آپ کا پروفائل ہے",
+  "profileSignInToAddFriends": "دوست شامل کرنے کے لیے سائن ان کریں",
+  "profileCantAddYourself": "آپ خود کو شامل نہیں کر سکتے",
+  "profileRequestSent": "درخواست @{username} کو بھیجی گئی",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "درخواست بھیجنے میں ناکامی",
+  "profileDefaultDisplayName": "نیا صارف",
+  "profileDefaultBio": "سیکھنے کے لیے تیار!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "مہمان",
+  "guestUsername": "مہمان",
+  "guestSessionLabel": "مہمان سیشن",
+  "unlockFullProfile": "مکمل پروفائل کھولیں",
+  "guestBenefitSync": "تمام آلات پر پیشرفت ہم آہنگ کریں",
+  "guestBenefitCircles": "Circles میں شامل ہوں اور لائیو کھیلیں",
+  "guestBenefitNotifications": "اطلاعات اور دوستی کی درخواستیں حاصل کریں",
+  "progressStaysOnDevice": "پیشرفت اس آلہ پر رہتی ہے جب تک آپ سائن ان نہیں کرتے",
+  "profileGoalLabel": "ہدف: {minutes} منٹ",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP پیشرفت",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "جیتیں",
+  "profileStreak": "لگاتار",
+  "profileFriendsTitle": "دوست",
+  "profileViewAll": "سب دیکھیں",
+  "profileAchievementsTitle": "کامیابیاں",
+  "profileNoAchievements": "ابھی تک کوئی کامیابیاں نہیں",
+  "profileRequested": "درخواست بھیجی گئی",
+  "profileSending": "بھیجا جا رہا ہے...",
+  "profileAddFriend": "دوست شامل کریں",
+  "profileConnectTitle": "جڑیں",
+  "profileMessage": "پیغام",
+  "profileSnapshot": "پروفائل سنیپ شاٹ",
+  "profileLocationHidden": "مقام چھپایا گیا",
+  "profileBioHidden": "تعارف چھپایا گیا",
+  "profileDailyGoal": "روزانہ {minutes} منٹ کا ہدف",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle دعوت نامہ",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "شامل ہونے کے لیے سائن ان کریں",
+  "joiningCircle": "شامل ہو رہے ہیں...",
+  "joinCircle": "Circle میں شامل ہوں",
+  "circleJoinedAsPlayer": "کھلاڑی کے طور پر شامل ہوئے",
+  "circleJoinedAsSpectator": "ناظر کے طور پر شامل ہوئے",
+  "accept": "قبول کریں",
+  "decline": "انکار کریں",
+  "open": "کھولیں",
+  "circleCountdownTitle": "تیار ہو جائیں",
+  "circleCountdownSubtitle": "Circle شروع ہو رہا ہے...",
+  "userFallbackName": "صارف",
+  "micOff": "مائیک بند",
+  "micOn": "مائیک آن",
+  "roleHost": "میزبان",
+  "roleSpectator": "ناظر",
+  "tagHost": "میزبان",
+  "tagYou": "آپ",
+  "statusCorrect": "درست",
+  "statusWrong": "غلط",
+  "statusWaiting": "منتظر",
+  "statusNone": "-",
+  "pointsAbbrev": "پوائنٹس",
+  "pointsLabel": "پوائنٹس",
+  "statCorrect": "درست",
+  "statAnswers": "جوابات",
+  "statTotal": "کل",
+  "statQuestions": "سوالات",
+  "statAccuracy": "درستگی",
+  "statRate": "شرح",
+  "statRank": "درجہ",
+  "statPosition": "پوزیشن",
+  "statMode": "موڈ",
+  "statType": "قسم",
+  "next": "اگلا",
+  "submit": "جمع کرائیں",
+  "continueLabel": "جاری رکھیں",
+  "save": "محفوظ کریں",
+  "playAgain": "دوبارہ کھیلیں",
+  "backToCourse": "کورس پر واپس",
+  "resultsTitle": "نتائج",
+  "shareLater": "بعد میں شیئر کریں",
+  "delete": "حذف کریں",
+  "ok": "ٹھیک ہے",
+  "minutesShort": "{minutes} منٹ",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} منٹ",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} گھنٹے",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} دن",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "ابھی ابھی",
+  "timeMinutesAgo": "{count} منٹ پہلے",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} گھنٹے پہلے",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} دن پہلے",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "میزبان کا انتظار...",
+  "liveQuizJoinRequestSent": "شامل ہونے کی درخواست بھیجی گئی",
+  "liveQuizJoinRequestFailed": "درخواست بھیجنے میں ناکامی: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "میزبان کنٹرول",
+  "liveQuizSpectatorModeTitle": "ناظر موڈ",
+  "liveQuizHostControlsSubtitle": "راؤنڈز خودکار طور پر آگے بڑھتے ہیں جب سب جواب دیں یا وقت ختم ہو",
+  "liveQuizSpectatorModeSubtitle": "سوالات اور لیڈر بورڈ لائیو دیکھیں۔ آپ جواب نہیں دے سکتے",
+  "liveQuizQuestionCounter": "سوال {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "درخواست بھیجی گئی",
+  "liveQuizRequestToJoin": "شامل ہونے کی درخواست",
+  "liveQuizSpectatorFooter": "آپ لائیو دیکھ رہے ہیں۔ سوالات اور لیڈر بورڈ سے لطف اندوز ہوں",
+  "circleNotFound": "Circle نہیں ملا",
+  "resultsRematchStartFailed": "دوبارہ مقابلہ شروع کرنے میں ناکامی: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "میچ کے نتائج",
+  "resultsNiceWork": "اچھا کام، {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "پہلی جگہ",
+  "resultsPlaceSecond": "دوسری جگہ",
+  "resultsPlaceThird": "تیسری جگہ",
+  "resultsPlaceNth": "{rank}ویں جگہ",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "{players} کھلاڑیوں میں سے",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "چیمپئن! آپ نے اس دائرے پر غلبہ پایا",
+  "resultsHighlightGreatAccuracy": "زبردست درستگی - آپ چوٹی کے قریب ہیں!",
+  "resultsHighlightKeepGoing": "جاری رکھیں - مستقل مزاجی نے رفتار کو شکست دی",
+  "resultsLeaderboardTitle": "لیڈر بورڈ",
+  "resultsPlayersCount": "{count} کھلاڑی",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Circles پر واپس",
+  "resultsRematch": "دوبارہ مقابلہ",
+  "resultsPlayAgain": "دوبارہ کھیلیں",
+  "leaderboardGlobalTitle": "عالمی درجہ بندی",
+  "leaderboardEmpty": "ابھی تک کوئی درجہ بندی نہیں",
+  "aboutTitle": "ایپ کے بارے میں",
+  "aboutVersion": "ورژن {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA ایک گیمیفائیڈ زبان سیکھنے کا پلیٹ فارم ہے جو نئی زبانوں میں مہارت حاصل کرنا دلچسپ اور سماجی بناتا ہے۔ Circles میں مقابلہ کریں، اکیلے مشق کریں، اور اپنی پیشرفت کو ٹریک کریں۔",
+  "aboutTerms": "استعمال کی شرائط",
+  "aboutPrivacy": "رازداری کی پالیسی",
+  "aboutOpenSource": "اوپن سورس لائسنس",
+  "addFriendTitle": "دوست شامل کریں",
+  "addFriendFindByUsername": "صارف نام سے تلاش کریں",
+  "addFriendUsernameHint": "صارف نام درج کریں...",
+  "addFriendTip": "تجویز: QR کوڈ + دوست ID سپورٹ بعد میں شامل کیا جائے گا",
+  "addFriendSending": "بھیجا جا رہا ہے...",
+  "addFriendSendRequest": "درخواست بھیجیں",
+  "addFriendUserNotFound": "صارف @{username} نہیں ملا",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "عمل ناکام ہوا یا پہلے سے بھیجا گیا: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "دوست",
+  "searchFriendsHint": "دوست تلاش کریں...",
+  "somaLearnerSubtitle": "Soma سیکھنے والا",
+  "friendRequestLabel": "درخواست",
+  "friendRequestSentLabel": "درخواست بھیجی گئی",
+  "friendIncomingRequestLabel": "آنے والی درخواست",
+  "friendRequestsSection": "درخواستیں",
+  "friendPendingSection": "زیر التوا",
+  "friendAllSection": "تمام دوست",
+  "friendsEmptyState": "ابھی تک کوئی دوست نہیں۔ اپنا پہلا دوست شامل کریں!",
+  "friendsEmptyShort": "ابھی تک کوئی دوست نہیں",
+  "noMatchForQuery": "\\\"{query}\\\" کے لیے کوئی مماثلت نہیں",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "ان باکس",
+  "searchChatsHint": "چیٹس تلاش کریں...",
+  "inboxEmptyState": "ابھی تک کوئی گفتگو نہیں۔ کسی دوست کے ساتھ چیٹ شروع کریں!",
+  "newMessageTitle": "نیا پیغام",
+  "chatCallLater": "آواز کال بعد میں (Circle voice اگلی ہے)",
+  "errorWithDetails": "خرابی: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "{name} کو سلام کہیں!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "پیغام...",
+  "notificationsTitle": "اطلاعات",
+  "notificationsTabAll": "تمام",
+  "notificationsTabCourses": "کورسز",
+  "notificationsTabSocial": "سوشل",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "سسٹم",
+  "notificationsEmpty": "کوئی اطلاعات نہیں",
+  "notificationsDeleted": "اطلاع حذف کر دی گئی",
+  "notificationTitleFallback": "اطلاع",
+  "notificationTypeCourse": "کورس",
+  "notificationTypeSocial": "سوشل",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "سسٹم",
+  "notificationsFriendAccepted": "دوستی کی درخواست قبول کی گئی",
+  "notificationsFriendAcceptFailed": "دوستی کی درخواست قبول کرنے میں ناکامی: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "دوستی کی درخواست مسترد کی گئی",
+  "notificationsFriendDeclineFailed": "دوستی کی درخواست مسترد کرنے میں ناکامی: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Circle میں شامل ہونے میں ناکامی: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "کھل رہا ہے",
+  "notificationsOpened": "کھولا گیا",
+  "notificationsActionMessage": "{action} اطلاع",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "ترتیبات",
+  "settingsSectionAccount": "اکاؤنٹ",
+  "settingsEditProfile": "پروفائل میں ترمیم کریں",
+  "settingsPrivacy": "رازداری",
+  "settingsSecurity": "سیکیورٹی",
+  "settingsSectionGameplay": "گیم پلے",
+  "settingsShowTranslationLine": "ترجمہ لائن دکھائیں",
+  "settingsShowReadingLine": "پڑھنا دکھائیں (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "ڈیفالٹ فی سوال ٹائمر",
+  "settingsMatchDifficulty": "میچ کی مشکل",
+  "settingsMatchDifficultyAdaptive": "اڈاپٹیو",
+  "settingsSectionSoundFeel": "آواز اور احساس",
+  "settingsMusic": "موسیقی",
+  "settingsSoundEffects": "آواز کے اثرات",
+  "settingsHaptics": "ہیپٹکس",
+  "settingsSectionNotifications": "اطلاعات",
+  "settingsPushNotifications": "پش اطلاعات",
+  "settingsDailyReminder": "روزانہ یاد دہانی",
+  "settingsSectionAppearance": "شکل و صورت",
+  "settingsTheme": "تھیم",
+  "settingsUiLanguage": "UI زبان",
+  "settingsSectionAbout": "کے بارے میں",
+  "settingsVersion": "ورژن",
+  "settingsTermsPrivacy": "شرائط اور رازداری",
+  "settingsSupport": "سپورٹ",
+  "settingsLogout": "لاگ آؤٹ",
+  "themeSystem": "سسٹم",
+  "themeDark": "تاریک",
+  "themeLight": "روشن",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "پروفائل اپ ڈیٹ ہو گیا",
+  "editProfileTitle": "پروفائل میں ترمیم کریں",
+  "editProfilePhotoLabel": "پروفائل تصویر",
+  "editProfilePhotoSubtitle": "Supabase Storage کے ذریعے اوتار انتخاب جلد آ رہا ہے",
+  "editProfileChangePhoto": "تبدیل کریں",
+  "editProfileAvatarUploadSoon": "اوتار اپ لوڈ جلد آ رہا ہے",
+  "editProfileDisplayNameLabel": "ڈسپلے نام",
+  "editProfileDisplayNameHint": "آپ کا نام",
+  "editProfileDisplayNameRequired": "اپنا نام درج کریں",
+  "editProfileDisplayNameTooShort": "بہت چھوٹا",
+  "editProfileUsernameLabel": "صارف نام",
+  "editProfileUsernameHint": "احمد_سیکھنے_والا",
+  "editProfileUsernameRequired": "صارف نام درج کریں",
+  "editProfileUsernameTooShort": "کم از کم 3 حروف",
+  "editProfileUsernameInvalid": "صرف حروف، اعداد، _",
+  "editProfileBioLabel": "تعارف",
+  "editProfileBioHint": "ایک مختصر تعارف...",
+  "editProfileBioTooLong": "زیادہ سے زیادہ 120 حروف",
+  "editProfileLocationLabel": "مقام",
+  "editProfileLocationHint": "شہر / ملک",
+  "editProfileDailyGoalTitle": "روزانہ ہدف",
+  "editProfileDailyGoalSubtitle": "منتخب کریں کہ آپ روزانہ کتنے منٹ مطالعہ کرنا چاہتے ہیں",
+  "securityTitle": "سیکیورٹی",
+  "securitySectionPassword": "پاس ورڈ",
+  "securityChangePasswordTitle": "پاس ورڈ تبدیل کریں",
+  "securityChangePasswordSubtitle": "اپنا پاس ورڈ باقاعدگی سے اپ ڈیٹ کریں",
+  "securitySectionTwoFactor": "دو عنصری تصدیق",
+  "securityEnable2faTitle": "2FA فعال کریں",
+  "securityEnable2faSubtitle": "سائن ان کرتے وقت اضافی تحفظ",
+  "securitySectionAppLock": "ایپ لاک",
+  "securityBiometricTitle": "بائیو میٹرک ان لاک",
+  "securityBiometricSubtitle": "SOMA کھولنے کے لیے FaceID/TouchID استعمال کریں",
+  "securityAppLockTitle": "ایپ لاک",
+  "securityAppLockSubtitle": "ایپ سے باہر جاتے وقت SOMA کو لاک کریں",
+  "securitySectionSessions": "فعال سیشنز",
+  "securityNoSessions": "کوئی فعال سیشن نہیں ملا",
+  "securityThisDevice": "یہ آلہ",
+  "securityDevice": "آلہ",
+  "securityActiveLabel": "فعال",
+  "securitySignInToEnable2fa": "2FA فعال کرنے کے لیے سائن ان کریں",
+  "securityEnable2faFailed": "2FA فعال کرنے میں ناکامی: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FA غیر فعال کرنے میں ناکامی: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA سیٹ اپ",
+  "securitySecretKeyLabel": "خفیہ کلید",
+  "securityCodeHint": "6 ہندسوں کا کوڈ",
+  "security2faEnabled": "2FA فعال ہے",
+  "securityVerifyCodeFailed": "کوڈ کی تصدیق میں ناکامی: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "تصدیق ہو رہی ہے...",
+  "securityVerify": "تصدیق کریں",
+  "securityCurrentPasswordHint": "موجودہ پاس ورڈ",
+  "securityNewPasswordHint": "نیا پاس ورڈ (کم از کم 8 حروف)",
+  "securityConfirmPasswordHint": "نئے پاس ورڈ کی تصدیق کریں",
+  "securitySignInToChangePassword": "پاس ورڈ تبدیل کرنے کے لیے سائن ان کریں",
+  "securityEnterCurrentPassword": "اپنا موجودہ پاس ورڈ درج کریں",
+  "securityPasswordMinLength": "نئے پاس ورڈ میں کم از کم 8 حروف ہونے چاہئیں",
+  "securityPasswordsDoNotMatch": "پاس ورڈ مماثل نہیں ہیں",
+  "securityPasswordUpdated": "پاس ورڈ اپ ڈیٹ ہو گیا",
+  "securityPasswordUpdateFailed": "پاس ورڈ اپ ڈیٹ کرنے میں ناکامی: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "اس کے بعد خودکار لاک",
+  "privacyTitle": "رازداری",
+  "privacySectionVisibility": "مرئیت",
+  "privacyProfileVisibilityTitle": "پروفائل کی مرئیت",
+  "privacyVisibilityPublic": "عوامی",
+  "privacyVisibilityFriends": "دوست",
+  "privacyVisibilityPrivate": "نجی",
+  "privacyVisibilityPublicSubtitle": "ہر کوئی آپ کا پروفائل دیکھ سکتا ہے",
+  "privacyVisibilityFriendsSubtitle": "صرف دوست آپ کا پروفائل دیکھ سکتے ہیں",
+  "privacyVisibilityPrivateSubtitle": "صرف آپ اپنا پروفائل دیکھ سکتے ہیں",
+  "privacySectionActivity": "سرگرمی",
+  "privacyShowOnlineTitle": "آن لائن سٹیٹس دکھائیں",
+  "privacyShowOnlineSubtitle": "دوسروں کو دیکھنے دیں جب آپ آن لائن ہوں",
+  "privacyShowActivityTitle": "سیکھنے کی سرگرمی دکھائیں",
+  "privacyShowActivitySubtitle": "لگاتار، XP، اور حالیہ پیشرفت دکھائیں",
+  "privacySectionSocial": "سوشل",
+  "privacyAllowRequestsTitle": "دوستی کی درخواستوں کی اجازت دیں",
+  "privacyAllowRequestsSubtitle": "لوگوں کو آپ کو دوستی کی درخواستیں بھیجنے دیں",
+  "privacyWhoCanDmTitle": "کون DM بھیج سکتا ہے",
+  "privacyDmEveryone": "ہر کوئی",
+  "privacyDmFriends": "دوست",
+  "privacyDmNoOne": "کوئی نہیں",
+  "privacyDmEveryoneSubtitle": "کوئی بھی آپ کو پیغام بھیج سکتا ہے",
+  "privacyDmFriendsSubtitle": "صرف دوست آپ کو پیغام بھیج سکتے ہیں",
+  "privacyDmNoOneSubtitle": "کوئی بھی آپ کو پیغام نہیں بھیج سکتا",
+  "privacySectionBlockedUsers": "مسدود صارفین",
+  "privacyBlockedUsersComingSoon": "مسدود صارفین کا انتظام جلد آ رہا ہے",
+  "privacySectionDataControls": "ڈیٹا کنٹرولز",
+  "privacyExportDataTitle": "میرا ڈیٹا برآمد کریں",
+  "privacyExportDataSubtitle": "اپنی سرگرمی اور کورسز ڈاؤن لوڈ کریں",
+  "privacyExportInfoTitle": "ڈیٹا برآمد",
+  "privacyExportInfoBody": "اگلا قدم: JSON/CSV برآمد بنائیں اور ای میل کریں یا مقامی طور پر ڈاؤن لوڈ کریں",
+  "privacyDeleteAccountTitle": "اکاؤنٹ حذف کریں",
+  "privacyDeleteAccountSubtitle": "یہ آپ کا اکاؤنٹ اور ڈیٹا مستقل طور پر حذف کر دے گا",
+  "privacyDeleteConfirmTitle": "اکاؤنٹ حذف کریں؟",
+  "privacyDeleteConfirmBody": "یہ عمل واپس نہیں ہو سکتا۔ آپ کا پروفائل، کورسز، دوست، اور پیغامات حذف ہو جائیں گے",
+  "privacyDeleteComingSoon": "حذف کرنا Supabase سے بعد میں منسلک ہوگا",
+  "soloLabel": "سولو",
+  "soloResultsCompletedTitle": "سولو سیشن مکمل",
+  "soloResultsFeedbackElite": "اعلیٰ کارکردگی - اپنا سلسلہ برقرار رکھیں",
+  "soloResultsFeedbackStrong": "مضبوط کام - آپ تیزی سے بہتر ہو رہے ہیں",
+  "soloResultsFeedbackProgress": "اچھی پیشرفت - غلطیوں کا جائزہ لیں اور دوبارہ کوشش کریں",
+  "soloResultsFeedbackTryAgain": "کوئی دباؤ نہیں - کم سوالات کے ساتھ دوبارہ کوشش کریں اور توجہ مرکوز کریں",
+  "soloResultsPerfectScore": "کامل سکور! جائزہ لینے کے لیے کوئی غلطیاں نہیں",
+  "soloResultsReviewPrompt": "تیزی سے سیکھنے کے لیے غلطیوں کا جائزہ لیں۔ آپ کے غلط جوابات نیچے ہیں",
+  "soloResultsReviewMistakes": "غلطیوں کا جائزہ لیں ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "آپ سائن ان نہیں ہیں",
+  "genericUser": "صارف",
+  "loading": "لوڈ ہو رہا ہے...",
+  "edit": "ترمیم کریں",
+  "send": "بھیجیں",
+  "join": "شامل ہوں",
+  "leave": "چھوڑیں",
+  "ready": "تیار",
+  "levelBeginner": "ابتدائی",
+  "levelIntermediate": "درمیانی",
+  "levelAdvanced": "اعلیٰ",
+  "questionsShort": "{count} سوالات",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} سیکنڈ",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "تمام کورسز",
+  "circlesAllModes": "تمام موڈز",
+  "circlesAllLevels": "تمام سطحیں",
+  "circlesAddNewCourse": "نیا کورس شامل کریں",
+  "circlesCoursesTitle": "کورسز",
+  "circlesModeTitle": "موڈ",
+  "circlesLevelTitle": "سطح",
+  "circlesNoActiveForFilters": "ان فلٹرز کے لیے کوئی فعال Circles نہیں",
+  "circlesUnknownRoom": "نامعلوم کمرہ",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Circle بنائیں",
+  "circlesCircleName": "Circle کا نام",
+  "circlesEnterName": "نام درج کریں",
+  "circlesLanguages": "زبانیں",
+  "circlesRoomSetup": "کمرے کا سیٹ اپ",
+  "circlesPlayers": "کھلاڑی",
+  "circlesEmptySlot": "خالی جگہ",
+  "circlesPlayersRange": "1-5 کھلاڑی",
+  "circlesQuestions": "سوالات",
+  "circlesQuestionsSubtitle": "سوالات کی تعداد",
+  "circlesTimePerQuestion": "فی سوال وقت",
+  "circlesSecondsPerQuestion": "سیکنڈ فی سوال",
+  "circlesAdvanced": "اعلیٰ درجہ",
+  "circlesAllowSpectators": "ناظرین کی اجازت دیں",
+  "circlesAllowSpectatorsSubtitle": "دوسروں کو بغیر کھیلے دیکھنے دیں",
+  "circlesLiveVoiceChat": "لائیو آواز چیٹ",
+  "circlesLiveVoiceChatSubtitle": "میچز کے دوران آواز کی بات چیت فعال کریں",
+  "circlesLiveTextChat": "لائیو ٹیکسٹ چیٹ",
+  "circlesLiveTextChatSubtitle": "میچز کے دوران چیٹ فعال کریں",
+  "circlesCreatedSuccess": "Circle بنایا گیا",
+  "circlesCreateError": "Circle بنانے میں ناکامی: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "تجویز: آپ بنانے کے بعد دوستوں کو مدعو کر سکتے ہیں",
+  "circlesJoinError": "Circle میں شامل ہونے میں ناکامی: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Circle لابی",
+  "circlesCodeLine": "کوڈ: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "میچ کی ترتیبات",
+  "circlesLevelWithValue": "سطح {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "مشکل",
+  "circlesPerQuestionShort": "فی سوال",
+  "circlesInvite": "مدعو کریں",
+  "circlesCopyId": "ID کاپی کریں",
+  "circlesCopiedId": "ID کاپی ہو گئی",
+  "circlesMatchInProgress": "میچ جاری ہے",
+  "circlesSpectatorQueuedBody": "میچ جاری ہے۔ آپ بطور ناظر شامل ہوں گے",
+  "circlesHostStartWhenReady": "میزبان شروع کرے گا جب سب تیار ہوں",
+  "circlesSpectators": "ناظرین",
+  "circlesSpectator": "ناظر",
+  "circlesSpectatorCanWatch": "ناظرین لائیو دیکھ سکتے ہیں",
+  "circlesJoinRequests": "شامل ہونے کی درخواستیں",
+  "circlesAcceptSpectatorsHint": "میچ شروع کرنے سے پہلے ناظرین کو قبول کریں",
+  "circlesStartGame": "کھیل شروع کریں",
+  "circlesWaitingForPlayers": "کھلاڑیوں کا انتظار",
+  "circlesLeaveCircle": "Circle چھوڑیں",
+  "circlesRequestSent": "درخواست بھیجی گئی",
+  "circlesRequestToJoin": "شامل ہونے کی درخواست",
+  "circlesWatchLive": "لائیو دیکھیں",
+  "circlesPlayerTip": "تیار ہونے پر تیار دبائیں۔ میزبان میچ شروع کرے گا",
+  "circlesSpectatorTip": "آپ دیکھ رہے ہیں۔ میزبان کے شروع کرنے پر لائیو دیکھیں",
+  "circlesHostControls": "میزبان کنٹرولز",
+  "circlesTransferHostFailed": "میزبان منتقل کرنے میں ناکامی: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Circle ختم کرنے میں ناکامی: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "صارف @{username} نہیں ملا",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "غلط صارف",
+  "circlesCantInviteSelf": "آپ خود کو مدعو نہیں کر سکتے",
+  "circlesUserAlreadyInCircle": "@{username} پہلے سے Circle میں ہے",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "میزبان",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "صارف نام سے مدعو کریں",
+  "circlesInviteSent": "دعوت نامہ @{username} کو بھیجا گیا",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "دعوت نامہ بھیجنے میں ناکامی: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "شامل ہونے کی درخواست بھیجی گئی",
+  "circlesJoinRequestFailed": "درخواست بھیجنے میں ناکامی: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle بھر گیا",
+  "circlesSpectatorAdded": "ناظر شامل کیا گیا",
+  "circlesApproveFailed": "درخواست منظور کرنے میں ناکامی: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "درخواست مسترد کر دی گئی",
+  "circlesDeclineFailed": "درخواست مسترد کرنے میں ناکامی: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "شریک",
+  "circlesLeavePromptTitle": "Circle چھوڑیں؟",
+  "circlesLeavePromptTransfer": "براہ کرم چھوڑنے سے پہلے میزبان منتقل کریں",
+  "circlesLeavePromptEndOnly": "Circle ختم کریں اور چھوڑیں",
+  "circlesTransferHost": "میزبان منتقل کریں",
+  "circlesEndCircle": "Circle ختم کریں",
+  "circlesTransferHostTitle": "میزبان منتقل کریں",
+  "circlesShareId": "Circle ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

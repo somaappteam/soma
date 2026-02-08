@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/glass.dart';
 import '../../core/theme/tokens.dart';
 
@@ -11,8 +11,7 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
@@ -79,7 +78,6 @@ class AboutScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }

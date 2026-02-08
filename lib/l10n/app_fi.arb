@@ -1,0 +1,781 @@
+{
+  "@@locale": "fi",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Learn. Compete. Master.",
+  "signUp": "Sign Up",
+  "signIn": "Sign In",
+  "skipForNow": "Skip for Now",
+  "authFillAllFields": "Please fill in all fields",
+  "authError": "Error: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "Email",
+  "authPassword": "Password",
+  "authUsername": "Username",
+  "authContinue": "Continue",
+  "authSigningIn": "Signing In...",
+  "authCreateAccount": "Create Account",
+  "authCreating": "Creating...",
+  "authNeedAccount": "Don't have an account? ",
+  "authHaveAccount": "Already have an account? ",
+  "dialogAuthRequiredTitle": "Sign in to access Circles",
+  "dialogAuthRequiredBody": "Circles are multiplayer rooms. Create an account to join live matches, invite friends, and save progress.",
+  "notNow": "Not now",
+  "navHome": "Home",
+  "navCircles": "Circles",
+  "navProfile": "Profile",
+  "removeCourseTitle": "Remove course?",
+  "removeCourseBody": "{course} will be removed from your home list.",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Cancel",
+  "remove": "Remove",
+  "welcomeBack": "Welcome back, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Edit courses",
+  "done": "Done",
+  "noCoursesToEdit": "No courses to edit.",
+  "addCourse": "Add Course",
+  "unknown": "Unknown",
+  "iSpeak": "I speak",
+  "iWantToLearn": "I want to learn",
+  "chooseYourLanguage": "Choose your language",
+  "chooseLearningLanguage": "Choose learning language",
+  "chooseTwoDifferentLanguages": "Choose two different languages.",
+  "createCourse": "Create Course",
+  "soloCourseTitle": "Solo Course",
+  "searchLanguage": "Search language",
+  "noMatches": "No matches",
+  "chooseCourseType": "Choose a course type",
+  "soloStudyDescription": "Study alone with the same quiz style as circles - but without rooms, chat, spectators, or host options.",
+  "soloModeVocabulary": "Vocabulary",
+  "soloModeSentences": "Sentences",
+  "soloModeReview": "Review",
+  "soloModeVocabularySubtitle": "Multiple choice meanings, synonyms, usage",
+  "soloModeSentencesSubtitle": "Fill in the blank + translation + reading",
+  "soloModeReviewDescription": "Practice what you learned: weak words, recent mistakes, and spaced repetition.",
+  "startReview": "Start Review",
+  "soloSetupTitle": "{mode} Setup",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Difficulty",
+  "numberOfQuestions": "Number of questions",
+  "timerPerQuestion": "Timer per question",
+  "noTimer": "No timer",
+  "start": "Start",
+  "profileTitle": "Profile",
+  "profileSignInToMessage": "Sign in to message",
+  "profileThatsYourProfile": "That's your profile",
+  "profileSignInToAddFriends": "Sign in to add friends",
+  "profileCantAddYourself": "You can't add yourself",
+  "profileRequestSent": "Request sent to @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Couldn't send request",
+  "profileDefaultDisplayName": "New User",
+  "profileDefaultBio": "Ready to learn!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Guest",
+  "guestUsername": "guest",
+  "guestSessionLabel": "Guest session",
+  "unlockFullProfile": "Unlock your full profile",
+  "guestBenefitSync": "Sync progress across devices",
+  "guestBenefitCircles": "Join Circles and play live",
+  "guestBenefitNotifications": "Get notifications and friend requests",
+  "progressStaysOnDevice": "Progress stays on this device until you sign in.",
+  "profileGoalLabel": "Goal: {minutes}m",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP Progress",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Wins",
+  "profileStreak": "Streak",
+  "profileFriendsTitle": "My Friends",
+  "profileViewAll": "View all",
+  "profileAchievementsTitle": "Achievements",
+  "profileNoAchievements": "Ei vielä saavutuksia",
+  "profileRequested": "Requested",
+  "profileSending": "Sending...",
+  "profileAddFriend": "Add Friend",
+  "profileConnectTitle": "Connect",
+  "profileMessage": "Message",
+  "profileSnapshot": "Profile Snapshot",
+  "profileLocationHidden": "Location hidden",
+  "profileBioHidden": "Bio hidden",
+  "profileDailyGoal": "Daily goal {minutes}m",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle invite",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Sign In to Join",
+  "joiningCircle": "Joining...",
+  "joinCircle": "Join Circle",
+  "circleJoinedAsPlayer": "Joined as player",
+  "circleJoinedAsSpectator": "Joined as spectator",
+  "accept": "Accept",
+  "decline": "Decline",
+  "open": "Open",
+  "circleCountdownTitle": "Get Ready",
+  "circleCountdownSubtitle": "Circle is starting...",
+  "userFallbackName": "User",
+  "micOff": "Mic Off",
+  "micOn": "Mic On",
+  "roleHost": "Host",
+  "roleSpectator": "Spectator",
+  "tagHost": "HOST",
+  "tagYou": "YOU",
+  "statusCorrect": "Correct",
+  "statusWrong": "Wrong",
+  "statusWaiting": "Waiting",
+  "statusNone": "-",
+  "pointsAbbrev": "pts",
+  "pointsLabel": "Points",
+  "statCorrect": "Correct",
+  "statAnswers": "answers",
+  "statTotal": "Total",
+  "statQuestions": "questions",
+  "statAccuracy": "Accuracy",
+  "statRate": "rate",
+  "statRank": "Rank",
+  "statPosition": "position",
+  "statMode": "Mode",
+  "statType": "type",
+  "next": "Next",
+  "submit": "Submit",
+  "continueLabel": "Continue",
+  "save": "Save",
+  "playAgain": "Play Again",
+  "backToCourse": "Back to Course",
+  "resultsTitle": "Results",
+  "shareLater": "Share later",
+  "delete": "Delete",
+  "ok": "OK",
+  "minutesShort": "{minutes}m",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}m",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}h",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}d",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "just now",
+  "timeMinutesAgo": "{count}m ago",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count}h ago",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count}d ago",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Waiting for host...",
+  "liveQuizJoinRequestSent": "Join request sent",
+  "liveQuizJoinRequestFailed": "Failed to request join: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Host controls",
+  "liveQuizSpectatorModeTitle": "Spectator mode",
+  "liveQuizHostControlsSubtitle": "Rounds auto-advance when everyone answers or time runs out.",
+  "liveQuizSpectatorModeSubtitle": "Watch questions and the live leaderboard. You can't answer.",
+  "liveQuizQuestionCounter": "Question {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Request Sent",
+  "liveQuizRequestToJoin": "Request to Join",
+  "liveQuizSpectatorFooter": "You're watching live. Enjoy the questions and leaderboard.",
+  "circleNotFound": "Circle not found",
+  "resultsRematchStartFailed": "Failed to start rematch: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Match Results",
+  "resultsNiceWork": "Nice work, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1st Place",
+  "resultsPlaceSecond": "2nd Place",
+  "resultsPlaceThird": "3rd Place",
+  "resultsPlaceNth": "Place {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "Out of {players} players",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Champion! You dominated this circle.",
+  "resultsHighlightGreatAccuracy": "Great accuracy. You're close to the top!",
+  "resultsHighlightKeepGoing": "Keep going - consistency beats speed.",
+  "resultsLeaderboardTitle": "Leaderboard",
+  "resultsPlayersCount": "{count} players",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Back to Circles",
+  "resultsRematch": "Rematch",
+  "resultsPlayAgain": "Play Again",
+  "leaderboardGlobalTitle": "Global Ranking",
+  "leaderboardEmpty": "No rankings yet.",
+  "aboutTitle": "Info",
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA is a gamified language learning platform designed to make mastering new languages engaging and social. Compete in circles, practice solo, and track your progress.",
+  "aboutTerms": "Terms of Service",
+  "aboutPrivacy": "Privacy Policy",
+  "aboutOpenSource": "Open Source Licenses",
+  "addFriendTitle": "Add Friend",
+  "addFriendFindByUsername": "Find by username",
+  "addFriendUsernameHint": "Type username...",
+  "addFriendTip": "Tip: later we can support QR code + friend ID.",
+  "addFriendSending": "Sending...",
+  "addFriendSendRequest": "Send Request",
+  "addFriendUserNotFound": "User @{username} not found",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Action failed or already sent: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Friends",
+  "searchFriendsHint": "Search friends...",
+  "somaLearnerSubtitle": "Soma Learner",
+  "friendRequestLabel": "Request",
+  "friendRequestSentLabel": "Request sent",
+  "friendIncomingRequestLabel": "Incoming Request",
+  "friendRequestsSection": "Requests",
+  "friendPendingSection": "Pending",
+  "friendAllSection": "All Friends",
+  "friendsEmptyState": "No friends yet. Add your first friend!",
+  "friendsEmptyShort": "No friends yet.",
+  "noMatchForQuery": "No match for \"{query}\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Inbox",
+  "searchChatsHint": "Search chats...",
+  "inboxEmptyState": "No conversations yet. Start chatting with a friend!",
+  "newMessageTitle": "New message",
+  "chatCallLater": "Voice call later (Circle voice is next)",
+  "errorWithDetails": "Error: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Say hi to {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Message...",
+  "notificationsTitle": "Ilmoitukset",
+  "notificationsTabAll": "All",
+  "notificationsTabCourses": "Courses",
+  "notificationsTabSocial": "Social",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "System",
+  "notificationsEmpty": "Ei vielä ilmoituksia",
+  "notificationsDeleted": "Notification deleted",
+  "notificationTitleFallback": "Notification",
+  "notificationTypeCourse": "Course",
+  "notificationTypeSocial": "Social",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "System",
+  "notificationsFriendAccepted": "Friend request accepted",
+  "notificationsFriendAcceptFailed": "Couldn't accept friend request: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Friend request declined",
+  "notificationsFriendDeclineFailed": "Couldn't decline friend request: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Piiriin liittyminen epäonnistui: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Avataan",
+  "notificationsOpened": "Avattu",
+  "notificationsActionMessage": "{action} ilmoitus",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Asetukset",
+  "settingsSectionAccount": "Tili",
+  "settingsEditProfile": "Muokkaa Profiilia",
+  "settingsPrivacy": "Yksityisyys",
+  "settingsSecurity": "Turvallisuus",
+  "settingsSectionGameplay": "Pelattavuus",
+  "settingsShowTranslationLine": "Näytä Käännösrivi",
+  "settingsShowReadingLine": "Näytä Lukurivi (Pinyin/Romanji)",
+  "settingsDefaultTimerPerQuestion": "Aika per Kysymys",
+  "settingsMatchDifficulty": "Matsin Vaikeusaste",
+  "settingsMatchDifficultyAdaptive": "Mukautuva",
+  "settingsSectionSoundFeel": "Ääni & Tuntuma",
+  "settingsMusic": "Musiikki",
+  "settingsSoundEffects": "Äänitehosteet",
+  "settingsHaptics": "Värinä",
+  "settingsSectionNotifications": "Ilmoitukset",
+  "settingsPushNotifications": "Push-ilmoitukset",
+  "settingsDailyReminder": "Päivittäinen Muistutus",
+  "settingsSectionAppearance": "Ulkoasu",
+  "settingsTheme": "Teema",
+  "settingsUiLanguage": "Käyttöliittymän Kieli",
+  "settingsSectionAbout": "Tietoja",
+  "settingsVersion": "Versio",
+  "settingsTermsPrivacy": "Ehdot & Yksityisyys",
+  "settingsSupport": "Tuki",
+  "settingsLogout": "Kirjaudu Ulos",
+  "themeSystem": "Järjestelmä",
+  "themeDark": "Tumma",
+  "themeLight": "Vaalea",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "فارسی",
+  "languagePunjabi": "ਪੰਜਾਬੀ",
+  "languageTamil": "தமிழ்",
+  "languageTelugu": "తెలుగు",
+  "languageSwahili": "Kiswahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Profiili Päivitetty",
+  "editProfileTitle": "Muokkaa Profiilia",
+  "editProfilePhotoLabel": "Profiilikuva",
+  "editProfilePhotoSubtitle": "Supabase Storage Avatar-valitsin tulossa pian",
+  "editProfileChangePhoto": "Vaihda",
+  "editProfileAvatarUploadSoon": "Avatarin lataus tulossa pian",
+  "editProfileDisplayNameLabel": "Näyttönimi",
+  "editProfileDisplayNameHint": "Sinun nimesi",
+  "editProfileDisplayNameRequired": "Anna nimesi",
+  "editProfileDisplayNameTooShort": "Liian lyhyt",
+  "editProfileUsernameLabel": "Käyttäjätunnus",
+  "editProfileUsernameHint": "learner_ali",
+  "editProfileUsernameRequired": "Anna käyttäjätunnus",
+  "editProfileUsernameTooShort": "Vähintään 3 merkkiä",
+  "editProfileUsernameInvalid": "Vain kirjaimia, numeroita, _",
+  "editProfileBioLabel": "Kuvaus",
+  "editProfileBioHint": "Lyhyt kuvaus sinusta...",
+  "editProfileBioTooLong": "Enintään 120 merkkiä",
+  "editProfileLocationLabel": "Sijainti",
+  "editProfileLocationHint": "Kaupunki / Maa",
+  "editProfileDailyGoalTitle": "Päivittäinen Tavoite",
+  "editProfileDailyGoalSubtitle": "Valitse kuinka monta minuuttia haluat oppia päivässä",
+  "securityTitle": "Turvallisuus",
+  "securitySectionPassword": "Salasana",
+  "securityChangePasswordTitle": "Vaihda Salasana",
+  "securityChangePasswordSubtitle": "Päivitä salasanasi säännöllisesti",
+  "securitySectionTwoFactor": "Kaksivaiheinen Tunnistautuminen",
+  "securityEnable2faTitle": "Ota 2FA Käyttöön",
+  "securityEnable2faSubtitle": "Lisäturvaa kirjautumiseen",
+  "securitySectionAppLock": "Sovelluksen Lukitus",
+  "securityBiometricTitle": "Biometrinen Avaus",
+  "securityBiometricSubtitle": "Käytä FaceID/TouchID:tä SOMAn avaamiseen",
+  "securityAppLockTitle": "Sovelluksen Lukitus",
+  "securityAppLockSubtitle": "Lukitse SOMA kun poistut",
+  "securitySectionSessions": "Aktiiviset Istunnot",
+  "securityNoSessions": "Ei aktiivisia istuntoja",
+  "securityThisDevice": "Tämä Laite",
+  "securityDevice": "Laite",
+  "securityActiveLabel": "Aktiivinen",
+  "securitySignInToEnable2fa": "Kirjaudu sisään ottaaksesi 2FA:n käyttöön",
+  "securityEnable2faFailed": "2FA:n käyttöönotto epäonnistui: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FA:n poistaminen käytöstä epäonnistui: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA Asennus",
+  "securitySecretKeyLabel": "Salainen Avain",
+  "securityCodeHint": "6-numeroinen koodi",
+  "security2faEnabled": "2FA Käytössä",
+  "securityVerifyCodeFailed": "Koodin vahvistaminen epäonnistui: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Vahvistetaan...",
+  "securityVerify": "Vahvista",
+  "securityCurrentPasswordHint": "Nykyinen Salasana",
+  "securityNewPasswordHint": "Uusi Salasana (min 8 merkkiä)",
+  "securityConfirmPasswordHint": "Vahvista uusi salasana",
+  "securitySignInToChangePassword": "Kirjaudu sisään vaihtaaksesi salasanan",
+  "securityEnterCurrentPassword": "Anna nykyinen salasanasi",
+  "securityPasswordMinLength": "Uuden salasanan on oltava vähintään 8 merkkiä",
+  "securityPasswordsDoNotMatch": "Salasanat eivät täsmää",
+  "securityPasswordUpdated": "Salasana päivitetty",
+  "securityPasswordUpdateFailed": "Salasanan päivitys epäonnistui: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Automaattinen Lukitus Jälkeen",
+  "privacyTitle": "Yksityisyys",
+  "privacySectionVisibility": "Näkyvyys",
+  "privacyProfileVisibilityTitle": "Profiilin Näkyvyys",
+  "privacyVisibilityPublic": "Julkinen",
+  "privacyVisibilityFriends": "Kaverit",
+  "privacyVisibilityPrivate": "Yksityinen",
+  "privacyVisibilityPublicSubtitle": "Kuka tahansa voi nähdä profiilisi",
+  "privacyVisibilityFriendsSubtitle": "Vain kaverit voivat nähdä profiilisi",
+  "privacyVisibilityPrivateSubtitle": "Vain sinä voit nähdä profiilisi",
+  "privacySectionActivity": "Toiminta",
+  "privacyShowOnlineTitle": "Näytä Online-tila",
+  "privacyShowOnlineSubtitle": "Salli pelaajien nähdä kun olet online",
+  "privacyShowActivityTitle": "Näytä Oppimistoiminta",
+  "privacyShowActivitySubtitle": "Näytä putki, XP ja viimeaikainen edistyminen",
+  "privacySectionSocial": "Sosiaalinen",
+  "privacyAllowRequestsTitle": "Salli Kaveripyynnöt",
+  "privacyAllowRequestsSubtitle": "Salli ihmisten lähettää sinulle kaveripyyntöjä",
+  "privacyWhoCanDmTitle": "Kuka Voi Lähettää Viestejä",
+  "privacyDmEveryone": "Kaikki",
+  "privacyDmFriends": "Kaverit",
+  "privacyDmNoOne": "Ei Kukaan",
+  "privacyDmEveryoneSubtitle": "Kuka tahansa voi lähettää sinulle viestejä",
+  "privacyDmFriendsSubtitle": "Vain kaverit voivat lähettää sinulle viestejä",
+  "privacyDmNoOneSubtitle": "Kukaan ei voi lähettää sinulle viestejä",
+  "privacySectionBlockedUsers": "Estetyt Käyttäjät",
+  "privacyBlockedUsersComingSoon": "Estettyjen käyttäjien hallinta tulossa pian",
+  "privacySectionDataControls": "Tietojen Hallinta",
+  "privacyExportDataTitle": "Vie Tietoni",
+  "privacyExportDataSubtitle": "Lataa toimintasi ja kurssisi",
+  "privacyExportInfoTitle": "Tietojen Vienti",
+  "privacyExportInfoBody": "Muu: Luo JSON/CSV vienti ja lähetä sähköpostitse tai lataa suoraan",
+  "privacyDeleteAccountTitle": "Poista Tili",
+  "privacyDeleteAccountSubtitle": "Tämä poistaa tilisi ja tietosi pysyvästi",
+  "privacyDeleteConfirmTitle": "Poista Tili?",
+  "privacyDeleteConfirmBody": "Tätä ei voi kumota. Profiilisi, kurssisi, kaverisi ja viestisi poistetaan",
+  "privacyDeleteComingSoon": "Poistaminen integroidaan Supabasen kanssa myöhemmin",
+  "soloLabel": "Soolo",
+  "soloResultsCompletedTitle": "Soolosessio Valmis",
+  "soloResultsFeedbackElite": "Huippusuoritus - pidä putki elossa",
+  "soloResultsFeedbackStrong": "Hyvää työtä - kehityt nopeasti",
+  "soloResultsFeedbackProgress": "Hyvää edistymistä - tarkista virheet ja yritä uudelleen",
+  "soloResultsFeedbackTryAgain": "Ei paineita - yritä uudelleen vähemmillä kysymyksillä ja keskity",
+  "soloResultsPerfectScore": "Täydellinen tulos! Ei tarkistettavaa",
+  "soloResultsReviewPrompt": "Tarkista virheesi oppiaksesi nopeammin. Väärät vastauksesi ovat alla",
+  "soloResultsReviewMistakes": "Tarkista Virheet ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Ei kirjautunut",
+  "genericUser": "Käyttäjä",
+  "loading": "Ladataan...",
+  "edit": "Muokkaa",
+  "send": "Lähetä",
+  "join": "Liity",
+  "leave": "Poistu",
+  "ready": "Valmis",
+  "levelBeginner": "Aloittelija",
+  "levelIntermediate": "Keskitaso",
+  "levelAdvanced": "Edistynyt",
+  "questionsShort": "{count} Kysymystä",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} Sekuntia",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Kaikki Kurssit",
+  "circlesAllModes": "Kaikki Tilat",
+  "circlesAllLevels": "Kaikki Tasot",
+  "circlesAddNewCourse": "Lisää Uusi Kurssi",
+  "circlesCoursesTitle": "Kurssit",
+  "circlesModeTitle": "Tila",
+  "circlesLevelTitle": "Taso",
+  "circlesNoActiveForFilters": "Ei aktiivista piiriä näillä suodattimilla",
+  "circlesUnknownRoom": "Tuntematon Huone",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Luo Piiri",
+  "circlesCircleName": "Piirin Nimi",
+  "circlesEnterName": "Anna nimi",
+  "circlesLanguages": "Kielet",
+  "circlesRoomSetup": "Huoneen Asetukset",
+  "circlesPlayers": "Pelaajat",
+  "circlesEmptySlot": "Tyhjä Paikka",
+  "circlesPlayersRange": "1-5 Pelaajaa",
+  "circlesQuestions": "Kysymykset",
+  "circlesQuestionsSubtitle": "Kysymysten määrä",
+  "circlesTimePerQuestion": "Aika per Kysymys",
+  "circlesSecondsPerQuestion": "Sek/Kys",
+  "circlesAdvanced": "Edistynyt",
+  "circlesAllowSpectators": "Salli Katsojat",
+  "circlesAllowSpectatorsSubtitle": "Salli muiden katsoa pelaamatta",
+  "circlesLiveVoiceChat": "Live Äänichat",
+  "circlesLiveVoiceChatSubtitle": "Salli ääni-interaktio matsin aikana",
+  "circlesLiveTextChat": "Live Tekstichat",
+  "circlesLiveTextChatSubtitle": "Salli viestit matsin aikana",
+  "circlesCreatedSuccess": "Piiri luotu",
+  "circlesCreateError": "Piirin luominen epäonnistui: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Vinkki: Voit kutsua kavereita luomisen jälkeen",
+  "circlesJoinError": "Piiriin liittyminen epäonnistui: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Piirin Aula",
+  "circlesCodeLine": "Koodi: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Matsin Asetukset",
+  "circlesLevelWithValue": "Taso {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Vaikeusaste",
+  "circlesPerQuestionShort": "Per Kysymys",
+  "circlesInvite": "Kutsu",
+  "circlesCopyId": "Kopioi ID",
+  "circlesCopiedId": "ID kopioitu",
+  "circlesMatchInProgress": "Matsi käynnissä",
+  "circlesSpectatorQueuedBody": "Matsi käynnissä. Liityt katsojana",
+  "circlesHostStartWhenReady": "Isäntä aloittaa kun kaikki ovat valmiina",
+  "circlesSpectators": "Katsojat",
+  "circlesSpectator": "Katsoja",
+  "circlesSpectatorCanWatch": "Katsojat voivat katsoa livenä",
+  "circlesJoinRequests": "Liittymispyynnöt",
+  "circlesAcceptSpectatorsHint": "Hyväksy katsojat ennen matsin alkua",
+  "circlesStartGame": "Aloita Peli",
+  "circlesWaitingForPlayers": "Odotetaan pelaajia",
+  "circlesLeaveCircle": "Poistu Piiristä",
+  "circlesRequestSent": "Pyyntö lähetetty",
+  "circlesRequestToJoin": "Pyydä Liittyä",
+  "circlesWatchLive": "Katso Livenä",
+  "circlesPlayerTip": "Napauta 'Valmis' kun olet valmis. Isäntä aloittaa matsin",
+  "circlesSpectatorTip": "Olet katsoja. Katso toimintaa livenä kun isäntä aloittaa",
+  "circlesHostControls": "Isännän Hallinta",
+  "circlesTransferHostFailed": "Isännän siirto epäonnistui: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Piirin lopettaminen epäonnistui: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "Käyttäjää @{username} ei löytynyt",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Virheellinen käyttäjä",
+  "circlesCantInviteSelf": "Et voi kutsua itseäsi",
+  "circlesUserAlreadyInCircle": "@{username} on jo piirissä",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Isäntä",
+  "circlesDefaultTitle": "Piiri",
+  "circlesInviteByUsername": "Käyttäjätunnuksella",
+  "circlesInviteSent": "Kutsu lähetetty käyttäjälle @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Kutsun lähetys epäonnistui: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Liittymispyyntö lähetetty",
+  "circlesJoinRequestFailed": "Pyyntö epäonnistui: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Piiri on täynnä",
+  "circlesSpectatorAdded": "Katsoja lisätty",
+  "circlesApproveFailed": "Hyväksyminen epäonnistui: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Pyyntö hylätty",
+  "circlesDeclineFailed": "Hylkääminen epäonnistui: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Osallistuja",
+  "circlesLeavePromptTitle": "Poistu Piiristä?",
+  "circlesLeavePromptTransfer": "Siirrä isännyys ennen poistumista",
+  "circlesLeavePromptEndOnly": "Lopeta Piiri ja poistu",
+  "circlesTransferHost": "Siirrä Isännyys",
+  "circlesEndCircle": "Lopeta Piiri",
+  "circlesTransferHostTitle": "Siirrä Isännyys",
+  "circlesShareId": "Piirin ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

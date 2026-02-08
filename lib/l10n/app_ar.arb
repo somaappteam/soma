@@ -1,0 +1,781 @@
+{
+  "@@locale": "ar",
+  "appTitle": "SOMA",
+  "welcomeTagline": "تعلّم. نافس. أتقن.",
+  "signUp": "إنشاء حساب",
+  "signIn": "تسجيل الدخول",
+  "skipForNow": "تخطي الآن",
+  "authFillAllFields": "يرجى ملء جميع الحقول",
+  "authError": "خطأ: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "البريد الإلكتروني",
+  "authPassword": "كلمة المرور",
+  "authUsername": "اسم المستخدم",
+  "authContinue": "متابعة",
+  "authSigningIn": "جارٍ تسجيل الدخول...",
+  "authCreateAccount": "إنشاء حساب",
+  "authCreating": "جارٍ الإنشاء...",
+  "authNeedAccount": "ليس لديك حساب؟ ",
+  "authHaveAccount": "لديك حساب بالفعل؟ ",
+  "dialogAuthRequiredTitle": "سجّل الدخول للوصول إلى Circles",
+  "dialogAuthRequiredBody": "Circles هي غرف متعددة اللاعبين. أنشئ حسابًا للانضمام إلى المباريات المباشرة ودعوة الأصدقاء وحفظ التقدم.",
+  "notNow": "ليس الآن",
+  "navHome": "الرئيسية",
+  "navCircles": "Circles",
+  "navProfile": "الملف الشخصي",
+  "removeCourseTitle": "إزالة الدورة؟",
+  "removeCourseBody": "سيتم إزالة {course} من قائمة الرئيسية.",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "إلغاء",
+  "remove": "إزالة",
+  "welcomeBack": "مرحبًا بعودتك، {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "تعديل الدورات",
+  "done": "تم",
+  "noCoursesToEdit": "لا توجد دورات للتعديل.",
+  "addCourse": "إضافة دورة",
+  "unknown": "غير معروف",
+  "iSpeak": "أتحدث",
+  "iWantToLearn": "أريد تعلم",
+  "chooseYourLanguage": "اختر لغتك",
+  "chooseLearningLanguage": "اختر اللغة التي تريد تعلمها",
+  "chooseTwoDifferentLanguages": "اختر لغتين مختلفتين.",
+  "createCourse": "إنشاء دورة",
+  "soloCourseTitle": "دورة فردية",
+  "searchLanguage": "بحث عن لغة",
+  "noMatches": "لا توجد نتائج",
+  "chooseCourseType": "اختر نوع الدورة",
+  "soloStudyDescription": "ادرس بمفردك بنفس أسلوب اختبار Circles - لكن بدون غرف أو محادثة أو متفرجين أو خيارات المضيف.",
+  "soloModeVocabulary": "المفردات",
+  "soloModeSentences": "الجمل",
+  "soloModeReview": "المراجعة",
+  "soloModeVocabularySubtitle": "اختيار متعدد للمعاني والمرادفات والاستخدام",
+  "soloModeSentencesSubtitle": "ملء الفراغات + الترجمة + القراءة",
+  "soloModeReviewDescription": "تدرّب على ما تعلمته: الكلمات الضعيفة والأخطاء الأخيرة والتكرار المتباعد.",
+  "startReview": "بدء المراجعة",
+  "soloSetupTitle": "إعداد {mode}",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "الصعوبة",
+  "numberOfQuestions": "عدد الأسئلة",
+  "timerPerQuestion": "المؤقت لكل سؤال",
+  "noTimer": "بدون مؤقت",
+  "start": "ابدأ",
+  "profileTitle": "الملف الشخصي",
+  "profileSignInToMessage": "سجّل الدخول لإرسال رسالة",
+  "profileThatsYourProfile": "هذا ملفك الشخصي",
+  "profileSignInToAddFriends": "سجّل الدخول لإضافة أصدقاء",
+  "profileCantAddYourself": "لا يمكنك إضافة نفسك",
+  "profileRequestSent": "تم إرسال الطلب إلى @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "فشل إرسال الطلب",
+  "profileDefaultDisplayName": "مستخدم جديد",
+  "profileDefaultBio": "مستعد للتعلم!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "ضيف",
+  "guestUsername": "ضيف",
+  "guestSessionLabel": "جلسة ضيف",
+  "unlockFullProfile": "افتح ملفك الشخصي الكامل",
+  "guestBenefitSync": "زامن التقدم على جميع الأجهزة",
+  "guestBenefitCircles": "انضم إلى Circles والعب مباشرة",
+  "guestBenefitNotifications": "احصل على إشعارات وطلبات صداقة",
+  "progressStaysOnDevice": "يبقى التقدم على هذا الجهاز حتى تسجل الدخول.",
+  "profileGoalLabel": "الهدف: {minutes}د",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "تقدم XP",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "الانتصارات",
+  "profileStreak": "السلسلة",
+  "profileFriendsTitle": "أصدقائي",
+  "profileViewAll": "عرض الكل",
+  "profileAchievementsTitle": "الإنجازات",
+  "profileNoAchievements": "لا توجد إنجازات بعد.",
+  "profileRequested": "مطلوب",
+  "profileSending": "جارٍ الإرسال...",
+  "profileAddFriend": "إضافة صديق",
+  "profileConnectTitle": "اتصل",
+  "profileMessage": "رسالة",
+  "profileSnapshot": "لقطة الملف الشخصي",
+  "profileLocationHidden": "الموقع مخفي",
+  "profileBioHidden": "السيرة الذاتية مخفية",
+  "profileDailyGoal": "الهدف اليومي {minutes}د",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "دعوة Circle",
+  "circleIdLabel": "معرّف Circle: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "سجّل الدخول للانضمام",
+  "joiningCircle": "جارٍ الانضمام...",
+  "joinCircle": "انضم إلى Circle",
+  "circleJoinedAsPlayer": "انضممت كلاعب",
+  "circleJoinedAsSpectator": "انضممت كمتفرج",
+  "accept": "قبول",
+  "decline": "رفض",
+  "open": "فتح",
+  "circleCountdownTitle": "استعد",
+  "circleCountdownSubtitle": "Circle يبدأ...",
+  "userFallbackName": "مستخدم",
+  "micOff": "الميكروفون متوقف",
+  "micOn": "الميكروفون يعمل",
+  "roleHost": "المضيف",
+  "roleSpectator": "متفرج",
+  "tagHost": "المضيف",
+  "tagYou": "أنت",
+  "statusCorrect": "صحيح",
+  "statusWrong": "خطأ",
+  "statusWaiting": "انتظار",
+  "statusNone": "-",
+  "pointsAbbrev": "نقاط",
+  "pointsLabel": "النقاط",
+  "statCorrect": "صحيح",
+  "statAnswers": "الإجابات",
+  "statTotal": "الإجمالي",
+  "statQuestions": "الأسئلة",
+  "statAccuracy": "الدقة",
+  "statRate": "المعدل",
+  "statRank": "الترتيب",
+  "statPosition": "الموقع",
+  "statMode": "الوضع",
+  "statType": "النوع",
+  "next": "التالي",
+  "submit": "إرسال",
+  "continueLabel": "متابعة",
+  "save": "حفظ",
+  "playAgain": "العب مرة أخرى",
+  "backToCourse": "العودة إلى الدورة",
+  "resultsTitle": "النتائج",
+  "shareLater": "مشاركة لاحقًا",
+  "delete": "حذف",
+  "ok": "حسنًا",
+  "minutesShort": "{minutes}د",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}د",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}س",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}ي",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "الآن",
+  "timeMinutesAgo": "منذ {count}د",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "منذ {count}س",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "منذ {count}ي",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "انتظار المضيف...",
+  "liveQuizJoinRequestSent": "تم إرسال طلب الانضمام",
+  "liveQuizJoinRequestFailed": "فشل الطلب: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "عناصر تحكم المضيف",
+  "liveQuizSpectatorModeTitle": "وضع المتفرج",
+  "liveQuizHostControlsSubtitle": "تتقدم الجولات تلقائيًا عندما يجيب الجميع أو ينتهي الوقت.",
+  "liveQuizSpectatorModeSubtitle": "شاهد الأسئلة ولوحة المتصدرين مباشرة. لا يمكنك الإجابة.",
+  "liveQuizQuestionCounter": "السؤال {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "تم إرسال الطلب",
+  "liveQuizRequestToJoin": "طلب الانضمام",
+  "liveQuizSpectatorFooter": "أنت تشاهد مباشرة. استمتع بالأسئلة ولوحة المتصدرين.",
+  "circleNotFound": "لم يتم العثور على Circle",
+  "resultsRematchStartFailed": "فشل بدء المباراة الإعادية: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "نتائج المباراة",
+  "resultsNiceWork": "عمل رائع، {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "المركز الأول",
+  "resultsPlaceSecond": "المركز الثاني",
+  "resultsPlaceThird": "المركز الثالث",
+  "resultsPlaceNth": "المركز {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "من {players} لاعبين",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "بطل! لقد هيمنت على هذا Circle.",
+  "resultsHighlightGreatAccuracy": "دقة رائعة. أنت قريب من القمة!",
+  "resultsHighlightKeepGoing": "استمر - الاتساق يتفوق على السرعة.",
+  "resultsLeaderboardTitle": "لوحة المتصدرين",
+  "resultsPlayersCount": "{count} لاعبين",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "العودة إلى Circles",
+  "resultsRematch": "إعادة المباراة",
+  "resultsPlayAgain": "العب مرة أخرى",
+  "leaderboardGlobalTitle": "لوحة المتصدرين العالمية",
+  "leaderboardEmpty": "لا توجد لوحة متصدرين بعد.",
+  "aboutTitle": "حول",
+  "aboutVersion": "الإصدار {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA هي منصة تعليم لغات قائمة على الألعاب تجعل إتقان اللغات الجديدة ممتعًا واجتماعيًا. انضم إلى Circles، تدرّب بمفردك، وتابع تقدمك.",
+  "aboutTerms": "شروط الخدمة",
+  "aboutPrivacy": "سياسة الخصوصية",
+  "aboutOpenSource": "تراخيص المصادر المفتوحة",
+  "addFriendTitle": "إضافة صديق",
+  "addFriendFindByUsername": "البحث باسم المستخدم",
+  "addFriendUsernameHint": "أدخل اسم المستخدم...",
+  "addFriendTip": "نصيحة: لاحقًا يمكننا دعم رمز QR + معرّف الأصدقاء.",
+  "addFriendSending": "جارٍ الإرسال...",
+  "addFriendSendRequest": "إرسال طلب",
+  "addFriendUserNotFound": "لم يتم العثور على @{username}",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "فشل الإجراء أو تم إرساله بالفعل: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "الأصدقاء",
+  "searchFriendsHint": "البحث عن الأصدقاء...",
+  "somaLearnerSubtitle": "متعلم Soma",
+  "friendRequestLabel": "طلب",
+  "friendRequestSentLabel": "تم إرسال الطلب",
+  "friendIncomingRequestLabel": "طلب وارد",
+  "friendRequestsSection": "الطلبات",
+  "friendPendingSection": "قيد الانتظار",
+  "friendAllSection": "جميع الأصدقاء",
+  "friendsEmptyState": "لا يوجد أصدقاء بعد. أضف صديقك الأول!",
+  "friendsEmptyShort": "لا يوجد أصدقاء بعد.",
+  "noMatchForQuery": "لا توجد نتائج لـ \"{query}\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "صندوق الوارد",
+  "searchChatsHint": "البحث في المحادثات...",
+  "inboxEmptyState": "لا توجد محادثات بعد. ابدأ الدردشة مع صديق!",
+  "newMessageTitle": "رسالة جديدة",
+  "chatCallLater": "مكالمة صوتية لاحقًا (لغة Circle قريبًا)",
+  "errorWithDetails": "خطأ: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "قل مرحبًا لـ {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "رسالة...",
+  "notificationsTitle": "الإشعارات",
+  "notificationsTabAll": "الكل",
+  "notificationsTabCourses": "الدورات",
+  "notificationsTabSocial": "الاجتماعية",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "النظام",
+  "notificationsEmpty": "لا توجد إشعارات هنا.",
+  "notificationsDeleted": "تم حذف الإشعار",
+  "notificationTitleFallback": "إشعار",
+  "notificationTypeCourse": "دورة",
+  "notificationTypeSocial": "اجتماعي",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "النظام",
+  "notificationsFriendAccepted": "تم قبول طلب الصداقة",
+  "notificationsFriendAcceptFailed": "فشل قبول طلب الصداقة: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "تم رفض طلب الصداقة",
+  "notificationsFriendDeclineFailed": "فشل رفض طلب الصداقة: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "فشل الانضمام إلى Circle: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "فتح",
+  "notificationsOpened": "تم الفتح",
+  "notificationsActionMessage": "{action} إشعار",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "الإعدادات",
+  "settingsSectionAccount": "الحساب",
+  "settingsEditProfile": "تعديل الملف الشخصي",
+  "settingsPrivacy": "الخصوصية",
+  "settingsSecurity": "الأمان",
+  "settingsSectionGameplay": "اللعب",
+  "settingsShowTranslationLine": "إظهار سطر الترجمة",
+  "settingsShowReadingLine": "إظهار القراءة (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "المؤقت الافتراضي لكل سؤال",
+  "settingsMatchDifficulty": "صعوبة المباراة",
+  "settingsMatchDifficultyAdaptive": "تكيفية",
+  "settingsSectionSoundFeel": "الصوت والإحساس",
+  "settingsMusic": "الموسيقى",
+  "settingsSoundEffects": "المؤثرات الصوتية",
+  "settingsHaptics": "الاهتزاز",
+  "settingsSectionNotifications": "الإشعارات",
+  "settingsPushNotifications": "الإشعارات الفورية",
+  "settingsDailyReminder": "التذكير اليومي",
+  "settingsSectionAppearance": "المظهر",
+  "settingsTheme": "المظهر",
+  "settingsUiLanguage": "لغة الواجهة",
+  "settingsSectionAbout": "حول",
+  "settingsVersion": "الإصدار",
+  "settingsTermsPrivacy": "الشروط والخصوصية",
+  "settingsSupport": "الدعم",
+  "settingsLogout": "تسجيل الخروج",
+  "themeSystem": "النظام",
+  "themeDark": "داكن",
+  "themeLight": "فاتح",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "تم تحديث الملف الشخصي",
+  "editProfileTitle": "تعديل الملف الشخصي",
+  "editProfilePhotoLabel": "صورة الملف الشخصي",
+  "editProfilePhotoSubtitle": "اختيار الصورة الرمزية عبر Supabase Storage قريبًا.",
+  "editProfileChangePhoto": "تغيير",
+  "editProfileAvatarUploadSoon": "تحميل الصورة الرمزية متاح قريبًا",
+  "editProfileDisplayNameLabel": "الاسم المعروض",
+  "editProfileDisplayNameHint": "اسمك",
+  "editProfileDisplayNameRequired": "أدخل اسمك",
+  "editProfileDisplayNameTooShort": "قصير جدًا",
+  "editProfileUsernameLabel": "اسم المستخدم",
+  "editProfileUsernameHint": "ali_mutaalim",
+  "editProfileUsernameRequired": "أدخل اسم المستخدم",
+  "editProfileUsernameTooShort": "3 أحرف على الأقل",
+  "editProfileUsernameInvalid": "أحرف وأرقام و _ فقط",
+  "editProfileBioLabel": "السيرة الذاتية",
+  "editProfileBioHint": "سيرة ذاتية قصيرة...",
+  "editProfileBioTooLong": "120 حرفًا كحد أقصى",
+  "editProfileLocationLabel": "الموقع",
+  "editProfileLocationHint": "المدينة / البلد",
+  "editProfileDailyGoalTitle": "الهدف اليومي",
+  "editProfileDailyGoalSubtitle": "اختر عدد الدقائق التي تريد أن تدرس فيها كل يوم.",
+  "securityTitle": "الأمان",
+  "securitySectionPassword": "كلمة المرور",
+  "securityChangePasswordTitle": "تغيير كلمة المرور",
+  "securityChangePasswordSubtitle": "حدّث كلمة المرور بانتظام.",
+  "securitySectionTwoFactor": "المصادقة الثنائية",
+  "securityEnable2faTitle": "تمكين 2FA",
+  "securityEnable2faSubtitle": "حماية إضافية عند تسجيل الدخول.",
+  "securitySectionAppLock": "قفل التطبيق",
+  "securityBiometricTitle": "فتح القفل البيومتري",
+  "securityBiometricSubtitle": "استخدم FaceID/TouchID لفتح قفل SOMA.",
+  "securityAppLockTitle": "قفل التطبيق",
+  "securityAppLockSubtitle": "اقفل SOMA عند الخروج من التطبيق.",
+  "securitySectionSessions": "الجلسات النشطة",
+  "securityNoSessions": "لم يتم العثور على جلسات نشطة.",
+  "securityThisDevice": "هذا الجهاز",
+  "securityDevice": "الجهاز",
+  "securityActiveLabel": "نشط",
+  "securitySignInToEnable2fa": "سجّل الدخول لتمكين 2FA",
+  "securityEnable2faFailed": "فشل تمكين 2FA: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "فشل تعطيل 2FA: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "إعداد 2FA",
+  "securitySecretKeyLabel": "المفتاح السري",
+  "securityCodeHint": "رمز مكون من 6 أرقام",
+  "security2faEnabled": "تم تمكين 2FA",
+  "securityVerifyCodeFailed": "فشل التحقق من الرمز: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "جارٍ التحقق...",
+  "securityVerify": "تحقق",
+  "securityCurrentPasswordHint": "كلمة المرور الحالية",
+  "securityNewPasswordHint": "كلمة المرور الجديدة (8 أحرف على الأقل)",
+  "securityConfirmPasswordHint": "تأكيد كلمة المرور الجديدة",
+  "securitySignInToChangePassword": "سجّل الدخول لتغيير كلمة المرور",
+  "securityEnterCurrentPassword": "أدخل كلمة المرور الحالية",
+  "securityPasswordMinLength": "يجب أن تحتوي كلمة المرور الجديدة على 8 أحرف على الأقل",
+  "securityPasswordsDoNotMatch": "كلمات المرور غير متطابقة",
+  "securityPasswordUpdated": "تم تحديث كلمة المرور",
+  "securityPasswordUpdateFailed": "فشل تحديث كلمة المرور: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "القفل التلقائي بعد",
+  "privacyTitle": "الخصوصية",
+  "privacySectionVisibility": "الرؤية",
+  "privacyProfileVisibilityTitle": "رؤية الملف الشخصي",
+  "privacyVisibilityPublic": "عام",
+  "privacyVisibilityFriends": "الأصدقاء",
+  "privacyVisibilityPrivate": "خاص",
+  "privacyVisibilityPublicSubtitle": "يمكن لأي شخص رؤية ملفك الشخصي.",
+  "privacyVisibilityFriendsSubtitle": "يمكن للأصدقاء فقط رؤية ملفك الشخصي.",
+  "privacyVisibilityPrivateSubtitle": "يمكنك فقط رؤية ملفك الشخصي.",
+  "privacySectionActivity": "النشاط",
+  "privacyShowOnlineTitle": "إظهار الحالة على الإنترنت",
+  "privacyShowOnlineSubtitle": "السماح للآخرين برؤية متى تكون متصلاً.",
+  "privacyShowActivityTitle": "إظهار نشاط التعلم",
+  "privacyShowActivitySubtitle": "عرض السلسلة وXP والتقدم الحالي.",
+  "privacySectionSocial": "الاجتماعية",
+  "privacyAllowRequestsTitle": "السماح بطلبات الصداقة",
+  "privacyAllowRequestsSubtitle": "السماح للأشخاص بإرسال طلبات صداقة.",
+  "privacyWhoCanDmTitle": "من يمكنه إرسال رسائل",
+  "privacyDmEveryone": "الجميع",
+  "privacyDmFriends": "الأصدقاء",
+  "privacyDmNoOne": "لا أحد",
+  "privacyDmEveryoneSubtitle": "يمكن لأي شخص إرسال رسائل.",
+  "privacyDmFriendsSubtitle": "يمكن للأصدقاء فقط إرسال رسائل.",
+  "privacyDmNoOneSubtitle": "لا يمكن لأحد إرسال رسائل.",
+  "privacySectionBlockedUsers": "المستخدمون المحظورون",
+  "privacyBlockedUsersComingSoon": "إدارة المستخدمين المحظورين متاحة قريبًا.",
+  "privacySectionDataControls": "عناصر التحكم في البيانات",
+  "privacyExportDataTitle": "تصدير بياناتي",
+  "privacyExportDataSubtitle": "نزّل نشاطك ودوراتك.",
+  "privacyExportInfoTitle": "تصدير البيانات",
+  "privacyExportInfoBody": "الخطوة التالية: إنشاء تصدير JSON/CSV وإرساله عبر البريد الإلكتروني أو تنزيله محليًا.",
+  "privacyDeleteAccountTitle": "حذف الحساب",
+  "privacyDeleteAccountSubtitle": "سيؤدي هذا إلى إزالة حسابك وبياناتك نهائيًا.",
+  "privacyDeleteConfirmTitle": "حذف الحساب؟",
+  "privacyDeleteConfirmBody": "هذا الإجراء دائم. سيتم إزالة ملفك الشخصي ودوراتك وأصدقائك ورسائلك.",
+  "privacyDeleteComingSoon": "سيتم توصيل الحذف بـ Supabase لاحقًا",
+  "soloLabel": "فردي",
+  "soloResultsCompletedTitle": "اكتملت الجلسة الفردية",
+  "soloResultsFeedbackElite": "أداء نخبوي. حافظ على السلسلة",
+  "soloResultsFeedbackStrong": "عمل قوي. أنت تتحسن بسرعة.",
+  "soloResultsFeedbackProgress": "تقدم جيد. راجع الأخطاء وكرر.",
+  "soloResultsFeedbackTryAgain": "لا توتر. حاول مرة أخرى بأسئلة أقل وتركيز.",
+  "soloResultsPerfectScore": "نتيجة مثالية! لا توجد أخطاء للمراجعة.",
+  "soloResultsReviewPrompt": "راجع الأخطاء للتعلم بشكل أسرع. سنعرض الإجابات الخاطئة أدناه.",
+  "soloResultsReviewMistakes": "مراجعة الأخطاء ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "لم تسجل الدخول",
+  "genericUser": "مستخدم",
+  "loading": "جارٍ التحميل...",
+  "edit": "تعديل",
+  "send": "إرسال",
+  "join": "انضم",
+  "leave": "مغادرة",
+  "ready": "جاهز",
+  "levelBeginner": "مبتدئ",
+  "levelIntermediate": "متوسط",
+  "levelAdvanced": "متقدم",
+  "questionsShort": "{count} س",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count}ث",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "جميع الدورات",
+  "circlesAllModes": "جميع الأوضاع",
+  "circlesAllLevels": "جميع المستويات",
+  "circlesAddNewCourse": "إضافة دورة جديدة",
+  "circlesCoursesTitle": "الدورات",
+  "circlesModeTitle": "الوضع",
+  "circlesLevelTitle": "المستوى",
+  "circlesNoActiveForFilters": "لا يوجد Circles نشطة لهذه الفلاتر.",
+  "circlesUnknownRoom": "غرفة غير معروفة",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "إنشاء Circle",
+  "circlesCircleName": "اسم Circle",
+  "circlesEnterName": "أدخل الاسم",
+  "circlesLanguages": "اللغات",
+  "circlesRoomSetup": "إعداد الغرفة",
+  "circlesPlayers": "اللاعبون",
+  "circlesEmptySlot": "مكان فارغ",
+  "circlesPlayersRange": "1-5 لاعبين",
+  "circlesQuestions": "الأسئلة",
+  "circlesQuestionsSubtitle": "عدد الأسئلة",
+  "circlesTimePerQuestion": "الوقت لكل سؤال",
+  "circlesSecondsPerQuestion": "ثواني لكل سؤال",
+  "circlesAdvanced": "متقدم",
+  "circlesAllowSpectators": "السماح بالمتفرجين",
+  "circlesAllowSpectatorsSubtitle": "السماح للآخرين بالمشاهدة دون اللعب.",
+  "circlesLiveVoiceChat": "محادثة صوتية مباشرة",
+  "circlesLiveVoiceChatSubtitle": "تمكين الصوت المباشر أثناء المباريات.",
+  "circlesLiveTextChat": "محادثة نصية مباشرة",
+  "circlesLiveTextChatSubtitle": "تمكين المحادثة أثناء المباريات.",
+  "circlesCreatedSuccess": "تم إنشاء Circle",
+  "circlesCreateError": "فشل إنشاء Circle: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "نصيحة: يمكنك دعوة الأصدقاء بعد الإنشاء.",
+  "circlesJoinError": "فشل الانضمام إلى Circle: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "ردهة Circle",
+  "circlesCodeLine": "الرمز: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "إعدادات المباراة",
+  "circlesLevelWithValue": "المستوى {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "الصعوبة",
+  "circlesPerQuestionShort": "لكل سؤال",
+  "circlesInvite": "دعوة",
+  "circlesCopyId": "نسخ المعرّف",
+  "circlesCopiedId": "تم نسخ المعرّف",
+  "circlesMatchInProgress": "المباراة جارية",
+  "circlesSpectatorQueuedBody": "المباراة جارية. ستنضم كمتفرج.",
+  "circlesHostStartWhenReady": "المضيف يبدأ عندما يكون الجميع جاهزين.",
+  "circlesSpectators": "المتفرجون",
+  "circlesSpectator": "متفرج",
+  "circlesSpectatorCanWatch": "يمكن للمتفرجين المشاهدة مباشرة.",
+  "circlesJoinRequests": "طلبات الانضمام",
+  "circlesAcceptSpectatorsHint": "اقبل المتفرجين قبل بدء المباراة.",
+  "circlesStartGame": "بدء اللعبة",
+  "circlesWaitingForPlayers": "انتظار اللاعبين",
+  "circlesLeaveCircle": "مغادرة Circle",
+  "circlesRequestSent": "تم إرسال الطلب",
+  "circlesRequestToJoin": "طلب الانضمام",
+  "circlesWatchLive": "مشاهدة مباشرة",
+  "circlesPlayerTip": "اضغط على جاهز عندما تكون مستعدًا. سيبدأ المضيف المباراة.",
+  "circlesSpectatorTip": "أنت تشاهد. شاهد مباشرة بمجرد أن يبدأ المضيف.",
+  "circlesHostControls": "عناصر تحكم المضيف",
+  "circlesTransferHostFailed": "فشل نقل المضيف: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "فشل إنهاء Circle: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "لم يتم العثور على @{username}",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "مستخدم غير صالح",
+  "circlesCantInviteSelf": "لا يمكنك دعوة نفسك",
+  "circlesUserAlreadyInCircle": "@{username} موجود بالفعل في Circle",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "المضيف",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "الدعوة باسم المستخدم",
+  "circlesInviteSent": "تم إرسال الدعوة إلى @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "فشل إرسال الدعوة: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "تم إرسال طلب الانضمام",
+  "circlesJoinRequestFailed": "فشل الطلب: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle ممتلئ",
+  "circlesSpectatorAdded": "تمت إضافة متفرج",
+  "circlesApproveFailed": "فشل الموافقة على الطلب: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "تم رفض الطلب",
+  "circlesDeclineFailed": "فشل رفض الطلب: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "مشارك",
+  "circlesLeavePromptTitle": "مغادرة Circle؟",
+  "circlesLeavePromptTransfer": "انقل المضيف قبل المغادرة.",
+  "circlesLeavePromptEndOnly": "أنهِ Circle وغادر.",
+  "circlesTransferHost": "نقل المضيف",
+  "circlesEndCircle": "إنهاء Circle",
+  "circlesTransferHostTitle": "نقل المضيف",
+  "circlesShareId": "معرّف Circle: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

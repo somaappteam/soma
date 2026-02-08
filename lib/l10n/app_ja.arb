@@ -1,0 +1,781 @@
+{
+  "@@locale": "ja",
+  "appTitle": "SOMA",
+  "welcomeTagline": "学ぶ。競う。マスターする。",
+  "signUp": "サインアップ",
+  "signIn": "サインイン",
+  "skipForNow": "今はスキップ",
+  "authFillAllFields": "すべてのフィールドを入力してください",
+  "authError": "エラー: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "メール",
+  "authPassword": "パスワード",
+  "authUsername": "ユーザー名",
+  "authContinue": "続ける",
+  "authSigningIn": "サインイン中...",
+  "authCreateAccount": "アカウント作成",
+  "authCreating": "作成中...",
+  "authNeedAccount": "アカウントをお持ちでないですか？ ",
+  "authHaveAccount": "すでにアカウントをお持ちですか？ ",
+  "dialogAuthRequiredTitle": "Circlesにアクセスするにはサインインしてください",
+  "dialogAuthRequiredBody": "Circlesはマルチプレイヤールームです。ライブマッチに参加し、友達を招待し、進捗を保存するにはアカウントを作成してください。",
+  "notNow": "今はしない",
+  "navHome": "ホーム",
+  "navCircles": "Circles",
+  "navProfile": "プロフィール",
+  "removeCourseTitle": "コースを削除しますか？",
+  "removeCourseBody": "{course}をホームリストから削除します。",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "キャンセル",
+  "remove": "削除",
+  "welcomeBack": "おかえりなさい、{name}さん！",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "コース編集",
+  "done": "完了",
+  "noCoursesToEdit": "編集するコースがありません。",
+  "addCourse": "コースを追加",
+  "unknown": "不明",
+  "iSpeak": "話せる言語",
+  "iWantToLearn": "学びたい言語",
+  "chooseYourLanguage": "言語を選択",
+  "chooseLearningLanguage": "学習する言語を選択してください",
+  "chooseTwoDifferentLanguages": "2つの異なる言語を選択してください。",
+  "createCourse": "コースを作成",
+  "soloCourseTitle": "ソロコース",
+  "searchLanguage": "言語を検索",
+  "noMatches": "一致なし",
+  "chooseCourseType": "コースタイプを選択",
+  "soloStudyDescription": "Circles スタイルのクイズで一人で学習 - ルーム、チャット、観戦者、ホストオプションなし。",
+  "soloModeVocabulary": "語彙",
+  "soloModeSentences": "文章",
+  "soloModeReview": "復習",
+  "soloModeVocabularySubtitle": "意味、類義語、用法の選択問題",
+  "soloModeSentencesSubtitle": "穴埋め + 翻訳 + 読み",
+  "soloModeReviewDescription": "学んだことを練習：苦手な単語、最近の間違い、間隔反復。",
+  "startReview": "復習を開始",
+  "soloSetupTitle": "{mode}セットアップ",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "難易度",
+  "numberOfQuestions": "問題数",
+  "timerPerQuestion": "問題ごとのタイマー",
+  "noTimer": "タイマーなし",
+  "start": "開始",
+  "profileTitle": "プロフィール",
+  "profileSignInToMessage": "メッセージを送るにはサインインしてください",
+  "profileThatsYourProfile": "これはあなたのプロフィールです",
+  "profileSignInToAddFriends": "友達を追加するにはサインインしてください",
+  "profileCantAddYourself": "自分自身を追加することはできません",
+  "profileRequestSent": "@{username}にリクエストを送信しました",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "リクエストの送信に失敗しました",
+  "profileDefaultDisplayName": "新規ユーザー",
+  "profileDefaultBio": "学習準備完了！",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "ゲスト",
+  "guestUsername": "ゲスト",
+  "guestSessionLabel": "ゲストセッション",
+  "unlockFullProfile": "フルプロフィールをアンロック",
+  "guestBenefitSync": "すべてのデバイスで進捗を同期",
+  "guestBenefitCircles": "Circlesに参加してライブでプレイ",
+  "guestBenefitNotifications": "通知と友達リクエストを受信",
+  "progressStaysOnDevice": "サインインするまで、進捗はこのデバイスに残ります。",
+  "profileGoalLabel": "目標: {minutes}分",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP進捗",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "勝利",
+  "profileStreak": "連続記録",
+  "profileFriendsTitle": "友達",
+  "profileViewAll": "すべて表示",
+  "profileAchievementsTitle": "実績",
+  "profileNoAchievements": "まだ実績がありません。",
+  "profileRequested": "リクエスト済み",
+  "profileSending": "送信中...",
+  "profileAddFriend": "友達を追加",
+  "profileConnectTitle": "つながる",
+  "profileMessage": "メッセージ",
+  "profileSnapshot": "プロフィールスナップショット",
+  "profileLocationHidden": "場所は非表示",
+  "profileBioHidden": "自己紹介は非表示",
+  "profileDailyGoal": "1日の目標 {minutes}分",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circleへの招待",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "参加するにはサインインしてください",
+  "joiningCircle": "参加中...",
+  "joinCircle": "Circleに参加",
+  "circleJoinedAsPlayer": "プレイヤーとして参加しました",
+  "circleJoinedAsSpectator": "観戦者として参加しました",
+  "accept": "承認",
+  "decline": "拒否",
+  "open": "開く",
+  "circleCountdownTitle": "準備してください",
+  "circleCountdownSubtitle": "Circle開始中...",
+  "userFallbackName": "ユーザー",
+  "micOff": "マイクオフ",
+  "micOn": "マイクオン",
+  "roleHost": "ホスト",
+  "roleSpectator": "観戦者",
+  "tagHost": "ホスト",
+  "tagYou": "あなた",
+  "statusCorrect": "正解",
+  "statusWrong": "不正解",
+  "statusWaiting": "待機中",
+  "statusNone": "-",
+  "pointsAbbrev": "pt",
+  "pointsLabel": "ポイント",
+  "statCorrect": "正解",
+  "statAnswers": "回答",
+  "statTotal": "合計",
+  "statQuestions": "問題",
+  "statAccuracy": "正確性",
+  "statRate": "レート",
+  "statRank": "ランク",
+  "statPosition": "順位",
+  "statMode": "モード",
+  "statType": "タイプ",
+  "next": "次へ",
+  "submit": "送信",
+  "continueLabel": "続ける",
+  "save": "保存",
+  "playAgain": "もう一度プレイ",
+  "backToCourse": "コースに戻る",
+  "resultsTitle": "結果",
+  "shareLater": "後で共有",
+  "delete": "削除",
+  "ok": "OK",
+  "minutesShort": "{minutes}分",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}分",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}時間",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}日",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "たった今",
+  "timeMinutesAgo": "{count}分前",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count}時間前",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count}日前",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "ホスト待機中...",
+  "liveQuizJoinRequestSent": "参加リクエストを送信しました",
+  "liveQuizJoinRequestFailed": "リクエスト失敗: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "ホストコントロール",
+  "liveQuizSpectatorModeTitle": "観戦モード",
+  "liveQuizHostControlsSubtitle": "全員が回答するか時間切れになると、ラウンドは自動的に進みます。",
+  "liveQuizSpectatorModeSubtitle": "問題とリーダーボードをライブで視聴。回答はできません。",
+  "liveQuizQuestionCounter": "問題 {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "リクエストを送信しました",
+  "liveQuizRequestToJoin": "参加をリクエスト",
+  "liveQuizSpectatorFooter": "ライブ視聴中です。問題とリーダーボードをお楽しみください。",
+  "circleNotFound": "Circleが見つかりません",
+  "resultsRematchStartFailed": "再戦の開始に失敗しました: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "マッチ結果",
+  "resultsNiceWork": "よくできました、{name}さん",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1位",
+  "resultsPlaceSecond": "2位",
+  "resultsPlaceThird": "3位",
+  "resultsPlaceNth": "{rank}位",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "{players}人中",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "チャンピオン！このCircleを制しました。",
+  "resultsHighlightGreatAccuracy": "優れた正確性。トップに近いです！",
+  "resultsHighlightKeepGoing": "継続は力なり - 安定性がスピードを上回ります。",
+  "resultsLeaderboardTitle": "リーダーボード",
+  "resultsPlayersCount": "{count}人のプレイヤー",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Circlesに戻る",
+  "resultsRematch": "再戦",
+  "resultsPlayAgain": "もう一度プレイ",
+  "leaderboardGlobalTitle": "グローバルリーダーボード",
+  "leaderboardEmpty": "まだリーダーボードがありません。",
+  "aboutTitle": "について",
+  "aboutVersion": "バージョン {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMAは、新しい言語の習得を楽しく社交的にするゲーミフィケーション言語学習プラットフォームです。Circlesに参加し、ソロで練習し、進捗を追跡しましょう。",
+  "aboutTerms": "利用規約",
+  "aboutPrivacy": "プライバシーポリシー",
+  "aboutOpenSource": "オープンソースライセンス",
+  "addFriendTitle": "友達を追加",
+  "addFriendFindByUsername": "ユーザー名で検索",
+  "addFriendUsernameHint": "ユーザー名を入力...",
+  "addFriendTip": "ヒント：後でQRコード+フレンドIDをサポートできます。",
+  "addFriendSending": "送信中...",
+  "addFriendSendRequest": "リクエストを送信",
+  "addFriendUserNotFound": "@{username}が見つかりません",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "アクションが失敗したか、すでに送信済み: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "友達",
+  "searchFriendsHint": "友達を検索...",
+  "somaLearnerSubtitle": "Soma学習者",
+  "friendRequestLabel": "リクエスト",
+  "friendRequestSentLabel": "リクエスト送信済み",
+  "friendIncomingRequestLabel": "受信リクエスト",
+  "friendRequestsSection": "リクエスト",
+  "friendPendingSection": "保留中",
+  "friendAllSection": "すべての友達",
+  "friendsEmptyState": "まだ友達がいません。最初の友達を追加しましょう！",
+  "friendsEmptyShort": "まだ友達がいません。",
+  "noMatchForQuery": "\"{query}\"に一致するものがありません",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "受信トレイ",
+  "searchChatsHint": "チャットを検索...",
+  "inboxEmptyState": "まだチャットがありません。友達とチャットを始めましょう！",
+  "newMessageTitle": "新しいメッセージ",
+  "chatCallLater": "後で音声通話（Circle言語は近日公開）",
+  "errorWithDetails": "エラー: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "{name}さんにあいさつしましょう！",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "メッセージ...",
+  "notificationsTitle": "通知",
+  "notificationsTabAll": "すべて",
+  "notificationsTabCourses": "コース",
+  "notificationsTabSocial": "ソーシャル",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "システム",
+  "notificationsEmpty": "ここには通知がありません。",
+  "notificationsDeleted": "通知を削除しました",
+  "notificationTitleFallback": "通知",
+  "notificationTypeCourse": "コース",
+  "notificationTypeSocial": "ソーシャル",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "システム",
+  "notificationsFriendAccepted": "友達リクエストを承認しました",
+  "notificationsFriendAcceptFailed": "友達リクエストの承認に失敗: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "友達リクエストを拒否しました",
+  "notificationsFriendDeclineFailed": "友達リクエストの拒否に失敗: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Circleへの参加に失敗: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "開いています",
+  "notificationsOpened": "開きました",
+  "notificationsActionMessage": "{action}通知",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "設定",
+  "settingsSectionAccount": "アカウント",
+  "settingsEditProfile": "プロフィール編集",
+  "settingsPrivacy": "プライバシー",
+  "settingsSecurity": "セキュリティ",
+  "settingsSectionGameplay": "ゲームプレイ",
+  "settingsShowTranslationLine": "翻訳行を表示",
+  "settingsShowReadingLine": "読みを表示（Pinyin/Romaji）",
+  "settingsDefaultTimerPerQuestion": "問題ごとのデフォルトタイマー",
+  "settingsMatchDifficulty": "マッチ難易度",
+  "settingsMatchDifficultyAdaptive": "適応型",
+  "settingsSectionSoundFeel": "サウンドと感触",
+  "settingsMusic": "音楽",
+  "settingsSoundEffects": "効果音",
+  "settingsHaptics": "触覚フィードバック",
+  "settingsSectionNotifications": "通知",
+  "settingsPushNotifications": "プッシュ通知",
+  "settingsDailyReminder": "毎日のリマインダー",
+  "settingsSectionAppearance": "外観",
+  "settingsTheme": "テーマ",
+  "settingsUiLanguage": "UI言語",
+  "settingsSectionAbout": "について",
+  "settingsVersion": "バージョン",
+  "settingsTermsPrivacy": "規約とプライバシー",
+  "settingsSupport": "サポート",
+  "settingsLogout": "ログアウト",
+  "themeSystem": "システム",
+  "themeDark": "ダーク",
+  "themeLight": "ライト",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "プロフィールを更新しました",
+  "editProfileTitle": "プロフィール編集",
+  "editProfilePhotoLabel": "プロフィール写真",
+  "editProfilePhotoSubtitle": "Supabase Storageを経由したアバター選択は近日公開。",
+  "editProfileChangePhoto": "変更",
+  "editProfileAvatarUploadSoon": "アバターアップロードは近日公開",
+  "editProfileDisplayNameLabel": "表示名",
+  "editProfileDisplayNameHint": "あなたの名前",
+  "editProfileDisplayNameRequired": "名前を入力してください",
+  "editProfileDisplayNameTooShort": "短すぎます",
+  "editProfileUsernameLabel": "ユーザー名",
+  "editProfileUsernameHint": "tanaka_learner",
+  "editProfileUsernameRequired": "ユーザー名を入力してください",
+  "editProfileUsernameTooShort": "最低3文字",
+  "editProfileUsernameInvalid": "文字、数字、_のみ",
+  "editProfileBioLabel": "自己紹介",
+  "editProfileBioHint": "短い自己紹介...",
+  "editProfileBioTooLong": "最大120文字",
+  "editProfileLocationLabel": "場所",
+  "editProfileLocationHint": "都市 / 国",
+  "editProfileDailyGoalTitle": "1日の目標",
+  "editProfileDailyGoalSubtitle": "毎日何分勉強したいかを選択してください。",
+  "securityTitle": "セキュリティ",
+  "securitySectionPassword": "パスワード",
+  "securityChangePasswordTitle": "パスワードを変更",
+  "securityChangePasswordSubtitle": "定期的にパスワードを更新してください。",
+  "securitySectionTwoFactor": "2段階認証",
+  "securityEnable2faTitle": "2FAを有効化",
+  "securityEnable2faSubtitle": "サインイン時の追加セキュリティ。",
+  "securitySectionAppLock": "アプリロック",
+  "securityBiometricTitle": "生体認証アンロック",
+  "securityBiometricSubtitle": "FaceID/TouchIDを使用してSOMAをアンロック。",
+  "securityAppLockTitle": "アプリロック",
+  "securityAppLockSubtitle": "アプリを終了時にSOMAをロック。",
+  "securitySectionSessions": "アクティブセッション",
+  "securityNoSessions": "アクティブセッションが見つかりません。",
+  "securityThisDevice": "このデバイス",
+  "securityDevice": "デバイス",
+  "securityActiveLabel": "アクティブ",
+  "securitySignInToEnable2fa": "2FAを有効にするにはサインインしてください",
+  "securityEnable2faFailed": "2FAの有効化に失敗: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FAの無効化に失敗: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FAセットアップ",
+  "securitySecretKeyLabel": "秘密鍵",
+  "securityCodeHint": "6桁のコード",
+  "security2faEnabled": "2FAを有効にしました",
+  "securityVerifyCodeFailed": "コードの確認に失敗: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "確認中...",
+  "securityVerify": "確認",
+  "securityCurrentPasswordHint": "現在のパスワード",
+  "securityNewPasswordHint": "新しいパスワード（8文字以上）",
+  "securityConfirmPasswordHint": "新しいパスワードを確認",
+  "securitySignInToChangePassword": "パスワードを変更するにはサインインしてください",
+  "securityEnterCurrentPassword": "現在のパスワードを入力してください",
+  "securityPasswordMinLength": "新しいパスワードは8文字以上である必要があります",
+  "securityPasswordsDoNotMatch": "パスワードが一致しません",
+  "securityPasswordUpdated": "パスワードを更新しました",
+  "securityPasswordUpdateFailed": "パスワードの更新に失敗: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "自動ロックまで",
+  "privacyTitle": "プライバシー",
+  "privacySectionVisibility": "表示",
+  "privacyProfileVisibilityTitle": "プロフィールの表示",
+  "privacyVisibilityPublic": "公開",
+  "privacyVisibilityFriends": "友達",
+  "privacyVisibilityPrivate": "非公開",
+  "privacyVisibilityPublicSubtitle": "誰でもあなたのプロフィールを見ることができます。",
+  "privacyVisibilityFriendsSubtitle": "友達のみがあなたのプロフィールを見ることができます。",
+  "privacyVisibilityPrivateSubtitle": "あなただけがプロフィールを見ることができます。",
+  "privacySectionActivity": "アクティビティ",
+  "privacyShowOnlineTitle": "オンラインステータスを表示",
+  "privacyShowOnlineSubtitle": "他の人があなたがオンラインであることを見られるようにします。",
+  "privacyShowActivityTitle": "学習アクティビティを表示",
+  "privacyShowActivitySubtitle": "連続記録、XP、現在の進捗を表示。",
+  "privacySectionSocial": "ソーシャル",
+  "privacyAllowRequestsTitle": "友達リクエストを許可",
+  "privacyAllowRequestsSubtitle": "他の人が友達リクエストを送信できるようにします。",
+  "privacyWhoCanDmTitle": "DMできる人",
+  "privacyDmEveryone": "全員",
+  "privacyDmFriends": "友達",
+  "privacyDmNoOne": "誰もいない",
+  "privacyDmEveryoneSubtitle": "誰でもあなたにDMできます。",
+  "privacyDmFriendsSubtitle": "友達のみがあなたにDMできます。",
+  "privacyDmNoOneSubtitle": "誰もあなたにDMできません。",
+  "privacySectionBlockedUsers": "ブロックしたユーザー",
+  "privacyBlockedUsersComingSoon": "ブロックしたユーザーの管理は近日公開。",
+  "privacySectionDataControls": "データ管理",
+  "privacyExportDataTitle": "データをエクスポート",
+  "privacyExportDataSubtitle": "アクティビティとコースをダウンロード。",
+  "privacyExportInfoTitle": "データエクスポート",
+  "privacyExportInfoBody": "次のステップ：JSON/CSVエクスポートを作成し、メールで送信するかローカルにダウンロードします。",
+  "privacyDeleteAccountTitle": "アカウントを削除",
+  "privacyDeleteAccountSubtitle": "これによりアカウントとデータが永久に削除されます。",
+  "privacyDeleteConfirmTitle": "アカウントを削除しますか？",
+  "privacyDeleteConfirmBody": "この操作は永続的です。プロフィール、コース、友達、メッセージが削除されます。",
+  "privacyDeleteComingSoon": "削除は後でSupabaseに接続されます",
+  "soloLabel": "ソロ",
+  "soloResultsCompletedTitle": "ソロセッション完了",
+  "soloResultsFeedbackElite": "エリートパフォーマンス。連続記録を維持しましょう。",
+  "soloResultsFeedbackStrong": "力強い。急速に改善しています。",
+  "soloResultsFeedbackProgress": "良い進捗。間違いを復習して繰り返しましょう。",
+  "soloResultsFeedbackTryAgain": "ストレスなく。少ない問題と集中で再挑戦しましょう。",
+  "soloResultsPerfectScore": "完璧なスコア！復習する間違いはありません。",
+  "soloResultsReviewPrompt": "より速く学ぶために間違いを復習しましょう。以下に誤答を表示します。",
+  "soloResultsReviewMistakes": "間違いを復習（{count}）",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "サインインしていません",
+  "genericUser": "ユーザー",
+  "loading": "読み込み中...",
+  "edit": "編集",
+  "send": "送信",
+  "join": "参加",
+  "leave": "退出",
+  "ready": "準備完了",
+  "levelBeginner": "初級",
+  "levelIntermediate": "中級",
+  "levelAdvanced": "上級",
+  "questionsShort": "{count}問",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count}秒",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "すべてのコース",
+  "circlesAllModes": "すべてのモード",
+  "circlesAllLevels": "すべてのレベル",
+  "circlesAddNewCourse": "新しいコースを追加",
+  "circlesCoursesTitle": "コース",
+  "circlesModeTitle": "モード",
+  "circlesLevelTitle": "レベル",
+  "circlesNoActiveForFilters": "このフィルターのアクティブなCirclesはありません。",
+  "circlesUnknownRoom": "不明なルーム",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Circleを作成",
+  "circlesCircleName": "Circle名",
+  "circlesEnterName": "名前を入力",
+  "circlesLanguages": "言語",
+  "circlesRoomSetup": "ルーム設定",
+  "circlesPlayers": "プレイヤー",
+  "circlesEmptySlot": "空きスロット",
+  "circlesPlayersRange": "1-5人のプレイヤー",
+  "circlesQuestions": "問題",
+  "circlesQuestionsSubtitle": "問題数",
+  "circlesTimePerQuestion": "問題ごとの時間",
+  "circlesSecondsPerQuestion": "問題ごとの秒数",
+  "circlesAdvanced": "詳細",
+  "circlesAllowSpectators": "観戦者を許可",
+  "circlesAllowSpectatorsSubtitle": "他の人がプレイせずに視聴できるようにします。",
+  "circlesLiveVoiceChat": "ライブ音声チャット",
+  "circlesLiveVoiceChatSubtitle": "マッチ中のライブ音声を有効化。",
+  "circlesLiveTextChat": "ライブテキストチャット",
+  "circlesLiveTextChatSubtitle": "マッチ中のチャットを有効化。",
+  "circlesCreatedSuccess": "Circleを作成しました",
+  "circlesCreateError": "Circleの作成に失敗: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "ヒント：作成後に友達を招待できます。",
+  "circlesJoinError": "Circleへの参加に失敗: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Circleロビー",
+  "circlesCodeLine": "コード: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "マッチ設定",
+  "circlesLevelWithValue": "レベル {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "難易度",
+  "circlesPerQuestionShort": "問題ごと",
+  "circlesInvite": "招待",
+  "circlesCopyId": "IDをコピー",
+  "circlesCopiedId": "IDをコピーしました",
+  "circlesMatchInProgress": "マッチ進行中",
+  "circlesSpectatorQueuedBody": "マッチ進行中。観戦者として参加します。",
+  "circlesHostStartWhenReady": "全員が準備完了したらホストが開始します。",
+  "circlesSpectators": "観戦者",
+  "circlesSpectator": "観戦者",
+  "circlesSpectatorCanWatch": "観戦者はライブで視聴できます。",
+  "circlesJoinRequests": "参加リクエスト",
+  "circlesAcceptSpectatorsHint": "マッチ開始前に観戦者を承認してください。",
+  "circlesStartGame": "ゲーム開始",
+  "circlesWaitingForPlayers": "プレイヤー待機中",
+  "circlesLeaveCircle": "Circleを退出",
+  "circlesRequestSent": "リクエストを送信しました",
+  "circlesRequestToJoin": "参加をリクエスト",
+  "circlesWatchLive": "ライブ視聴",
+  "circlesPlayerTip": "準備ができたら準備完了をタップ。ホストがマッチを開始します。",
+  "circlesSpectatorTip": "視聴中です。ホストが開始したらライブで視聴してください。",
+  "circlesHostControls": "ホストコントロール",
+  "circlesTransferHostFailed": "ホストの移行に失敗: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Circleの終了に失敗: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "@{username}が見つかりません",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "無効なユーザー",
+  "circlesCantInviteSelf": "自分自身を招待することはできません",
+  "circlesUserAlreadyInCircle": "@{username}は既にCircleにいます",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "ホスト",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "ユーザー名で招待",
+  "circlesInviteSent": "@{username}に招待を送信しました",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "招待の送信に失敗: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "参加リクエストを送信しました",
+  "circlesJoinRequestFailed": "リクエスト失敗: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circleが満員です",
+  "circlesSpectatorAdded": "観戦者を追加しました",
+  "circlesApproveFailed": "リクエストの承認に失敗: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "リクエストを拒否しました",
+  "circlesDeclineFailed": "リクエストの拒否に失敗: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "参加者",
+  "circlesLeavePromptTitle": "Circleを退出しますか？",
+  "circlesLeavePromptTransfer": "退出する前にホストを移行してください。",
+  "circlesLeavePromptEndOnly": "Circleを終了して退出。",
+  "circlesTransferHost": "ホストを移行",
+  "circlesEndCircle": "Circleを終了",
+  "circlesTransferHostTitle": "ホストを移行",
+  "circlesShareId": "Circle ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

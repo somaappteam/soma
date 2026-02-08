@@ -1,0 +1,781 @@
+{
+  "@@locale": "pa",
+  "appTitle": "SOMA",
+  "welcomeTagline": "ਸਿੱਖੋ। ਮੁਕਾਬਲਾ ਕਰੋ। ਮਾਹਰ ਬਣੋ।",
+  "signUp": "ਸਾਈਨ ਅੱਪ",
+  "signIn": "ਸਾਈਨ ਇਨ",
+  "skipForNow": "ਹੁਣ ਲਈ ਛੱਡੋ",
+  "authFillAllFields": "ਕਿਰਪਾ ਕਰਕੇ ਸਾਰੇ ਖੇਤਰ ਭਰੋ",
+  "authError": "ਗਲਤੀ: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "ਈਮੇਲ",
+  "authPassword": "ਪਾਸਵਰਡ",
+  "authUsername": "ਯੂਜ਼ਰਨੇਮ",
+  "authContinue": "ਜਾਰੀ ਰੱਖੋ",
+  "authSigningIn": "ਸਾਈਨ ਇਨ ਹੋ ਰਿਹਾ ਹੈ...",
+  "authCreateAccount": "ਖਾਤਾ ਬਣਾਓ",
+  "authCreating": "ਬਣਾਇਆ ਜਾ ਰਿਹਾ ਹੈ...",
+  "authNeedAccount": "ਖਾਤਾ ਨਹੀਂ ਹੈ? ",
+  "authHaveAccount": "ਪਹਿਲਾਂ ਹੀ ਖਾਤਾ ਹੈ? ",
+  "dialogAuthRequiredTitle": "Circles ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸਾਈਨ ਇਨ ਕਰੋ",
+  "dialogAuthRequiredBody": "Circles ਮਲਟੀਪਲੇਅਰ ਕਮਰੇ ਹਨ। ਲਾਈਵ ਮੈਚਾਂ ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ, ਦੋਸਤਾਂ ਨੂੰ ਸੱਦਾ ਦੇਣ ਅਤੇ ਤਰੱਕੀ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕਰਨ ਲਈ ਖਾਤਾ ਬਣਾਓ।",
+  "notNow": "ਹੁਣ ਨਹੀਂ",
+  "navHome": "ਹੋਮ",
+  "navCircles": "Circles",
+  "navProfile": "ਪ੍ਰੋਫਾਈਲ",
+  "removeCourseTitle": "ਕੋਰਸ ਹਟਾਉਣਾ ਹੈ?",
+  "removeCourseBody": "{course} ਤੁਹਾਡੀ ਸੂਚੀ ਵਿੱਚੋਂ ਹਟਾ ਦਿੱਤਾ ਜਾਵੇਗਾ",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "ਰੱਦ ਕਰੋ",
+  "remove": "ਹਟਾਓ",
+  "welcomeBack": "ਵਾਪਸੀ 'ਤੇ ਸੁਆਗਤ ਹੈ, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "ਕੋਰਸ ਸੰਪਾਦਿਤ ਕਰੋ",
+  "done": "ਹੋ ਗਿਆ",
+  "noCoursesToEdit": "ਸੰਪਾਦਿਤ ਕਰਨ ਲਈ ਕੋਈ ਕੋਰਸ ਨਹੀਂ",
+  "addCourse": "ਕੋਰਸ ਸ਼ਾਮਲ ਕਰੋ",
+  "unknown": "ਅਣਜਾਣ",
+  "iSpeak": "ਮੈਂ ਬੋਲਦਾ/ਬੋਲਦੀ ਹਾਂ",
+  "iWantToLearn": "ਮੈਂ ਸਿੱਖਣਾ ਚਾਹੁੰਦਾ/ਚਾਹੁੰਦੀ ਹਾਂ",
+  "chooseYourLanguage": "ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ",
+  "chooseLearningLanguage": "ਸਿੱਖਣ ਵਾਲੀ ਭਾਸ਼ਾ ਚੁਣੋ",
+  "chooseTwoDifferentLanguages": "ਕਿਰਪਾ ਕਰਕੇ ਦੋ ਵੱਖਰੀਆਂ ਭਾਸ਼ਾਵਾਂ ਚੁਣੋ",
+  "createCourse": "ਕੋਰਸ ਬਣਾਓ",
+  "soloCourseTitle": "ਸੋਲੋ ਕੋਰਸ",
+  "searchLanguage": "ਭਾਸ਼ਾ ਖੋਜੋ",
+  "noMatches": "ਕੋਈ ਮੇਲ ਨਹੀਂ",
+  "chooseCourseType": "ਕੋਰਸ ਦੀ ਕਿਸਮ ਚੁਣੋ",
+  "soloStudyDescription": "Circles ਵਰਗੇ ਹੀ ਕਵਿਜ਼ਾਂ ਨਾਲ ਇਕੱਲੇ ਅਭਿਆਸ ਕਰੋ - ਪਰ ਬਿਨਾਂ ਕਮਰੇ, ਚੈਟ, ਦਰਸ਼ਕ ਜਾਂ ਹੋਸਟ ਵਿਕਲਪਾਂ ਦੇ",
+  "soloModeVocabulary": "ਸ਼ਬਦਾਵਲੀ",
+  "soloModeSentences": "ਵਾਕ",
+  "soloModeReview": "ਸਮੀਖਿਆ",
+  "soloModeVocabularySubtitle": "ਬਹੁ-ਵਿਕਲਪੀ, ਅਰਥ, ਸਮਾਨਾਰਥੀ, ਵਰਤੋਂ",
+  "soloModeSentencesSubtitle": "ਖਾਲੀ ਥਾਂ ਭਰੋ + ਅਨੁਵਾਦ + ਪੜ੍ਹਨਾ",
+  "soloModeReviewDescription": "ਜੋ ਸਿੱਖਿਆ ਹੈ ਉਸਦਾ ਅਭਿਆਸ ਕਰੋ: ਕਮਜ਼ੋਰ ਸ਼ਬਦ, ਤਾਜ਼ਾ ਗਲਤੀਆਂ ਅਤੇ ਦੁਹਰਾਓ",
+  "startReview": "ਸਮੀਖਿਆ ਸ਼ੁਰੂ ਕਰੋ",
+  "soloSetupTitle": "{mode} ਸੈੱਟਅੱਪ",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "ਮੁਸ਼ਕਲ ਪੱਧਰ",
+  "numberOfQuestions": "ਸਵਾਲਾਂ ਦੀ ਗਿਣਤੀ",
+  "timerPerQuestion": "ਪ੍ਰਤੀ ਸਵਾਲ ਟਾਈਮਰ",
+  "noTimer": "ਕੋਈ ਟਾਈਮਰ ਨਹੀਂ",
+  "start": "ਸ਼ੁਰੂ ਕਰੋ",
+  "profileTitle": "ਪ੍ਰੋਫਾਈਲ",
+  "profileSignInToMessage": "ਸੁਨੇਹਾ ਭੇਜਣ ਲਈ ਸਾਈਨ ਇਨ ਕਰੋ",
+  "profileThatsYourProfile": "ਇਹ ਤੁਹਾਡਾ ਪ੍ਰੋਫਾਈਲ ਹੈ",
+  "profileSignInToAddFriends": "ਦੋਸਤੋ ਨੂੰ ਸ਼ਾਮਲ ਕਰਨ ਲਈ ਸਾਈਨ ਇਨ ਕਰੋ",
+  "profileCantAddYourself": "ਤੁਸੀਂ ਆਪਣੇ ਆਪ ਨੂੰ ਸ਼ਾਮਲ ਨਹੀਂ ਕਰ ਸਕਦੇ",
+  "profileRequestSent": "@{username} ਨੂੰ ਬੇਨਤੀ ਭੇਜੀ ਗਈ",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "ਬੇਨਤੀ ਭੇਜਣ ਵਿੱਚ ਅਸਫਲ",
+  "profileDefaultDisplayName": "ਨਵਾਂ ਯੂਜ਼ਰ",
+  "profileDefaultBio": "ਸਿੱਖਣ ਲਈ ਤਿਆਰ!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "ਮਹਿਮਾਨ",
+  "guestUsername": "ਮਹਿਮਾਨ",
+  "guestSessionLabel": "ਮਹਿਮਾਨ ਸੈਸ਼ਨ",
+  "unlockFullProfile": "ਪੂਰਾ ਪ੍ਰੋਫਾਈਲ ਅਨਲੌਕ ਕਰੋ",
+  "guestBenefitSync": "ਸਾਰੇ ਡਿਵਾਈਸਾਂ 'ਤੇ ਤਰੱਕੀ ਸਿੰਕ ਕਰੋ",
+  "guestBenefitCircles": "Circles ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ ਅਤੇ ਲਾਈਵ ਖੇਡੋ",
+  "guestBenefitNotifications": "ਸੂਚਨਾਵਾਂ ਅਤੇ ਦੋਸਤੀ ਬੇਨਤੀਆਂ ਪ੍ਰਾਪਤ ਕਰੋ",
+  "progressStaysOnDevice": "ਤਰੱਕੀ ਇਸ ਡਿਵਾਈਸ 'ਤੇ ਰਹਿੰਦੀ ਹੈ ਜਦੋਂ ਤੱਕ ਤੁਸੀਂ ਸਾਈਨ ਇਨ ਨਹੀਂ ਕਰਦੇ",
+  "profileGoalLabel": "ਟੀਚਾ: {minutes} ਮਿੰਟ",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP ਤਰੱਕੀ",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "ਜਿੱਤਾਂ",
+  "profileStreak": "ਲਗਾਤਾਰ",
+  "profileFriendsTitle": "ਦੋਸਤ",
+  "profileViewAll": "ਸਾਰੇ ਵੇਖੋ",
+  "profileAchievementsTitle": "ਪ੍ਰਾਪਤੀਆਂ",
+  "profileNoAchievements": "ਅਜੇ ਕੋਈ ਪ੍ਰਾਪਤੀ ਨਹੀਂ",
+  "profileRequested": "ਬੇਨਤੀ ਕੀਤੀ",
+  "profileSending": "ਭੇਜਿਆ ਜਾ ਰਿਹਾ ਹੈ...",
+  "profileAddFriend": "ਦੋਸਤ ਸ਼ਾਮਲ ਕਰੋ",
+  "profileConnectTitle": "ਜੁੜੋ",
+  "profileMessage": "ਸੁਨੇਹਾ",
+  "profileSnapshot": "ਪ੍ਰੋਫਾਈਲ ਸਨੈਪਸ਼ਾਟ",
+  "profileLocationHidden": "ਟਿਕਾਣਾ ਲੁਕਿਆ ਹੋਇਆ",
+  "profileBioHidden": "ਬਾਇਓ ਲੁਕਿਆ ਹੋਇਆ",
+  "profileDailyGoal": "ਰੋਜ਼ਾਨਾ ਟੀਚਾ {minutes} ਮਿੰਟ",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle ਸੱਦਾ",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਸਾਈਨ ਇਨ ਕਰੋ",
+  "joiningCircle": "ਸ਼ਾਮਲ ਹੋ ਰਿਹਾ ਹੈ...",
+  "joinCircle": "Circle ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਵੋ",
+  "circleJoinedAsPlayer": "ਖਿਡਾਰੀ ਵਜੋਂ ਸ਼ਾਮਲ ਹੋਏ",
+  "circleJoinedAsSpectator": "ਦਰਸ਼ਕ ਵਜੋਂ ਸ਼ਾਮਲ ਹੋਏ",
+  "accept": "ਸਵੀਕਾਰ ਕਰੋ",
+  "decline": "ਅਸਵੀਕਾਰ ਕਰੋ",
+  "open": "ਖੋਲ੍ਹੋ",
+  "circleCountdownTitle": "ਤਿਆਰ ਰਹੋ",
+  "circleCountdownSubtitle": "Circle ਸ਼ੁਰੂ ਹੋ ਰਿਹਾ ਹੈ...",
+  "userFallbackName": "ਯੂਜ਼ਰ",
+  "micOff": "ਮਾਈਕ ਬੰਦ",
+  "micOn": "ਮਾਈਕ ਚਾਲੂ",
+  "roleHost": "ਹੋਸਟ",
+  "roleSpectator": "ਦਰਸ਼ਕ",
+  "tagHost": "ਹੋਸਟ",
+  "tagYou": "ਤੁਸੀਂ",
+  "statusCorrect": "ਸਹੀ",
+  "statusWrong": "ਗਲਤ",
+  "statusWaiting": "ਉਡੀਕ",
+  "statusNone": "-",
+  "pointsAbbrev": "ਅੰਕ",
+  "pointsLabel": "ਅੰਕ",
+  "statCorrect": "ਸਹੀ",
+  "statAnswers": "ਜਵਾਬ",
+  "statTotal": "ਕੁੱਲ",
+  "statQuestions": "ਸਵਾਲ",
+  "statAccuracy": "ਸ਼ੁੱਧਤਾ",
+  "statRate": "ਦਰ",
+  "statRank": "ਰੈਂਕ",
+  "statPosition": "ਸਥਿਤੀ",
+  "statMode": "ਮੋਡ",
+  "statType": "ਕਿਸਮ",
+  "next": "ਅਗਲਾ",
+  "submit": "ਜਮ੍ਹਾਂ ਕਰੋ",
+  "continueLabel": "ਜਾਰੀ ਰੱਖੋ",
+  "save": "ਸੁਰੱਖਿਅਤ ਕਰੋ",
+  "playAgain": "ਦੁਬਾਰਾ ਖੇਡੋ",
+  "backToCourse": "ਕੋਰਸ 'ਤੇ ਵਾਪਸ",
+  "resultsTitle": "ਨਤੀਜੇ",
+  "shareLater": "ਬਾਅਦ ਵਿੱਚ ਸਾਂਝਾ ਕਰੋ",
+  "delete": "ਹਟਾਓ",
+  "ok": "ਠੀਕ ਹੈ",
+  "minutesShort": "{minutes} ਮਿੰਟ",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} ਮਿੰਟ",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} ਘੰਟੇ",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} ਦਿਨ",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "ਹੁਣੇ",
+  "timeMinutesAgo": "{count} ਮਿੰਟ ਪਹਿਲਾਂ",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} ਘੰਟੇ ਪਹਿਲਾਂ",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} ਦਿਨ ਪਹਿਲਾਂ",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "ਹੋਸਟ ਦੀ ਉਡੀਕ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ...",
+  "liveQuizJoinRequestSent": "ਸ਼ਾਮਲ ਹੋਣ ਦੀ ਬੇਨਤੀ ਭੇਜੀ ਗਈ",
+  "liveQuizJoinRequestFailed": "ਬੇਨਤੀ ਭੇਜਣ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "ਹੋਸਟ ਕੰਟਰੋਲ",
+  "liveQuizSpectatorModeTitle": "ਦਰਸ਼ਕ ਮੋਡ",
+  "liveQuizHostControlsSubtitle": "ਜਦੋਂ ਹਰ ਕੋਈ ਜਵਾਬ ਦਿੰਦਾ ਹੈ ਜਾਂ ਸਮਾਂ ਸਮਾਪਤ ਹੁੰਦਾ ਹੈ ਤਾਂ ਰਾਊਂਡ ਆਪਣੇ ਆਪ ਅੱਗੇ ਵਧਦੇ ਹਨ",
+  "liveQuizSpectatorModeSubtitle": "ਸਵਾਲਾਂ ਅਤੇ ਲੀਡਰਬੋਰਡਾਂ ਨੂੰ ਲਾਈਵ ਦੇਖੋ। ਤੁਸੀਂ ਜਵਾਬ ਨਹੀਂ ਦੇ ਸਕਦੇ",
+  "liveQuizQuestionCounter": "ਸਵਾਲ {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "ਬੇਨਤੀ ਭੇਜੀ ਗਈ",
+  "liveQuizRequestToJoin": "ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਬੇਨਤੀ",
+  "liveQuizSpectatorFooter": "ਤੁਸੀਂ ਲਾਈਵ ਦੇਖ ਰਹੇ ਹੋ। ਸਵਾਲਾਂ ਅਤੇ ਲੀਡਰਬੋਰਡਾਂ ਦਾ ਅਨੰਦ ਲਓ",
+  "circleNotFound": "Circle ਨਹੀਂ ਮਿਲਿਆ",
+  "resultsRematchStartFailed": "ਰੀਮੈਚ ਸ਼ੁਰੂ ਕਰਨ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "ਮੈਚ ਦੇ ਨਤੀਜੇ",
+  "resultsNiceWork": "ਵਧੀਆ ਕੰਮ, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "ਪਹਿਲਾ ਸਥਾਨ",
+  "resultsPlaceSecond": "ਦੂਜਾ ਸਥਾਨ",
+  "resultsPlaceThird": "ਤੀਜਾ ਸਥਾਨ",
+  "resultsPlaceNth": "{rank}ਵਾਂ ਸਥਾਨ",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "{players} ਖਿਡਾਰੀਆਂ ਵਿੱਚੋਂ",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "ਚੈਂਪੀਅਨ! ਤੁਸੀਂ ਇਸ ਰਾਊਂਡ ਵਿੱਚ ਸ਼ਾਨਦਾਰ ਪ੍ਰਦਰਸ਼ਨ ਕੀਤਾ",
+  "resultsHighlightGreatAccuracy": "ਸ਼ਾਨਦਾਰ ਸ਼ੁੱਧਤਾ - ਕਾਫੀ ਸਹੀ!",
+  "resultsHighlightKeepGoing": "ਜਾਰੀ ਰੱਖੋ - ਸਥਿਰਤਾ ਗਤੀ ਨੂੰ ਹਰਾਉਂਦੀ ਹੈ",
+  "resultsLeaderboardTitle": "ਲੀਡਰਬੋਰਡ",
+  "resultsPlayersCount": "{count} ਖਿਡਾਰੀ",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Circles 'ਤੇ ਵਾਪਸ",
+  "resultsRematch": "ਰੀਮੈਚ",
+  "resultsPlayAgain": "ਦੁਬਾਰਾ ਖੇਡੋ",
+  "leaderboardGlobalTitle": "ਗਲੋਬਲ ਲੀਡਰਬੋਰਡ",
+  "leaderboardEmpty": "ਅਜੇ ਕੋਈ ਦਰਜਾਬੰਦੀ ਨਹੀਂ",
+  "aboutTitle": "ਬਾਰੇ",
+  "aboutVersion": "ਵਰਜਨ {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA ਇੱਕ ਖੇਡ-ਅਧਾਰਿਤ ਭਾਸ਼ਾ ਸਿੱਖਣ ਪਲੇਟਫਾਰਮ ਹੈ ਜੋ ਨਵੀਆਂ ਭਾਸ਼ਾਵਾਂ ਵਿੱਚ ਮੁਹਾਰਤ ਹਾਸਲ ਕਰਨ ਨੂੰ ਮਜ਼ੇਦਾਰ ਅਤੇ ਸਮਾਜਿਕ ਬਣਾਉਂਦਾ ਹੈ। Circles ਵਿੱਚ ਮੁਕਾਬਲਾ ਕਰੋ, ਇਕੱਲੇ ਅਭਿਆਸ ਕਰੋ ਅਤੇ ਆਪਣੀ ਤਰੱਕੀ ਨੂੰ ਟਰੈਕ ਕਰੋ।",
+  "aboutTerms": "ਵਰਤੋਂ ਦੀਆਂ ਸ਼ਰਤਾਂ",
+  "aboutPrivacy": "ਪਰਦੇਦਾਰੀ ਨੀਤੀ",
+  "aboutOpenSource": "ਓਪਨ ਸੋਰਸ ਲਾਇਸੰਸ",
+  "addFriendTitle": "ਦੋਸਤ ਸ਼ਾਮਲ ਕਰੋ",
+  "addFriendFindByUsername": "ਯੂਜ਼ਰਨੇਮ ਦੁਆਰਾ ਲੱਭੋ",
+  "addFriendUsernameHint": "ਯੂਜ਼ਰਨੇਮ ਭਰੋ...",
+  "addFriendTip": "ਸੁਝਾਅ: QR ਕੋਡ + ਦੋਸਤ ID ਸਹਾਇਤਾ ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ",
+  "addFriendSending": "ਭੇਜਿਆ ਜਾ ਰਿਹਾ ਹੈ...",
+  "addFriendSendRequest": "ਬੇਨਤੀ ਭੇਜੋ",
+  "addFriendUserNotFound": "ਯੂਜ਼ਰ @{username} ਨਹੀਂ ਮਿਲਿਆ",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "ਕਾਰਵਾਈ ਅਸਫਲ ਰਹੀ ਜਾਂ ਪਹਿਲਾਂ ਹੀ ਭੇਜੀ ਗਈ: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "ਦੋਸਤ",
+  "searchFriendsHint": "ਦੋਸਤਾਂ ਨੂੰ ਲੱਭੋ...",
+  "somaLearnerSubtitle": "Soma ਸਿਖਿਆਰਥੀ",
+  "friendRequestLabel": "ਬੇਨਤੀ",
+  "friendRequestSentLabel": "ਬੇਨਤੀ ਭੇਜੀ ਗਈ",
+  "friendIncomingRequestLabel": "ਆ ਰਹੀ ਬੇਨਤੀ",
+  "friendRequestsSection": "ਬੇਨਤੀਆਂ",
+  "friendPendingSection": "ਲੰਬਿਤ",
+  "friendAllSection": "ਸਾਰੇ ਦੋਸਤ",
+  "friendsEmptyState": "ਅਜੇ ਕੋਈ ਦੋਸਤ ਨਹੀਂ। ਆਪਣਾ ਪਹਿਲਾ ਦੋਸਤ ਸ਼ਾਮਲ ਕਰੋ!",
+  "friendsEmptyShort": "ਅਜੇ ਕੋਈ ਦੋਸਤ ਨਹੀਂ",
+  "noMatchForQuery": "\\\"{query}\\\" ਲਈ ਕੋਈ ਮੇਲ ਨਹੀਂ ਮਿਲਿਆ",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "ਇਨਬਾਕਸ",
+  "searchChatsHint": "ਚੈਟ ਖੋਜੋ...",
+  "inboxEmptyState": "ਅਜੇ ਕੋਈ ਚੈਟ ਨਹੀਂ। ਕਿਸੇ ਦੋਸਤ ਨਾਲ ਗੱਲਬਾਤ ਸ਼ੁਰੂ ਕਰੋ!",
+  "newMessageTitle": "ਨਵਾਂ ਸੁਨੇਹਾ",
+  "chatCallLater": "ਵਾਇਸ ਕਾਲ ਜਲਦੀ (ਅਗਲੇ Circle ਦੀ ਆਵਾਜ਼)",
+  "errorWithDetails": "ਗਲਤੀ: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "{name} ਨੂੰ ਹੈਲੋ ਕਹੋ!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "ਸੁਨੇਹਾ...",
+  "notificationsTitle": "ਸੂਚਨਾਵਾਂ",
+  "notificationsTabAll": "ਸਭ",
+  "notificationsTabCourses": "ਕੋਰਸ",
+  "notificationsTabSocial": "ਸੋਸ਼ਲ",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "ਸਿਸਟਮ",
+  "notificationsEmpty": "ਕੋਈ ਸੂਚਨਾਵਾਂ ਨਹੀਂ",
+  "notificationsDeleted": "ਸੂਚਨਾ ਹਟਾਈ ਗਈ",
+  "notificationTitleFallback": "ਸੂਚਨਾ",
+  "notificationTypeCourse": "ਕੋਰਸ",
+  "notificationTypeSocial": "ਸੋਸ਼ਲ",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "ਸਿਸਟਮ",
+  "notificationsFriendAccepted": "ਦੋਸਤੀ ਦੀ ਬੇਨਤੀ ਸਵੀਕਾਰ ਕੀਤੀ ਗਈ",
+  "notificationsFriendAcceptFailed": "ਦੋਸਤੀ ਦੀ ਬੇਨਤੀ ਸਵੀਕਾਰ ਕਰਨ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "ਦੋਸਤੀ ਦੀ ਬੇਨਤੀ ਅਸਵੀਕਾਰ ਕੀਤੀ ਗਈ",
+  "notificationsFriendDeclineFailed": "ਦੋਸਤੀ ਦੀ ਬੇਨਤੀ ਅਸਵੀਕਾਰ ਕਰਨ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Circle ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "ਖੁੱਲ੍ਹ ਰਿਹਾ ਹੈ",
+  "notificationsOpened": "ਖੁੱਲ੍ਹ ਗਿਆ",
+  "notificationsActionMessage": "{action} ਸੂਚਨਾ",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "ਸੈਟਿੰਗਾਂ",
+  "settingsSectionAccount": "ਖਾਤਾ",
+  "settingsEditProfile": "ਪ੍ਰੋਫਾਈਲ ਸੰਪਾਦਿਤ ਕਰੋ",
+  "settingsPrivacy": "ਪਰਦੇਦਾਰੀ",
+  "settingsSecurity": "ਸੁਰੱਖਿਆ",
+  "settingsSectionGameplay": "ਗੇਮਪਲੇ",
+  "settingsShowTranslationLine": "ਅਨੁਵਾਦ ਲਾਈਨ ਦਿਖਾਓ",
+  "settingsShowReadingLine": "ਪੜ੍ਹਨਾ ਦਿਖਾਓ (ਪਿਨਯਿਨ/ਰੋਮਾਜੀ)",
+  "settingsDefaultTimerPerQuestion": "ਪ੍ਰਤੀ ਸਵਾਲ ਡਿਫਾਲਟ ਟਾਈਮਰ",
+  "settingsMatchDifficulty": "ਮੈਚ ਦੀ ਮੁਸ਼ਕਲ",
+  "settingsMatchDifficultyAdaptive": "ਅਨੁਕੂਲ",
+  "settingsSectionSoundFeel": "ਆਵਾਜ਼ ਅਤੇ ਮਹਿਸੂਸ",
+  "settingsMusic": "ਸੰਗੀਤ",
+  "settingsSoundEffects": "ਧੁਨੀ ਪ੍ਰਭਾਵ",
+  "settingsHaptics": "ਹੈਪਟਿਕਸ",
+  "settingsSectionNotifications": "ਸੂਚਨਾਵਾਂ",
+  "settingsPushNotifications": "ਪੁਸ਼ ਸੂਚਨਾਵਾਂ",
+  "settingsDailyReminder": "ਰੋਜ਼ਾਨਾ ਰੀਮਾਈਂਡਰ",
+  "settingsSectionAppearance": "ਦਿੱਖ",
+  "settingsTheme": "ਥੀਮ",
+  "settingsUiLanguage": "UI ਭਾਸ਼ਾ",
+  "settingsSectionAbout": "ਬਾਰੇ",
+  "settingsVersion": "ਵਰਜਨ",
+  "settingsTermsPrivacy": "ਸ਼ਰਤਾਂ ਅਤੇ ਪਰਦੇਦਾਰੀ",
+  "settingsSupport": "ਸਹਾਇਤਾ",
+  "settingsLogout": "ਲੌਗ ਆਉਟ",
+  "themeSystem": "ਸਿਸਟਮ",
+  "themeDark": "ਡਾਰਕ",
+  "themeLight": "ਲਾਈਟ",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "فارسی",
+  "languagePunjabi": "ਪੰਜਾਬੀ",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "ਪ੍ਰੋਫਾਈਲ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ",
+  "editProfileTitle": "ਪ੍ਰੋਫਾਈਲ ਸੰਪਾਦਿਤ ਕਰੋ",
+  "editProfilePhotoLabel": "ਪ੍ਰੋਫਾਈਲ ਫੋਟੋ",
+  "editProfilePhotoSubtitle": "Supabase Storage ਰਾਹੀਂ ਅਵਤਾਰ ਚੋਣ ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ",
+  "editProfileChangePhoto": "ਬਦਲੋ",
+  "editProfileAvatarUploadSoon": "ਅਵਤਾਰ ਅਪਲੋਡ ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ",
+  "editProfileDisplayNameLabel": "ਡਿਸਪਲੇ ਨਾਮ",
+  "editProfileDisplayNameHint": "ਤੁਹਾਡਾ ਨਾਮ",
+  "editProfileDisplayNameRequired": "ਆਪਣਾ ਨਾਮ ਦਰਜ ਕਰੋ",
+  "editProfileDisplayNameTooShort": "ਬਹੁਤ ਛੋਟਾ",
+  "editProfileUsernameLabel": "ਯੂਜ਼ਰਨੇਮ",
+  "editProfileUsernameHint": "learner_ali",
+  "editProfileUsernameRequired": "ਯੂਜ਼ਰਨੇਮ ਦਰਜ ਕਰੋ",
+  "editProfileUsernameTooShort": "ਘੱਟੋ ਘੱਟ 3 ਅੱਖਰ",
+  "editProfileUsernameInvalid": "ਸਿਰਫ ਅੱਖਰ, ਨੰਬਰ, _",
+  "editProfileBioLabel": "ਬਾਇਓ",
+  "editProfileBioHint": "ਇੱਕ ਛੋਟਾ ਬਾਇਓ...",
+  "editProfileBioTooLong": "ਵੱਧ ਤੋਂ ਵੱਧ 120 ਅੱਖਰ",
+  "editProfileLocationLabel": "ਟਿਕਾਣਾ",
+  "editProfileLocationHint": "ਸ਼ਹਿਰ / ਦੇਸ਼",
+  "editProfileDailyGoalTitle": "ਰੋਜ਼ਾਨਾ ਟੀਚਾ",
+  "editProfileDailyGoalSubtitle": "ਚੁਣੋ ਕਿ ਤੁਸੀਂ ਰੋਜ਼ਾਨਾ ਕਿੰਨੇ ਮਿੰਟ ਅਧਿਐਨ ਕਰਨਾ ਚਾਹੁੰਦੇ ਹੋ",
+  "securityTitle": "ਸੁਰੱਖਿਆ",
+  "securitySectionPassword": "ਪਾਸਵਰਡ",
+  "securityChangePasswordTitle": "ਪਾਸਵਰਡ ਬਦਲੋ",
+  "securityChangePasswordSubtitle": "ਆਪਣੇ ਪਾਸਵਰਡ ਨੂੰ ਨਿਯਮਿਤ ਤੌਰ 'ਤੇ ਅੱਪਡੇਟ ਕਰੋ",
+  "securitySectionTwoFactor": "ਦੋ-ਕਾਰਕ ਪ੍ਰਮਾਣਿਕਤਾ",
+  "securityEnable2faTitle": "2FA ਯੋਗ ਕਰੋ",
+  "securityEnable2faSubtitle": "ਸਾਈਨ ਇਨ ਕਰਨ ਵੇਲੇ ਵਾਧੂ ਸੁਰੱਖਿਆ",
+  "securitySectionAppLock": "ਐਪ ਲੌਕ",
+  "securityBiometricTitle": "ਬਾਇਓਮੀਟ੍ਰਿਕ ਅਨਲੌਕ",
+  "securityBiometricSubtitle": "SOMA ਨੂੰ ਅਨਲੌਕ ਕਰਨ ਲਈ FaceID/TouchID ਦੀ ਵਰਤੋਂ ਕਰੋ",
+  "securityAppLockTitle": "ਐਪ ਲੌਕ",
+  "securityAppLockSubtitle": "ਜਦੋਂ ਤੁਸੀਂ ਐਪ ਛੱਡੋ ਤਾਂ SOMA ਲੌਕ ਕਰੋ",
+  "securitySectionSessions": "ਸਰਗਰਮ ਸੈਸ਼ਨ",
+  "securityNoSessions": "ਕੋਈ ਸਰਗਰਮ ਸੈਸ਼ਨ ਨਹੀਂ ਮਿਲਿਆ",
+  "securityThisDevice": "ਇਹ ਡਿਵਾਈਸ",
+  "securityDevice": "ਡਿਵਾਈਸ",
+  "securityActiveLabel": "ਸਰਗਰਮ",
+  "securitySignInToEnable2fa": "2FA ਯੋਗ ਕਰਨ ਲਈ ਸਾਈਨ ਇਨ ਕਰੋ",
+  "securityEnable2faFailed": "2FA ਯੋਗ ਕਰਨ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FA ਅਯੋਗ ਕਰਨ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA ਸੈੱਟਅੱਪ",
+  "securitySecretKeyLabel": "ਗੁਪਤ ਕੁੰਜੀ",
+  "securityCodeHint": "6-ਅੰਕ ਦਾ ਕੋਡ",
+  "security2faEnabled": "2FA ਯੋਗ ਕੀਤਾ ਗਿਆ",
+  "securityVerifyCodeFailed": "ਕੋਡ ਦੀ ਪੁਸ਼ਟੀ ਕਰਨ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "ਪੁਸ਼ਟੀ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ...",
+  "securityVerify": "ਪੁਸ਼ਟੀ ਕਰੋ",
+  "securityCurrentPasswordHint": "ਮੌਜੂਦਾ ਪਾਸਵਰਡ",
+  "securityNewPasswordHint": "ਨਵਾਂ ਪਾਸਵਰਡ (ਘੱਟੋ-ਘੱਟ 8 ਅੱਖਰ)",
+  "securityConfirmPasswordHint": "ਨਵੇਂ ਪਾਸਵਰਡ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ",
+  "securitySignInToChangePassword": "ਪਾਸਵਰਡ ਬਦਲਣ ਲਈ ਸਾਈਨ ਇਨ ਕਰੋ",
+  "securityEnterCurrentPassword": "ਆਪਣਾ ਮੌਜੂਦਾ ਪਾਸਵਰਡ ਦਰਜ ਕਰੋ",
+  "securityPasswordMinLength": "ਨਵੇਂ ਪਾਸਵਰਡ ਵਿੱਚ ਘੱਟੋ-ਘੱਟ 8 ਅੱਖਰ ਹੋਣੇ ਚਾਹੀਦੇ ਹਨ",
+  "securityPasswordsDoNotMatch": "ਪਾਸਵਰਡ ਮੇਲ ਨਹੀਂ ਖਾਂਦੇ",
+  "securityPasswordUpdated": "ਪਾਸਵਰਡ ਅੱਪਡੇਟ ਕੀਤਾ ਗਿਆ",
+  "securityPasswordUpdateFailed": "ਪਾਸਵਰਡ ਅੱਪਡੇਟ ਕਰਨ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "ਇਸ ਤੋਂ ਬਾਅਦ ਆਟੋ ਲੌਕ",
+  "privacyTitle": "ਪਰਦੇਦਾਰੀ",
+  "privacySectionVisibility": "ਦਿੱਖ",
+  "privacyProfileVisibilityTitle": "ਪ੍ਰੋਫਾਈਲ ਦਿੱਖ",
+  "privacyVisibilityPublic": "ਸਾਰਵਜਨਿਕ",
+  "privacyVisibilityFriends": "ਦੋਸਤ",
+  "privacyVisibilityPrivate": "ਨਿੱਜੀ",
+  "privacyVisibilityPublicSubtitle": "ਹਰ ਕੋਈ ਤੁਹਾਡਾ ਪ੍ਰੋਫਾਈਲ ਦੇਖ ਸਕਦਾ ਹੈ",
+  "privacyVisibilityFriendsSubtitle": "ਕੇਵਲ ਦੋਸਤ ਤੁਹਾਡਾ ਪ੍ਰੋਫਾਈਲ ਦੇਖ ਸਕਦੇ ਹਨ",
+  "privacyVisibilityPrivateSubtitle": "ਕੇਵਲ ਤੁਸੀਂ ਆਪਣਾ ਪ੍ਰੋਫਾਈਲ ਦੇਖ ਸਕਦੇ ਹੋ",
+  "privacySectionActivity": "ਗਤੀਵਿਧੀ",
+  "privacyShowOnlineTitle": "ਔਨਲਾਈਨ ਸਥਿਤੀ ਦਿਖਾਓ",
+  "privacyShowOnlineSubtitle": "ਖਿਡਾਰੀਆਂ ਨੂੰ ਇਹ ਦੇਖਣ ਦਿਓ ਕਿ ਤੁਸੀਂ ਕਦੋਂ ਔਨਲਾਈਨ ਹੋ",
+  "privacyShowActivityTitle": "ਸਿੱਖਣ ਦੀ ਗਤੀਵਿਧੀ ਦਿਖਾਓ",
+  "privacyShowActivitySubtitle": "ਲਗਾਤਾਰ, XP ਅਤੇ ਹਾਲੀਆ ਤਰੱਕੀ ਦਿਖਾਓ",
+  "privacySectionSocial": "ਸੋਸ਼ਲ",
+  "privacyAllowRequestsTitle": "ਦੋਸਤੀ ਦੀਆਂ ਬੇਨਤੀਆਂ ਦੀ ਆਗਿਆ ਦਿਓ",
+  "privacyAllowRequestsSubtitle": "ਲੋਕਾਂ ਨੂੰ ਤੁਹਾਨੂੰ ਦੋਸਤੀ ਦੀਆਂ ਬੇਨਤੀਆਂ ਭੇਜਣ ਦਿਓ",
+  "privacyWhoCanDmTitle": "ਕੌਣ DM ਭੇਜ ਸਕਦਾ ਹੈ",
+  "privacyDmEveryone": "ਹਰ ਕੋਈ",
+  "privacyDmFriends": "ਦੋਸਤ",
+  "privacyDmNoOne": "ਕੋਈ ਨਹੀਂ",
+  "privacyDmEveryoneSubtitle": "ਕੋਈ ਵੀ ਤੁਹਾਨੂੰ ਸੁਨੇਹਾ ਭੇਜ ਸਕਦਾ ਹੈ",
+  "privacyDmFriendsSubtitle": "ਕੇਵਲ ਦੋਸਤ ਤੁਹਾਨੂੰ ਸੁਨੇਹਾ ਭੇਜ ਸਕਦੇ ਹਨ",
+  "privacyDmNoOneSubtitle": "ਕੋਈ ਵੀ ਤੁਹਾਨੂੰ ਸੁਨੇਹਾ ਨਹੀਂ ਭੇਜ ਸਕਦਾ",
+  "privacySectionBlockedUsers": "ਬਲੌਕ ਕੀਤੇ ਯੂਜ਼ਰ",
+  "privacyBlockedUsersComingSoon": "ਬਲੌਕ ਕੀਤੇ ਯੂਜ਼ਰਾਂ ਦਾ ਪ੍ਰਬੰਧਨ ਜਲਦੀ ਆ ਰਿਹਾ ਹੈ",
+  "privacySectionDataControls": "ਡਾਟਾ ਕੰਟਰੋਲ",
+  "privacyExportDataTitle": "ਮੇਰਾ ਡਾਟਾ ਐਕਸਪੋਰਟ ਕਰੋ",
+  "privacyExportDataSubtitle": "ਆਪਣੀ ਗਤੀਵਿਧੀ ਅਤੇ ਕੋਰਸਾਂ ਨੂੰ ਡਾਊਨਲੋਡ ਕਰੋ",
+  "privacyExportInfoTitle": "ਡਾਟਾ ਐਕਸਪੋਰਟ",
+  "privacyExportInfoBody": "ਅਗਲਾ ਕਦਮ: JSON/CSV ਐਕਸਪੋਰਟ ਬਣਾਉਣਾ ਅਤੇ ਈਮੇਲ ਜਾਂ ਲੋਕਲ ਡਾਊਨਲੋਡ",
+  "privacyDeleteAccountTitle": "ਖਾਤਾ ਮਿਟਾਓ",
+  "privacyDeleteAccountSubtitle": "ਇਹ ਤੁਹਾਡੇ ਖਾਤੇ ਅਤੇ ਡਾਟਾ ਨੂੰ ਪੱਕੇ ਤੌਰ 'ਤੇ ਹਟਾ ਦਿੰਦਾ ਹੈ",
+  "privacyDeleteConfirmTitle": "ਖਾਤਾ ਮਿਟਾਉਣਾ ਹੈ?",
+  "privacyDeleteConfirmBody": "ਇਹ ਕਾਰਵਾਈ ਵਾਪਸ ਨਹੀਂ ਲਈ ਜਾ ਸਕਦੀ। ਤੁਹਾਡਾ ਪ੍ਰੋਫਾਈਲ, ਕੋਰਸ, ਦੋਸਤ ਅਤੇ ਸੁਨੇਹੇ ਹਟਾ ਦਿੱਤੇ ਜਾਣਗੇ",
+  "privacyDeleteComingSoon": "ਮਿਟਾਉਣਾ ਬਾਅਦ ਵਿੱਚ Supabase ਨਾਲ ਜੁੜਿਆ ਜਾਵੇਗਾ",
+  "soloLabel": "ਸੋਲੋ",
+  "soloResultsCompletedTitle": "ਸੋਲੋ ਸੈਸ਼ਨ ਪੂਰਾ ਹੋਇਆ",
+  "soloResultsFeedbackElite": "ਵਧੀਆ ਪ੍ਰਦਰਸ਼ਨ - ਸਟ੍ਰੀਕ ਜਾਰੀ ਰੱਖੋ",
+  "soloResultsFeedbackStrong": "ਮਜ਼ਬੂਤ ਕੰਮ - ਤੇਜ਼ੀ ਨਾਲ ਸੁਧਾਰ ਹੋ ਰਿਹਾ ਹੈ",
+  "soloResultsFeedbackProgress": "ਚੰਗੀ ਤਰੱਕੀ - ਗਲਤੀਆਂ ਦੀ ਸਮੀਖਿਆ ਕਰੋ ਅਤੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ",
+  "soloResultsFeedbackTryAgain": "ਕੋਈ ਦਬਾਅ ਨਹੀਂ - ਘੱਟ ਸਵਾਲਾਂ ਨਾਲ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ ਅਤੇ ਫੋਕਸ ਕਰੋ",
+  "soloResultsPerfectScore": "ਪੂਰਾ ਸਕੋਰ! ਸਮੀਖਿਆ ਕਰਨ ਲਈ ਕੋਈ ਗਲਤੀ ਨਹੀਂ",
+  "soloResultsReviewPrompt": "ਤੇਜ਼ੀ ਨਾਲ ਸਿੱਖਣ ਲਈ ਗਲਤੀਆਂ ਦੀ ਸਮੀਖਿਆ ਕਰੋ। ਤੁਹਾਡੇ ਗਲਤ ਜਵਾਬ ਹੇਠਾਂ ਹਨ",
+  "soloResultsReviewMistakes": "ਗਲਤੀਆਂ ਦੀ ਸਮੀਖਿਆ ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "ਸਾਈਨ ਇਨ ਨਹੀਂ ਕੀਤਾ",
+  "genericUser": "ਯੂਜ਼ਰ",
+  "loading": "ਲੋਡ ਹੋ ਰਿਹਾ ਹੈ...",
+  "edit": "ਸੰਪਾਦਿਤ ਕਰੋ",
+  "send": "ਭੇਜੋ",
+  "join": "ਸ਼ਾਮਲ ਹੋਵੋ",
+  "leave": "ਛੱਡੋ",
+  "ready": "ਤਿਆਰ",
+  "levelBeginner": "ਸ਼ੁਰੂਆਤੀ",
+  "levelIntermediate": "ਦਰਮਿਆਨਾ",
+  "levelAdvanced": "ਉੱਨਤ",
+  "questionsShort": "{count} ਸਵਾਲ",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} ਸਕਿੰਟ",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "ਸਾਰੇ ਕੋਰਸ",
+  "circlesAllModes": "ਸਾਰੇ ਮੋਡ",
+  "circlesAllLevels": "ਸਾਰੇ ਪੱਧਰ",
+  "circlesAddNewCourse": "ਨਵਾਂ ਕੋਰਸ ਸ਼ਾਮਲ ਕਰੋ",
+  "circlesCoursesTitle": "ਕੋਰਸ",
+  "circlesModeTitle": "ਮੋਡ",
+  "circlesLevelTitle": "ਪੱਧਰ",
+  "circlesNoActiveForFilters": "ਇਹਨਾਂ ਫਿਲਟਰਾਂ ਲਈ ਕੋਈ ਸਰਗਰਮ Circle ਨਹੀਂ",
+  "circlesUnknownRoom": "ਅਣਜਾਣ ਕਮਰਾ",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Circle ਬਣਾਓ",
+  "circlesCircleName": "Circle ਦਾ ਨਾਮ",
+  "circlesEnterName": "ਨਾਮ ਦਰਜ ਕਰੋ",
+  "circlesLanguages": "ਭਾਸ਼ਾਵਾਂ",
+  "circlesRoomSetup": "ਕਮਰਾ ਸੈੱਟਅੱਪ",
+  "circlesPlayers": "ਖਿਡਾਰੀ",
+  "circlesEmptySlot": "ਖਾਲੀ ਥਾਂ",
+  "circlesPlayersRange": "1-5 ਖਿਡਾਰੀ",
+  "circlesQuestions": "ਸਵਾਲ",
+  "circlesQuestionsSubtitle": "ਸਵਾਲਾਂ ਦੀ ਗਿਣਤੀ",
+  "circlesTimePerQuestion": "ਸਮਾਂ ਪ੍ਰਤੀ ਸਵਾਲ",
+  "circlesSecondsPerQuestion": "ਸਕਿੰਟ ਪ੍ਰਤੀ ਸਵਾਲ",
+  "circlesAdvanced": "ਉੱਨਤ",
+  "circlesAllowSpectators": "ਦਰਸ਼ਕਾਂ ਦੀ ਆਗਿਆ ਦਿਓ",
+  "circlesAllowSpectatorsSubtitle": "Let others watch without playing.",
+  "circlesLiveVoiceChat": "ਲਾਈਵ ਵਾਇਸ ਚੈਟ",
+  "circlesLiveVoiceChatSubtitle": "ਮੈਚਾਂ ਦੌਰਾਨ ਆਵਾਜ਼ ਸੰਚਾਰ ਯੋਗ ਕਰੋ",
+  "circlesLiveTextChat": "ਲਾਈਵ ਟੈਕਸਟ ਚੈਟ",
+  "circlesLiveTextChatSubtitle": "ਮੈਚਾਂ ਦੌਰਾਨ ਚੈਟ ਯੋਗ ਕਰੋ",
+  "circlesCreatedSuccess": "Circle ਬਣਾਇਆ ਗਿਆ",
+  "circlesCreateError": "Circle ਬਣਾਉਣ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "ਸੁਝਾਅ: ਤੁਸੀਂ ਬਣਾਉਣ ਤੋਂ ਬਾਅਦ ਦੋਸਤਾਂ ਨੂੰ ਸੱਦਾ ਦੇ ਸਕਦੇ ਹੋ",
+  "circlesJoinError": "Circle ਵਿੱਚ ਸ਼ਾਮਲ ਹੋਣ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Circle ਲਾਬੀ",
+  "circlesCodeLine": "ਕੋਡ: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "ਮੈਚ ਸੈਟਿੰਗਾਂ",
+  "circlesLevelWithValue": "ਪੱਧਰ {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "ਮੁਸ਼ਕਲ",
+  "circlesPerQuestionShort": "ਪ੍ਰਤੀ ਸਵਾਲ",
+  "circlesInvite": "ਸੱਦਾ",
+  "circlesCopyId": "ID ਕਾਪੀ ਕਰੋ",
+  "circlesCopiedId": "ID ਕਾਪੀ ਕੀਤੀ ਗਈ",
+  "circlesMatchInProgress": "ਮੈਚ ਚੱਲ ਰਿਹਾ ਹੈ",
+  "circlesSpectatorQueuedBody": "ਮੈਚ ਚੱਲ ਰਿਹਾ ਹੈ। ਤੁਸੀਂ ਦਰਸ਼ਕ ਵਜੋਂ ਸ਼ਾਮਲ ਹੋਵੋਗੇ",
+  "circlesHostStartWhenReady": "ਜਦੋਂ ਹਰ ਕੋਈ ਤਿਆਰ ਹੋਵੇਗਾ ਤਾਂ ਹੋਸਟ ਸ਼ੁਰੂ ਕਰੇਗਾ",
+  "circlesSpectators": "ਦਰਸ਼ਕ",
+  "circlesSpectator": "ਦਰਸ਼ਕ",
+  "circlesSpectatorCanWatch": "ਦਰਸ਼ਕ ਲਾਈਵ ਦੇਖ ਸਕਦੇ ਹਨ",
+  "circlesJoinRequests": "ਸ਼ਾਮਲ ਹੋਣ ਦੀਆਂ ਬੇਨਤੀਆਂ",
+  "circlesAcceptSpectatorsHint": "ਮੈਚ ਸ਼ੁਰੂ ਕਰਨ ਤੋਂ ਪਹਿਲਾਂ ਦਰਸ਼ਕਾਂ ਨੂੰ ਸਵੀਕਾਰ ਕਰੋ",
+  "circlesStartGame": "ਗੇਮ ਸ਼ੁਰੂ ਕਰੋ",
+  "circlesWaitingForPlayers": "ਖਿਡਾਰੀਆਂ ਦੀ ਉਡੀਕ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ",
+  "circlesLeaveCircle": "Circle ਛੱਡੋ",
+  "circlesRequestSent": "ਬੇਨਤੀ ਭੇਜੀ ਗਈ",
+  "circlesRequestToJoin": "ਸ਼ਾਮਲ ਹੋਣ ਲਈ ਬੇਨਤੀ",
+  "circlesWatchLive": "ਲਾਈਵ ਦੇਖੋ",
+  "circlesPlayerTip": "ਜਦੋਂ ਤੁਸੀਂ ਤਿਆਰ ਹੋਵੋ ਤਾਂ ਤਿਆਰ ਦਬਾਓ। ਹੋਸਟ ਮੈਚ ਸ਼ੁਰੂ ਕਰੇਗਾ",
+  "circlesSpectatorTip": "ਤੁਸੀਂ ਦੇਖ ਰਹੇ ਹੋ। ਜਦੋਂ ਹੋਸਟ ਸ਼ੁਰੂ ਕਰਦਾ ਹੈ ਤਾਂ ਲਾਈਵ ਦੇਖੋ",
+  "circlesHostControls": "ਹੋਸਟ ਕੰਟਰੋਲ",
+  "circlesTransferHostFailed": "ਹੋਸਟ ਟ੍ਰਾਂਸਫਰ ਕਰਨ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Circle ਖਤਮ ਕਰਨ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "ਯੂਜ਼ਰ @{username} ਨਹੀਂ ਮਿਲਿਆ",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "ਅਵੈਧ ਯੂਜ਼ਰ",
+  "circlesCantInviteSelf": "ਤੁਸੀਂ ਆਪਣੇ ਆਪ ਨੂੰ ਸੱਦਾ ਨਹੀਂ ਦੇ ਸਕਦੇ",
+  "circlesUserAlreadyInCircle": "@{username} ਪਹਿਲਾਂ ਹੀ Circle ਵਿੱਚ ਹੈ",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "ਹੋਸਟ",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "ਯੂਜ਼ਰਨੇਮ ਦੁਆਰਾ ਸੱਦਾ ਦਿਓ",
+  "circlesInviteSent": "@{username} ਨੂੰ ਸੱਦਾ ਭੇਜਿਆ ਗਿਆ",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "ਸੱਦਾ ਭੇਜਣ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "ਸ਼ਾਮਲ ਹੋਣ ਦੀ ਬੇਨਤੀ ਭੇਜੀ ਗਈ",
+  "circlesJoinRequestFailed": "ਬੇਨਤੀ ਭੇਜਣ ਵਿੱਚ ਅਸਫਲ: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle ਭਰ ਗਿਆ ਹੈ",
+  "circlesSpectatorAdded": "ਦਰਸ਼ਕ ਸ਼ਾਮਲ ਕੀਤਾ ਗਿਆ",
+  "circlesApproveFailed": "ਮਨਜ਼ੂਰੀ ਅਸਫਲ: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "ਬੇਨਤੀ ਅਸਵੀਕਾਰ ਕੀਤੀ ਗਈ",
+  "circlesDeclineFailed": "ਅਸਵੀਕਾਰ ਕਰਨਾ ਅਸਫਲ: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "ਭਾਗੀਦਾਰ",
+  "circlesLeavePromptTitle": "Circle ਛੱਡਣਾ ਹੈ?",
+  "circlesLeavePromptTransfer": "ਕਿਰਪਾ ਕਰਕੇ ਛੱਡਣ ਤੋਂ ਪਹਿਲਾਂ ਹੋਸਟ ਟ੍ਰਾਂਸਫਰ ਕਰੋ",
+  "circlesLeavePromptEndOnly": "Circle ਖਤਮ ਕਰੋ ਅਤੇ ਬਾਹਰ ਜਾਓ",
+  "circlesTransferHost": "ਹੋਸਟ ਟ੍ਰਾਂਸਫਰ ਕਰੋ",
+  "circlesEndCircle": "Circle ਖਤਮ ਕਰੋ",
+  "circlesTransferHostTitle": "ਹੋਸਟ ਟ੍ਰਾਂਸਫਰ",
+  "circlesShareId": "Circle ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

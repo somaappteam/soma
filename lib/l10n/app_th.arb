@@ -1,0 +1,781 @@
+{
+  "@@locale": "th",
+  "appTitle": "SOMA",
+  "welcomeTagline": "เรียนรู้ แข่งขัน ชนะใจ",
+  "signUp": "สมัครสมาชิก",
+  "signIn": "เข้าสู่ระบบ",
+  "skipForNow": "ข้ามไปก่อน",
+  "authFillAllFields": "กรุณากรอกข้อมูลให้ครบทุกช่อง",
+  "authError": "ข้อผิดพลาด: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "อีเมล",
+  "authPassword": "รหัสผ่าน",
+  "authUsername": "ชื่อผู้ใช้",
+  "authContinue": "ดำเนินการต่อ",
+  "authSigningIn": "กำลังเข้าสู่ระบบ...",
+  "authCreateAccount": "สร้างบัญชี",
+  "authCreating": "กำลังสร้าง...",
+  "authNeedAccount": "ยังไม่มีบัญชี? ",
+  "authHaveAccount": "มีบัญชีแล้ว? ",
+  "dialogAuthRequiredTitle": "เข้าสู่ระบบเพื่อเข้าถึง Circles",
+  "dialogAuthRequiredBody": "Circles เป็นพื้นที่สำหรับหลายผู้เล่น สร้างบัญชีเพื่อเข้าร่วมการแข่งขันสด เชิญเพื่อน และบันทึกความคืบหน้าของคุณ",
+  "notNow": "ไว้ทีหลัง",
+  "navHome": "หน้าแรก",
+  "navCircles": "Circles",
+  "navProfile": "โปรไฟล์",
+  "removeCourseTitle": "ลบคอร์สหรือไม่?",
+  "removeCourseBody": "กำลังลบ {course} จากรายการหน้าแรกของคุณ",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "ยกเลิก",
+  "remove": "ลบ",
+  "welcomeBack": "ยินดีต้อนรับกลับมา {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "แก้ไขคอร์ส",
+  "done": "เสร็จสิ้น",
+  "noCoursesToEdit": "ไม่มีคอร์สให้แก้ไข",
+  "addCourse": "เพิ่มคอร์ส",
+  "unknown": "ไม่ทราบ",
+  "iSpeak": "ฉันพูดภาษา",
+  "iWantToLearn": "ฉันต้องการเรียน",
+  "chooseYourLanguage": "เลือกภาษาของคุณ",
+  "chooseLearningLanguage": "เลือกภาษาที่คุณต้องการเรียน",
+  "chooseTwoDifferentLanguages": "กรุณาเลือกสองภาษาที่แตกต่างกัน",
+  "createCourse": "สร้างคอร์ส",
+  "soloCourseTitle": "คอร์สเดี่ยว",
+  "searchLanguage": "ค้นหาภาษา",
+  "noMatches": "ไม่พบผลลัพธ์",
+  "chooseCourseType": "เลือกประเภทคอร์ส",
+  "soloStudyDescription": "เรียนด้วยตัวเองด้วยแบบทดสอบสไตล์ Circles - ไม่มีห้อง แชท ผู้ชม หรือตัวเลือกโฮสต์",
+  "soloModeVocabulary": "คำศัพท์",
+  "soloModeSentences": "ประโยค",
+  "soloModeReview": "ทบทวน",
+  "soloModeVocabularySubtitle": "คำถามแบบปรนัย ความหมาย คำพ้อง การใช้งาน",
+  "soloModeSentencesSubtitle": "เติมคำในช่องว่าง + แปล + การอ่าน",
+  "soloModeReviewDescription": "ฝึกฝนสิ่งที่เรียนรู้: คำที่จำไม่ได้ ข้อผิดพลาดล่าสุด การทบทวนตามช่วงเวลา",
+  "startReview": "เริ่มทบทวน",
+  "soloSetupTitle": "การตั้งค่า {mode}",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "ระดับความยาก",
+  "numberOfQuestions": "จำนวนคำถาม",
+  "timerPerQuestion": "ตัวจับเวลาต่อคำถาม",
+  "noTimer": "ไม่มีตัวจับเวลา",
+  "start": "เริ่ม",
+  "profileTitle": "โปรไฟล์",
+  "profileSignInToMessage": "เข้าสู่ระบบเพื่อส่งข้อความ",
+  "profileThatsYourProfile": "นี่คือโปรไฟล์ของคุณ",
+  "profileSignInToAddFriends": "เข้าสู่ระบบเพื่อเพิ่มเพื่อน",
+  "profileCantAddYourself": "ไม่สามารถเพิ่มตัวเองได้",
+  "profileRequestSent": "ส่งคำขอไปยัง @{username} แล้ว",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "ส่งคำขอไม่สำเร็จ",
+  "profileDefaultDisplayName": "ผู้ใช้ใหม่",
+  "profileDefaultBio": "พร้อมเรียนรู้!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "ผู้เยี่ยมชม",
+  "guestUsername": "ผู้เยี่ยมชม",
+  "guestSessionLabel": "เซสชันผู้เยี่ยมชม",
+  "unlockFullProfile": "ปลดล็อคโปรไฟล์เต็มรูปแบบ",
+  "guestBenefitSync": "ซิงค์ความคืบหน้าในทุกอุปกรณ์",
+  "guestBenefitCircles": "เข้าร่วม Circles เพื่อเล่นแบบสด",
+  "guestBenefitNotifications": "รับการแจ้งเตือนและคำขอเพิ่มเพื่อน",
+  "progressStaysOnDevice": "จนกว่าคุณจะเข้าสู่ระบบ ความคืบหน้าของคุณจะอยู่ในอุปกรณ์นี้",
+  "profileGoalLabel": "เป้าหมาย: {minutes} นาที",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "ความคืบหน้า XP",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "ชนะ",
+  "profileStreak": "ต่อเนื่อง",
+  "profileFriendsTitle": "เพื่อน",
+  "profileViewAll": "ดูทั้งหมด",
+  "profileAchievementsTitle": "ความสำเร็จ",
+  "profileNoAchievements": "ยังไม่มีความสำเร็จ",
+  "profileRequested": "ส่งคำขอแล้ว",
+  "profileSending": "กำลังส่ง...",
+  "profileAddFriend": "เพิ่มเพื่อน",
+  "profileConnectTitle": "เชื่อมต่อ",
+  "profileMessage": "ข้อความ",
+  "profileSnapshot": "สแนปช็อตโปรไฟล์",
+  "profileLocationHidden": "ซ่อนที่อยู่",
+  "profileBioHidden": "ซ่อนประวัติ",
+  "profileDailyGoal": "เป้าหมายรายวัน {minutes} นาที",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "คำเชิญ Circle",
+  "circleIdLabel": "รหัส Circle: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "เข้าสู่ระบบเพื่อเข้าร่วม",
+  "joiningCircle": "กำลังเข้าร่วม...",
+  "joinCircle": "เข้าร่วม Circle",
+  "circleJoinedAsPlayer": "เข้าร่วมในฐานะผู้เล่น",
+  "circleJoinedAsSpectator": "เข้าร่วมในฐานะผู้ชม",
+  "accept": "ยอมรับ",
+  "decline": "ปฏิเสธ",
+  "open": "เปิด",
+  "circleCountdownTitle": "เตรียมพร้อม",
+  "circleCountdownSubtitle": "Circle กำลังเริ่ม...",
+  "userFallbackName": "ผู้ใช้",
+  "micOff": "ไมค์ปิด",
+  "micOn": "ไมค์เปิด",
+  "roleHost": "โฮสต์",
+  "roleSpectator": "ผู้ชม",
+  "tagHost": "โฮสต์",
+  "tagYou": "คุณ",
+  "statusCorrect": "ถูกต้อง",
+  "statusWrong": "ผิด",
+  "statusWaiting": "กำลังรอ",
+  "statusNone": "-",
+  "pointsAbbrev": "คะแนน",
+  "pointsLabel": "คะแนน",
+  "statCorrect": "ถูกต้อง",
+  "statAnswers": "คำตอบ",
+  "statTotal": "รวม",
+  "statQuestions": "คำถาม",
+  "statAccuracy": "ความแม่นยำ",
+  "statRate": "อัตรา",
+  "statRank": "อันดับ",
+  "statPosition": "ตำแหน่ง",
+  "statMode": "โหมด",
+  "statType": "ประเภท",
+  "next": "ถัดไป",
+  "submit": "ส่ง",
+  "continueLabel": "ดำเนินการต่อ",
+  "save": "บันทึก",
+  "playAgain": "เล่นอีกครั้ง",
+  "backToCourse": "กลับไปยังคอร์ส",
+  "resultsTitle": "ผลลัพธ์",
+  "shareLater": "แชร์ภายหลัง",
+  "delete": "ลบ",
+  "ok": "ตกลง",
+  "minutesShort": "{minutes} นาที",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} นาที",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} ชม.",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} วัน",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "เมื่อสักครู่",
+  "timeMinutesAgo": "{count} นาทีที่แล้ว",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} ชั่วโมงที่แล้ว",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} วันที่แล้ว",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "กำลังรอโฮสต์...",
+  "liveQuizJoinRequestSent": "ส่งคำขอเข้าร่วมแล้ว",
+  "liveQuizJoinRequestFailed": "คำขอล้มเหลว: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "การควบคุมโฮสต์",
+  "liveQuizSpectatorModeTitle": "โหมดผู้ชม",
+  "liveQuizHostControlsSubtitle": "รอบจะดำเนินไปโดยอัตโนมัติเมื่อทุกคนตอบหรือหมดเวลา",
+  "liveQuizSpectatorModeSubtitle": "ดูคำถามและกระดานคะแนนแบบสด คุณไม่สามารถตอบคำถามได้",
+  "liveQuizQuestionCounter": "คำถาม {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "ส่งคำขอแล้ว",
+  "liveQuizRequestToJoin": "ขอเข้าร่วม",
+  "liveQuizSpectatorFooter": "คุณกำลังดูแบบสด เพลิดเพลินกับคำถามและกระดานคะแนน",
+  "circleNotFound": "ไม่พบ Circle",
+  "resultsRematchStartFailed": "เริ่มการแข่งขันซ้ำไม่สำเร็จ: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "ผลการแข่งขัน",
+  "resultsNiceWork": "ทำได้ดี {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "ที่ 1",
+  "resultsPlaceSecond": "ที่ 2",
+  "resultsPlaceThird": "ที่ 3",
+  "resultsPlaceNth": "ที่ {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "จาก {players} ผู้เล่น",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "แชมป์! คุณพิชิต Circle นี้แล้ว",
+  "resultsHighlightGreatAccuracy": "ความแม่นยำยอดเยี่ยม คุณเกือบถึงจุดสูงสุดแล้ว!",
+  "resultsHighlightKeepGoing": "ทำต่อไป - ความสม่ำเสมอเอาชนะความเร็ว",
+  "resultsLeaderboardTitle": "กระดานผู้นำ",
+  "resultsPlayersCount": "{count} ผู้เล่น",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "กลับไปยัง Circles",
+  "resultsRematch": "แข่งซ้ำ",
+  "resultsPlayAgain": "เล่นอีกครั้ง",
+  "leaderboardGlobalTitle": "กระดานผู้นำทั่วโลก",
+  "leaderboardEmpty": "ยังไม่มีกระดานผู้นำ",
+  "aboutTitle": "เกี่ยวกับ",
+  "aboutVersion": "เวอร์ชัน {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA เป็นแพลตฟอร์มเรียนภาษาแบบเกมมิฟิเคชันที่ทำให้การเรียนภาษาใหม่สนุกและเป็นสังคม เข้าร่วม Circles ฝึกฝนเดี่ยว และติดตามความคืบหน้าของคุณ",
+  "aboutTerms": "ข้อกำหนดการให้บริการ",
+  "aboutPrivacy": "นโยบายความเป็นส่วนตัว",
+  "aboutOpenSource": "สิทธิ์การใช้งานโอเพนซอร์ส",
+  "addFriendTitle": "เพิ่มเพื่อน",
+  "addFriendFindByUsername": "ค้นหาตามชื่อผู้ใช้",
+  "addFriendUsernameHint": "ใส่ชื่อผู้ใช้...",
+  "addFriendTip": "เคล็ดลับ: รองรับ QR code + รหัสเพื่อนจะเพิ่มในภายหลัง",
+  "addFriendSending": "กำลังส่ง...",
+  "addFriendSendRequest": "ส่งคำขอ",
+  "addFriendUserNotFound": "ไม่พบ @{username}",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "การดำเนินการล้มเหลวหรือส่งแล้ว: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "เพื่อน",
+  "searchFriendsHint": "ค้นหาเพื่อน...",
+  "somaLearnerSubtitle": "ผู้เรียน Soma",
+  "friendRequestLabel": "คำขอ",
+  "friendRequestSentLabel": "ส่งคำขอแล้ว",
+  "friendIncomingRequestLabel": "คำขอเข้ามา",
+  "friendRequestsSection": "คำขอ",
+  "friendPendingSection": "รอดำเนินการ",
+  "friendAllSection": "เพื่อนทั้งหมด",
+  "friendsEmptyState": "ยังไม่มีเพื่อน เพิ่มเพื่อนคนแรกของคุณ!",
+  "friendsEmptyShort": "ยังไม่มีเพื่อน",
+  "noMatchForQuery": "ไม่พบผลลัพธ์สำหรับ \\\"{query}\\\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "กล่องข้อความ",
+  "searchChatsHint": "ค้นหาแชท...",
+  "inboxEmptyState": "ยังไม่มีแชท เริ่มแชทกับเพื่อน!",
+  "newMessageTitle": "ข้อความใหม่",
+  "chatCallLater": "โทรเสียงภายหลัง (ภาษา Circle เร็วๆ นี้)",
+  "errorWithDetails": "ข้อผิดพลาด: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "ทักทาย {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "ข้อความ...",
+  "notificationsTitle": "การแจ้งเตือน",
+  "notificationsTabAll": "ทั้งหมด",
+  "notificationsTabCourses": "คอร์ส",
+  "notificationsTabSocial": "โซเชียล",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "ระบบ",
+  "notificationsEmpty": "ไม่มีการแจ้งเตือน",
+  "notificationsDeleted": "ลบการแจ้งเตือนแล้ว",
+  "notificationTitleFallback": "การแจ้งเตือน",
+  "notificationTypeCourse": "คอร์ส",
+  "notificationTypeSocial": "โซเชียล",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "ระบบ",
+  "notificationsFriendAccepted": "ยอมรับคำขอเพิ่มเพื่อนแล้ว",
+  "notificationsFriendAcceptFailed": "ยอมรับคำขอไม่สำเร็จ: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "ปฏิเสธคำขอเพิ่มเพื่อนแล้ว",
+  "notificationsFriendDeclineFailed": "ปฏิเสธคำขอไม่สำเร็จ: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "เข้าร่วม Circle ไม่สำเร็จ: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "กำลังเปิด",
+  "notificationsOpened": "เปิดแล้ว",
+  "notificationsActionMessage": "{action} การแจ้งเตือน",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "การตั้งค่า",
+  "settingsSectionAccount": "บัญชี",
+  "settingsEditProfile": "แก้ไขโปรไฟล์",
+  "settingsPrivacy": "ความเป็นส่วนตัว",
+  "settingsSecurity": "ความปลอดภัย",
+  "settingsSectionGameplay": "การเล่นเกม",
+  "settingsShowTranslationLine": "แสดงบรรทัดคำแปล",
+  "settingsShowReadingLine": "แสดงการอ่าน (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "ตัวจับเวลาเริ่มต้นต่อคำถาม",
+  "settingsMatchDifficulty": "ความยากในการแข่งขัน",
+  "settingsMatchDifficultyAdaptive": "ปรับตัว",
+  "settingsSectionSoundFeel": "เสียงและความรู้สึก",
+  "settingsMusic": "ดนตรี",
+  "settingsSoundEffects": "เอฟเฟกต์เสียง",
+  "settingsHaptics": "การสั่นสะเทือน",
+  "settingsSectionNotifications": "การแจ้งเตือน",
+  "settingsPushNotifications": "การแจ้งเตือนแบบพุช",
+  "settingsDailyReminder": "การเตือนรายวัน",
+  "settingsSectionAppearance": "รูปลักษณ์",
+  "settingsTheme": "ธีม",
+  "settingsUiLanguage": "ภาษาอินเตอร์เฟซ",
+  "settingsSectionAbout": "เกี่ยวกับ",
+  "settingsVersion": "เวอร์ชัน",
+  "settingsTermsPrivacy": "ข้อกำหนดและความเป็นส่วนตัว",
+  "settingsSupport": "การสนับสนุน",
+  "settingsLogout": "ออกจากระบบ",
+  "themeSystem": "ระบบ",
+  "themeDark": "มืด",
+  "themeLight": "สว่าง",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "อัปเดตโปรไฟล์แล้ว",
+  "editProfileTitle": "แก้ไขโปรไฟล์",
+  "editProfilePhotoLabel": "รูปโปรไฟล์",
+  "editProfilePhotoSubtitle": "การเลือกอวาตาร์ผ่าน Supabase Storage เร็วๆ นี้",
+  "editProfileChangePhoto": "เปลี่ยน",
+  "editProfileAvatarUploadSoon": "อัปโหลดอวาตาร์เร็วๆ นี้",
+  "editProfileDisplayNameLabel": "ชื่อที่แสดง",
+  "editProfileDisplayNameHint": "ชื่อของคุณ",
+  "editProfileDisplayNameRequired": "กรุณาใส่ชื่อ",
+  "editProfileDisplayNameTooShort": "สั้นเกินไป",
+  "editProfileUsernameLabel": "ชื่อผู้ใช้",
+  "editProfileUsernameHint": "somchai_learner",
+  "editProfileUsernameRequired": "กรุณาใส่ชื่อผู้ใช้",
+  "editProfileUsernameTooShort": "อย่างน้อย 3 ตัวอักษร",
+  "editProfileUsernameInvalid": "อนุญาตเฉพาะตัวอักษร ตัวเลข _",
+  "editProfileBioLabel": "ประวัติ",
+  "editProfileBioHint": "ประวัติสั้นๆ...",
+  "editProfileBioTooLong": "สูงสุด 120 ตัวอักษร",
+  "editProfileLocationLabel": "ที่อยู่",
+  "editProfileLocationHint": "เมือง / ประเทศ",
+  "editProfileDailyGoalTitle": "เป้าหมายรายวัน",
+  "editProfileDailyGoalSubtitle": "เลือกจำนวนนาทีที่คุณต้องการเรียนในแต่ละวัน",
+  "securityTitle": "ความปลอดภัย",
+  "securitySectionPassword": "รหัสผ่าน",
+  "securityChangePasswordTitle": "เปลี่ยนรหัสผ่าน",
+  "securityChangePasswordSubtitle": "อัปเดตรหัสผ่านของคุณเป็นประจำ",
+  "securitySectionTwoFactor": "การยืนยันตัวตนแบบสองปัจจัย",
+  "securityEnable2faTitle": "เปิดใช้งาน 2FA",
+  "securityEnable2faSubtitle": "ความปลอดภัยเพิ่มเติมเมื่อเข้าสู่ระบบ",
+  "securitySectionAppLock": "ล็อคแอป",
+  "securityBiometricTitle": "ปลดล็อคด้วยไบโอเมตริก",
+  "securityBiometricSubtitle": "ใช้ FaceID/TouchID เพื่อปลดล็อค SOMA",
+  "securityAppLockTitle": "ล็อคแอป",
+  "securityAppLockSubtitle": "ล็อค SOMA เมื่อออกจากแอป",
+  "securitySectionSessions": "เซสชันที่ใช้งานอยู่",
+  "securityNoSessions": "ไม่พบเซสชันที่ใช้งานอยู่",
+  "securityThisDevice": "อุปกรณ์นี้",
+  "securityDevice": "อุปกรณ์",
+  "securityActiveLabel": "ใช้งานอยู่",
+  "securitySignInToEnable2fa": "เข้าสู่ระบบเพื่อเปิดใช้งาน 2FA",
+  "securityEnable2faFailed": "เปิดใช้งาน 2FA ไม่สำเร็จ: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "ปิดใช้งาน 2FA ไม่สำเร็จ: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "ตั้งค่า 2FA",
+  "securitySecretKeyLabel": "คีย์ลับ",
+  "securityCodeHint": "รหัส 6 หลัก",
+  "security2faEnabled": "เปิดใช้งาน 2FA แล้ว",
+  "securityVerifyCodeFailed": "ตรวจสอบรหัสไม่สำเร็จ: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "กำลังตรวจสอบ...",
+  "securityVerify": "ตรวจสอบ",
+  "securityCurrentPasswordHint": "รหัสผ่านปัจจุบัน",
+  "securityNewPasswordHint": "รหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)",
+  "securityConfirmPasswordHint": "ยืนยันรหัสผ่านใหม่",
+  "securitySignInToChangePassword": "เข้าสู่ระบบเพื่อเปลี่ยนรหัสผ่าน",
+  "securityEnterCurrentPassword": "กรุณาใส่รหัสผ่านปัจจุบัน",
+  "securityPasswordMinLength": "รหัสผ่านใหม่ต้องมีอย่างน้อย 8 ตัวอักษร",
+  "securityPasswordsDoNotMatch": "รหัสผ่านไม่ตรงกัน",
+  "securityPasswordUpdated": "อัปเดตรหัสผ่านแล้ว",
+  "securityPasswordUpdateFailed": "อัปเดตรหัสผ่านไม่สำเร็จ: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "ล็อคอัตโนมัติหลังจาก",
+  "privacyTitle": "ความเป็นส่วนตัว",
+  "privacySectionVisibility": "การมองเห็น",
+  "privacyProfileVisibilityTitle": "การมองเห็นโปรไฟล์",
+  "privacyVisibilityPublic": "สาธารณะ",
+  "privacyVisibilityFriends": "เพื่อน",
+  "privacyVisibilityPrivate": "ส่วนตัว",
+  "privacyVisibilityPublicSubtitle": "ทุกคนสามารถเห็นโปรไฟล์ของคุณได้",
+  "privacyVisibilityFriendsSubtitle": "เฉพาะเพื่อนเท่านั้นที่เห็นโปรไฟล์ของคุณได้",
+  "privacyVisibilityPrivateSubtitle": "เฉพาะคุณเท่านั้นที่เห็นโปรไฟล์ได้",
+  "privacySectionActivity": "กิจกรรม",
+  "privacyShowOnlineTitle": "แสดงสถานะออนไลน์",
+  "privacyShowOnlineSubtitle": "ให้ผู้อื่นเห็นว่าคุณออนไลน์",
+  "privacyShowActivityTitle": "แสดงกิจกรรมการเรียนรู้",
+  "privacyShowActivitySubtitle": "แสดงสถิติต่อเนื่อง XP และความคืบหน้าปัจจุบัน",
+  "privacySectionSocial": "โซเชียล",
+  "privacyAllowRequestsTitle": "อนุญาตคำขอเพิ่มเพื่อน",
+  "privacyAllowRequestsSubtitle": "อนุญาตให้ผู้อื่นส่งคำขอเพิ่มเพื่อน",
+  "privacyWhoCanDmTitle": "ใครสามารถส่ง DM ได้",
+  "privacyDmEveryone": "ทุกคน",
+  "privacyDmFriends": "เพื่อน",
+  "privacyDmNoOne": "ไม่มีใคร",
+  "privacyDmEveryoneSubtitle": "ทุกคนสามารถส่ง DM ให้คุณได้",
+  "privacyDmFriendsSubtitle": "เฉพาะเพื่อนเท่านั้นที่ส่ง DM ให้คุณได้",
+  "privacyDmNoOneSubtitle": "ไม่มีใครส่ง DM ให้คุณได้",
+  "privacySectionBlockedUsers": "ผู้ใช้ที่ถูกบล็อค",
+  "privacyBlockedUsersComingSoon": "การจัดการผู้ใช้ที่ถูกบล็อคเร็วๆ นี้",
+  "privacySectionDataControls": "การควบคุมข้อมูล",
+  "privacyExportDataTitle": "ส่งออกข้อมูล",
+  "privacyExportDataSubtitle": "ดาวน์โหลดกิจกรรมและคอร์สของคุณ",
+  "privacyExportInfoTitle": "ส่งออกข้อมูล",
+  "privacyExportInfoBody": "ขั้นตอนถัดไป: สร้างไฟล์ส่งออก JSON/CSV และส่งทางอีเมลหรือดาวน์โหลดในเครื่อง",
+  "privacyDeleteAccountTitle": "ลบบัญชี",
+  "privacyDeleteAccountSubtitle": "การกระทำนี้จะลบบัญชีและข้อมูลของคุณอย่างถาวร",
+  "privacyDeleteConfirmTitle": "ลบบัญชีหรือไม่?",
+  "privacyDeleteConfirmBody": "การกระทำนี้ไม่สามารถย้อนกลับได้ โปรไฟล์ คอร์ส เพื่อน และข้อความของคุณจะถูกลบ",
+  "privacyDeleteComingSoon": "การลบจะเชื่อมต่อกับ Supabase ในภายหลัง",
+  "soloLabel": "เดี่ยว",
+  "soloResultsCompletedTitle": "เซสชันเดี่ยวเสร็จสิ้น",
+  "soloResultsFeedbackElite": "ผลงานระดับยอด รักษาสถิติต่อเนื่องไว้",
+  "soloResultsFeedbackStrong": "แข็งแกร่ง คุณกำลังเติบโตอย่างรวดเร็ว",
+  "soloResultsFeedbackProgress": "ความคืบหน้าที่ดี ทบทวนข้อผิดพลาดและลองใหม่",
+  "soloResultsFeedbackTryAgain": "ไม่ต้องเครียด ลองใหม่ด้วยคำถามน้อยลงและโฟกัส",
+  "soloResultsPerfectScore": "คะแนนสมบูรณ์! ไม่มีข้อผิดพลาดให้ทบทวน",
+  "soloResultsReviewPrompt": "ทบทวนข้อผิดพลาดเพื่อเรียนรู้เร็วขึ้น คำตอบที่ผิดของคุณอยู่ด้านล่าง",
+  "soloResultsReviewMistakes": "ทบทวนข้อผิดพลาด ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "ยังไม่ได้เข้าสู่ระบบ",
+  "genericUser": "ผู้ใช้",
+  "loading": "กำลังโหลด...",
+  "edit": "แก้ไข",
+  "send": "ส่ง",
+  "join": "เข้าร่วม",
+  "leave": "ออก",
+  "ready": "พร้อม",
+  "levelBeginner": "เริ่มต้น",
+  "levelIntermediate": "กลาง",
+  "levelAdvanced": "ขั้นสูง",
+  "questionsShort": "{count} คำถาม",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} วิ",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "คอร์สทั้งหมด",
+  "circlesAllModes": "โหมดทั้งหมด",
+  "circlesAllLevels": "ระดับทั้งหมด",
+  "circlesAddNewCourse": "เพิ่มคอร์สใหม่",
+  "circlesCoursesTitle": "คอร์ส",
+  "circlesModeTitle": "โหมด",
+  "circlesLevelTitle": "ระดับ",
+  "circlesNoActiveForFilters": "ไม่มี Circles ที่ใช้งานอยู่สำหรับตัวกรองนี้",
+  "circlesUnknownRoom": "ห้องที่ไม่รู้จัก",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "สร้าง Circle",
+  "circlesCircleName": "ชื่อ Circle",
+  "circlesEnterName": "ใส่ชื่อ",
+  "circlesLanguages": "ภาษา",
+  "circlesRoomSetup": "การตั้งค่าห้อง",
+  "circlesPlayers": "ผู้เล่น",
+  "circlesEmptySlot": "ช่องว่าง",
+  "circlesPlayersRange": "1-5 ผู้เล่น",
+  "circlesQuestions": "คำถาม",
+  "circlesQuestionsSubtitle": "จำนวนคำถาม",
+  "circlesTimePerQuestion": "เวลาต่อคำถาม",
+  "circlesSecondsPerQuestion": "วินาทีต่อคำถาม",
+  "circlesAdvanced": "ขั้นสูง",
+  "circlesAllowSpectators": "อนุญาตผู้ชม",
+  "circlesAllowSpectatorsSubtitle": "อนุญาตให้ผู้อื่นดูโดยไม่เล่น",
+  "circlesLiveVoiceChat": "แชทด้วยเสียงแบบสด",
+  "circlesLiveVoiceChatSubtitle": "เปิดใช้งานเสียงแบบสดระหว่างการแข่งขัน",
+  "circlesLiveTextChat": "แชทข้อความแบบสด",
+  "circlesLiveTextChatSubtitle": "เปิดใช้งานแชทระหว่างการแข่งขัน",
+  "circlesCreatedSuccess": "สร้าง Circle แล้ว",
+  "circlesCreateError": "สร้าง Circle ไม่สำเร็จ: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "เคล็ดลับ: คุณสามารถเชิญเพื่อนหลังจากสร้างแล้ว",
+  "circlesJoinError": "เข้าร่วม Circle ไม่สำเร็จ: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "ล็อบบี้ Circle",
+  "circlesCodeLine": "รหัส: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "การตั้งค่าการแข่งขัน",
+  "circlesLevelWithValue": "ระดับ {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "ความยาก",
+  "circlesPerQuestionShort": "ต่อคำถาม",
+  "circlesInvite": "เชิญ",
+  "circlesCopyId": "คัดลอกรหัส",
+  "circlesCopiedId": "คัดลอกรหัสแล้ว",
+  "circlesMatchInProgress": "การแข่งขันกำลังดำเนินอยู่",
+  "circlesSpectatorQueuedBody": "การแข่งขันกำลังดำเนินอยู่ เข้าร่วมในฐานะผู้ชม",
+  "circlesHostStartWhenReady": "โฮสต์จะเริ่มเมื่อทุกคนพร้อม",
+  "circlesSpectators": "ผู้ชม",
+  "circlesSpectator": "ผู้ชม",
+  "circlesSpectatorCanWatch": "ผู้ชมสามารถดูแบบสดได้",
+  "circlesJoinRequests": "คำขอเข้าร่วม",
+  "circlesAcceptSpectatorsHint": "อนุมัติผู้ชมก่อนเริ่มการแข่งขัน",
+  "circlesStartGame": "เริ่มเกม",
+  "circlesWaitingForPlayers": "กำลังรอผู้เล่น",
+  "circlesLeaveCircle": "ออกจาก Circle",
+  "circlesRequestSent": "ส่งคำขอแล้ว",
+  "circlesRequestToJoin": "ขอเข้าร่วม",
+  "circlesWatchLive": "ดูแบบสด",
+  "circlesPlayerTip": "แตะพร้อมเมื่อคุณพร้อม โฮสต์จะเริ่มการแข่งขัน",
+  "circlesSpectatorTip": "คุณกำลังดู ดูแบบสดเมื่อโฮสต์เริ่ม",
+  "circlesHostControls": "การควบคุมโฮสต์",
+  "circlesTransferHostFailed": "โอนโฮสต์ไม่สำเร็จ: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "จบ Circle ไม่สำเร็จ: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "ไม่พบ @{username}",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "ผู้ใช้ไม่ถูกต้อง",
+  "circlesCantInviteSelf": "ไม่สามารถเชิญตัวเองได้",
+  "circlesUserAlreadyInCircle": "@{username} อยู่ใน Circle แล้ว",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "โฮสต์",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "เชิญด้วยชื่อผู้ใช้",
+  "circlesInviteSent": "ส่งคำเชิญไปยัง @{username} แล้ว",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "ส่งคำเชิญไม่สำเร็จ: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "ส่งคำขอเข้าร่วมแล้ว",
+  "circlesJoinRequestFailed": "คำขอล้มเหลว: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle เต็มแล้ว",
+  "circlesSpectatorAdded": "เพิ่มผู้ชมแล้ว",
+  "circlesApproveFailed": "อนุมัติคำขอไม่สำเร็จ: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "ปฏิเสธคำขอแล้ว",
+  "circlesDeclineFailed": "ปฏิเสธคำขอไม่สำเร็จ: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "ผู้เข้าร่วม",
+  "circlesLeavePromptTitle": "ออกจาก Circle หรือไม่?",
+  "circlesLeavePromptTransfer": "กรุณาโอนโฮสต์ก่อนออก",
+  "circlesLeavePromptEndOnly": "จบ Circle และออก",
+  "circlesTransferHost": "โอนโฮสต์",
+  "circlesEndCircle": "จบ Circle",
+  "circlesTransferHostTitle": "โอนโฮสต์",
+  "circlesShareId": "รหัส Circle: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

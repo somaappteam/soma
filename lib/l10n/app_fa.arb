@@ -1,0 +1,781 @@
+{
+  "@@locale": "fa",
+  "appTitle": "SOMA",
+  "welcomeTagline": "یاد بگیر. رقابت کن. تسلط پیدا کن",
+  "signUp": "ثبت نام",
+  "signIn": "ورود",
+  "skipForNow": "الان رد شو",
+  "authFillAllFields": "لطفاً تمام فیلدها را پر کنید",
+  "authError": "خطا: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "ایمیل",
+  "authPassword": "رمز عبور",
+  "authUsername": "نام کاربری",
+  "authContinue": "ادامه",
+  "authSigningIn": "در حال ورود...",
+  "authCreateAccount": "ایجاد حساب",
+  "authCreating": "در حال ایجاد...",
+  "authNeedAccount": "حساب ندارید؟ ",
+  "authHaveAccount": "قبلاً حساب دارید؟ ",
+  "dialogAuthRequiredTitle": "برای دسترسی به Circles وارد شوید",
+  "dialogAuthRequiredBody": "Circles اتاق‌های چند کاربره هستند. برای پیوستن به بازی‌های زنده، دعوت دوستان و ذخیره پیشرفت، حساب بسازید.",
+  "notNow": "الان نه",
+  "navHome": "خانه",
+  "navCircles": "Circles",
+  "navProfile": "پروفایل",
+  "removeCourseTitle": "دوره حذف شود؟",
+  "removeCourseBody": "{course} از لیست شما حذف می‌شود",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "لغو",
+  "remove": "حذف",
+  "welcomeBack": "خوش برگشتی، {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "ویرایش دوره‌ها",
+  "done": "انجام شد",
+  "noCoursesToEdit": "دوره‌ای برای ویرایش نیست",
+  "addCourse": "افزودن دوره",
+  "unknown": "نامشخص",
+  "iSpeak": "من صحبت می‌کنم",
+  "iWantToLearn": "می‌خواهم یاد بگیرم",
+  "chooseYourLanguage": "زبان خود را انتخاب کنید",
+  "chooseLearningLanguage": "زبان یادگیری را انتخاب کنید",
+  "chooseTwoDifferentLanguages": "لطفاً دو زبان مختلف انتخاب کنید",
+  "createCourse": "ایجاد دوره",
+  "soloCourseTitle": "دوره انفرادی",
+  "searchLanguage": "جستجوی زبان",
+  "noMatches": "تطابقی وجود ندارد",
+  "chooseCourseType": "نوع دوره را انتخاب کنید",
+  "soloStudyDescription": "به تنهایی با آزمون‌های مشابه Circles مطالعه کنید - اما بدون اتاق، چت، تماشاگر یا گزینه‌های میزبان",
+  "soloModeVocabulary": "واژگان",
+  "soloModeSentences": "جملات",
+  "soloModeReview": "بازبینی",
+  "soloModeVocabularySubtitle": "چند گزینه‌ای، معانی، مترادف‌ها، کاربرد",
+  "soloModeSentencesSubtitle": "پر کردن جای خالی + ترجمه + خواندن",
+  "soloModeReviewDescription": "تمرین آموخته‌ها: کلمات ضعیف، اشتباهات اخیر و تکرار فاصله‌دار",
+  "startReview": "شروع بازبینی",
+  "soloSetupTitle": "تنظیمات {mode}",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "سختی",
+  "numberOfQuestions": "تعداد سوالات",
+  "timerPerQuestion": "زمان‌سنج برای هر سوال",
+  "noTimer": "بدون زمان‌سنج",
+  "start": "شروع",
+  "profileTitle": "پروفایل",
+  "profileSignInToMessage": "برای ارسال پیام وارد شوید",
+  "profileThatsYourProfile": "این پروفایل شماست",
+  "profileSignInToAddFriends": "برای افزودن دوستان وارد شوید",
+  "profileCantAddYourself": "نمی‌توانید خودتان را اضافه کنید",
+  "profileRequestSent": "درخواست به @{username} ارسال شد",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "ارسال درخواست ناموفق بود",
+  "profileDefaultDisplayName": "کاربر جدید",
+  "profileDefaultBio": "آماده یادگیری!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "مهمان",
+  "guestUsername": "مهمان",
+  "guestSessionLabel": "جلسه مهمان",
+  "unlockFullProfile": "بازکردن پروفایل کامل",
+  "guestBenefitSync": "همگام‌سازی پیشرفت در همه دستگاه‌ها",
+  "guestBenefitCircles": "پیوستن به Circles و بازی زنده",
+  "guestBenefitNotifications": "دریافت اعلان‌ها و درخواست‌های دوستی",
+  "progressStaysOnDevice": "پیشرفت روی این دستگاه می‌ماند تا وارد شوید",
+  "profileGoalLabel": "هدف: {minutes} دقیقه",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "پیشرفت XP",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "برد‌ها",
+  "profileStreak": "پی‌درپی",
+  "profileFriendsTitle": "دوستان",
+  "profileViewAll": "مشاهده همه",
+  "profileAchievementsTitle": "دستاوردها",
+  "profileNoAchievements": "هنوز دستاوردی نیست",
+  "profileRequested": "درخواست ارسال شد",
+  "profileSending": "در حال ارسال...",
+  "profileAddFriend": "افزودن دوست",
+  "profileConnectTitle": "ارتباط",
+  "profileMessage": "پیام",
+  "profileSnapshot": "عکس پروفایل",
+  "profileLocationHidden": "موقعیت مخفی شده",
+  "profileBioHidden": "بیوگرافی مخفی شده",
+  "profileDailyGoal": "هدف روزانه {minutes} دقیقه",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "دعوتنامه Circle",
+  "circleIdLabel": "شناسه Circle: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "برای پیوستن وارد شوید",
+  "joiningCircle": "در حال پیوستن...",
+  "joinCircle": "پیوستن به Circle",
+  "circleJoinedAsPlayer": "به عنوان بازیکن پیوستید",
+  "circleJoinedAsSpectator": "به عنوان تماشاگر پیوستید",
+  "accept": "قبول",
+  "decline": "رد",
+  "open": "باز کردن",
+  "circleCountdownTitle": "آماده شوید",
+  "circleCountdownSubtitle": "Circle در حال شروع...",
+  "userFallbackName": "کاربر",
+  "micOff": "میکروفون خاموش",
+  "micOn": "میکروفون روشن",
+  "roleHost": "میزبان",
+  "roleSpectator": "تماشاگر",
+  "tagHost": "میزبان",
+  "tagYou": "شما",
+  "statusCorrect": "درست",
+  "statusWrong": "اشتباه",
+  "statusWaiting": "در انتظار",
+  "statusNone": "-",
+  "pointsAbbrev": "امتیاز",
+  "pointsLabel": "امتیازها",
+  "statCorrect": "درست",
+  "statAnswers": "پاسخ‌ها",
+  "statTotal": "کل",
+  "statQuestions": "سوالات",
+  "statAccuracy": "دقت",
+  "statRate": "نرخ",
+  "statRank": "رتبه",
+  "statPosition": "موقعیت",
+  "statMode": "حالت",
+  "statType": "نوع",
+  "next": "بعدی",
+  "submit": "ارسال",
+  "continueLabel": "ادامه",
+  "save": "ذخیره",
+  "playAgain": "بازی دوباره",
+  "backToCourse": "بازگشت به دوره",
+  "resultsTitle": "نتایج",
+  "shareLater": "بعداً به اشتراک بگذارید",
+  "delete": "حذف",
+  "ok": "باشه",
+  "minutesShort": "{minutes} دقیقه",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} دق",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} ساعت",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} روز",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "همین الان",
+  "timeMinutesAgo": "{count} دقیقه پیش",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} ساعت پیش",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} روز پیش",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "در انتظار میزبان...",
+  "liveQuizJoinRequestSent": "درخواست پیوستن ارسال شد",
+  "liveQuizJoinRequestFailed": "ارسال درخواست ناموفق بود: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "کنترل‌های میزبان",
+  "liveQuizSpectatorModeTitle": "حالت تماشاگر",
+  "liveQuizHostControlsSubtitle": "دور‌ها به طور خودکار پیش می‌روند وقتی همه پاسخ دهند یا زمان تمام شود",
+  "liveQuizSpectatorModeSubtitle": "سوالات و جدول امتیازات را به صورت زنده تماشا کنید. نمی‌توانید پاسخ دهید",
+  "liveQuizQuestionCounter": "سوال {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "درخواست ارسال شد",
+  "liveQuizRequestToJoin": "درخواست پیوستن",
+  "liveQuizSpectatorFooter": "شما دارید زنده تماشا می‌کنید. از سوالات و جدول امتیازات لذت ببرید",
+  "circleNotFound": "Circle یافت نشد",
+  "resultsRematchStartFailed": "شروع مسابقه مجدد ناموفق بود: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "نتایج مسابقه",
+  "resultsNiceWork": "کار خوبی بود، {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "مقام اول",
+  "resultsPlaceSecond": "مقام دوم",
+  "resultsPlaceThird": "مقام سوم",
+  "resultsPlaceNth": "مقام {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "از {players} بازیکن",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "قهرمان! شما در این دور تسلط داشتید",
+  "resultsHighlightGreatAccuracy": "دقت عالی - نزدیک قله هستید!",
+  "resultsHighlightKeepGoing": "ادامه دهید - پایداری بر سرعت غلبه می‌کند",
+  "resultsLeaderboardTitle": "جدول امتیازات",
+  "resultsPlayersCount": "{count} بازیکن",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "بازگشت به Circles",
+  "resultsRematch": "مسابقه مجدد",
+  "resultsPlayAgain": "بازی دوباره",
+  "leaderboardGlobalTitle": "رتبه‌بندی جهانی",
+  "leaderboardEmpty": "هنوز رتبه‌بندی نیست",
+  "aboutTitle": "درباره برنامه",
+  "aboutVersion": "نسخه {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA یک پلتفرم یادگیری زبان بازی‌سازی‌شده است که تسلط بر زبان‌های جدید را جذاب و اجتماعی می‌کند. در Circles رقابت کنید، به تنهایی تمرین کنید و پیشرفتتان را دنبال کنید.",
+  "aboutTerms": "شرایط استفاده",
+  "aboutPrivacy": "سیاست حفظ حریم خصوصی",
+  "aboutOpenSource": "مجوزهای متن‌باز",
+  "addFriendTitle": "افزودن دوست",
+  "addFriendFindByUsername": "جستجو با نام کاربری",
+  "addFriendUsernameHint": "نام کاربری را وارد کنید...",
+  "addFriendTip": "نکته: پشتیبانی کد QR + شناسه دوست بعداً اضافه می‌شود",
+  "addFriendSending": "در حال ارسال...",
+  "addFriendSendRequest": "ارسال درخواست",
+  "addFriendUserNotFound": "کاربر @{username} یافت نشد",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "عمل ناموفق بود یا قبلاً ارسال شده: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "دوستان",
+  "searchFriendsHint": "جستجوی دوستان...",
+  "somaLearnerSubtitle": "یادگیرنده Soma",
+  "friendRequestLabel": "درخواست",
+  "friendRequestSentLabel": "درخواست ارسال شد",
+  "friendIncomingRequestLabel": "درخواست ورودی",
+  "friendRequestsSection": "درخواست‌ها",
+  "friendPendingSection": "در انتظار",
+  "friendAllSection": "همه دوستان",
+  "friendsEmptyState": "هنوز دوستی ندارید. اولین دوستتان را اضافه کنید!",
+  "friendsEmptyShort": "هنوز دوستی نیست",
+  "noMatchForQuery": "تطابقی برای \\\"{query}\\\" یافت نشد",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "صندوق ورودی",
+  "searchChatsHint": "جستجوی گفتگوها...",
+  "inboxEmptyState": "هنوز گفتگویی نیست. با دوستی گفتگو شروع کنید!",
+  "newMessageTitle": "پیام جدید",
+  "chatCallLater": "تماس صوتی بعداً (صدای Circle بعدی است)",
+  "errorWithDetails": "خطا: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "به {name} سلام کنید!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "پیام...",
+  "notificationsTitle": "اعلان‌ها",
+  "notificationsTabAll": "همه",
+  "notificationsTabCourses": "دوره‌ها",
+  "notificationsTabSocial": "اجتماعی",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "سیستم",
+  "notificationsEmpty": "اعلانی نیست",
+  "notificationsDeleted": "اعلان حذف شد",
+  "notificationTitleFallback": "اعلان",
+  "notificationTypeCourse": "دوره",
+  "notificationTypeSocial": "اجتماعی",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "سیستم",
+  "notificationsFriendAccepted": "درخواست دوستی پذیرفته شد",
+  "notificationsFriendAcceptFailed": "پذیرش درخواست دوستی ناموفق بود: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "درخواست دوستی رد شد",
+  "notificationsFriendDeclineFailed": "رد درخواست دوستی ناموفق بود: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "پیوستن به Circle ناموفق بود: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "در حال باز کردن",
+  "notificationsOpened": "باز شد",
+  "notificationsActionMessage": "{action} اعلان",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "تنظیمات",
+  "settingsSectionAccount": "حساب",
+  "settingsEditProfile": "ویرایش پروفایل",
+  "settingsPrivacy": "حریم خصوصی",
+  "settingsSecurity": "امنیت",
+  "settingsSectionGameplay": "بازی",
+  "settingsShowTranslationLine": "نمایش خط ترجمه",
+  "settingsShowReadingLine": "نمایش خواندن (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "زمان‌سنج پیش‌فرض هر سوال",
+  "settingsMatchDifficulty": "سختی مسابقه",
+  "settingsMatchDifficultyAdaptive": "تطبیقی",
+  "settingsSectionSoundFeel": "صدا و احساس",
+  "settingsMusic": "موسیقی",
+  "settingsSoundEffects": "جلوه‌های صوتی",
+  "settingsHaptics": "لرزش",
+  "settingsSectionNotifications": "اعلان‌ها",
+  "settingsPushNotifications": "اعلا‌ن‌های فشاری",
+  "settingsDailyReminder": "یادآوری روزانه",
+  "settingsSectionAppearance": "ظاهر",
+  "settingsTheme": "تم",
+  "settingsUiLanguage": "زبان رابط کاربری",
+  "settingsSectionAbout": "درباره",
+  "settingsVersion": "نسخه",
+  "settingsTermsPrivacy": "شرایط و حریم خصوصی",
+  "settingsSupport": "پشتیبانی",
+  "settingsLogout": "خروج",
+  "themeSystem": "سیستم",
+  "themeDark": "تاریک",
+  "themeLight": "روشن",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "فارسی",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "پروفایل به‌روز شد",
+  "editProfileTitle": "ویرایش پروفایل",
+  "editProfilePhotoLabel": "عکس پروفایل",
+  "editProfilePhotoSubtitle": "انتخاب آواتار از طریق Supabase Storage به زودی",
+  "editProfileChangePhoto": "تغییر",
+  "editProfileAvatarUploadSoon": "بارگذاری آواتار به زودی",
+  "editProfileDisplayNameLabel": "نام نمایشی",
+  "editProfileDisplayNameHint": "نام شما",
+  "editProfileDisplayNameRequired": "نام خود را وارد کنید",
+  "editProfileDisplayNameTooShort": "خیلی کوتاه",
+  "editProfileUsernameLabel": "نام کاربری",
+  "editProfileUsernameHint": "علی_یادگیرنده",
+  "editProfileUsernameRequired": "نام کاربری را وارد کنید",
+  "editProfileUsernameTooShort": "حداقل 3 کاراکتر",
+  "editProfileUsernameInvalid": "فقط حروف، اعداد، _",
+  "editProfileBioLabel": "بیوگرافی",
+  "editProfileBioHint": "یک بیوگرافی کوتاه...",
+  "editProfileBioTooLong": "حداکثر 120 کاراکتر",
+  "editProfileLocationLabel": "موقعیت",
+  "editProfileLocationHint": "شهر / کشور",
+  "editProfileDailyGoalTitle": "هدف روزانه",
+  "editProfileDailyGoalSubtitle": "انتخاب کنید چند دقیقه در روز می‌خواهید مطالعه کنید",
+  "securityTitle": "امنیت",
+  "securitySectionPassword": "رمز عبور",
+  "securityChangePasswordTitle": "تغییر رمز عبور",
+  "securityChangePasswordSubtitle": "رمز عبور خود را به طور منظم به‌روز کنید",
+  "securitySectionTwoFactor": "احراز هویت دو مرحله‌ای",
+  "securityEnable2faTitle": "فعال کردن 2FA",
+  "securityEnable2faSubtitle": "حفاظت اضافی هنگام ورود",
+  "securitySectionAppLock": "قفل برنامه",
+  "securityBiometricTitle": "باز کردن قفل بیومتریک",
+  "securityBiometricSubtitle": "از FaceID/TouchID برای باز کردن SOMA استفاده کنید",
+  "securityAppLockTitle": "قفل برنامه",
+  "securityAppLockSubtitle": "SOMA را هنگام خروج از برنامه قفل کنید",
+  "securitySectionSessions": "جلسات فعال",
+  "securityNoSessions": "جلسه فعالی یافت نشد",
+  "securityThisDevice": "این دستگاه",
+  "securityDevice": "دستگاه",
+  "securityActiveLabel": "فعال",
+  "securitySignInToEnable2fa": "برای فعال کردن 2FA وارد شوید",
+  "securityEnable2faFailed": "فعال کردن 2FA ناموفق بود: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "غیرفعال کردن 2FA ناموفق بود: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "راه‌اندازی 2FA",
+  "securitySecretKeyLabel": "کلید مخفی",
+  "securityCodeHint": "کد 6 رقمی",
+  "security2faEnabled": "2FA فعال شد",
+  "securityVerifyCodeFailed": "تأیید کد ناموفق بود: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "در حال تأیید...",
+  "securityVerify": "تأیید",
+  "securityCurrentPasswordHint": "رمز عبور فعلی",
+  "securityNewPasswordHint": "رمز عبور جدید (حداقل 8 کاراکتر)",
+  "securityConfirmPasswordHint": "تأیید رمز عبور جدید",
+  "securitySignInToChangePassword": "برای تغییر رمز عبور وارد شوید",
+  "securityEnterCurrentPassword": "رمز عبور فعلی خود را وارد کنید",
+  "securityPasswordMinLength": "رمز عبور جدید باید حداقل 8 کاراکتر داشته باشد",
+  "securityPasswordsDoNotMatch": "رمزهای عبور مطابقت ندارند",
+  "securityPasswordUpdated": "رمز عبور به‌روز شد",
+  "securityPasswordUpdateFailed": "به‌روزرسانی رمز عبور ناموفق بود: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "قفل خودکار پس از",
+  "privacyTitle": "حریم خصوصی",
+  "privacySectionVisibility": "نمایش",
+  "privacyProfileVisibilityTitle": "نمایش پروفایل",
+  "privacyVisibilityPublic": "عمومی",
+  "privacyVisibilityFriends": "دوستان",
+  "privacyVisibilityPrivate": "خصوصی",
+  "privacyVisibilityPublicSubtitle": "همه می‌توانند پروفایل شما را ببینند",
+  "privacyVisibilityFriendsSubtitle": "فقط دوستان می‌توانند پروفایل شما را ببینند",
+  "privacyVisibilityPrivateSubtitle": "فقط شما می‌توانید پروفایل خود را ببینید",
+  "privacySectionActivity": "فعالیت",
+  "privacyShowOnlineTitle": "نمایش وضعیت آنلاین",
+  "privacyShowOnlineSubtitle": "به دیگران اجازه دهید وقتی آنلاین هستید ببینند",
+  "privacyShowActivityTitle": "نمایش فعالیت یادگیری",
+  "privacyShowActivitySubtitle": "نمایش پی‌درپی، XP و پیشرفت اخیر",
+  "privacySectionSocial": "اجتماعی",
+  "privacyAllowRequestsTitle": "اجازه درخواست‌های دوستی",
+  "privacyAllowRequestsSubtitle": "به افراد اجازه دهید درخواست دوستی بفرستند",
+  "privacyWhoCanDmTitle": "چه کسی می‌تواند DM بفرستد",
+  "privacyDmEveryone": "همه",
+  "privacyDmFriends": "دوستان",
+  "privacyDmNoOne": "هیچ‌کس",
+  "privacyDmEveryoneSubtitle": "هر کسی می‌تواند به شما پیام دهد",
+  "privacyDmFriendsSubtitle": "فقط دوستان می‌توانند به شما پیام دهند",
+  "privacyDmNoOneSubtitle": "هیچ‌کس نمی‌تواند به شما پیام دهد",
+  "privacySectionBlockedUsers": "کاربران مسدود شده",
+  "privacyBlockedUsersComingSoon": "مدیریت کاربران مسدود شده به زودی",
+  "privacySectionDataControls": "کنترل‌های داده",
+  "privacyExportDataTitle": "صدور داده‌های من",
+  "privacyExportDataSubtitle": "فعالیت و دوره‌های خود را دانلود کنید",
+  "privacyExportInfoTitle": "صدور داده",
+  "privacyExportInfoBody": "مرحله بعد: ایجاد صدور JSON/CSV و ایمیل یا دانلود محلی",
+  "privacyDeleteAccountTitle": "حذف حساب",
+  "privacyDeleteAccountSubtitle": "این کار حساب و داده‌های شما را برای همیشه حذف می‌کند",
+  "privacyDeleteConfirmTitle": "حذف حساب؟",
+  "privacyDeleteConfirmBody": "این عمل قابل بازگشت نیست. پروفایل، دوره‌ها، دوستان و پیام‌های شما حذف خواهند شد",
+  "privacyDeleteComingSoon": "حذف بعداً به Supabase متصل می‌شود",
+  "soloLabel": "انفرادی",
+  "soloResultsCompletedTitle": "جلسه انفرادی تکمیل شد",
+  "soloResultsFeedbackElite": "عملکرد ممتاز - سلسله را حفظ کنید",
+  "soloResultsFeedbackStrong": "کار قوی - به سرعت بهتر می‌شوید",
+  "soloResultsFeedbackProgress": "پیشرفت خوب - اشتباهات را بررسی و دوباره امتحان کنید",
+  "soloResultsFeedbackTryAgain": "فشاری نیست - با سوالات کمتر دوباره امتحان کنید و تمرکز کنید",
+  "soloResultsPerfectScore": "امتیاز کامل! اشتباهی برای بررسی نیست",
+  "soloResultsReviewPrompt": "برای یادگیری سریع‌تر اشتباهات را بررسی کنید. پاسخ‌های اشتباه شما در زیر است",
+  "soloResultsReviewMistakes": "بررسی اشتباهات ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "وارد نشده‌اید",
+  "genericUser": "کاربر",
+  "loading": "در حال بارگذاری...",
+  "edit": "ویرایش",
+  "send": "ارسال",
+  "join": "پیوستن",
+  "leave": "خروج",
+  "ready": "آماده",
+  "levelBeginner": "مبتدی",
+  "levelIntermediate": "متوسط",
+  "levelAdvanced": "پیشرفته",
+  "questionsShort": "{count} سوال",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} ثانیه",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "همه دوره‌ها",
+  "circlesAllModes": "همه حالت‌ها",
+  "circlesAllLevels": "همه سطوح",
+  "circlesAddNewCourse": "افزودن دوره جدید",
+  "circlesCoursesTitle": "دوره‌ها",
+  "circlesModeTitle": "حالت",
+  "circlesLevelTitle": "سطح",
+  "circlesNoActiveForFilters": "Circle فعالی برای این فیلترها نیست",
+  "circlesUnknownRoom": "اتاق نامشخص",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "ایجاد Circle",
+  "circlesCircleName": "نام Circle",
+  "circlesEnterName": "نام را وارد کنید",
+  "circlesLanguages": "زبان‌ها",
+  "circlesRoomSetup": "تنظیمات اتاق",
+  "circlesPlayers": "بازیکنان",
+  "circlesEmptySlot": "جای خالی",
+  "circlesPlayersRange": "1-5 بازیکن",
+  "circlesQuestions": "سوالات",
+  "circlesQuestionsSubtitle": "تعداد سوالات",
+  "circlesTimePerQuestion": "زمان هر سوال",
+  "circlesSecondsPerQuestion": "ثانیه هر سوال",
+  "circlesAdvanced": "پیشرفته",
+  "circlesAllowSpectators": "اجازه تماشاگران",
+  "circlesAllowSpectatorsSubtitle": "Let others watch without playing.",
+  "circlesLiveVoiceChat": "چت صوتی زنده",
+  "circlesLiveVoiceChatSubtitle": "فعال کردن ارتباط صوتی در مسابقات",
+  "circlesLiveTextChat": "چت متنی زنده",
+  "circlesLiveTextChatSubtitle": "فعال کردن چت در مسابقات",
+  "circlesCreatedSuccess": "Circle ایجاد شد",
+  "circlesCreateError": "ایجاد Circle ناموفق بود: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "نکته: می‌توانید بعد از ایجاد دوستان را دعوت کنید",
+  "circlesJoinError": "پیوستن به Circle ناموفق بود: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "لابی Circle",
+  "circlesCodeLine": "کد: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "تنظیمات مسابقه",
+  "circlesLevelWithValue": "سطح {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "سختی",
+  "circlesPerQuestionShort": "هر سوال",
+  "circlesInvite": "دعوت",
+  "circlesCopyId": "کپی شناسه",
+  "circlesCopiedId": "شناسه کپی شد",
+  "circlesMatchInProgress": "مسابقه در حال انجام",
+  "circlesSpectatorQueuedBody": "مسابقه در حال انجام. به عنوان تماشاگر پیوست خواهید شد",
+  "circlesHostStartWhenReady": "میزبان وقتی همه آماده باشند شروع می‌کند",
+  "circlesSpectators": "تماشاگران",
+  "circlesSpectator": "تماشاگر",
+  "circlesSpectatorCanWatch": "تماشاگران می‌توانند زنده تماشا کنند",
+  "circlesJoinRequests": "درخواست‌های پیوستن",
+  "circlesAcceptSpectatorsHint": "تماشاگران را قبل از شروع مسابقه بپذیرید",
+  "circlesStartGame": "شروع بازی",
+  "circlesWaitingForPlayers": "در انتظار بازیکنان",
+  "circlesLeaveCircle": "ترک Circle",
+  "circlesRequestSent": "درخواست ارسال شد",
+  "circlesRequestToJoin": "درخواست پیوستن",
+  "circlesWatchLive": "تماشای زنده",
+  "circlesPlayerTip": "وقتی آماده شدید آماده را بزنید. میزبان مسابقه را شروع می‌کند",
+  "circlesSpectatorTip": "شما تماشا می‌کنید. وقتی میزبان شروع کند زنده تماشا کنید",
+  "circlesHostControls": "کنترل‌های میزبان",
+  "circlesTransferHostFailed": "انتقال میزبان ناموفق بود: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "پایان Circle ناموفق بود: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "کاربر @{username} یافت نشد",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "کاربر نامعتبر",
+  "circlesCantInviteSelf": "نمی‌توانید خودتان را دعوت کنید",
+  "circlesUserAlreadyInCircle": "@{username} قبلاً در Circle است",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "میزبان",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "دعوت با نام کاربری",
+  "circlesInviteSent": "دعوتنامه به @{username} ارسال شد",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "ارسال دعوتنامه ناموفق بود: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "درخواست پیوستن ارسال شد",
+  "circlesJoinRequestFailed": "ارسال درخواست ناموفق بود: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle پر است",
+  "circlesSpectatorAdded": "تماشاگر اضافه شد",
+  "circlesApproveFailed": "تأیید درخواست ناموفق بود: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "درخواست رد شد",
+  "circlesDeclineFailed": "رد درخواست ناموفق بود: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "شرکت‌کننده",
+  "circlesLeavePromptTitle": "ترک Circle؟",
+  "circlesLeavePromptTransfer": "لطفاً قبل از ترک میزبان را منتقل کنید",
+  "circlesLeavePromptEndOnly": "پایان Circle و خروج",
+  "circlesTransferHost": "انتقال میزبان",
+  "circlesEndCircle": "پایان Circle",
+  "circlesTransferHostTitle": "انتقال میزبان",
+  "circlesShareId": "شناسه Circle: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

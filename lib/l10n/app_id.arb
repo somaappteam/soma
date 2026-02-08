@@ -1,0 +1,781 @@
+{
+  "@@locale": "id",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Belajar. Bersaing. Menguasai.",
+  "signUp": "Daftar",
+  "signIn": "Masuk",
+  "skipForNow": "Lewati Sekarang",
+  "authFillAllFields": "Harap isi semua kolom",
+  "authError": "Kesalahan: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "Email",
+  "authPassword": "Kata Sandi",
+  "authUsername": "Nama Pengguna",
+  "authContinue": "Lanjutkan",
+  "authSigningIn": "Masuk...",
+  "authCreateAccount": "Buat Akun",
+  "authCreating": "Membuat...",
+  "authNeedAccount": "Belum punya akun? ",
+  "authHaveAccount": "Sudah punya akun? ",
+  "dialogAuthRequiredTitle": "Masuk untuk mengakses Circles",
+  "dialogAuthRequiredBody": "Circles adalah ruang multipemain. Buat akun untuk bergabung di pertandingan langsung, mengundang teman, dan menyimpan kemajuan Anda.",
+  "notNow": "Nanti Saja",
+  "navHome": "Beranda",
+  "navCircles": "Circles",
+  "navProfile": "Profil",
+  "removeCourseTitle": "Hapus Kursus?",
+  "removeCourseBody": "Menghapus {course} dari daftar beranda Anda.",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Batal",
+  "remove": "Hapus",
+  "welcomeBack": "Selamat datang kembali, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Edit Kursus",
+  "done": "Selesai",
+  "noCoursesToEdit": "Tidak ada kursus untuk diedit.",
+  "addCourse": "Tambah Kursus",
+  "unknown": "Tidak Diketahui",
+  "iSpeak": "Saya Berbicara",
+  "iWantToLearn": "Saya Ingin Belajar",
+  "chooseYourLanguage": "Pilih Bahasa Anda",
+  "chooseLearningLanguage": "Pilih bahasa yang ingin Anda pelajari",
+  "chooseTwoDifferentLanguages": "Harap pilih dua bahasa yang berbeda.",
+  "createCourse": "Buat Kursus",
+  "soloCourseTitle": "Kursus Solo",
+  "searchLanguage": "Cari Bahasa",
+  "noMatches": "Tidak Ada Kecocokan",
+  "chooseCourseType": "Pilih Jenis Kursus",
+  "soloStudyDescription": "Belajar sendiri dengan kuis gaya Circles - tanpa ruang, obrolan, penonton, atau opsi tuan rumah.",
+  "soloModeVocabulary": "Kosa Kata",
+  "soloModeSentences": "Kalimat",
+  "soloModeReview": "Tinjauan",
+  "soloModeVocabularySubtitle": "Pilihan ganda arti, sinonim, penggunaan",
+  "soloModeSentencesSubtitle": "Isi kosong + terjemahan + bacaan",
+  "soloModeReviewDescription": "Praktikkan apa yang telah dipelajari: kata-kata lemah, kesalahan terbaru, pengulangan berjarak.",
+  "startReview": "Mulai Tinjauan",
+  "soloSetupTitle": "Pengaturan {mode}",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Kesulitan",
+  "numberOfQuestions": "Jumlah Pertanyaan",
+  "timerPerQuestion": "Waktu per Pertanyaan",
+  "noTimer": "Tanpa Waktu",
+  "start": "Mulai",
+  "profileTitle": "Profil",
+  "profileSignInToMessage": "Masuk untuk mengirim pesan",
+  "profileThatsYourProfile": "Ini profil Anda",
+  "profileSignInToAddFriends": "Masuk untuk menambahkan teman",
+  "profileCantAddYourself": "Tidak bisa menambahkan diri sendiri",
+  "profileRequestSent": "Permintaan terkirim ke @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Gagal mengirim permintaan",
+  "profileDefaultDisplayName": "Pengguna Baru",
+  "profileDefaultBio": "Siap belajar!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Tamu",
+  "guestUsername": "tamu",
+  "guestSessionLabel": "Sesi Tamu",
+  "unlockFullProfile": "Buka Profil Lengkap",
+  "guestBenefitSync": "Sinkronkan kemajuan di semua perangkat",
+  "guestBenefitCircles": "Bergabung di Circles untuk bermain langsung",
+  "guestBenefitNotifications": "Terima notifikasi dan permintaan teman",
+  "progressStaysOnDevice": "Sampai Anda masuk, kemajuan Anda tetap di perangkat ini.",
+  "profileGoalLabel": "Target: {minutes} mnt",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "Kemajuan XP",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Menang",
+  "profileStreak": "Rentetan",
+  "profileFriendsTitle": "Teman",
+  "profileViewAll": "Lihat Semua",
+  "profileAchievementsTitle": "Pencapaian",
+  "profileNoAchievements": "Belum ada pencapaian.",
+  "profileRequested": "Diminta",
+  "profileSending": "Mengirim...",
+  "profileAddFriend": "Tambah Teman",
+  "profileConnectTitle": "Terhubung",
+  "profileMessage": "Pesan",
+  "profileSnapshot": "Cuplikan Profil",
+  "profileLocationHidden": "Lokasi Disembunyikan",
+  "profileBioHidden": "Bio Disembunyikan",
+  "profileDailyGoal": "Target Harian {minutes} mnt",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Undangan Circle",
+  "circleIdLabel": "ID Circle: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Masuk untuk bergabung",
+  "joiningCircle": "Bergabung...",
+  "joinCircle": "Gabung Circle",
+  "circleJoinedAsPlayer": "Bergabung sebagai pemain",
+  "circleJoinedAsSpectator": "Bergabung sebagai penonton",
+  "accept": "Terima",
+  "decline": "Tolak",
+  "open": "Buka",
+  "circleCountdownTitle": "Bersiap-siaplah",
+  "circleCountdownSubtitle": "Circle dimulai...",
+  "userFallbackName": "Pengguna",
+  "micOff": "Mikrofon Mati",
+  "micOn": "Mikrofon Hidup",
+  "roleHost": "Tuan Rumah",
+  "roleSpectator": "Penonton",
+  "tagHost": "Tuan Rumah",
+  "tagYou": "Anda",
+  "statusCorrect": "Benar",
+  "statusWrong": "Salah",
+  "statusWaiting": "Menunggu",
+  "statusNone": "-",
+  "pointsAbbrev": "poin",
+  "pointsLabel": "Poin",
+  "statCorrect": "Benar",
+  "statAnswers": "Jawaban",
+  "statTotal": "Total",
+  "statQuestions": "Pertanyaan",
+  "statAccuracy": "Akurasi",
+  "statRate": "Tingkat",
+  "statRank": "Peringkat",
+  "statPosition": "Posisi",
+  "statMode": "Mode",
+  "statType": "Jenis",
+  "next": "Berikutnya",
+  "submit": "Kirim",
+  "continueLabel": "Lanjutkan",
+  "save": "Simpan",
+  "playAgain": "Main Lagi",
+  "backToCourse": "Kembali ke Kursus",
+  "resultsTitle": "Hasil",
+  "shareLater": "Bagikan Nanti",
+  "delete": "Hapus",
+  "ok": "OK",
+  "minutesShort": "{minutes} mnt",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} mnt",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} jam",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} hari",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "Baru saja",
+  "timeMinutesAgo": "{count} menit lalu",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} jam lalu",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} hari lalu",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Menunggu tuan rumah...",
+  "liveQuizJoinRequestSent": "Permintaan bergabung terkirim",
+  "liveQuizJoinRequestFailed": "Permintaan gagal: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Kontrol Tuan Rumah",
+  "liveQuizSpectatorModeTitle": "Mode Penonton",
+  "liveQuizHostControlsSubtitle": "Putaran berlangsung otomatis ketika semua orang menjawab atau waktu habis.",
+  "liveQuizSpectatorModeSubtitle": "Saksikan pertanyaan dan papan peringkat secara langsung. Anda tidak dapat menjawab.",
+  "liveQuizQuestionCounter": "Pertanyaan {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Permintaan terkirim",
+  "liveQuizRequestToJoin": "Minta Bergabung",
+  "liveQuizSpectatorFooter": "Anda menyaksikan secara langsung. Nikmati pertanyaan dan papan peringkat.",
+  "circleNotFound": "Circle tidak ditemukan",
+  "resultsRematchStartFailed": "Gagal memulai pertandingan ulang: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Hasil Pertandingan",
+  "resultsNiceWork": "Kerja bagus, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "Ke-1",
+  "resultsPlaceSecond": "Ke-2",
+  "resultsPlaceThird": "Ke-3",
+  "resultsPlaceNth": "Ke-{rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "dari {players} pemain",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Juara! Anda menaklukkan Circle ini.",
+  "resultsHighlightGreatAccuracy": "Akurasi hebat. Anda hampir di puncak!",
+  "resultsHighlightKeepGoing": "Terus lanjutkan - konsistensi mengalahkan kecepatan.",
+  "resultsLeaderboardTitle": "Papan Peringkat",
+  "resultsPlayersCount": "{count} pemain",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Kembali ke Circles",
+  "resultsRematch": "Pertandingan Ulang",
+  "resultsPlayAgain": "Main Lagi",
+  "leaderboardGlobalTitle": "Papan Peringkat Global",
+  "leaderboardEmpty": "Belum ada papan peringkat.",
+  "aboutTitle": "Tentang",
+  "aboutVersion": "Versi {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA adalah platform pembelajaran bahasa yang digamifikasi yang membuat belajar bahasa baru menjadi menyenangkan dan sosial. Bergabunglah di Circles, berlatih sendiri, dan lacak kemajuan Anda.",
+  "aboutTerms": "Syarat Layanan",
+  "aboutPrivacy": "Kebijakan Privasi",
+  "aboutOpenSource": "Lisensi Sumber Terbuka",
+  "addFriendTitle": "Tambah Teman",
+  "addFriendFindByUsername": "Cari berdasarkan nama pengguna",
+  "addFriendUsernameHint": "Masukkan nama pengguna...",
+  "addFriendTip": "Tips: Dukungan kode QR + ID teman dapat ditambahkan nanti.",
+  "addFriendSending": "Mengirim...",
+  "addFriendSendRequest": "Kirim Permintaan",
+  "addFriendUserNotFound": "@{username} tidak ditemukan",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Tindakan gagal atau sudah terkirim: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Teman",
+  "searchFriendsHint": "Cari teman...",
+  "somaLearnerSubtitle": "Pelajar Soma",
+  "friendRequestLabel": "Permintaan",
+  "friendRequestSentLabel": "Permintaan Terkirim",
+  "friendIncomingRequestLabel": "Permintaan Masuk",
+  "friendRequestsSection": "Permintaan",
+  "friendPendingSection": "Tertunda",
+  "friendAllSection": "Semua Teman",
+  "friendsEmptyState": "Belum ada teman. Tambahkan teman pertama Anda!",
+  "friendsEmptyShort": "Belum ada teman.",
+  "noMatchForQuery": "Tidak ada yang cocok dengan \\\"{query}\\\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Kotak Masuk",
+  "searchChatsHint": "Cari obrolan...",
+  "inboxEmptyState": "Belum ada obrolan. Mulai obrolan dengan teman!",
+  "newMessageTitle": "Pesan Baru",
+  "chatCallLater": "Panggilan suara nanti (bahasa Circle segera hadir)",
+  "errorWithDetails": "Kesalahan: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Sapa {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Pesan...",
+  "notificationsTitle": "Notifikasi",
+  "notificationsTabAll": "Semua",
+  "notificationsTabCourses": "Kursus",
+  "notificationsTabSocial": "Sosial",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "Sistem",
+  "notificationsEmpty": "Tidak ada notifikasi di sini.",
+  "notificationsDeleted": "Notifikasi dihapus",
+  "notificationTitleFallback": "Notifikasi",
+  "notificationTypeCourse": "Kursus",
+  "notificationTypeSocial": "Sosial",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "Sistem",
+  "notificationsFriendAccepted": "Permintaan teman diterima",
+  "notificationsFriendAcceptFailed": "Gagal menerima permintaan teman: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Permintaan teman ditolak",
+  "notificationsFriendDeclineFailed": "Gagal menolak permintaan teman: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Gagal bergabung di Circle: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Membuka",
+  "notificationsOpened": "Dibuka",
+  "notificationsActionMessage": "{action} notifikasi",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Pengaturan",
+  "settingsSectionAccount": "Akun",
+  "settingsEditProfile": "Edit Profil",
+  "settingsPrivacy": "Privasi",
+  "settingsSecurity": "Keamanan",
+  "settingsSectionGameplay": "Gameplay",
+  "settingsShowTranslationLine": "Tampilkan baris terjemahan",
+  "settingsShowReadingLine": "Tampilkan bacaan (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "Waktu default per pertanyaan",
+  "settingsMatchDifficulty": "Kesulitan Pertandingan",
+  "settingsMatchDifficultyAdaptive": "Adaptif",
+  "settingsSectionSoundFeel": "Suara & Nuansa",
+  "settingsMusic": "Musik",
+  "settingsSoundEffects": "Efek Suara",
+  "settingsHaptics": "Umpan Balik Haptik",
+  "settingsSectionNotifications": "Notifikasi",
+  "settingsPushNotifications": "Notifikasi Push",
+  "settingsDailyReminder": "Pengingat Harian",
+  "settingsSectionAppearance": "Tampilan",
+  "settingsTheme": "Tema",
+  "settingsUiLanguage": "Bahasa UI",
+  "settingsSectionAbout": "Tentang",
+  "settingsVersion": "Versi",
+  "settingsTermsPrivacy": "Syarat & Privasi",
+  "settingsSupport": "Dukungan",
+  "settingsLogout": "Keluar",
+  "themeSystem": "Sistem",
+  "themeDark": "Gelap",
+  "themeLight": "Terang",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Profil diperbarui",
+  "editProfileTitle": "Edit Profil",
+  "editProfilePhotoLabel": "Foto Profil",
+  "editProfilePhotoSubtitle": "Pemilihan avatar melalui Supabase Storage segera hadir.",
+  "editProfileChangePhoto": "Ubah",
+  "editProfileAvatarUploadSoon": "Unggah avatar segera hadir",
+  "editProfileDisplayNameLabel": "Nama Tampilan",
+  "editProfileDisplayNameHint": "Nama Anda",
+  "editProfileDisplayNameRequired": "Harap masukkan nama",
+  "editProfileDisplayNameTooShort": "Terlalu pendek",
+  "editProfileUsernameLabel": "Nama Pengguna",
+  "editProfileUsernameHint": "budi_pelajar",
+  "editProfileUsernameRequired": "Harap masukkan nama pengguna",
+  "editProfileUsernameTooShort": "Minimal 3 karakter",
+  "editProfileUsernameInvalid": "Hanya huruf, angka, _",
+  "editProfileBioLabel": "Bio",
+  "editProfileBioHint": "Bio singkat...",
+  "editProfileBioTooLong": "Maksimal 120 karakter",
+  "editProfileLocationLabel": "Lokasi",
+  "editProfileLocationHint": "Kota / Negara",
+  "editProfileDailyGoalTitle": "Target Harian",
+  "editProfileDailyGoalSubtitle": "Pilih berapa menit Anda ingin belajar setiap hari.",
+  "securityTitle": "Keamanan",
+  "securitySectionPassword": "Kata Sandi",
+  "securityChangePasswordTitle": "Ubah Kata Sandi",
+  "securityChangePasswordSubtitle": "Perbarui kata sandi Anda secara berkala.",
+  "securitySectionTwoFactor": "Autentikasi Dua Faktor",
+  "securityEnable2faTitle": "Aktifkan 2FA",
+  "securityEnable2faSubtitle": "Keamanan ekstra saat masuk.",
+  "securitySectionAppLock": "Kunci Aplikasi",
+  "securityBiometricTitle": "Buka Kunci Biometrik",
+  "securityBiometricSubtitle": "Gunakan FaceID/TouchID untuk membuka SOMA.",
+  "securityAppLockTitle": "Kunci Aplikasi",
+  "securityAppLockSubtitle": "Kunci SOMA saat keluar.",
+  "securitySectionSessions": "Sesi Aktif",
+  "securityNoSessions": "Tidak ada sesi aktif ditemukan.",
+  "securityThisDevice": "Perangkat Ini",
+  "securityDevice": "Perangkat",
+  "securityActiveLabel": "Aktif",
+  "securitySignInToEnable2fa": "Masuk untuk mengaktifkan 2FA",
+  "securityEnable2faFailed": "Gagal mengaktifkan 2FA: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "Gagal menonaktifkan 2FA: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "Pengaturan 2FA",
+  "securitySecretKeyLabel": "Kunci Rahasia",
+  "securityCodeHint": "Kode 6 digit",
+  "security2faEnabled": "2FA diaktifkan",
+  "securityVerifyCodeFailed": "Gagal memverifikasi kode: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Memverifikasi...",
+  "securityVerify": "Verifikasi",
+  "securityCurrentPasswordHint": "Kata sandi saat ini",
+  "securityNewPasswordHint": "Kata sandi baru (min. 8 karakter)",
+  "securityConfirmPasswordHint": "Konfirmasi kata sandi baru",
+  "securitySignInToChangePassword": "Masuk untuk mengubah kata sandi",
+  "securityEnterCurrentPassword": "Harap masukkan kata sandi saat ini",
+  "securityPasswordMinLength": "Kata sandi baru harus minimal 8 karakter",
+  "securityPasswordsDoNotMatch": "Kata sandi tidak cocok",
+  "securityPasswordUpdated": "Kata sandi diperbarui",
+  "securityPasswordUpdateFailed": "Gagal memperbarui kata sandi: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Kunci otomatis setelah",
+  "privacyTitle": "Privasi",
+  "privacySectionVisibility": "Visibilitas",
+  "privacyProfileVisibilityTitle": "Visibilitas Profil",
+  "privacyVisibilityPublic": "Publik",
+  "privacyVisibilityFriends": "Teman",
+  "privacyVisibilityPrivate": "Pribadi",
+  "privacyVisibilityPublicSubtitle": "Siapa pun dapat melihat profil Anda.",
+  "privacyVisibilityFriendsSubtitle": "Hanya teman yang dapat melihat profil Anda.",
+  "privacyVisibilityPrivateSubtitle": "Hanya Anda yang dapat melihat profil.",
+  "privacySectionActivity": "Aktivitas",
+  "privacyShowOnlineTitle": "Tampilkan Status Online",
+  "privacyShowOnlineSubtitle": "Biarkan orang lain melihat Anda online.",
+  "privacyShowActivityTitle": "Tampilkan Aktivitas Belajar",
+  "privacyShowActivitySubtitle": "Tampilkan rentetan, XP, dan kemajuan saat ini.",
+  "privacySectionSocial": "Sosial",
+  "privacyAllowRequestsTitle": "Izinkan Permintaan Teman",
+  "privacyAllowRequestsSubtitle": "Izinkan orang lain mengirim permintaan teman.",
+  "privacyWhoCanDmTitle": "Siapa yang Bisa DM",
+  "privacyDmEveryone": "Semua Orang",
+  "privacyDmFriends": "Teman",
+  "privacyDmNoOne": "Tidak Ada",
+  "privacyDmEveryoneSubtitle": "Siapa pun dapat mengirim DM kepada Anda.",
+  "privacyDmFriendsSubtitle": "Hanya teman yang dapat mengirim DM kepada Anda.",
+  "privacyDmNoOneSubtitle": "Tidak ada yang dapat mengirim DM kepada Anda.",
+  "privacySectionBlockedUsers": "Pengguna yang Diblokir",
+  "privacyBlockedUsersComingSoon": "Kelola pengguna yang diblokir segera hadir.",
+  "privacySectionDataControls": "Kontrol Data",
+  "privacyExportDataTitle": "Ekspor Data",
+  "privacyExportDataSubtitle": "Unduh aktivitas dan kursus Anda.",
+  "privacyExportInfoTitle": "Ekspor Data",
+  "privacyExportInfoBody": "Langkah selanjutnya: Buat ekspor JSON/CSV dan kirim melalui email atau unduh secara lokal.",
+  "privacyDeleteAccountTitle": "Hapus Akun",
+  "privacyDeleteAccountSubtitle": "Ini akan menghapus akun dan data Anda secara permanen.",
+  "privacyDeleteConfirmTitle": "Hapus Akun?",
+  "privacyDeleteConfirmBody": "Tindakan ini permanen. Profil, kursus, teman, dan pesan Anda akan dihapus.",
+  "privacyDeleteComingSoon": "Penghapusan akan terhubung ke Supabase nanti",
+  "soloLabel": "Solo",
+  "soloResultsCompletedTitle": "Sesi Solo Selesai",
+  "soloResultsFeedbackElite": "Performa elite. Pertahankan rentetan.",
+  "soloResultsFeedbackStrong": "Kuat. Anda berkembang pesat.",
+  "soloResultsFeedbackProgress": "Kemajuan bagus. Tinjau kesalahan dan ulangi.",
+  "soloResultsFeedbackTryAgain": "Tanpa stres. Coba lagi dengan lebih sedikit pertanyaan dan fokus.",
+  "soloResultsPerfectScore": "Skor sempurna! Tidak ada kesalahan untuk ditinjau.",
+  "soloResultsReviewPrompt": "Tinjau kesalahan untuk belajar lebih cepat. Jawaban salah Anda ada di bawah.",
+  "soloResultsReviewMistakes": "Tinjau Kesalahan ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Belum masuk",
+  "genericUser": "Pengguna",
+  "loading": "Memuat...",
+  "edit": "Edit",
+  "send": "Kirim",
+  "join": "Gabung",
+  "leave": "Tinggalkan",
+  "ready": "Siap",
+  "levelBeginner": "Pemula",
+  "levelIntermediate": "Menengah",
+  "levelAdvanced": "Lanjutan",
+  "questionsShort": "{count} pert.",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} dtk",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Semua Kursus",
+  "circlesAllModes": "Semua Mode",
+  "circlesAllLevels": "Semua Level",
+  "circlesAddNewCourse": "Tambah Kursus Baru",
+  "circlesCoursesTitle": "Kursus",
+  "circlesModeTitle": "Mode",
+  "circlesLevelTitle": "Level",
+  "circlesNoActiveForFilters": "Tidak ada Circle aktif untuk filter ini.",
+  "circlesUnknownRoom": "Ruang Tidak Dikenal",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Buat Circle",
+  "circlesCircleName": "Nama Circle",
+  "circlesEnterName": "Masukkan nama",
+  "circlesLanguages": "Bahasa",
+  "circlesRoomSetup": "Pengaturan Ruang",
+  "circlesPlayers": "Pemain",
+  "circlesEmptySlot": "Slot Kosong",
+  "circlesPlayersRange": "1-5 pemain",
+  "circlesQuestions": "Pertanyaan",
+  "circlesQuestionsSubtitle": "Jumlah pertanyaan",
+  "circlesTimePerQuestion": "Waktu per Pertanyaan",
+  "circlesSecondsPerQuestion": "Detik per pertanyaan",
+  "circlesAdvanced": "Lanjutan",
+  "circlesAllowSpectators": "Izinkan Penonton",
+  "circlesAllowSpectatorsSubtitle": "Izinkan orang lain menonton tanpa bermain.",
+  "circlesLiveVoiceChat": "Obrolan Suara Langsung",
+  "circlesLiveVoiceChatSubtitle": "Aktifkan suara langsung selama pertandingan.",
+  "circlesLiveTextChat": "Obrolan Teks Langsung",
+  "circlesLiveTextChatSubtitle": "Aktifkan obrolan selama pertandingan.",
+  "circlesCreatedSuccess": "Circle dibuat",
+  "circlesCreateError": "Gagal membuat Circle: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Tips: Anda dapat mengundang teman setelah membuat.",
+  "circlesJoinError": "Gagal bergabung di Circle: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Lobi Circle",
+  "circlesCodeLine": "Kode: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Pengaturan Pertandingan",
+  "circlesLevelWithValue": "Level {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Kesulitan",
+  "circlesPerQuestionShort": "per pert.",
+  "circlesInvite": "Undang",
+  "circlesCopyId": "Salin ID",
+  "circlesCopiedId": "ID disalin",
+  "circlesMatchInProgress": "Pertandingan Berlangsung",
+  "circlesSpectatorQueuedBody": "Pertandingan berlangsung. Bergabung sebagai penonton.",
+  "circlesHostStartWhenReady": "Tuan rumah memulai ketika semua orang siap.",
+  "circlesSpectators": "Penonton",
+  "circlesSpectator": "Penonton",
+  "circlesSpectatorCanWatch": "Penonton dapat menyaksikan secara langsung.",
+  "circlesJoinRequests": "Permintaan Bergabung",
+  "circlesAcceptSpectatorsHint": "Setujui penonton sebelum memulai pertandingan.",
+  "circlesStartGame": "Mulai Permainan",
+  "circlesWaitingForPlayers": "Menunggu Pemain",
+  "circlesLeaveCircle": "Tinggalkan Circle",
+  "circlesRequestSent": "Permintaan terkirim",
+  "circlesRequestToJoin": "Minta Bergabung",
+  "circlesWatchLive": "Saksikan Langsung",
+  "circlesPlayerTip": "Ketuk siap saat Anda siap. Tuan rumah akan memulai pertandingan.",
+  "circlesSpectatorTip": "Anda sedang menyaksikan. Saksikan secara langsung ketika tuan rumah memulai.",
+  "circlesHostControls": "Kontrol Tuan Rumah",
+  "circlesTransferHostFailed": "Gagal memindahkan tuan rumah: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Gagal mengakhiri Circle: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "@{username} tidak ditemukan",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Pengguna tidak valid",
+  "circlesCantInviteSelf": "Tidak bisa mengundang diri sendiri",
+  "circlesUserAlreadyInCircle": "@{username} sudah ada di Circle",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Tuan Rumah",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "Undang dengan nama pengguna",
+  "circlesInviteSent": "Undangan terkirim ke @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Gagal mengirim undangan: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Permintaan bergabung terkirim",
+  "circlesJoinRequestFailed": "Permintaan gagal: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle penuh",
+  "circlesSpectatorAdded": "Penonton ditambahkan",
+  "circlesApproveFailed": "Gagal menyetujui permintaan: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Permintaan ditolak",
+  "circlesDeclineFailed": "Gagal menolak permintaan: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Peserta",
+  "circlesLeavePromptTitle": "Tinggalkan Circle?",
+  "circlesLeavePromptTransfer": "Harap pindahkan tuan rumah sebelum meninggalkan.",
+  "circlesLeavePromptEndOnly": "Akhiri Circle dan tinggalkan.",
+  "circlesTransferHost": "Pindahkan Tuan Rumah",
+  "circlesEndCircle": "Akhiri Circle",
+  "circlesTransferHostTitle": "Pindahkan Tuan Rumah",
+  "circlesShareId": "ID Circle: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

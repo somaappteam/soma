@@ -15,7 +15,7 @@ import '../../data/notifications_store.dart';
 import '../../data/auth_repository.dart';
 import '../../core/theme/motion.dart';
 import '../../core/widgets/responsive.dart';
-import '../../core/widgets/soma_background.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -206,8 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = AppLocalizations.of(context);
     final isGuest = authRepository.currentUser == null;
     _syncCoursesIfNeeded();
-    return SomaBackground(
-      child: SafeArea(
+    return SafeArea(
         child: ResponsiveFrame(
           child: Stack(
             children: [
@@ -328,8 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
@@ -383,7 +381,6 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final card = Glass(
       radius: BorderRadius.circular(24),
       padding: EdgeInsets.zero,

@@ -1,0 +1,781 @@
+{
+  "@@locale": "ro",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Learn. Compete. Master.",
+  "signUp": "Sign Up",
+  "signIn": "Sign In",
+  "skipForNow": "Skip for Now",
+  "authFillAllFields": "Please fill in all fields",
+  "authError": "Error: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "Email",
+  "authPassword": "Password",
+  "authUsername": "Username",
+  "authContinue": "Continue",
+  "authSigningIn": "Signing In...",
+  "authCreateAccount": "Create Account",
+  "authCreating": "Creating...",
+  "authNeedAccount": "Don't have an account? ",
+  "authHaveAccount": "Already have an account? ",
+  "dialogAuthRequiredTitle": "Sign in to access Circles",
+  "dialogAuthRequiredBody": "Circles are multiplayer rooms. Create an account to join live matches, invite friends, and save progress.",
+  "notNow": "Not now",
+  "navHome": "Home",
+  "navCircles": "Circles",
+  "navProfile": "Profile",
+  "removeCourseTitle": "Remove course?",
+  "removeCourseBody": "{course} will be removed from your home list.",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Cancel",
+  "remove": "Remove",
+  "welcomeBack": "Welcome back, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Edit courses",
+  "done": "Done",
+  "noCoursesToEdit": "No courses to edit.",
+  "addCourse": "Add Course",
+  "unknown": "Unknown",
+  "iSpeak": "I speak",
+  "iWantToLearn": "I want to learn",
+  "chooseYourLanguage": "Choose your language",
+  "chooseLearningLanguage": "Choose learning language",
+  "chooseTwoDifferentLanguages": "Choose two different languages.",
+  "createCourse": "Create Course",
+  "soloCourseTitle": "Solo Course",
+  "searchLanguage": "Search language",
+  "noMatches": "No matches",
+  "chooseCourseType": "Choose a course type",
+  "soloStudyDescription": "Study alone with the same quiz style as circles - but without rooms, chat, spectators, or host options.",
+  "soloModeVocabulary": "Vocabulary",
+  "soloModeSentences": "Sentences",
+  "soloModeReview": "Review",
+  "soloModeVocabularySubtitle": "Multiple choice meanings, synonyms, usage",
+  "soloModeSentencesSubtitle": "Fill in the blank + translation + reading",
+  "soloModeReviewDescription": "Practice what you learned: weak words, recent mistakes, and spaced repetition.",
+  "startReview": "Start Review",
+  "soloSetupTitle": "{mode} Setup",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Difficulty",
+  "numberOfQuestions": "Number of questions",
+  "timerPerQuestion": "Timer per question",
+  "noTimer": "No timer",
+  "start": "Start",
+  "profileTitle": "Profile",
+  "profileSignInToMessage": "Sign in to message",
+  "profileThatsYourProfile": "That's your profile",
+  "profileSignInToAddFriends": "Sign in to add friends",
+  "profileCantAddYourself": "You can't add yourself",
+  "profileRequestSent": "Request sent to @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Couldn't send request",
+  "profileDefaultDisplayName": "New User",
+  "profileDefaultBio": "Ready to learn!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Guest",
+  "guestUsername": "guest",
+  "guestSessionLabel": "Guest session",
+  "unlockFullProfile": "Unlock your full profile",
+  "guestBenefitSync": "Sync progress across devices",
+  "guestBenefitCircles": "Join Circles and play live",
+  "guestBenefitNotifications": "Get notifications and friend requests",
+  "progressStaysOnDevice": "Progress stays on this device until you sign in.",
+  "profileGoalLabel": "Goal: {minutes}m",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP Progress",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Wins",
+  "profileStreak": "Streak",
+  "profileFriendsTitle": "My Friends",
+  "profileViewAll": "View all",
+  "profileAchievementsTitle": "Achievements",
+  "profileNoAchievements": "Încă nu sunt realizări",
+  "profileRequested": "Requested",
+  "profileSending": "Sending...",
+  "profileAddFriend": "Add Friend",
+  "profileConnectTitle": "Connect",
+  "profileMessage": "Message",
+  "profileSnapshot": "Profile Snapshot",
+  "profileLocationHidden": "Location hidden",
+  "profileBioHidden": "Bio hidden",
+  "profileDailyGoal": "Daily goal {minutes}m",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle invite",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Sign In to Join",
+  "joiningCircle": "Joining...",
+  "joinCircle": "Join Circle",
+  "circleJoinedAsPlayer": "Joined as player",
+  "circleJoinedAsSpectator": "Joined as spectator",
+  "accept": "Accept",
+  "decline": "Decline",
+  "open": "Open",
+  "circleCountdownTitle": "Get Ready",
+  "circleCountdownSubtitle": "Circle is starting...",
+  "userFallbackName": "User",
+  "micOff": "Mic Off",
+  "micOn": "Mic On",
+  "roleHost": "Host",
+  "roleSpectator": "Spectator",
+  "tagHost": "HOST",
+  "tagYou": "YOU",
+  "statusCorrect": "Correct",
+  "statusWrong": "Wrong",
+  "statusWaiting": "Waiting",
+  "statusNone": "-",
+  "pointsAbbrev": "pts",
+  "pointsLabel": "Points",
+  "statCorrect": "Correct",
+  "statAnswers": "answers",
+  "statTotal": "Total",
+  "statQuestions": "questions",
+  "statAccuracy": "Accuracy",
+  "statRate": "rate",
+  "statRank": "Rank",
+  "statPosition": "position",
+  "statMode": "Mode",
+  "statType": "type",
+  "next": "Next",
+  "submit": "Submit",
+  "continueLabel": "Continue",
+  "save": "Save",
+  "playAgain": "Play Again",
+  "backToCourse": "Back to Course",
+  "resultsTitle": "Results",
+  "shareLater": "Share later",
+  "delete": "Delete",
+  "ok": "OK",
+  "minutesShort": "{minutes}m",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}m",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}h",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}d",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "just now",
+  "timeMinutesAgo": "{count}m ago",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count}h ago",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count}d ago",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Waiting for host...",
+  "liveQuizJoinRequestSent": "Join request sent",
+  "liveQuizJoinRequestFailed": "Failed to request join: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Host controls",
+  "liveQuizSpectatorModeTitle": "Spectator mode",
+  "liveQuizHostControlsSubtitle": "Rounds auto-advance when everyone answers or time runs out.",
+  "liveQuizSpectatorModeSubtitle": "Watch questions and the live leaderboard. You can't answer.",
+  "liveQuizQuestionCounter": "Question {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Request Sent",
+  "liveQuizRequestToJoin": "Request to Join",
+  "liveQuizSpectatorFooter": "You're watching live. Enjoy the questions and leaderboard.",
+  "circleNotFound": "Circle not found",
+  "resultsRematchStartFailed": "Failed to start rematch: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Match Results",
+  "resultsNiceWork": "Nice work, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1st Place",
+  "resultsPlaceSecond": "2nd Place",
+  "resultsPlaceThird": "3rd Place",
+  "resultsPlaceNth": "Place {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "Out of {players} players",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Champion! You dominated this circle.",
+  "resultsHighlightGreatAccuracy": "Great accuracy. You're close to the top!",
+  "resultsHighlightKeepGoing": "Keep going - consistency beats speed.",
+  "resultsLeaderboardTitle": "Leaderboard",
+  "resultsPlayersCount": "{count} players",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Back to Circles",
+  "resultsRematch": "Rematch",
+  "resultsPlayAgain": "Play Again",
+  "leaderboardGlobalTitle": "Global Ranking",
+  "leaderboardEmpty": "No rankings yet.",
+  "aboutTitle": "Info",
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA is a gamified language learning platform designed to make mastering new languages engaging and social. Compete in circles, practice solo, and track your progress.",
+  "aboutTerms": "Terms of Service",
+  "aboutPrivacy": "Privacy Policy",
+  "aboutOpenSource": "Open Source Licenses",
+  "addFriendTitle": "Add Friend",
+  "addFriendFindByUsername": "Find by username",
+  "addFriendUsernameHint": "Type username...",
+  "addFriendTip": "Tip: later we can support QR code + friend ID.",
+  "addFriendSending": "Sending...",
+  "addFriendSendRequest": "Send Request",
+  "addFriendUserNotFound": "User @{username} not found",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Action failed or already sent: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Friends",
+  "searchFriendsHint": "Search friends...",
+  "somaLearnerSubtitle": "Soma Learner",
+  "friendRequestLabel": "Request",
+  "friendRequestSentLabel": "Request sent",
+  "friendIncomingRequestLabel": "Incoming Request",
+  "friendRequestsSection": "Requests",
+  "friendPendingSection": "Pending",
+  "friendAllSection": "All Friends",
+  "friendsEmptyState": "No friends yet. Add your first friend!",
+  "friendsEmptyShort": "No friends yet.",
+  "noMatchForQuery": "No match for \"{query}\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Inbox",
+  "searchChatsHint": "Search chats...",
+  "inboxEmptyState": "No conversations yet. Start chatting with a friend!",
+  "newMessageTitle": "New message",
+  "chatCallLater": "Voice call later (Circle voice is next)",
+  "errorWithDetails": "Error: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Say hi to {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Message...",
+  "notificationsTitle": "Notificări",
+  "notificationsTabAll": "All",
+  "notificationsTabCourses": "Courses",
+  "notificationsTabSocial": "Social",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "System",
+  "notificationsEmpty": "Nu există notificări încă",
+  "notificationsDeleted": "Notification deleted",
+  "notificationTitleFallback": "Notification",
+  "notificationTypeCourse": "Course",
+  "notificationTypeSocial": "Social",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "System",
+  "notificationsFriendAccepted": "Friend request accepted",
+  "notificationsFriendAcceptFailed": "Couldn't accept friend request: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Friend request declined",
+  "notificationsFriendDeclineFailed": "Couldn't decline friend request: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Nu s-a putut alătura Cercului: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Se deschide",
+  "notificationsOpened": "Deschis",
+  "notificationsActionMessage": "Notificare {action}",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Setări",
+  "settingsSectionAccount": "Cont",
+  "settingsEditProfile": "Editează Profil",
+  "settingsPrivacy": "Confidențialitate",
+  "settingsSecurity": "Securitate",
+  "settingsSectionGameplay": "Joc",
+  "settingsShowTranslationLine": "Arată Pasajul Tradus",
+  "settingsShowReadingLine": "Arată Pasajul de Citire (Pinyin/Romanji)",
+  "settingsDefaultTimerPerQuestion": "Timp per Întrebare",
+  "settingsMatchDifficulty": "Dificultate Meci",
+  "settingsMatchDifficultyAdaptive": "Adaptiv",
+  "settingsSectionSoundFeel": "Sunet & Simț",
+  "settingsMusic": "Muzică",
+  "settingsSoundEffects": "Efecte Sonore",
+  "settingsHaptics": "Vibrații",
+  "settingsSectionNotifications": "Notificări",
+  "settingsPushNotifications": "Notificări Push",
+  "settingsDailyReminder": "Memento Zilnic",
+  "settingsSectionAppearance": "Aspect",
+  "settingsTheme": "Temă",
+  "settingsUiLanguage": "Limbă interfață",
+  "settingsSectionAbout": "Despre",
+  "settingsVersion": "Versiune",
+  "settingsTermsPrivacy": "Termeni & Confidențialitate",
+  "settingsSupport": "Suport",
+  "settingsLogout": "Deconectare",
+  "themeSystem": "Sistem",
+  "themeDark": "Întunecat",
+  "themeLight": "Luminos",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "فارسی",
+  "languagePunjabi": "ਪੰਜਾਬੀ",
+  "languageTamil": "தமிழ்",
+  "languageTelugu": "తెలుగు",
+  "languageSwahili": "Kiswahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Profil Actualizat",
+  "editProfileTitle": "Editează Profil",
+  "editProfilePhotoLabel": "Poză de Profil",
+  "editProfilePhotoSubtitle": "Selector Avatar Supabase Storage disponibil în curând",
+  "editProfileChangePhoto": "Schimbă",
+  "editProfileAvatarUploadSoon": "Încărcare Avatar în curând",
+  "editProfileDisplayNameLabel": "Nume Afișat",
+  "editProfileDisplayNameHint": "Numele tău",
+  "editProfileDisplayNameRequired": "Te rog introdu numele tău",
+  "editProfileDisplayNameTooShort": "Prea scurt",
+  "editProfileUsernameLabel": "Nume Utilizator",
+  "editProfileUsernameHint": "learner_ali",
+  "editProfileUsernameRequired": "Te rog introdu un nume de utilizator",
+  "editProfileUsernameTooShort": "Minim 3 caractere",
+  "editProfileUsernameInvalid": "Doar litere, cifre, _",
+  "editProfileBioLabel": "Bio",
+  "editProfileBioHint": "O scurtă descriere despre tine...",
+  "editProfileBioTooLong": "Maxim 120 caractere",
+  "editProfileLocationLabel": "Locație",
+  "editProfileLocationHint": "Oraș / Țară",
+  "editProfileDailyGoalTitle": "Obiectiv Zilnic",
+  "editProfileDailyGoalSubtitle": "Alege câte minute vrei să înveți pe zi",
+  "securityTitle": "Securitate",
+  "securitySectionPassword": "Parolă",
+  "securityChangePasswordTitle": "Schimbă Parola",
+  "securityChangePasswordSubtitle": "Actualizează-ți parola periodic",
+  "securitySectionTwoFactor": "Autentificare în Doi Pași",
+  "securityEnable2faTitle": "Activează 2FA",
+  "securityEnable2faSubtitle": "Securitate suplimentară la autentificare",
+  "securitySectionAppLock": "Blocare Aplicație",
+  "securityBiometricTitle": "Deblocare Biometrică",
+  "securityBiometricSubtitle": "Folosește FaceID/TouchID pentru a debloca SOMA",
+  "securityAppLockTitle": "Blocare Aplicație",
+  "securityAppLockSubtitle": "Blochează SOMA când pleci",
+  "securitySectionSessions": "Sesiuni Active",
+  "securityNoSessions": "Nu există sesiuni active",
+  "securityThisDevice": "Acest Dispozitiv",
+  "securityDevice": "Dispozitiv",
+  "securityActiveLabel": "Activ",
+  "securitySignInToEnable2fa": "Conectează-te pentru a activa 2FA",
+  "securityEnable2faFailed": "Activare 2FA eșuată: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "Dezactivare 2FA eșuată: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "Configurare 2FA",
+  "securitySecretKeyLabel": "Cheie Secretă",
+  "securityCodeHint": "Cod din 6 cifre",
+  "security2faEnabled": "2FA Activat",
+  "securityVerifyCodeFailed": "Verificare cod eșuată: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Se verifică...",
+  "securityVerify": "Verifică",
+  "securityCurrentPasswordHint": "Parola Curentă",
+  "securityNewPasswordHint": "Parola Nouă (min 8 caractere)",
+  "securityConfirmPasswordHint": "Confirmă parola nouă",
+  "securitySignInToChangePassword": "Conectează-te pentru a schimba parola",
+  "securityEnterCurrentPassword": "Introdu parola curentă",
+  "securityPasswordMinLength": "Parola nouă trebuie să aibă minim 8 caractere",
+  "securityPasswordsDoNotMatch": "Parolele nu se potrivesc",
+  "securityPasswordUpdated": "Parolă actualizată",
+  "securityPasswordUpdateFailed": "Actualizare parolă eșuată: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Blocare Automată După",
+  "privacyTitle": "Confidențialitate",
+  "privacySectionVisibility": "Vizibilitate",
+  "privacyProfileVisibilityTitle": "Vizibilitate Profil",
+  "privacyVisibilityPublic": "Public",
+  "privacyVisibilityFriends": "Prieteni",
+  "privacyVisibilityPrivate": "Privat",
+  "privacyVisibilityPublicSubtitle": "Oricine îți poate vedea profilul",
+  "privacyVisibilityFriendsSubtitle": "Doar prietenii îți pot vedea profilul",
+  "privacyVisibilityPrivateSubtitle": "Doar tu îți poți vedea profilul",
+  "privacySectionActivity": "Activitate",
+  "privacyShowOnlineTitle": "Arată Statut Online",
+  "privacyShowOnlineSubtitle": "Permite jucătorilor să vadă când ești online",
+  "privacyShowActivityTitle": "Arată Activitate Învățare",
+  "privacyShowActivitySubtitle": "Arată seria, XP și progresul recent",
+  "privacySectionSocial": "Social",
+  "privacyAllowRequestsTitle": "Permite Cereri de Prietenie",
+  "privacyAllowRequestsSubtitle": "Permite oamenilor să trimită cereri de prietenie",
+  "privacyWhoCanDmTitle": "Cine poate trimite Mesaje",
+  "privacyDmEveryone": "Oricine",
+  "privacyDmFriends": "Prieteni",
+  "privacyDmNoOne": "Nimeni",
+  "privacyDmEveryoneSubtitle": "Oricine îți poate trimite mesaje",
+  "privacyDmFriendsSubtitle": "Doar prietenii îți pot trimite mesaje",
+  "privacyDmNoOneSubtitle": "Nimeni nu îți poate trimite mesaje",
+  "privacySectionBlockedUsers": "Utilizatori Blocați",
+  "privacyBlockedUsersComingSoon": "Gestionarea utilizatorilor blocați în curând",
+  "privacySectionDataControls": "Control Date",
+  "privacyExportDataTitle": "Exportă Datele Mele",
+  "privacyExportDataSubtitle": "Descarcă activitatea și cursurile tale",
+  "privacyExportInfoTitle": "Export Date",
+  "privacyExportInfoBody": "Altele: Generează un export JSON/CSV și trimite pe email sau descarcă direct",
+  "privacyDeleteAccountTitle": "Șterge Cont",
+  "privacyDeleteAccountSubtitle": "Aceasta va șterge permanent contul și datele tale",
+  "privacyDeleteConfirmTitle": "Ștergi Contul?",
+  "privacyDeleteConfirmBody": "Aceasta nu poate fi anulată. Profilul, cursurile, prietenii și mesajele vor fi șterse",
+  "privacyDeleteComingSoon": "Ștergerea va fi integrată cu Supabase mai târziu",
+  "soloLabel": "Solo",
+  "soloResultsCompletedTitle": "Sesiune Solo Completă",
+  "soloResultsFeedbackElite": "Performanță de elită - menține seria vie",
+  "soloResultsFeedbackStrong": "Treabă bună - îmbunătățire rapidă",
+  "soloResultsFeedbackProgress": "Progres bun - revizuiește greșelile și încearcă din nou",
+  "soloResultsFeedbackTryAgain": "Fără presiune - încearcă din nou cu mai puține întrebări și concentrează-te",
+  "soloResultsPerfectScore": "Scor perfect! Fără greșeli de revizuit",
+  "soloResultsReviewPrompt": "Revizuiește greșelile pentru a învăța mai repede. Răspunsurile tale sunt mai jos",
+  "soloResultsReviewMistakes": "Revizuiește Greșeli ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Neautentificat",
+  "genericUser": "Utilizator",
+  "loading": "Se încarcă...",
+  "edit": "Editează",
+  "send": "Trimite",
+  "join": "Alătură-te",
+  "leave": "Părăsește",
+  "ready": "Gata",
+  "levelBeginner": "Începător",
+  "levelIntermediate": "Intermediar",
+  "levelAdvanced": "Avansat",
+  "questionsShort": "{count} Întrebări",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} Secunde",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Toate Cursurile",
+  "circlesAllModes": "Toate Modurile",
+  "circlesAllLevels": "Toate Nivelurile",
+  "circlesAddNewCourse": "Adaugă Curs Nou",
+  "circlesCoursesTitle": "Cursuri",
+  "circlesModeTitle": "Mod",
+  "circlesLevelTitle": "Nivel",
+  "circlesNoActiveForFilters": "Niciun Cerc activ cu aceste filtre",
+  "circlesUnknownRoom": "Cameră Necunoscută",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Creează Cerc",
+  "circlesCircleName": "Nume Cerc",
+  "circlesEnterName": "Introdu nume",
+  "circlesLanguages": "Limbi",
+  "circlesRoomSetup": "Configurare Cameră",
+  "circlesPlayers": "Jucători",
+  "circlesEmptySlot": "Loc Gol",
+  "circlesPlayersRange": "1-5 Jucători",
+  "circlesQuestions": "Întrebări",
+  "circlesQuestionsSubtitle": "Cantitate întrebări",
+  "circlesTimePerQuestion": "Timp per Întrebare",
+  "circlesSecondsPerQuestion": "Sec/Întrebare",
+  "circlesAdvanced": "Avansat",
+  "circlesAllowSpectators": "Permite Spectatori",
+  "circlesAllowSpectatorsSubtitle": "Permite altora să privească fără să joace",
+  "circlesLiveVoiceChat": "Chat Vocal Live",
+  "circlesLiveVoiceChatSubtitle": "Activează interacțiunea vocală în timpul meciului",
+  "circlesLiveTextChat": "Chat Text Live",
+  "circlesLiveTextChatSubtitle": "Activează mesageria în timpul meciului",
+  "circlesCreatedSuccess": "Cerc creat",
+  "circlesCreateError": "Creare Cerc eșuată: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Sfat: Poți invita prieteni după creare",
+  "circlesJoinError": "Nu s-a putut intra în Cerc: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Lobby Cerc",
+  "circlesCodeLine": "Cod: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Setări Meci",
+  "circlesLevelWithValue": "Nivel {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Dificultate",
+  "circlesPerQuestionShort": "Per întrebare",
+  "circlesInvite": "Invită",
+  "circlesCopyId": "Copiază ID",
+  "circlesCopiedId": "ID copiat",
+  "circlesMatchInProgress": "Meci în desfășurare",
+  "circlesSpectatorQueuedBody": "Meci în desfășurare. Vei intra ca spectator",
+  "circlesHostStartWhenReady": "Gazda va începe când toată lumea e gata",
+  "circlesSpectators": "Spectatori",
+  "circlesSpectator": "Spectator",
+  "circlesSpectatorCanWatch": "Spectatorii pot privi live",
+  "circlesJoinRequests": "Cereri de Alăturare",
+  "circlesAcceptSpectatorsHint": "Acceptă spectatori înainte de a începe meciul",
+  "circlesStartGame": "Începe Joc",
+  "circlesWaitingForPlayers": "Se așteaptă jucători",
+  "circlesLeaveCircle": "Părăsește Cerc",
+  "circlesRequestSent": "Cerere trimisă",
+  "circlesRequestToJoin": "Cere să te alături",
+  "circlesWatchLive": "Privește Live",
+  "circlesPlayerTip": "Apasă 'Gata' când ești pregătit. Gazda va începe meciul",
+  "circlesSpectatorTip": "Ești spectator. Vezi acțiunea în timp real când gazda începe",
+  "circlesHostControls": "Control Gazdă",
+  "circlesTransferHostFailed": "Transfer gazdă eșuat: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Închidere Cerc eșuată: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "Utilizatorul @{username} nu a fost găsit",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Utilizator invalid",
+  "circlesCantInviteSelf": "Nu te poți invita singur",
+  "circlesUserAlreadyInCircle": "@{username} este deja în Cerc",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Gazdă",
+  "circlesDefaultTitle": "Cerc",
+  "circlesInviteByUsername": "După Nume Utilizator",
+  "circlesInviteSent": "Invitație trimisă către @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Trimitere invitație eșuată: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Cerere de alăturare trimisă",
+  "circlesJoinRequestFailed": "Cerere eșuată: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Cerc plin",
+  "circlesSpectatorAdded": "Spectator adăugat",
+  "circlesApproveFailed": "Aprobare eșuată: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Cerere refuzată",
+  "circlesDeclineFailed": "Refuz eșuat: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Participant",
+  "circlesLeavePromptTitle": "Părăsești Cercul?",
+  "circlesLeavePromptTransfer": "Transferă gazda înainte de a pleca",
+  "circlesLeavePromptEndOnly": "Închide Cercul și pleacă",
+  "circlesTransferHost": "Transferă Gazdă",
+  "circlesEndCircle": "Închide Cerc",
+  "circlesTransferHostTitle": "Transfer Gazdă",
+  "circlesShareId": "ID Cerc: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

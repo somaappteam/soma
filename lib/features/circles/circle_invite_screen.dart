@@ -3,7 +3,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/responsive.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../data/auth_repository.dart';
 import '../../data/circles_repository.dart';
 import '../auth/sign_in_screen.dart';
@@ -78,8 +78,7 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
     final title = widget.circleTitle ?? l10n.circleInviteTitle;
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: ResponsiveFrame(
             maxWidth: 420,
             child: Padding(
@@ -202,7 +201,6 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
               ),
             ),
           ),
-        ),
       ),
     );
   }

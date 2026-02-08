@@ -4,7 +4,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 
 import '../../models/fill_blank_question.dart';
 import '../../core/theme/motion.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/glass.dart';
 
@@ -153,8 +153,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
     final progress = (_secondsLeft / _secondsPerQuestion).clamp(0.0, 1.0);
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
             child: Column(
@@ -419,8 +418,7 @@ if (q.hint != null) ...[
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

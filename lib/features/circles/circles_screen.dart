@@ -6,13 +6,13 @@ import '../social/friends_screen.dart';
 import '../social/inbox_screen.dart';
 import 'create_circle_screen.dart';
 import 'circle_lobby_screen.dart';
+import '../../core/theme/tokens.dart';
 import '../solo/add_course_screen.dart';
 import '../../data/circles_repository.dart';
 import '../../data/courses_repository.dart';
 import '../../data/languages.dart';
 import '../../models/solo_course.dart';
 import '../../core/widgets/responsive.dart';
-import '../../core/widgets/soma_background.dart';
 
 class CirclesScreen extends StatefulWidget {
   const CirclesScreen({super.key});
@@ -43,7 +43,6 @@ class _CirclesScreenState extends State<CirclesScreen> {
   }
 
   Future<void> _cleanupGhostCircles() async {
-    // Fire and forget cleanup
     try {
       await circlesRepository.cleanupGhostCircles();
     } catch (e) {
@@ -229,170 +228,167 @@ class _CirclesScreenState extends State<CirclesScreen> {
       }
     }
 
-    return SomaBackground(
-      child: SafeArea(
-        child: ResponsiveFrame(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-            child: Column(
-              children: [
-                // Header
-                Row(
+    return SafeArea(
+      child: ResponsiveFrame(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+          child: Column(
+            children: [
+              // Header
+              Row(
+                children: [
+                  Text(
+                    l10n.navCircles,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                        ),
+                  ),
+                  const Spacer(),
+                  _SmallIconButton(
+                    icon: Icons.people_rounded,
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FriendsScreen())),
+                  ),
+                  const SizedBox(width: 10),
+                  _SmallIconButton(
+                    icon: Icons.mail_rounded,
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const InboxScreen())),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              // Filters row
+              Glass(
+                radius: BorderRadius.circular(18),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Row(
                   children: [
-                    Text(
-                      l10n.navCircles,
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                          ),
-                    ),
-                    const Spacer(),
-                    _SmallIconButton(
-                      icon: Icons.people_rounded,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FriendsScreen())),
+                    _FilterChip(
+                      label: _courseLabel(courseOptions, l10n),
+                      icon: Icons.translate_rounded,
+                      onTap: () => _selectCourseFilter(courseOptions),
                     ),
                     const SizedBox(width: 10),
-                    _SmallIconButton(
-                      icon: Icons.mail_rounded,
-                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const InboxScreen())),
+                    _FilterChip(
+                      label: _modeLabel(l10n),
+                      icon: Icons.grid_view_rounded,
+                      onTap: _selectModeFilter,
+                    ),
+                    const SizedBox(width: 10),
+                    _FilterChip(
+                      label: _levelLabel(l10n),
+                      icon: Icons.leaderboard_rounded,
+                      onTap: _selectLevelFilter,
                     ),
                   ],
                 ),
+              ),
 
-                const SizedBox(height: 14),
+              const SizedBox(height: 14),
 
-                // Filters row
-                Glass(
-                  radius: BorderRadius.circular(18),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  child: Row(
-                    children: [
-                      _FilterChip(
-                        label: _courseLabel(courseOptions, l10n),
-                        icon: Icons.translate_rounded,
-                        onTap: () => _selectCourseFilter(courseOptions),
-                      ),
-                      const SizedBox(width: 10),
-                      _FilterChip(
-                        label: _modeLabel(l10n),
-                        icon: Icons.grid_view_rounded,
-                        onTap: _selectModeFilter,
-                      ),
-                      const SizedBox(width: 10),
-                      _FilterChip(
-                        label: _levelLabel(l10n),
-                        icon: Icons.leaderboard_rounded,
-                        onTap: _selectLevelFilter,
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                // Active circles list
-                Expanded(
-                  child: StreamBuilder<List<Map<String, dynamic>>>(
-                    stream: circlesRepository.getOpenCircles(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(
-                          child: CircularProgressIndicator(color: Color(0xFF2AFADF)),
-                        );
-                      }
-                      
-                      final rooms = snapshot.data!;
-                      final filtered = rooms.where((data) {
-                        if (!_matchesMode(data['mode']?.toString())) return false;
-                        if (!_matchesLevel(data['level']?.toString())) return false;
-                        if (selectedCourseOption != null && !_matchesCourse(data, selectedCourseOption)) return false;
-                        return true;
-                      }).toList();
-
-                      if (filtered.isEmpty) {
-                        return Center(
-                          child: Text(
-                            l10n.circlesNoActiveForFilters,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.6),
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        );
-                      }
-
-                      return ListView.separated(
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: filtered.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 14),
-                        itemBuilder: (context, i) {
-                          final data = filtered[i];
-                          // Map Data to Model
-                          final fromLabel = langLabel(data['from_lang']?.toString() ?? '?');
-                          final toLabel = langLabel(data['to_lang']?.toString() ?? '?');
-                          final room = CircleRoom(
-                            id: data['id'],
-                            title: data['name'] ?? l10n.circlesUnknownRoom,
-                            fromLang: fromLabel,
-                            toLang: toLabel,
-                            level: data['level'] ?? 'A',
-                            mode: data['mode'] ?? 'Vocabulary',
-                            players: 0, // We would need a join/count for this
-                            maxPlayers: data['max_players'] ?? 5,
-                            spectators: 0,
-                            questions: data['questions_count'] ?? 15,
-                            timePerQ: data['time_per_q'] ?? 10,
-                            isLive: true,
-                          );
-
-                          return CircleCard(
-                            room: room,
-                            onJoin: () async {
-                              try {
-                                final status = data['status']?.toString() ?? 'lobby';
-                                final role = status == 'active' ? 'spectator' : 'player';
-                                await circlesRepository.joinCircle(room.id, role: role);
-                                if (!context.mounted) return;
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => CircleLobbyScreen(circleId: room.id),
-                                  ),
-                                );
-                              } catch (e) {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(l10n.circlesJoinError(e.toString())), backgroundColor: Colors.redAccent),
-                                  );
-                                }
-                              }
-                            },
-                          );
-                        },
+              // Active circles list
+              Expanded(
+                child: StreamBuilder<List<Map<String, dynamic>>>(
+                  stream: circlesRepository.getOpenCircles(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Center(
+                        child: CircularProgressIndicator(color: Color(0xFF2AFADF)),
                       );
                     }
-                  ),
-                ),
+                    
+                    final rooms = snapshot.data!;
+                    final filtered = rooms.where((data) {
+                      if (!_matchesMode(data['mode']?.toString())) return false;
+                      if (!_matchesLevel(data['level']?.toString())) return false;
+                      if (selectedCourseOption != null && !_matchesCourse(data, selectedCourseOption)) return false;
+                      return true;
+                    }).toList();
 
-                // Create Circle CTA
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: NeonButton(
-                    label: l10n.circlesCreateCircle,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CreateCircleScreen(),
+                    if (filtered.isEmpty) {
+                      return Center(
+                        child: Text(
+                          l10n.circlesNoActiveForFilters,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.6),
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       );
-                    },
-                  ),
+                    }
+
+                    return ListView.separated(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: filtered.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 14),
+                      itemBuilder: (context, i) {
+                        final data = filtered[i];
+                        final fromLabel = langLabel(data['from_lang']?.toString() ?? '?');
+                        final toLabel = langLabel(data['to_lang']?.toString() ?? '?');
+                        final room = CircleRoom(
+                          id: data['id'],
+                          title: data['name'] ?? l10n.circlesUnknownRoom,
+                          fromLang: fromLabel,
+                          toLang: toLabel,
+                          level: data['level'] ?? 'A',
+                          mode: data['mode'] ?? 'Vocabulary',
+                          players: 0,
+                          maxPlayers: data['max_players'] ?? 5,
+                          spectators: 0,
+                          questions: data['questions_count'] ?? 15,
+                          timePerQ: data['time_per_q'] ?? 10,
+                          isLive: true,
+                        );
+
+                        return CircleCard(
+                          room: room,
+                          onJoin: () async {
+                            try {
+                              final status = data['status']?.toString() ?? 'lobby';
+                              final role = status == 'active' ? 'spectator' : 'player';
+                              await circlesRepository.joinCircle(room.id, role: role);
+                              if (!context.mounted) return;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => CircleLobbyScreen(circleId: room.id),
+                                ),
+                              );
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(l10n.circlesJoinError(e.toString())), backgroundColor: Colors.redAccent),
+                                );
+                              }
+                            }
+                          },
+                        );
+                      },
+                    );
+                  }
                 ),
-              ],
-            ),
+              ),
+
+              // Create Circle CTA
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: NeonButton(
+                  label: l10n.circlesCreateCircle,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CreateCircleScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -448,10 +444,10 @@ class _CourseOption {
   });
 
   factory _CourseOption.fromCourse(SoloCourse course) {
-    final parts = course.subtitle.split("→");
+    final parts = course.subtitle.split("?");
     final fromName = parts.isNotEmpty ? parts.first.trim() : course.subtitle.trim();
     final toName = parts.length > 1 ? parts[1].trim() : "";
-    final label = toName.isEmpty ? fromName : "$fromName → $toName";
+    final label = toName.isEmpty ? fromName : "$fromName ? $toName";
     return _CourseOption(
       id: course.id,
       label: label,
@@ -798,9 +794,9 @@ class _LiveDot extends StatelessWidget {
         boxShadow: live
             ? [
                 BoxShadow(
-                  color: const Color(0xFF2AFADF).withValues(alpha: 0.55),
-                  blurRadius: 14,
-                  spreadRadius: 2,
+                  color: const Color(0xFF2AFADF).withValues(alpha: 0.25),
+                  blurRadius: 8,
+                  spreadRadius: 0,
                 ),
               ]
             : null,
@@ -856,14 +852,7 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = filled
-        ? const LinearGradient(
-            begin: Alignment.centerLeft,
-            end: Alignment.centerRight,
-            stops: [0, 0.5, 1],
-            colors: [Color(0xFF2AFADF), Color(0xFF7C7CFF), Color(0xFFFF4ECD)],
-          )
-        : null;
+    final bg = filled ? T.neonGradient : null;
 
     return InkWell(
       borderRadius: BorderRadius.circular(18),
@@ -878,9 +867,9 @@ class _ActionButton extends StatelessWidget {
           boxShadow: filled
               ? [
                   BoxShadow(
-                    color: const Color(0xFF7C7CFF).withValues(alpha: 0.35),
-                    blurRadius: 18,
-                    spreadRadius: 2,
+                    color: T.neonA.withValues(alpha: 0.15),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
                   ),
                 ]
               : null,

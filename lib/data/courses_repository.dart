@@ -18,17 +18,6 @@ class CoursesRepository {
 
   String? get currentUserId => _supabase.auth.currentUser?.id;
 
-  // Static definition of courses supported by the app content
-  // Static definition of courses supported by the app content
-  final List<SoloCourse> _fallbackCourses = [
-    const SoloCourse(
-      id: "solo_en_es",
-      title: "Speed Vocabulary",
-      subtitle: "English → Spanish",
-      iconUrl: "",
-    ),
-  ];
-
   final List<SoloCourse> _customCourses = [];
   final Set<String> _removedCourseIds = {};
 

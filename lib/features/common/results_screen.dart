@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/staggered_in.dart';
+import '../../core/theme/tokens.dart';
 import '../../models/leaderboard_player.dart';
 import '../../data/circle_voice_service.dart';
 import '../../data/profile_store.dart';
@@ -230,8 +231,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final pct = (accuracy * 100).round();
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             child: ListView(
@@ -531,7 +531,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 }
@@ -598,10 +597,8 @@ class _AccuracyBar extends StatelessWidget {
               child: FractionallySizedBox(
                 widthFactor: clamped / 100,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xFF35E7FF), Color(0xFF9A5BFF), Color(0xFFFF49D7)],
-                    ),
+                  decoration: BoxDecoration(
+                    gradient: T.neonGradient,
                   ),
                 ),
               ),
@@ -898,11 +895,9 @@ class _RowAvatarBubble extends StatelessWidget {
     return Container(
       width: 36,
       height: 36,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [Color(0xFF2AFADF), Color(0xFF7C7CFF), Color(0xFFFF4ECD)],
-        ),
+        gradient: T.neonGradient,
       ),
       child: Center(
         child: Text(
@@ -942,9 +937,9 @@ class _RowVoiceBadge extends StatelessWidget {
             boxShadow: speaking
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF2AFADF).withValues(alpha: 0.45),
-                      blurRadius: 12,
-                      spreadRadius: 1,
+                      color: const Color(0xFF2AFADF).withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      spreadRadius: 0,
                     ),
                   ]
                 : null,

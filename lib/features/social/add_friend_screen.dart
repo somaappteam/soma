@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../data/social_repository.dart';
@@ -80,8 +80,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
             child: Column(
@@ -113,7 +112,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                       Text(
                         "Find by username",
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.75),
+                          color: Colors.white.withValues(alpha: 0.75),
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -130,7 +129,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                           decoration: InputDecoration(
                             hintText: "Type username…",
                             hintStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.45)),
+                                color: Colors.white.withValues(alpha: 0.45)),
                             border: InputBorder.none,
                           ),
                         ),
@@ -139,7 +138,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                       Text(
                         "Tip: later we can support QR code + friend ID.",
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.55),
+                          color: Colors.white.withValues(alpha: 0.55),
                           fontWeight: FontWeight.w700,
                           fontSize: 12,
                         ),
@@ -155,7 +154,6 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
               ],
             ),
           ),
-        ),
       ),
     );
   }
@@ -174,7 +172,7 @@ class _IconGlass extends StatelessWidget {
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withOpacity(0.92)),
+        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92)),
       ),
     );
   }

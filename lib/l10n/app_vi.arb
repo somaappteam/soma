@@ -1,0 +1,781 @@
+{
+  "@@locale": "vi",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Học. Thi đấu. Thống trị",
+  "signUp": "Đăng ký",
+  "signIn": "Đăng nhập",
+  "skipForNow": "Bỏ qua bây giờ",
+  "authFillAllFields": "Vui lòng điền đầy đủ các trường",
+  "authError": "Lỗi: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "Email",
+  "authPassword": "Mật khẩu",
+  "authUsername": "Tên người dùng",
+  "authContinue": "Tiếp tục",
+  "authSigningIn": "Đang đăng nhập...",
+  "authCreateAccount": "Tạo tài khoản",
+  "authCreating": "Đang tạo...",
+  "authNeedAccount": "Chưa có tài khoản? ",
+  "authHaveAccount": "Đã có tài khoản? ",
+  "dialogAuthRequiredTitle": "Đăng nhập để truy cập Circles",
+  "dialogAuthRequiredBody": "Circles là phòng nhiều người chơi. Tạo tài khoản để tham gia trận đấu trực tiếp, mời bạn bè và lưu tiến độ.",
+  "notNow": "Không phải bây giờ",
+  "navHome": "Trang chủ",
+  "navCircles": "Circles",
+  "navProfile": "Hồ sơ",
+  "removeCourseTitle": "Xóa khóa học?",
+  "removeCourseBody": "{course} sẽ bị xóa khỏi danh sách của bạn",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Hủy",
+  "remove": "Xóa",
+  "welcomeBack": "Chào mừng trở lại, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Chỉnh sửa khóa học",
+  "done": "Hoàn thành",
+  "noCoursesToEdit": "Không có khóa học để chỉnh sửa",
+  "addCourse": "Thêm khóa học",
+  "unknown": "Không rõ",
+  "iSpeak": "Tôi nói",
+  "iWantToLearn": "Tôi muốn học",
+  "chooseYourLanguage": "Chọn ngôn ngữ của bạn",
+  "chooseLearningLanguage": "Chọn ngôn ngữ học",
+  "chooseTwoDifferentLanguages": "Vui lòng chọn hai ngôn ngữ khác nhau",
+  "createCourse": "Tạo khóa học",
+  "soloCourseTitle": "Khóa học đơn",
+  "searchLanguage": "Tìm kiếm ngôn ngữ",
+  "noMatches": "Không có kết quả",
+  "chooseCourseType": "Chọn loại khóa học",
+  "soloStudyDescription": "Học một mình với các bài kiểm tra giống như Circles - nhưng không có phòng, trò chuyện, người xem hoặc tùy chọn chủ phòng",
+  "soloModeVocabulary": "Từ vựng",
+  "soloModeSentences": "Câu",
+  "soloModeReview": "Ôn tập",
+  "soloModeVocabularySubtitle": "Trắc nghiệm, nghĩa, từ đồng nghĩa, cách dùng",
+  "soloModeSentencesSubtitle": "Điền vào chỗ trống + dịch + đọc",
+  "soloModeReviewDescription": "Luyện tập những gì đã học: từ yếu, lỗi gần đây và ôn tập ngắt quãng",
+  "startReview": "Bắt đầu ôn tập",
+  "soloSetupTitle": "Thiết lập {mode}",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Độ khó",
+  "numberOfQuestions": "Số câu hỏi",
+  "timerPerQuestion": "Bộ đếm thời gian mỗi câu",
+  "noTimer": "Không có bộ đếm",
+  "start": "Bắt đầu",
+  "profileTitle": "Hồ sơ",
+  "profileSignInToMessage": "Đăng nhập để nhắn tin",
+  "profileThatsYourProfile": "Đây là hồ sơ của bạn",
+  "profileSignInToAddFriends": "Đăng nhập để thêm bạn bè",
+  "profileCantAddYourself": "Bạn không thể thêm chính mình",
+  "profileRequestSent": "Đã gửi yêu cầu đến @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Gửi yêu cầu thất bại",
+  "profileDefaultDisplayName": "Người dùng mới",
+  "profileDefaultBio": "Sẵn sàng học!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Khách",
+  "guestUsername": "khách",
+  "guestSessionLabel": "Phiên khách",
+  "unlockFullProfile": "Mở khóa hồ sơ đầy đủ",
+  "guestBenefitSync": "Đồng bộ tiến độ trên tất cả thiết bị",
+  "guestBenefitCircles": "Tham gia Circles và chơi trực tiếp",
+  "guestBenefitNotifications": "Nhận thông báo và yêu cầu kết bạn",
+  "progressStaysOnDevice": "Tiến độ được lưu trên thiết bị này cho đến khi bạn đăng nhập",
+  "profileGoalLabel": "Mục tiêu: {minutes} phút",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "Tiến độ XP",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Chiến thắng",
+  "profileStreak": "Chuỗi",
+  "profileFriendsTitle": "Bạn bè",
+  "profileViewAll": "Xem tất cả",
+  "profileAchievementsTitle": "Thành tích",
+  "profileNoAchievements": "Chưa có thành tích nào",
+  "profileRequested": "Đã gửi yêu cầu",
+  "profileSending": "Đang gửi...",
+  "profileAddFriend": "Thêm bạn",
+  "profileConnectTitle": "Kết nối",
+  "profileMessage": "Tin nhắn",
+  "profileSnapshot": "Ảnh chụp hồ sơ",
+  "profileLocationHidden": "Vị trí đã ẩn",
+  "profileBioHidden": "Tiểu sử đã ẩn",
+  "profileDailyGoal": "Mục tiêu {minutes} phút mỗi ngày",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Lời mời Circle",
+  "circleIdLabel": "ID Circle: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Đăng nhập để tham gia",
+  "joiningCircle": "Đang tham gia...",
+  "joinCircle": "Tham gia Circle",
+  "circleJoinedAsPlayer": "Đã tham gia với tư cách người chơi",
+  "circleJoinedAsSpectator": "Đã tham gia với tư cách người xem",
+  "accept": "Chấp nhận",
+  "decline": "Từ chối",
+  "open": "Mở",
+  "circleCountdownTitle": "Chuẩn bị",
+  "circleCountdownSubtitle": "Circle sắp bắt đầu...",
+  "userFallbackName": "Người dùng",
+  "micOff": "Tắt mic",
+  "micOn": "Bật mic",
+  "roleHost": "Chủ phòng",
+  "roleSpectator": "Người xem",
+  "tagHost": "CHỦ PHÒNG",
+  "tagYou": "BẠN",
+  "statusCorrect": "Đúng",
+  "statusWrong": "Sai",
+  "statusWaiting": "Chờ",
+  "statusNone": "-",
+  "pointsAbbrev": "điểm",
+  "pointsLabel": "Điểm",
+  "statCorrect": "Đúng",
+  "statAnswers": "câu trả lời",
+  "statTotal": "Tổng",
+  "statQuestions": "câu hỏi",
+  "statAccuracy": "Độ chính xác",
+  "statRate": "tỷ lệ",
+  "statRank": "Hạng",
+  "statPosition": "vị trí",
+  "statMode": "Chế độ",
+  "statType": "loại",
+  "next": "Tiếp theo",
+  "submit": "Gửi",
+  "continueLabel": "Tiếp tục",
+  "save": "Lưu",
+  "playAgain": "Chơi lại",
+  "backToCourse": "Quay lại khóa học",
+  "resultsTitle": "Kết quả",
+  "shareLater": "Chia sẻ sau",
+  "delete": "Xóa",
+  "ok": "OK",
+  "minutesShort": "{minutes} phút",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} ph",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} giờ",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} ngày",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "vừa xong",
+  "timeMinutesAgo": "{count} phút trước",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} giờ trước",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} ngày trước",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Đang chờ chủ phòng...",
+  "liveQuizJoinRequestSent": "Đã gửi yêu cầu tham gia",
+  "liveQuizJoinRequestFailed": "Gửi yêu cầu thất bại: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Điều khiển chủ phòng",
+  "liveQuizSpectatorModeTitle": "Chế độ người xem",
+  "liveQuizHostControlsSubtitle": "Vòng tự động tiếp tục khi mọi người trả lời hoặc hết giờ",
+  "liveQuizSpectatorModeSubtitle": "Xem câu hỏi và bảng xếp hạng trực tiếp. Bạn không thể trả lời",
+  "liveQuizQuestionCounter": "Câu hỏi {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Đã gửi yêu cầu",
+  "liveQuizRequestToJoin": "Yêu cầu tham gia",
+  "liveQuizSpectatorFooter": "Bạn đang xem trực tiếp. Thưởng thức câu hỏi và bảng xếp hạng",
+  "circleNotFound": "Không tìm thấy Circle",
+  "resultsRematchStartFailed": "Không thể bắt đầu trận tái đấu: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Kết quả trận đấu",
+  "resultsNiceWork": "Làm tốt lắm, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "Hạng 1",
+  "resultsPlaceSecond": "Hạng 2",
+  "resultsPlaceThird": "Hạng 3",
+  "resultsPlaceNth": "Hạng {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "Trong số {players} người chơi",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Vô địch! Bạn đã thống trị vòng này",
+  "resultsHighlightGreatAccuracy": "Độ chính xác tuyệt vời - bạn gần đỉnh rồi!",
+  "resultsHighlightKeepGoing": "Tiếp tục - sự kiên định thắng tốc độ",
+  "resultsLeaderboardTitle": "Bảng xếp hạng",
+  "resultsPlayersCount": "{count} người chơi",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Quay lại Circles",
+  "resultsRematch": "Tái đấu",
+  "resultsPlayAgain": "Chơi lại",
+  "leaderboardGlobalTitle": "Xếp hạng toàn cầu",
+  "leaderboardEmpty": "Chưa có xếp hạng",
+  "aboutTitle": "Về ứng dụng",
+  "aboutVersion": "Phiên bản {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA là nền tảng học ngôn ngữ trò chơi hóa giúp việc thành thạo ngôn ngữ mới trở nên thú vị và mang tính xã hội. Thi đấu trong Circles, luyện tập đơn, và theo dõi tiến độ của bạn.",
+  "aboutTerms": "Điều khoản sử dụng",
+  "aboutPrivacy": "Chính sách bảo mật",
+  "aboutOpenSource": "Giấy phép mã nguồn mở",
+  "addFriendTitle": "Thêm bạn",
+  "addFriendFindByUsername": "Tìm theo tên người dùng",
+  "addFriendUsernameHint": "Nhập tên người dùng...",
+  "addFriendTip": "Mẹo: hỗ trợ mã QR + ID bạn bè sẽ được thêm sau",
+  "addFriendSending": "Đang gửi...",
+  "addFriendSendRequest": "Gửi yêu cầu",
+  "addFriendUserNotFound": "Không tìm thấy người dùng @{username}",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Hành động thất bại hoặc đã gửi: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Bạn bè",
+  "searchFriendsHint": "Tìm kiếm bạn bè...",
+  "somaLearnerSubtitle": "Học viên Soma",
+  "friendRequestLabel": "Yêu cầu",
+  "friendRequestSentLabel": "Đã gửi yêu cầu",
+  "friendIncomingRequestLabel": "Yêu cầu đến",
+  "friendRequestsSection": "Yêu cầu",
+  "friendPendingSection": "Đang chờ",
+  "friendAllSection": "Tất cả bạn bè",
+  "friendsEmptyState": "Chưa có bạn bè. Thêm bạn đầu tiên của bạn!",
+  "friendsEmptyShort": "Chưa có bạn bè",
+  "noMatchForQuery": "Không có kết quả cho \\\"{query}\\\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Hộp thư",
+  "searchChatsHint": "Tìm kiếm trò chuyện...",
+  "inboxEmptyState": "Chưa có cuộc trò chuyện nào. Bắt đầu trò chuyện với bạn bè!",
+  "newMessageTitle": "Tin nhắn mới",
+  "chatCallLater": "Gọi thoại sau (Circle voice tiếp theo)",
+  "errorWithDetails": "Lỗi: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Chào {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Tin nhắn...",
+  "notificationsTitle": "Thông báo",
+  "notificationsTabAll": "Tất cả",
+  "notificationsTabCourses": "Khóa học",
+  "notificationsTabSocial": "Xã hội",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "Hệ thống",
+  "notificationsEmpty": "Không có thông báo",
+  "notificationsDeleted": "Đã xóa thông báo",
+  "notificationTitleFallback": "Thông báo",
+  "notificationTypeCourse": "Khóa học",
+  "notificationTypeSocial": "Xã hội",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "Hệ thống",
+  "notificationsFriendAccepted": "Đã chấp nhận yêu cầu kết bạn",
+  "notificationsFriendAcceptFailed": "Chấp nhận yêu cầu kết bạn thất bại: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Đã từ chối yêu cầu kết bạn",
+  "notificationsFriendDeclineFailed": "Từ chối yêu cầu kết bạn thất bại: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Tham gia Circle thất bại: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Đang mở",
+  "notificationsOpened": "Đã mở",
+  "notificationsActionMessage": "{action} thông báo",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Cài đặt",
+  "settingsSectionAccount": "Tài khoản",
+  "settingsEditProfile": "Chỉnh sửa hồ sơ",
+  "settingsPrivacy": "Quyền riêng tư",
+  "settingsSecurity": "Bảo mật",
+  "settingsSectionGameplay": "Trò chơi",
+  "settingsShowTranslationLine": "Hiển thị dòng dịch",
+  "settingsShowReadingLine": "Hiển thị cách đọc (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "Bộ đếm mặc định mỗi câu",
+  "settingsMatchDifficulty": "Độ khó trận đấu",
+  "settingsMatchDifficultyAdaptive": "Thích ứng",
+  "settingsSectionSoundFeel": "Âm thanh và cảm giác",
+  "settingsMusic": "Nhạc",
+  "settingsSoundEffects": "Hiệu ứng âm thanh",
+  "settingsHaptics": "Rung",
+  "settingsSectionNotifications": "Thông báo",
+  "settingsPushNotifications": "Thông báo đẩy",
+  "settingsDailyReminder": "Nhắc nhở hàng ngày",
+  "settingsSectionAppearance": "Giao diện",
+  "settingsTheme": "Chủ đề",
+  "settingsUiLanguage": "Ngôn ngữ giao diện",
+  "settingsSectionAbout": "Giới thiệu",
+  "settingsVersion": "Phiên bản",
+  "settingsTermsPrivacy": "Điều khoản và Quyền riêng tư",
+  "settingsSupport": "Hỗ trợ",
+  "settingsLogout": "Đăng xuất",
+  "themeSystem": "Hệ thống",
+  "themeDark": "Tối",
+  "themeLight": "Sáng",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Đã cập nhật hồ sơ",
+  "editProfileTitle": "Chỉnh sửa hồ sơ",
+  "editProfilePhotoLabel": "Ảnh hồ sơ",
+  "editProfilePhotoSubtitle": "Chọn avatar qua Supabase Storage sắp ra mắt",
+  "editProfileChangePhoto": "Thay đổi",
+  "editProfileAvatarUploadSoon": "Tải avatar lên sắp ra mắt",
+  "editProfileDisplayNameLabel": "Tên hiển thị",
+  "editProfileDisplayNameHint": "Tên của bạn",
+  "editProfileDisplayNameRequired": "Nhập tên của bạn",
+  "editProfileDisplayNameTooShort": "Quá ngắn",
+  "editProfileUsernameLabel": "Tên người dùng",
+  "editProfileUsernameHint": "minh_hoc_vien",
+  "editProfileUsernameRequired": "Nhập tên người dùng",
+  "editProfileUsernameTooShort": "Tối thiểu 3 ký tự",
+  "editProfileUsernameInvalid": "Chỉ chữ, số, _",
+  "editProfileBioLabel": "Tiểu sử",
+  "editProfileBioHint": "Tiểu sử ngắn...",
+  "editProfileBioTooLong": "Tối đa 120 ký tự",
+  "editProfileLocationLabel": "Vị trí",
+  "editProfileLocationHint": "Thành phố / Quốc gia",
+  "editProfileDailyGoalTitle": "Mục tiêu hàng ngày",
+  "editProfileDailyGoalSubtitle": "Chọn số phút bạn muốn học mỗi ngày",
+  "securityTitle": "Bảo mật",
+  "securitySectionPassword": "Mật khẩu",
+  "securityChangePasswordTitle": "Đổi mật khẩu",
+  "securityChangePasswordSubtitle": "Cập nhật mật khẩu thường xuyên",
+  "securitySectionTwoFactor": "Xác thực hai yếu tố",
+  "securityEnable2faTitle": "Bật 2FA",
+  "securityEnable2faSubtitle": "Bảo vệ thêm khi đăng nhập",
+  "securitySectionAppLock": "Khóa ứng dụng",
+  "securityBiometricTitle": "Mở khóa sinh trắc học",
+  "securityBiometricSubtitle": "Dùng FaceID/TouchID để mở SOMA",
+  "securityAppLockTitle": "Khóa ứng dụng",
+  "securityAppLockSubtitle": "Khóa SOMA khi thoát ứng dụng",
+  "securitySectionSessions": "Phiên hoạt động",
+  "securityNoSessions": "Không tìm thấy phiên hoạt động",
+  "securityThisDevice": "Thiết bị này",
+  "securityDevice": "Thiết bị",
+  "securityActiveLabel": "Hoạt động",
+  "securitySignInToEnable2fa": "Đăng nhập để bật 2FA",
+  "securityEnable2faFailed": "Bật 2FA thất bại: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "Tắt 2FA thất bại: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "Thiết lập 2FA",
+  "securitySecretKeyLabel": "Khóa bí mật",
+  "securityCodeHint": "Mã 6 chữ số",
+  "security2faEnabled": "2FA đã bật",
+  "securityVerifyCodeFailed": "Xác minh mã thất bại: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Đang xác minh...",
+  "securityVerify": "Xác minh",
+  "securityCurrentPasswordHint": "Mật khẩu hiện tại",
+  "securityNewPasswordHint": "Mật khẩu mới (tối thiểu 8 ký tự)",
+  "securityConfirmPasswordHint": "Xác nhận mật khẩu mới",
+  "securitySignInToChangePassword": "Đăng nhập để đổi mật khẩu",
+  "securityEnterCurrentPassword": "Nhập mật khẩu hiện tại",
+  "securityPasswordMinLength": "Mật khẩu mới phải có ít nhất 8 ký tự",
+  "securityPasswordsDoNotMatch": "Mật khẩu không khớp",
+  "securityPasswordUpdated": "Đã cập nhật mật khẩu",
+  "securityPasswordUpdateFailed": "Cập nhật mật khẩu thất bại: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Tự động khóa sau",
+  "privacyTitle": "Quyền riêng tư",
+  "privacySectionVisibility": "Hiển thị",
+  "privacyProfileVisibilityTitle": "Hiển thị hồ sơ",
+  "privacyVisibilityPublic": "Công khai",
+  "privacyVisibilityFriends": "Bạn bè",
+  "privacyVisibilityPrivate": "Riêng tư",
+  "privacyVisibilityPublicSubtitle": "Mọi người có thể xem hồ sơ của bạn",
+  "privacyVisibilityFriendsSubtitle": "Chỉ bạn bè có thể xem hồ sơ của bạn",
+  "privacyVisibilityPrivateSubtitle": "Chỉ bạn có thể xem hồ sơ của mình",
+  "privacySectionActivity": "Hoạt động",
+  "privacyShowOnlineTitle": "Hiện trạng thái trực tuyến",
+  "privacyShowOnlineSubtitle": "Cho phép người khác xem khi bạn trực tuyến",
+  "privacyShowActivityTitle": "Hiện hoạt động học tập",
+  "privacyShowActivitySubtitle": "Hiện chuỗi, XP và tiến độ gần đây",
+  "privacySectionSocial": "Xã hội",
+  "privacyAllowRequestsTitle": "Cho phép yêu cầu kết bạn",
+  "privacyAllowRequestsSubtitle": "Cho phép người khác gửi yêu cầu kết bạn",
+  "privacyWhoCanDmTitle": "Ai có thể gửi tin nhắn riêng",
+  "privacyDmEveryone": "Mọi người",
+  "privacyDmFriends": "Bạn bè",
+  "privacyDmNoOne": "Không ai",
+  "privacyDmEveryoneSubtitle": "Bất kỳ ai cũng có thể nhắn tin cho bạn",
+  "privacyDmFriendsSubtitle": "Chỉ bạn bè có thể nhắn tin cho bạn",
+  "privacyDmNoOneSubtitle": "Không ai có thể nhắn tin cho bạn",
+  "privacySectionBlockedUsers": "Người dùng bị chặn",
+  "privacyBlockedUsersComingSoon": "Quản lý người dùng bị chặn sắp ra mắt",
+  "privacySectionDataControls": "Kiểm soát dữ liệu",
+  "privacyExportDataTitle": "Xuất dữ liệu của tôi",
+  "privacyExportDataSubtitle": "Tải xuống hoạt động và khóa học của bạn",
+  "privacyExportInfoTitle": "Xuất dữ liệu",
+  "privacyExportInfoBody": "Bước tiếp theo: tạo xuất JSON/CSV và gửi email hoặc tải xuống cục bộ",
+  "privacyDeleteAccountTitle": "Xóa tài khoản",
+  "privacyDeleteAccountSubtitle": "Điều này sẽ xóa vĩnh viễn tài khoản và dữ liệu của bạn",
+  "privacyDeleteConfirmTitle": "Xóa tài khoản?",
+  "privacyDeleteConfirmBody": "Hành động này không thể hoàn tác. Hồ sơ, khóa học, bạn bè và tin nhắn của bạn sẽ bị xóa",
+  "privacyDeleteComingSoon": "Xóa sẽ được kết nối với Supabase sau",
+  "soloLabel": "Đơn",
+  "soloResultsCompletedTitle": "Phiên đơn hoàn thành",
+  "soloResultsFeedbackElite": "Thành tích ưu tú - giữ vững chuỗi",
+  "soloResultsFeedbackStrong": "Làm tốt - bạn đang tiến bộ nhanh",
+  "soloResultsFeedbackProgress": "Tiến bộ tốt - xem lại lỗi và thử lại",
+  "soloResultsFeedbackTryAgain": "Không sao - thử lại với ít câu hỏi hơn và tập trung",
+  "soloResultsPerfectScore": "Điểm hoàn hảo! Không có lỗi để xem lại",
+  "soloResultsReviewPrompt": "Xem lại lỗi để học nhanh hơn. Câu trả lời sai của bạn ở dưới",
+  "soloResultsReviewMistakes": "Xem lại lỗi ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Bạn chưa đăng nhập",
+  "genericUser": "Người dùng",
+  "loading": "Đang tải...",
+  "edit": "Chỉnh sửa",
+  "send": "Gửi",
+  "join": "Tham gia",
+  "leave": "Rời",
+  "ready": "Sẵn sàng",
+  "levelBeginner": "Mới bắt đầu",
+  "levelIntermediate": "Trung cấp",
+  "levelAdvanced": "Nâng cao",
+  "questionsShort": "{count} câu hỏi",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} giây",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Tất cả khóa học",
+  "circlesAllModes": "Tất cả chế độ",
+  "circlesAllLevels": "Tất cả cấp độ",
+  "circlesAddNewCourse": "Thêm khóa học mới",
+  "circlesCoursesTitle": "Khóa học",
+  "circlesModeTitle": "Chế độ",
+  "circlesLevelTitle": "Cấp độ",
+  "circlesNoActiveForFilters": "Không có Circle hoạt động cho các bộ lọc này",
+  "circlesUnknownRoom": "Phòng không rõ",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Tạo Circle",
+  "circlesCircleName": "Tên Circle",
+  "circlesEnterName": "Nhập tên",
+  "circlesLanguages": "Ngôn ngữ",
+  "circlesRoomSetup": "Thiết lập phòng",
+  "circlesPlayers": "Người chơi",
+  "circlesEmptySlot": "Chỗ trống",
+  "circlesPlayersRange": "1-5 người chơi",
+  "circlesQuestions": "Câu hỏi",
+  "circlesQuestionsSubtitle": "Số lượng câu hỏi",
+  "circlesTimePerQuestion": "Thời gian mỗi câu",
+  "circlesSecondsPerQuestion": "giây mỗi câu",
+  "circlesAdvanced": "Nâng cao",
+  "circlesAllowSpectators": "Cho phép người xem",
+  "circlesAllowSpectatorsSubtitle": "Cho phép người khác xem mà không chơi",
+  "circlesLiveVoiceChat": "Trò chuyện thoại trực tiếp",
+  "circlesLiveVoiceChatSubtitle": "Bật giao tiếp bằng giọng nói trong trận đấu",
+  "circlesLiveTextChat": "Trò chuyện văn bản trực tiếp",
+  "circlesLiveTextChatSubtitle": "Bật trò chuyện trong trận đấu",
+  "circlesCreatedSuccess": "Đã tạo Circle",
+  "circlesCreateError": "Tạo Circle thất bại: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Mẹo: bạn có thể mời bạn bè sau khi tạo",
+  "circlesJoinError": "Tham gia Circle thất bại: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Sảnh Circle",
+  "circlesCodeLine": "Mã: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Cài đặt trận đấu",
+  "circlesLevelWithValue": "Cấp độ {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Độ khó",
+  "circlesPerQuestionShort": "mỗi câu",
+  "circlesInvite": "Mời",
+  "circlesCopyId": "Sao chép ID",
+  "circlesCopiedId": "Đã sao chép ID",
+  "circlesMatchInProgress": "Trận đấu đang diễn ra",
+  "circlesSpectatorQueuedBody": "Trận đấu đang diễn ra. Bạn sẽ tham gia với tư cách người xem",
+  "circlesHostStartWhenReady": "Chủ phòng sẽ bắt đầu khi mọi người sẵn sàng",
+  "circlesSpectators": "Người xem",
+  "circlesSpectator": "Người xem",
+  "circlesSpectatorCanWatch": "Người xem có thể xem trực tiếp",
+  "circlesJoinRequests": "Yêu cầu tham gia",
+  "circlesAcceptSpectatorsHint": "Chấp nhận người xem trước khi bắt đầu trận đấu",
+  "circlesStartGame": "Bắt đầu trò chơi",
+  "circlesWaitingForPlayers": "Đang chờ người chơi",
+  "circlesLeaveCircle": "Rời Circle",
+  "circlesRequestSent": "Đã gửi yêu cầu",
+  "circlesRequestToJoin": "Yêu cầu tham gia",
+  "circlesWatchLive": "Xem trực tiếp",
+  "circlesPlayerTip": "Nhấn Sẵn sàng khi bạn ổn. Chủ phòng sẽ bắt đầu trận đấu",
+  "circlesSpectatorTip": "Bạn đang xem. Xem trực tiếp khi chủ phòng bắt đầu",
+  "circlesHostControls": "Điều khiển chủ phòng",
+  "circlesTransferHostFailed": "Chuyển chủ phòng thất bại: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Kết thúc Circle thất bại: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "Không tìm thấy người dùng @{username}",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Người dùng không hợp lệ",
+  "circlesCantInviteSelf": "Bạn không thể mời chính mình",
+  "circlesUserAlreadyInCircle": "@{username} đã ở trong Circle",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Chủ phòng",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "Mời theo tên người dùng",
+  "circlesInviteSent": "Đã gửi lời mời đến @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Gửi lời mời thất bại: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Đã gửi yêu cầu tham gia",
+  "circlesJoinRequestFailed": "Gửi yêu cầu thất bại: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle đã đầy",
+  "circlesSpectatorAdded": "Đã thêm người xem",
+  "circlesApproveFailed": "Phê duyệt yêu cầu thất bại: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Đã từ chối yêu cầu",
+  "circlesDeclineFailed": "Từ chối yêu cầu thất bại: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Người tham gia",
+  "circlesLeavePromptTitle": "Rời Circle?",
+  "circlesLeavePromptTransfer": "Vui lòng chuyển chủ phòng trước khi rời",
+  "circlesLeavePromptEndOnly": "Kết thúc Circle và rời",
+  "circlesTransferHost": "Chuyển chủ phòng",
+  "circlesEndCircle": "Kết thúc Circle",
+  "circlesTransferHostTitle": "Chuyển chủ phòng",
+  "circlesShareId": "ID Circle: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

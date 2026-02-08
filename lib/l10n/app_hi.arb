@@ -1,0 +1,781 @@
+{
+  "@@locale": "hi",
+  "appTitle": "SOMA",
+  "welcomeTagline": "सीखें। प्रतिस्पर्धा करें। महारत हासिल करें।",
+  "signUp": "साइन अप करें",
+  "signIn": "साइन इन करें",
+  "skipForNow": "अभी छोड़ें",
+  "authFillAllFields": "कृपया सभी फ़ील्ड भरें",
+  "authError": "त्रुटि: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "ईमेल",
+  "authPassword": "पासवर्ड",
+  "authUsername": "उपयोगकर्ता नाम",
+  "authContinue": "जारी रखें",
+  "authSigningIn": "साइन इन हो रहा है...",
+  "authCreateAccount": "खाता बनाएं",
+  "authCreating": "बना रहे हैं...",
+  "authNeedAccount": "खाता नहीं है? ",
+  "authHaveAccount": "पहले से खाता है? ",
+  "dialogAuthRequiredTitle": "Circles तक पहुंचने के लिए साइन इन करें",
+  "dialogAuthRequiredBody": "Circles मल्टीप्लेयर रूम हैं। लाइव मैच में शामिल होने, दोस्तों को आमंत्रित करने और प्रगति सहेजने के लिए एक खाता बनाएं।",
+  "notNow": "अभी नहीं",
+  "navHome": "होम",
+  "navCircles": "Circles",
+  "navProfile": "प्रोफ़ाइल",
+  "removeCourseTitle": "कोर्स हटाएं?",
+  "removeCourseBody": "{course} होम सूची से हटाया जाएगा।",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "रद्द करें",
+  "remove": "हटाएं",
+  "welcomeBack": "वापस स्वागत है, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "कोर्स संपादित करें",
+  "done": "हो गया",
+  "noCoursesToEdit": "संपादित करने के लिए कोई कोर्स नहीं।",
+  "addCourse": "कोर्स जोड़ें",
+  "unknown": "अज्ञात",
+  "iSpeak": "मैं बोलता/बोलती हूं",
+  "iWantToLearn": "मैं सीखना चाहता/चाहती हूं",
+  "chooseYourLanguage": "अपनी भाषा चुनें",
+  "chooseLearningLanguage": "वह भाषा चुनें जो आप सीखना चाहते हैं",
+  "chooseTwoDifferentLanguages": "दो अलग-अलग भाषाएं चुनें।",
+  "createCourse": "कोर्स बनाएं",
+  "soloCourseTitle": "एकल कोर्स",
+  "searchLanguage": "भाषा खोजें",
+  "noMatches": "कोई मिलान नहीं",
+  "chooseCourseType": "कोर्स प्रकार चुनें",
+  "soloStudyDescription": "Circles-शैली क्विज़ के साथ अकेले अध्ययन करें - लेकिन कमरे या चैट या दर्शकों या होस्ट विकल्पों के बिना।",
+  "soloModeVocabulary": "शब्दावली",
+  "soloModeSentences": "वाक्य",
+  "soloModeReview": "समीक्षा",
+  "soloModeVocabularySubtitle": "अर्थ, समानार्थी शब्द और उपयोग के लिए बहुविकल्पी",
+  "soloModeSentencesSubtitle": "रिक्त स्थान भरें + अनुवाद + पढ़ना",
+  "soloModeReviewDescription": "जो आपने सीखा है उसका अभ्यास करें: कमजोर शब्द, हाल की गलतियां और स्पेस्ड रिपीटिशन।",
+  "startReview": "समीक्षा शुरू करें",
+  "soloSetupTitle": "{mode} सेटअप",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "कठिनाई",
+  "numberOfQuestions": "प्रश्नों की संख्या",
+  "timerPerQuestion": "प्रति प्रश्न टाइमर",
+  "noTimer": "टाइमर नहीं",
+  "start": "शुरू करें",
+  "profileTitle": "प्रोफ़ाइल",
+  "profileSignInToMessage": "संदेश भेजने के लिए साइन इन करें",
+  "profileThatsYourProfile": "यह आपकी प्रोफ़ाइल है",
+  "profileSignInToAddFriends": "दोस्त जोड़ने के लिए साइन इन करें",
+  "profileCantAddYourself": "आप खुद को नहीं जोड़ सकते",
+  "profileRequestSent": "@{username} को अनुरोध भेजा गया",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "अनुरोध भेजने में विफल",
+  "profileDefaultDisplayName": "नया उपयोगकर्ता",
+  "profileDefaultBio": "सीखने के लिए तैयार!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "अतिथि",
+  "guestUsername": "अतिथि",
+  "guestSessionLabel": "अतिथि सत्र",
+  "unlockFullProfile": "अपनी पूर्ण प्रोफ़ाइल अनलॉक करें",
+  "guestBenefitSync": "सभी डिवाइसों पर प्रगति सिंक करें",
+  "guestBenefitCircles": "Circles में शामिल हों और लाइव खेलें",
+  "guestBenefitNotifications": "सूचनाएं और मित्र अनुरोध प्राप्त करें",
+  "progressStaysOnDevice": "जब तक आप साइन इन नहीं करते, प्रगति इस डिवाइस पर रहती है।",
+  "profileGoalLabel": "लक्ष्य: {minutes}मि",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP प्रगति",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "जीत",
+  "profileStreak": "लकीर",
+  "profileFriendsTitle": "मेरे दोस्त",
+  "profileViewAll": "सभी देखें",
+  "profileAchievementsTitle": "उपलब्धियाँ",
+  "profileNoAchievements": "अभी तक कोई उपलब्धि नहीं।",
+  "profileRequested": "अनुरोध किया गया",
+  "profileSending": "भेज रहे हैं...",
+  "profileAddFriend": "दोस्त जोड़ें",
+  "profileConnectTitle": "कनेक्ट करें",
+  "profileMessage": "संदेश",
+  "profileSnapshot": "प्रोफ़ाइल स्नैपशॉट",
+  "profileLocationHidden": "स्थान छिपा हुआ",
+  "profileBioHidden": "जीवनी छिपी हुई",
+  "profileDailyGoal": "दैनिक लक्ष्य {minutes}मि",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle आमंत्रण",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "शामिल होने के लिए साइन इन करें",
+  "joiningCircle": "शामिल हो रहे हैं...",
+  "joinCircle": "Circle में शामिल हों",
+  "circleJoinedAsPlayer": "खिलाड़ी के रूप में शामिल हुए",
+  "circleJoinedAsSpectator": "दर्शक के रूप में शामिल हुए",
+  "accept": "स्वीकार करें",
+  "decline": "अस्वीकार करें",
+  "open": "खोलें",
+  "circleCountdownTitle": "तैयार हो जाएं",
+  "circleCountdownSubtitle": "Circle शुरू हो रहा है...",
+  "userFallbackName": "उपयोगकर्ता",
+  "micOff": "माइक बंद",
+  "micOn": "माइक चालू",
+  "roleHost": "होस्ट",
+  "roleSpectator": "दर्शक",
+  "tagHost": "होस्ट",
+  "tagYou": "आप",
+  "statusCorrect": "सही",
+  "statusWrong": "गलत",
+  "statusWaiting": "प्रतीक्षा कर रहे हैं",
+  "statusNone": "-",
+  "pointsAbbrev": "अंक",
+  "pointsLabel": "अंक",
+  "statCorrect": "सही",
+  "statAnswers": "उत्तर",
+  "statTotal": "कुल",
+  "statQuestions": "प्रश्न",
+  "statAccuracy": "सटीकता",
+  "statRate": "दर",
+  "statRank": "रैंक",
+  "statPosition": "स्थिति",
+  "statMode": "मोड",
+  "statType": "प्रकार",
+  "next": "अगला",
+  "submit": "जमा करें",
+  "continueLabel": "जारी रखें",
+  "save": "सहेजें",
+  "playAgain": "फिर से खेलें",
+  "backToCourse": "कोर्स पर वापस जाएं",
+  "resultsTitle": "परिणाम",
+  "shareLater": "बाद में साझा करें",
+  "delete": "हटाएं",
+  "ok": "ठीक है",
+  "minutesShort": "{minutes}मि",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}मि",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}घं",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}दि",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "अभी",
+  "timeMinutesAgo": "{count}मि पहले",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count}घं पहले",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count}दि पहले",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "होस्ट की प्रतीक्षा कर रहे हैं...",
+  "liveQuizJoinRequestSent": "शामिल होने का अनुरोध भेजा गया",
+  "liveQuizJoinRequestFailed": "अनुरोध विफल: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "होस्ट नियंत्रण",
+  "liveQuizSpectatorModeTitle": "दर्शक मोड",
+  "liveQuizHostControlsSubtitle": "जब सभी उत्तर देते हैं या समय समाप्त होता है तो राउंड स्वचालित रूप से आगे बढ़ता है।",
+  "liveQuizSpectatorModeSubtitle": "प्रश्न और लीडरबोर्ड लाइव देखें। आप उत्तर नहीं दे सकते।",
+  "liveQuizQuestionCounter": "प्रश्न {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "अनुरोध भेजा गया",
+  "liveQuizRequestToJoin": "शामिल होने का अनुरोध",
+  "liveQuizSpectatorFooter": "आप लाइव देख रहे हैं। प्रश्न और लीडरबोर्ड का आनंद लें।",
+  "circleNotFound": "Circle नहीं मिला",
+  "resultsRematchStartFailed": "रीमैच शुरू करने में विफल: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "मैच परिणाम",
+  "resultsNiceWork": "बढ़िया काम, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "पहला स्थान",
+  "resultsPlaceSecond": "दूसरा स्थान",
+  "resultsPlaceThird": "तीसरा स्थान",
+  "resultsPlaceNth": "{rank}वां स्थान",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "{players} खिलाड़ियों में से",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "चैंपियन! आपने इस Circle पर हावी रहे।",
+  "resultsHighlightGreatAccuracy": "शानदार सटीकता। आप शीर्ष के करीब हैं!",
+  "resultsHighlightKeepGoing": "जारी रखें - स्थिरता गति को हराती है।",
+  "resultsLeaderboardTitle": "लीडरबोर्ड",
+  "resultsPlayersCount": "{count} खिलाड़ी",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Circles पर वापस जाएं",
+  "resultsRematch": "रीमैच",
+  "resultsPlayAgain": "फिर से खेलें",
+  "leaderboardGlobalTitle": "वैश्विक लीडरबोर्ड",
+  "leaderboardEmpty": "अभी तक कोई लीडरबोर्ड नहीं।",
+  "aboutTitle": "के बारे में",
+  "aboutVersion": "संस्करण {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA एक गेमिफाइड भाषा सीखने का मंच है जो नई भाषाओं में महारत हासिल करना मजेदार और सामाजिक बनाता है। Circles में शामिल हों, अकेले अभ्यास करें और अपनी प्रगति को ट्रैक करें।",
+  "aboutTerms": "सेवा की शर्तें",
+  "aboutPrivacy": "गोपनीयता नीति",
+  "aboutOpenSource": "ओपन सोर्स लाइसेंस",
+  "addFriendTitle": "दोस्त जोड़ें",
+  "addFriendFindByUsername": "उपयोगकर्ता नाम से खोजें",
+  "addFriendUsernameHint": "उपयोगकर्ता नाम दर्ज करें...",
+  "addFriendTip": "टिप: बाद में हम QR कोड + मित्र ID का समर्थन कर सकते हैं।",
+  "addFriendSending": "भेज रहे हैं...",
+  "addFriendSendRequest": "अनुरोध भेजें",
+  "addFriendUserNotFound": "@{username} नहीं मिला",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "कार्य विफल या पहले से भेजा गया: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "दोस्त",
+  "searchFriendsHint": "दोस्तों को खोजें...",
+  "somaLearnerSubtitle": "Soma शिक्षार्थी",
+  "friendRequestLabel": "अनुरोध",
+  "friendRequestSentLabel": "अनुरोध भेजा गया",
+  "friendIncomingRequestLabel": "आने वाला अनुरोध",
+  "friendRequestsSection": "अनुरोध",
+  "friendPendingSection": "लंबित",
+  "friendAllSection": "सभी दोस्त",
+  "friendsEmptyState": "अभी तक कोई दोस्त नहीं। अपना पहला दोस्त जोड़ें!",
+  "friendsEmptyShort": "अभी तक कोई दोस्त नहीं।",
+  "noMatchForQuery": "\"{query}\" के लिए कोई मिलान नहीं",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "इनबॉक्स",
+  "searchChatsHint": "चैट खोजें...",
+  "inboxEmptyState": "अभी तक कोई चैट नहीं। किसी दोस्त के साथ चैट शुरू करें!",
+  "newMessageTitle": "नया संदेश",
+  "chatCallLater": "बाद में वॉयस कॉल (Circle भाषा जल्द आ रही है)",
+  "errorWithDetails": "त्रुटि: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "{name} को हाय कहें!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "संदेश...",
+  "notificationsTitle": "सूचनाएं",
+  "notificationsTabAll": "सभी",
+  "notificationsTabCourses": "कोर्स",
+  "notificationsTabSocial": "सामाजिक",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "सिस्टम",
+  "notificationsEmpty": "यहां कोई सूचना नहीं।",
+  "notificationsDeleted": "सूचना हटाई गई",
+  "notificationTitleFallback": "सूचना",
+  "notificationTypeCourse": "कोर्स",
+  "notificationTypeSocial": "सामाजिक",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "सिस्टम",
+  "notificationsFriendAccepted": "मित्र अनुरोध स्वीकार किया गया",
+  "notificationsFriendAcceptFailed": "मित्र अनुरोध स्वीकार करने में विफल: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "मित्र अनुरोध अस्वीकार किया गया",
+  "notificationsFriendDeclineFailed": "मित्र अनुरोध अस्वीकार करने में विफल: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Circle में शामिल होने में विफल: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "खोल रहे हैं",
+  "notificationsOpened": "खोला गया",
+  "notificationsActionMessage": "{action} सूचना",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "सेटिंग्स",
+  "settingsSectionAccount": "खाता",
+  "settingsEditProfile": "प्रोफ़ाइल संपादित करें",
+  "settingsPrivacy": "गोपनीयता",
+  "settingsSecurity": "सुरक्षा",
+  "settingsSectionGameplay": "गेमप्ले",
+  "settingsShowTranslationLine": "अनुवाद पंक्ति दिखाएं",
+  "settingsShowReadingLine": "पढ़ना दिखाएं (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "प्रति प्रश्न डिफ़ॉल्ट टाइमर",
+  "settingsMatchDifficulty": "मैच कठिनाई",
+  "settingsMatchDifficultyAdaptive": "अनुकूली",
+  "settingsSectionSoundFeel": "ध्वनि और अनुभव",
+  "settingsMusic": "संगीत",
+  "settingsSoundEffects": "ध्वनि प्रभाव",
+  "settingsHaptics": "हैप्टिक्स",
+  "settingsSectionNotifications": "सूचनाएं",
+  "settingsPushNotifications": "पुश सूचनाएं",
+  "settingsDailyReminder": "दैनिक अनुस्मारक",
+  "settingsSectionAppearance": "दिखावट",
+  "settingsTheme": "थीम",
+  "settingsUiLanguage": "UI भाषा",
+  "settingsSectionAbout": "के बारे में",
+  "settingsVersion": "संस्करण",
+  "settingsTermsPrivacy": "शर्तें और गोपनीयता",
+  "settingsSupport": "सहायता",
+  "settingsLogout": "लॉग आउट",
+  "themeSystem": "सिस्टम",
+  "themeDark": "गहरा",
+  "themeLight": "हल्का",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "प्रोफ़ाइल अपडेट की गई",
+  "editProfileTitle": "प्रोफ़ाइल संपादित करें",
+  "editProfilePhotoLabel": "प्रोफ़ाइल फ़ोटो",
+  "editProfilePhotoSubtitle": "Supabase स्टोरेज के माध्यम से अवतार चयन जल्द आ रहा है।",
+  "editProfileChangePhoto": "बदलें",
+  "editProfileAvatarUploadSoon": "अवतार अपलोड जल्द आ रहा है",
+  "editProfileDisplayNameLabel": "प्रदर्शन नाम",
+  "editProfileDisplayNameHint": "आपका नाम",
+  "editProfileDisplayNameRequired": "अपना नाम दर्ज करें",
+  "editProfileDisplayNameTooShort": "बहुत छोटा",
+  "editProfileUsernameLabel": "उपयोगकर्ता नाम",
+  "editProfileUsernameHint": "राज_सीखने_वाला",
+  "editProfileUsernameRequired": "उपयोगकर्ता नाम दर्ज करें",
+  "editProfileUsernameTooShort": "कम से कम 3 वर्ण",
+  "editProfileUsernameInvalid": "केवल अक्षर, संख्याएं और _",
+  "editProfileBioLabel": "जीवनी",
+  "editProfileBioHint": "एक छोटी जीवनी...",
+  "editProfileBioTooLong": "अधिकतम 120 वर्ण",
+  "editProfileLocationLabel": "स्थान",
+  "editProfileLocationHint": "शहर / देश",
+  "editProfileDailyGoalTitle": "दैनिक लक्ष्य",
+  "editProfileDailyGoalSubtitle": "चुनें कि आप प्रतिदिन कितने मिनट अध्ययन करना चाहते हैं।",
+  "securityTitle": "सुरक्षा",
+  "securitySectionPassword": "पासवर्ड",
+  "securityChangePasswordTitle": "पासवर्ड बदलें",
+  "securityChangePasswordSubtitle": "नियमित रूप से पासवर्ड अपडेट करें।",
+  "securitySectionTwoFactor": "टू-फैक्टर प्रमाणीकरण",
+  "securityEnable2faTitle": "2FA सक्षम करें",
+  "securityEnable2faSubtitle": "साइन इन करते समय अतिरिक्त सुरक्षा।",
+  "securitySectionAppLock": "ऐप लॉक",
+  "securityBiometricTitle": "बायोमेट्रिक अनलॉक",
+  "securityBiometricSubtitle": "SOMA को अनलॉक करने के लिए FaceID/TouchID का उपयोग करें।",
+  "securityAppLockTitle": "ऐप लॉक",
+  "securityAppLockSubtitle": "ऐप से बाहर निकलने पर SOMA को लॉक करें।",
+  "securitySectionSessions": "सक्रिय सत्र",
+  "securityNoSessions": "कोई सक्रिय सत्र नहीं मिला।",
+  "securityThisDevice": "यह डिवाइस",
+  "securityDevice": "डिवाइस",
+  "securityActiveLabel": "सक्रिय",
+  "securitySignInToEnable2fa": "2FA सक्षम करने के लिए साइन इन करें",
+  "securityEnable2faFailed": "2FA सक्षम करने में विफल: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FA अक्षम करने में विफल: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA सेटअप",
+  "securitySecretKeyLabel": "गुप्त कुंजी",
+  "securityCodeHint": "6-अंक कोड",
+  "security2faEnabled": "2FA सक्षम किया गया",
+  "securityVerifyCodeFailed": "कोड सत्यापित करने में विफल: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "सत्यापित कर रहे हैं...",
+  "securityVerify": "सत्यापित करें",
+  "securityCurrentPasswordHint": "मौजूदा पासवर्ड",
+  "securityNewPasswordHint": "नया पासवर्ड (कम से कम 8 वर्ण)",
+  "securityConfirmPasswordHint": "नया पासवर्ड की पुष्टि करें",
+  "securitySignInToChangePassword": "पासवर्ड बदलने के लिए साइन इन करें",
+  "securityEnterCurrentPassword": "मौजूदा पासवर्ड दर्ज करें",
+  "securityPasswordMinLength": "नया पासवर्ड कम से कम 8 वर्ण का होना चाहिए",
+  "securityPasswordsDoNotMatch": "पासवर्ड मेल नहीं खाते",
+  "securityPasswordUpdated": "पासवर्ड अपडेट किया गया",
+  "securityPasswordUpdateFailed": "पासवर्ड अपडेट करने में विफल: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "इसके बाद स्वतः लॉक करें",
+  "privacyTitle": "गोपनीयता",
+  "privacySectionVisibility": "दृश्यता",
+  "privacyProfileVisibilityTitle": "प्रोफ़ाइल दृश्यता",
+  "privacyVisibilityPublic": "सार्वजनिक",
+  "privacyVisibilityFriends": "दोस्त",
+  "privacyVisibilityPrivate": "निजी",
+  "privacyVisibilityPublicSubtitle": "कोई भी आपकी प्रोफ़ाइल देख सकता है।",
+  "privacyVisibilityFriendsSubtitle": "केवल दोस्त आपकी प्रोफ़ाइल देख सकते हैं।",
+  "privacyVisibilityPrivateSubtitle": "केवल आप अपनी प्रोफ़ाइल देख सकते हैं।",
+  "privacySectionActivity": "गतिविधि",
+  "privacyShowOnlineTitle": "ऑनलाइन स्थिति दिखाएं",
+  "privacyShowOnlineSubtitle": "दूसरों को देखने दें कि आप कब ऑनलाइन हैं।",
+  "privacyShowActivityTitle": "सीखने की गतिविधि दिखाएं",
+  "privacyShowActivitySubtitle": "लकीर, XP और वर्तमान प्रगति प्रदर्शित करें।",
+  "privacySectionSocial": "सामाजिक",
+  "privacyAllowRequestsTitle": "मित्र अनुरोधों की अनुमति दें",
+  "privacyAllowRequestsSubtitle": "लोगों को मित्र अनुरोध भेजने दें।",
+  "privacyWhoCanDmTitle": "कौन DM कर सकता है",
+  "privacyDmEveryone": "सभी",
+  "privacyDmFriends": "दोस्त",
+  "privacyDmNoOne": "कोई नहीं",
+  "privacyDmEveryoneSubtitle": "कोई भी आपको DM कर सकता है।",
+  "privacyDmFriendsSubtitle": "केवल दोस्त आपको DM कर सकते हैं।",
+  "privacyDmNoOneSubtitle": "कोई भी आपको DM नहीं कर सकता।",
+  "privacySectionBlockedUsers": "ब्लॉक किए गए उपयोगकर्ता",
+  "privacyBlockedUsersComingSoon": "ब्लॉक किए गए उपयोगकर्ताओं का प्रबंधन जल्द आ रहा है।",
+  "privacySectionDataControls": "डेटा नियंत्रण",
+  "privacyExportDataTitle": "मेरा डेटा निर्यात करें",
+  "privacyExportDataSubtitle": "अपनी गतिविधि और कोर्स डाउनलोड करें।",
+  "privacyExportInfoTitle": "डेटा निर्यात",
+  "privacyExportInfoBody": "अगला कदम: JSON/CSV निर्यात बनाएं और ईमेल के माध्यम से भेजें या स्थानीय रूप से डाउनलोड करें।",
+  "privacyDeleteAccountTitle": "खाता हटाएं",
+  "privacyDeleteAccountSubtitle": "यह आपके खाते और डेटा को स्थायी रूप से हटा देगा।",
+  "privacyDeleteConfirmTitle": "खाता हटाएं?",
+  "privacyDeleteConfirmBody": "यह क्रिया स्थायी है। आपकी प्रोफ़ाइल, कोर्स, दोस्त और संदेश हटा दिए जाएंगे।",
+  "privacyDeleteComingSoon": "बाद में Supabase से हटाने को वायर किया जाएगा",
+  "soloLabel": "एकल",
+  "soloResultsCompletedTitle": "एकल सत्र पूर्ण",
+  "soloResultsFeedbackElite": "एलीट प्रदर्शन। लकीर बनाए रखें।",
+  "soloResultsFeedbackStrong": "मजबूत काम। आप तेजी से सुधार कर रहे हैं।",
+  "soloResultsFeedbackProgress": "अच्छी प्रगति। गलतियों की समीक्षा करें और दोहराएं।",
+  "soloResultsFeedbackTryAgain": "कोई तनाव नहीं। कम प्रश्नों और फोकस के साथ फिर से प्रयास करें।",
+  "soloResultsPerfectScore": "परफेक्ट स्कोर! समीक्षा करने के लिए कोई गलती नहीं।",
+  "soloResultsReviewPrompt": "तेजी से सीखने के लिए गलतियों की समीक्षा करें। हम नीचे गलत उत्तर दिखाएंगे।",
+  "soloResultsReviewMistakes": "गलतियों की समीक्षा ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "साइन इन नहीं किया गया",
+  "genericUser": "उपयोगकर्ता",
+  "loading": "लोड हो रहा है...",
+  "edit": "संपादित करें",
+  "send": "भेजें",
+  "join": "शामिल हों",
+  "leave": "छोड़ें",
+  "ready": "तैयार",
+  "levelBeginner": "शुरुआती",
+  "levelIntermediate": "मध्यवर्ती",
+  "levelAdvanced": "उन्नत",
+  "questionsShort": "{count} प्र",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count}से",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "सभी कोर्स",
+  "circlesAllModes": "सभी मोड",
+  "circlesAllLevels": "सभी स्तर",
+  "circlesAddNewCourse": "नया कोर्स जोड़ें",
+  "circlesCoursesTitle": "कोर्स",
+  "circlesModeTitle": "मोड",
+  "circlesLevelTitle": "स्तर",
+  "circlesNoActiveForFilters": "इन फ़िल्टर के लिए कोई सक्रिय Circles नहीं।",
+  "circlesUnknownRoom": "अज्ञात रूम",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Circle बनाएं",
+  "circlesCircleName": "Circle नाम",
+  "circlesEnterName": "नाम दर्ज करें",
+  "circlesLanguages": "भाषाएं",
+  "circlesRoomSetup": "रूम सेटअप",
+  "circlesPlayers": "खिलाड़ी",
+  "circlesEmptySlot": "खाली स्लॉट",
+  "circlesPlayersRange": "1-5 खिलाड़ी",
+  "circlesQuestions": "प्रश्न",
+  "circlesQuestionsSubtitle": "प्रश्नों की संख्या",
+  "circlesTimePerQuestion": "प्रति प्रश्न समय",
+  "circlesSecondsPerQuestion": "प्रति प्रश्न सेकंड",
+  "circlesAdvanced": "उन्नत",
+  "circlesAllowSpectators": "दर्शकों की अनुमति दें",
+  "circlesAllowSpectatorsSubtitle": "दूसरों को बिना खेले देखने दें।",
+  "circlesLiveVoiceChat": "लाइव वॉयस चैट",
+  "circlesLiveVoiceChatSubtitle": "मैच के दौरान लाइव ऑडियो सक्षम करें।",
+  "circlesLiveTextChat": "लाइव टेक्स्ट चैट",
+  "circlesLiveTextChatSubtitle": "मैच के दौरान चैट सक्षम करें।",
+  "circlesCreatedSuccess": "Circle बनाया गया",
+  "circlesCreateError": "Circle बनाने में विफल: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "टिप: बनाने के बाद आप दोस्तों को आमंत्रित कर सकते हैं।",
+  "circlesJoinError": "Circle में शामिल होने में विफल: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Circle लॉबी",
+  "circlesCodeLine": "कोड: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "मैच सेटिंग्स",
+  "circlesLevelWithValue": "स्तर {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "कठिनाई",
+  "circlesPerQuestionShort": "प्रति प्रश्न",
+  "circlesInvite": "आमंत्रित करें",
+  "circlesCopyId": "ID कॉपी करें",
+  "circlesCopiedId": "ID कॉपी की गई",
+  "circlesMatchInProgress": "मैच चल रहा है",
+  "circlesSpectatorQueuedBody": "मैच चल रहा है। आप दर्शक के रूप में शामिल होंगे।",
+  "circlesHostStartWhenReady": "सभी तैयार होने पर होस्ट शुरू करेगा।",
+  "circlesSpectators": "दर्शक",
+  "circlesSpectator": "दर्शक",
+  "circlesSpectatorCanWatch": "दर्शक लाइव देख सकते हैं।",
+  "circlesJoinRequests": "शामिल होने के अनुरोध",
+  "circlesAcceptSpectatorsHint": "मैच शुरू करने से पहले दर्शकों को स्वीकार करें।",
+  "circlesStartGame": "गेम शुरू करें",
+  "circlesWaitingForPlayers": "खिलाड़ियों की प्रतीक्षा कर रहे हैं",
+  "circlesLeaveCircle": "Circle छोड़ें",
+  "circlesRequestSent": "अनुरोध भेजा गया",
+  "circlesRequestToJoin": "शामिल होने का अनुरोध",
+  "circlesWatchLive": "लाइव देखें",
+  "circlesPlayerTip": "जब आप तैयार हों तो तैयार टैप करें। होस्ट मैच शुरू करेगा।",
+  "circlesSpectatorTip": "आप देख रहे हैं। होस्ट शुरू करते ही लाइव देखें।",
+  "circlesHostControls": "होस्ट नियंत्रण",
+  "circlesTransferHostFailed": "होस्ट स्थानांतरित करने में विफल: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Circle समाप्त करने में विफल: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "@{username} नहीं मिला",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "अमान्य उपयोगकर्ता",
+  "circlesCantInviteSelf": "आप खुद को आमंत्रित नहीं कर सकते",
+  "circlesUserAlreadyInCircle": "@{username} पहले से ही Circle में है",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "होस्ट",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "उपयोगकर्ता नाम से आमंत्रित करें",
+  "circlesInviteSent": "@{username} को आमंत्रण भेजा गया",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "आमंत्रण भेजने में विफल: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "शामिल होने का अनुरोध भेजा गया",
+  "circlesJoinRequestFailed": "अनुरोध विफल: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle भरा हुआ है",
+  "circlesSpectatorAdded": "दर्शक जोड़ा गया",
+  "circlesApproveFailed": "अनुरोध स्वीकृत करने में विफल: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "अनुरोध अस्वीकार किया गया",
+  "circlesDeclineFailed": "अनुरोध अस्वीकार करने में विफल: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "प्रतिभागी",
+  "circlesLeavePromptTitle": "Circle छोड़ें?",
+  "circlesLeavePromptTransfer": "छोड़ने से पहले होस्ट स्थानांतरित करें।",
+  "circlesLeavePromptEndOnly": "Circle समाप्त करें और छोड़ें।",
+  "circlesTransferHost": "होस्ट स्थानांतरित करें",
+  "circlesEndCircle": "Circle समाप्त करें",
+  "circlesTransferHostTitle": "होस्ट स्थानांतरित करें",
+  "circlesShareId": "Circle ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

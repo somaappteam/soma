@@ -1,0 +1,781 @@
+{
+  "@@locale": "ru",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Учись. Соревнуйся. Мастери.",
+  "signUp": "Регистрация",
+  "signIn": "Войти",
+  "skipForNow": "Пропустить",
+  "authFillAllFields": "Заполните все поля",
+  "authError": "Ошибка: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "Эл. почта",
+  "authPassword": "Пароль",
+  "authUsername": "Имя пользователя",
+  "authContinue": "Продолжить",
+  "authSigningIn": "Вход...",
+  "authCreateAccount": "Создать аккаунт",
+  "authCreating": "Создание...",
+  "authNeedAccount": "Нет аккаунта? ",
+  "authHaveAccount": "Уже есть аккаунт? ",
+  "dialogAuthRequiredTitle": "Войдите для доступа к Circles",
+  "dialogAuthRequiredBody": "Circles — это многопользовательские комнаты. Создайте аккаунт, чтобы участвовать в матчах, приглашать друзей и сохранять прогресс.",
+  "notNow": "Не сейчас",
+  "navHome": "Главная",
+  "navCircles": "Circles",
+  "navProfile": "Профиль",
+  "removeCourseTitle": "Удалить курс?",
+  "removeCourseBody": "{course} будет удален из списка.",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Отмена",
+  "remove": "Удалить",
+  "welcomeBack": "С возвращением, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Редактировать курсы",
+  "done": "Готово",
+  "noCoursesToEdit": "Нет курсов для редактирования.",
+  "addCourse": "Добавить курс",
+  "unknown": "Неизвестно",
+  "iSpeak": "Я говорю",
+  "iWantToLearn": "Хочу изучать",
+  "chooseYourLanguage": "Выберите ваш язык",
+  "chooseLearningLanguage": "Выберите изучаемый язык",
+  "chooseTwoDifferentLanguages": "Выберите два разных языка.",
+  "createCourse": "Создать курс",
+  "soloCourseTitle": "Соло курс",
+  "searchLanguage": "Поиск языка",
+  "noMatches": "Нет совпадений",
+  "chooseCourseType": "Выберите тип курса",
+  "soloStudyDescription": "Изучайте самостоятельно в формате викторины Circles — но без комнат, чата, зрителей и опций хоста.",
+  "soloModeVocabulary": "Словарь",
+  "soloModeSentences": "Предложения",
+  "soloModeReview": "Повторение",
+  "soloModeVocabularySubtitle": "Выбор значений, синонимов, использование",
+  "soloModeSentencesSubtitle": "Заполнение пропусков + перевод + чтение",
+  "soloModeReviewDescription": "Практикуйте изученное: слабые слова, недавние ошибки и интервальное повторение.",
+  "startReview": "Начать повторение",
+  "soloSetupTitle": "Настройка {mode}",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Сложность",
+  "numberOfQuestions": "Количество вопросов",
+  "timerPerQuestion": "Таймер на вопрос",
+  "noTimer": "Без таймера",
+  "start": "Начать",
+  "profileTitle": "Профиль",
+  "profileSignInToMessage": "Войдите для отправки сообщений",
+  "profileThatsYourProfile": "Это ваш профиль",
+  "profileSignInToAddFriends": "Войдите для добавления друзей",
+  "profileCantAddYourself": "Вы не можете добавить себя",
+  "profileRequestSent": "Запрос отправлен @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Не удалось отправить запрос",
+  "profileDefaultDisplayName": "Новый пользователь",
+  "profileDefaultBio": "Готов учиться!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Гость",
+  "guestUsername": "гость",
+  "guestSessionLabel": "Гостевая сессия",
+  "unlockFullProfile": "Разблокируйте полный профиль",
+  "guestBenefitSync": "Синхронизация прогресса на всех устройствах",
+  "guestBenefitCircles": "Присоединяйтесь к Circles и играйте вживую",
+  "guestBenefitNotifications": "Получайте уведомления и запросы в друзья",
+  "progressStaysOnDevice": "Прогресс остается на устройстве, пока вы не войдете.",
+  "profileGoalLabel": "Цель: {minutes}м",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "Прогресс XP",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Победы",
+  "profileStreak": "Серия",
+  "profileFriendsTitle": "Мои друзья",
+  "profileViewAll": "Все",
+  "profileAchievementsTitle": "Достижения",
+  "profileNoAchievements": "Пока нет достижений.",
+  "profileRequested": "Запрошено",
+  "profileSending": "Отправка...",
+  "profileAddFriend": "Добавить друга",
+  "profileConnectTitle": "Подключиться",
+  "profileMessage": "Сообщение",
+  "profileSnapshot": "Снимок профиля",
+  "profileLocationHidden": "Местоположение скрыто",
+  "profileBioHidden": "Биография скрыта",
+  "profileDailyGoal": "Ежедневная цель {minutes}м",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Приглашение в Circle",
+  "circleIdLabel": "ID Circle: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Войдите для участия",
+  "joiningCircle": "Присоединение...",
+  "joinCircle": "Присоединиться",
+  "circleJoinedAsPlayer": "Вы присоединились как игрок",
+  "circleJoinedAsSpectator": "Вы присоединились как зритель",
+  "accept": "Принять",
+  "decline": "Отклонить",
+  "open": "Открыть",
+  "circleCountdownTitle": "Приготовьтесь",
+  "circleCountdownSubtitle": "Circle начинается...",
+  "userFallbackName": "Пользователь",
+  "micOff": "Микрофон выкл",
+  "micOn": "Микрофон вкл",
+  "roleHost": "Хост",
+  "roleSpectator": "Зритель",
+  "tagHost": "ХОСТ",
+  "tagYou": "ВЫ",
+  "statusCorrect": "Верно",
+  "statusWrong": "Неверно",
+  "statusWaiting": "Ожидание",
+  "statusNone": "-",
+  "pointsAbbrev": "Очк",
+  "pointsLabel": "Очки",
+  "statCorrect": "Верно",
+  "statAnswers": "Ответы",
+  "statTotal": "Всего",
+  "statQuestions": "Вопросы",
+  "statAccuracy": "Точность",
+  "statRate": "Скорость",
+  "statRank": "Рейтинг",
+  "statPosition": "Позиция",
+  "statMode": "Режим",
+  "statType": "Тип",
+  "next": "Далее",
+  "submit": "Отправить",
+  "continueLabel": "Продолжить",
+  "save": "Сохранить",
+  "playAgain": "Играть снова",
+  "backToCourse": "Вернуться к курсу",
+  "resultsTitle": "Результаты",
+  "shareLater": "Поделиться позже",
+  "delete": "Удалить",
+  "ok": "ОК",
+  "minutesShort": "{minutes}м",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}м",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}ч",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}д",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "только что",
+  "timeMinutesAgo": "{count}м назад",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count}ч назад",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count}д назад",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Ожидание хоста...",
+  "liveQuizJoinRequestSent": "Запрос на вход отправлен",
+  "liveQuizJoinRequestFailed": "Запрос не удался: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Управление хоста",
+  "liveQuizSpectatorModeTitle": "Режим зрителя",
+  "liveQuizHostControlsSubtitle": "Раунды продолжаются автоматически, когда все ответили или время истекло.",
+  "liveQuizSpectatorModeSubtitle": "Смотрите вопросы и таблицу лидеров. Вы не можете отвечать.",
+  "liveQuizQuestionCounter": "Вопрос {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Запрос отправлен",
+  "liveQuizRequestToJoin": "Запрос на вход",
+  "liveQuizSpectatorFooter": "Вы наблюдаете вживую. Наслаждайтесь вопросами и таблицей лидеров.",
+  "circleNotFound": "Circle не найден",
+  "resultsRematchStartFailed": "Не удалось начать реванш: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Результаты матча",
+  "resultsNiceWork": "Отличная работа, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1-е место",
+  "resultsPlaceSecond": "2-е место",
+  "resultsPlaceThird": "3-е место",
+  "resultsPlaceNth": "{rank}-е место",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "Из {players} игроков",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Чемпион! Вы доминировали в этом Circle.",
+  "resultsHighlightGreatAccuracy": "Отличная точность. Вы близки к вершине!",
+  "resultsHighlightKeepGoing": "Продолжайте — постоянство важнее скорости.",
+  "resultsLeaderboardTitle": "Таблица лидеров",
+  "resultsPlayersCount": "{count} игроков",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Вернуться к Circles",
+  "resultsRematch": "Реванш",
+  "resultsPlayAgain": "Играть снова",
+  "leaderboardGlobalTitle": "Глобальная таблица лидеров",
+  "leaderboardEmpty": "Таблица лидеров пока пуста.",
+  "aboutTitle": "О приложении",
+  "aboutVersion": "Версия {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA — это игровая платформа для изучения языков, которая делает освоение новых языков увлекательным и социальным. Присоединяйтесь к Circles, практикуйтесь самостоятельно и отслеживайте свой прогресс.",
+  "aboutTerms": "Условия использования",
+  "aboutPrivacy": "Политика конфиденциальности",
+  "aboutOpenSource": "Лицензии с открытым исходным кодом",
+  "addFriendTitle": "Добавить друга",
+  "addFriendFindByUsername": "Найти по имени пользователя",
+  "addFriendUsernameHint": "Введите имя пользователя...",
+  "addFriendTip": "Подсказка: Позже мы сможем поддерживать QR-код + ID друзей.",
+  "addFriendSending": "Отправка...",
+  "addFriendSendRequest": "Отправить запрос",
+  "addFriendUserNotFound": "Пользователь @{username} не найден",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Действие не удалось или уже отправлено: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Друзья",
+  "searchFriendsHint": "Поиск друзей...",
+  "somaLearnerSubtitle": "Учащийся Soma",
+  "friendRequestLabel": "Запрос",
+  "friendRequestSentLabel": "Запрос отправлен",
+  "friendIncomingRequestLabel": "Входящий запрос",
+  "friendRequestsSection": "Запросы",
+  "friendPendingSection": "Ожидающие",
+  "friendAllSection": "Все друзья",
+  "friendsEmptyState": "Пока нет друзей. Добавьте первого друга!",
+  "friendsEmptyShort": "Пока нет друзей.",
+  "noMatchForQuery": "Нет результатов для \"{query}\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Входящие",
+  "searchChatsHint": "Поиск чатов...",
+  "inboxEmptyState": "Пока нет бесед. Начните чат с другом!",
+  "newMessageTitle": "Новое сообщение",
+  "chatCallLater": "Голосовой звонок позже (язык Circle скоро)",
+  "errorWithDetails": "Ошибка: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Поздоровайтесь с {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Сообщение...",
+  "notificationsTitle": "Уведомления",
+  "notificationsTabAll": "Все",
+  "notificationsTabCourses": "Курсы",
+  "notificationsTabSocial": "Социальные",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "Система",
+  "notificationsEmpty": "Здесь нет уведомлений.",
+  "notificationsDeleted": "Уведомление удалено",
+  "notificationTitleFallback": "Уведомление",
+  "notificationTypeCourse": "Курс",
+  "notificationTypeSocial": "Социальное",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "Система",
+  "notificationsFriendAccepted": "Запрос в друзья принят",
+  "notificationsFriendAcceptFailed": "Не удалось принять запрос в друзья: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Запрос в друзья отклонен",
+  "notificationsFriendDeclineFailed": "Не удалось отклонить запрос в друзья: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Не удалось присоединиться к Circle: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Открытие",
+  "notificationsOpened": "Открыто",
+  "notificationsActionMessage": "{action} уведомление",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Настройки",
+  "settingsSectionAccount": "Аккаунт",
+  "settingsEditProfile": "Редактировать профиль",
+  "settingsPrivacy": "Конфиденциальность",
+  "settingsSecurity": "Безопасность",
+  "settingsSectionGameplay": "Игра",
+  "settingsShowTranslationLine": "Показать строку перевода",
+  "settingsShowReadingLine": "Показать чтение (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "Таймер по умолчанию на вопрос",
+  "settingsMatchDifficulty": "Сложность матча",
+  "settingsMatchDifficultyAdaptive": "Адаптивная",
+  "settingsSectionSoundFeel": "Звук и вибрация",
+  "settingsMusic": "Музыка",
+  "settingsSoundEffects": "Звуковые эффекты",
+  "settingsHaptics": "Вибрация",
+  "settingsSectionNotifications": "Уведомления",
+  "settingsPushNotifications": "Push-уведомления",
+  "settingsDailyReminder": "Ежедневное напоминание",
+  "settingsSectionAppearance": "Внешний вид",
+  "settingsTheme": "Тема",
+  "settingsUiLanguage": "Язык интерфейса",
+  "settingsSectionAbout": "О приложении",
+  "settingsVersion": "Версия",
+  "settingsTermsPrivacy": "Условия и конфиденциальность",
+  "settingsSupport": "Поддержка",
+  "settingsLogout": "Выйти",
+  "themeSystem": "Системная",
+  "themeDark": "Темная",
+  "themeLight": "Светлая",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Профиль обновлен",
+  "editProfileTitle": "Редактировать профиль",
+  "editProfilePhotoLabel": "Фото профиля",
+  "editProfilePhotoSubtitle": "Выбор аватара через Supabase Storage скоро.",
+  "editProfileChangePhoto": "Изменить",
+  "editProfileAvatarUploadSoon": "Загрузка аватара скоро доступна",
+  "editProfileDisplayNameLabel": "Отображаемое имя",
+  "editProfileDisplayNameHint": "Ваше имя",
+  "editProfileDisplayNameRequired": "Введите ваше имя",
+  "editProfileDisplayNameTooShort": "Слишком короткое",
+  "editProfileUsernameLabel": "Имя пользователя",
+  "editProfileUsernameHint": "alex_uchenik",
+  "editProfileUsernameRequired": "Введите имя пользователя",
+  "editProfileUsernameTooShort": "Мин. 3 символа",
+  "editProfileUsernameInvalid": "Только буквы, цифры, _",
+  "editProfileBioLabel": "О себе",
+  "editProfileBioHint": "Короткая биография...",
+  "editProfileBioTooLong": "Макс. 120 символов",
+  "editProfileLocationLabel": "Местоположение",
+  "editProfileLocationHint": "Город / Страна",
+  "editProfileDailyGoalTitle": "Ежедневная цель",
+  "editProfileDailyGoalSubtitle": "Выберите, сколько минут вы хотите заниматься каждый день.",
+  "securityTitle": "Безопасность",
+  "securitySectionPassword": "Пароль",
+  "securityChangePasswordTitle": "Изменить пароль",
+  "securityChangePasswordSubtitle": "Регулярно обновляйте пароль.",
+  "securitySectionTwoFactor": "Двухфакторная аутентификация",
+  "securityEnable2faTitle": "Включить 2FA",
+  "securityEnable2faSubtitle": "Дополнительная защита при входе.",
+  "securitySectionAppLock": "Блокировка приложения",
+  "securityBiometricTitle": "Биометрическая разблокировка",
+  "securityBiometricSubtitle": "Используйте FaceID/TouchID для разблокировки SOMA.",
+  "securityAppLockTitle": "Блокировка приложения",
+  "securityAppLockSubtitle": "Блокируйте SOMA при выходе из приложения.",
+  "securitySectionSessions": "Активные сессии",
+  "securityNoSessions": "Активных сессий не найдено.",
+  "securityThisDevice": "Это устройство",
+  "securityDevice": "Устройство",
+  "securityActiveLabel": "Активно",
+  "securitySignInToEnable2fa": "Войдите для включения 2FA",
+  "securityEnable2faFailed": "Не удалось включить 2FA: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "Не удалось отключить 2FA: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "Настроить 2FA",
+  "securitySecretKeyLabel": "Секретный ключ",
+  "securityCodeHint": "6-значный код",
+  "security2faEnabled": "2FA включена",
+  "securityVerifyCodeFailed": "Не удалось проверить код: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Проверка...",
+  "securityVerify": "Проверить",
+  "securityCurrentPasswordHint": "Текущий пароль",
+  "securityNewPasswordHint": "Новый пароль (мин. 8 символов)",
+  "securityConfirmPasswordHint": "Подтвердите новый пароль",
+  "securitySignInToChangePassword": "Войдите для изменения пароля",
+  "securityEnterCurrentPassword": "Введите текущий пароль",
+  "securityPasswordMinLength": "Новый пароль должен содержать минимум 8 символов",
+  "securityPasswordsDoNotMatch": "Пароли не совпадают",
+  "securityPasswordUpdated": "Пароль обновлен",
+  "securityPasswordUpdateFailed": "Не удалось обновить пароль: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Автоблокировка после",
+  "privacyTitle": "Конфиденциальность",
+  "privacySectionVisibility": "Видимость",
+  "privacyProfileVisibilityTitle": "Видимость профиля",
+  "privacyVisibilityPublic": "Публичный",
+  "privacyVisibilityFriends": "Друзья",
+  "privacyVisibilityPrivate": "Приватный",
+  "privacyVisibilityPublicSubtitle": "Любой может просматривать ваш профиль.",
+  "privacyVisibilityFriendsSubtitle": "Только друзья могут просматривать ваш профиль.",
+  "privacyVisibilityPrivateSubtitle": "Только вы можете просматривать ваш профиль.",
+  "privacySectionActivity": "Активность",
+  "privacyShowOnlineTitle": "Показывать статус онлайн",
+  "privacyShowOnlineSubtitle": "Позволить другим видеть, когда вы онлайн.",
+  "privacyShowActivityTitle": "Показывать учебную активность",
+  "privacyShowActivitySubtitle": "Отображать серию, XP и текущий прогресс.",
+  "privacySectionSocial": "Социальное",
+  "privacyAllowRequestsTitle": "Разрешить запросы в друзья",
+  "privacyAllowRequestsSubtitle": "Позволить людям отправлять запросы в друзья.",
+  "privacyWhoCanDmTitle": "Кто может отправлять сообщения",
+  "privacyDmEveryone": "Все",
+  "privacyDmFriends": "Друзья",
+  "privacyDmNoOne": "Никто",
+  "privacyDmEveryoneSubtitle": "Любой может отправлять сообщения.",
+  "privacyDmFriendsSubtitle": "Только друзья могут отправлять сообщения.",
+  "privacyDmNoOneSubtitle": "Никто не может отправлять сообщения.",
+  "privacySectionBlockedUsers": "Заблокированные пользователи",
+  "privacyBlockedUsersComingSoon": "Управление заблокированными пользователями скоро доступно.",
+  "privacySectionDataControls": "Управление данными",
+  "privacyExportDataTitle": "Экспортировать мои данные",
+  "privacyExportDataSubtitle": "Скачайте вашу активность и курсы.",
+  "privacyExportInfoTitle": "Экспорт данных",
+  "privacyExportInfoBody": "Следующий шаг: создайте экспорт JSON/CSV и отправьте по электронной почте или скачайте локально.",
+  "privacyDeleteAccountTitle": "Удалить аккаунт",
+  "privacyDeleteAccountSubtitle": "Это навсегда удалит ваш аккаунт и данные.",
+  "privacyDeleteConfirmTitle": "Удалить аккаунт?",
+  "privacyDeleteConfirmBody": "Это действие необратимо. Ваш профиль, курсы, друзья и сообщения будут удалены.",
+  "privacyDeleteComingSoon": "Удаление будет подключено к Supabase позже",
+  "soloLabel": "Соло",
+  "soloResultsCompletedTitle": "Соло-сессия завершена",
+  "soloResultsFeedbackElite": "Элитное выступление. Сохраняйте серию",
+  "soloResultsFeedbackStrong": "Отличная работа. Вы быстро улучшаетесь.",
+  "soloResultsFeedbackProgress": "Хороший прогресс. Повторите ошибки и попробуйте снова.",
+  "soloResultsFeedbackTryAgain": "Без стресса. Попробуйте снова с меньшим количеством вопросов и концентрацией.",
+  "soloResultsPerfectScore": "Идеальный результат! Нет ошибок для повторения.",
+  "soloResultsReviewPrompt": "Повторите ошибки, чтобы учиться быстрее. Мы покажем неправильные ответы ниже.",
+  "soloResultsReviewMistakes": "Повторить ошибки ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Вы не вошли в систему",
+  "genericUser": "Пользователь",
+  "loading": "Загрузка...",
+  "edit": "Редактировать",
+  "send": "Отправить",
+  "join": "Присоединиться",
+  "leave": "Выйти",
+  "ready": "Готов",
+  "levelBeginner": "Начинающий",
+  "levelIntermediate": "Средний",
+  "levelAdvanced": "Продвинутый",
+  "questionsShort": "{count} В",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count}с",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Все курсы",
+  "circlesAllModes": "Все режимы",
+  "circlesAllLevels": "Все уровни",
+  "circlesAddNewCourse": "Добавить новый курс",
+  "circlesCoursesTitle": "Курсы",
+  "circlesModeTitle": "Режим",
+  "circlesLevelTitle": "Уровень",
+  "circlesNoActiveForFilters": "Нет активных Circles для этих фильтров.",
+  "circlesUnknownRoom": "Неизвестная комната",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Создать Circle",
+  "circlesCircleName": "Название Circle",
+  "circlesEnterName": "Введите название",
+  "circlesLanguages": "Языки",
+  "circlesRoomSetup": "Настройка комнаты",
+  "circlesPlayers": "Игроки",
+  "circlesEmptySlot": "Пустое место",
+  "circlesPlayersRange": "1-5 игроков",
+  "circlesQuestions": "Вопросы",
+  "circlesQuestionsSubtitle": "Количество вопросов",
+  "circlesTimePerQuestion": "Время на вопрос",
+  "circlesSecondsPerQuestion": "Секунд на вопрос",
+  "circlesAdvanced": "Расширенные",
+  "circlesAllowSpectators": "Разрешить зрителей",
+  "circlesAllowSpectatorsSubtitle": "Позволить другим наблюдать без игры.",
+  "circlesLiveVoiceChat": "Голосовой чат вживую",
+  "circlesLiveVoiceChatSubtitle": "Включить голосовой чат во время матчей.",
+  "circlesLiveTextChat": "Текстовый чат вживую",
+  "circlesLiveTextChatSubtitle": "Включить чат во время матчей.",
+  "circlesCreatedSuccess": "Circle создан",
+  "circlesCreateError": "Не удалось создать Circle: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Подсказка: Вы можете пригласить друзей после создания.",
+  "circlesJoinError": "Не удалось присоединиться к Circle: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Лобби Circle",
+  "circlesCodeLine": "Код: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Настройки матча",
+  "circlesLevelWithValue": "Уровень {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Сложность",
+  "circlesPerQuestionShort": "на вопрос",
+  "circlesInvite": "Пригласить",
+  "circlesCopyId": "Копировать ID",
+  "circlesCopiedId": "ID скопирован",
+  "circlesMatchInProgress": "Матч идет",
+  "circlesSpectatorQueuedBody": "Матч идет. Вы присоединитесь как зритель.",
+  "circlesHostStartWhenReady": "Хост запустит, когда все будут готовы.",
+  "circlesSpectators": "Зрители",
+  "circlesSpectator": "Зритель",
+  "circlesSpectatorCanWatch": "Зрители могут смотреть вживую.",
+  "circlesJoinRequests": "Запросы на вход",
+  "circlesAcceptSpectatorsHint": "Примите зрителей до начала матча.",
+  "circlesStartGame": "Начать игру",
+  "circlesWaitingForPlayers": "Ожидание игроков",
+  "circlesLeaveCircle": "Покинуть Circle",
+  "circlesRequestSent": "Запрос отправлен",
+  "circlesRequestToJoin": "Запрос на вход",
+  "circlesWatchLive": "Смотреть вживую",
+  "circlesPlayerTip": "Нажмите Готов, когда будете готовы. Хост запустит матч.",
+  "circlesSpectatorTip": "Вы наблюдаете. Смотрите вживую, как только хост запустит.",
+  "circlesHostControls": "Управление хоста",
+  "circlesTransferHostFailed": "Не удалось передать хоста: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Не удалось завершить Circle: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "Пользователь @{username} не найден",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Неверный пользователь",
+  "circlesCantInviteSelf": "Вы не можете пригласить себя",
+  "circlesUserAlreadyInCircle": "Пользователь @{username} уже в Circle",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Хост",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "Пригласить по имени пользователя",
+  "circlesInviteSent": "Приглашение отправлено @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Не удалось отправить приглашение: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Запрос на вход отправлен",
+  "circlesJoinRequestFailed": "Запрос не удался: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle заполнен",
+  "circlesSpectatorAdded": "Зритель добавлен",
+  "circlesApproveFailed": "Не удалось одобрить запрос: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Запрос отклонен",
+  "circlesDeclineFailed": "Не удалось отклонить запрос: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Участник",
+  "circlesLeavePromptTitle": "Покинуть Circle?",
+  "circlesLeavePromptTransfer": "Передайте хоста перед уходом.",
+  "circlesLeavePromptEndOnly": "Завершите Circle и уйдите.",
+  "circlesTransferHost": "Передать хоста",
+  "circlesEndCircle": "Завершить Circle",
+  "circlesTransferHostTitle": "Передать хоста",
+  "circlesShareId": "ID Circle: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/glass.dart';
 import '../../models/friend.dart';
 import '../../data/social_repository.dart';
@@ -56,8 +56,7 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
     }).toList();
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
             child: Column(
@@ -159,7 +158,6 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
               ],
             ),
           ),
-        ),
       ),
     );
   }

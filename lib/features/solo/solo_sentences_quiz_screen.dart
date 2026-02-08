@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/pressable_scale.dart';
@@ -381,202 +381,200 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
 
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-            child: Column(
-              children: [
-                Row(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  _IconGlass(
+                      icon: Icons.arrow_back_ios_new_rounded,
+                      onTap: () => Navigator.pop(context)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      "Sentences • ${widget.course.title}",
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900),
+                    ),
+                  ),
+                  _IconGlass(
+                    icon: showReading
+                        ? Icons.text_fields_rounded
+                        : Icons.text_fields_outlined,
+                    onTap: () => setState(() => showReading = !showReading),
+                  ),
+                  const SizedBox(width: 10),
+                  _Pill(
+                      text: "${index + 1}/${widget.totalQuestions}",
+                      icon: Icons.layers_rounded),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Glass(
+                radius: BorderRadius.circular(22),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                child: Column(
                   children: [
-                    _IconGlass(
-                        icon: Icons.arrow_back_ios_new_rounded,
-                        onTap: () => Navigator.pop(context)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        "Sentences • ${widget.course.title}",
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900),
-                      ),
-                    ),
-                    _IconGlass(
-                      icon: showReading
-                          ? Icons.text_fields_rounded
-                          : Icons.text_fields_outlined,
-                      onTap: () => setState(() => showReading = !showReading),
-                    ),
-                    const SizedBox(width: 10),
-                    _Pill(
-                        text: "${index + 1}/${widget.totalQuestions}",
-                        icon: Icons.layers_rounded),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                Glass(
-                  radius: BorderRadius.circular(22),
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(999),
-                        child: SizedBox(
-                          height: 10,
-                          child: LinearProgressIndicator(
-                            value: progress,
-                            backgroundColor: Colors.white.withOpacity(0.10),
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Color.lerp(const Color(0xFF33D6FF),
-                                  const Color(0xFFFF4BD8), 1.0 - progress)!,
-                            ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: SizedBox(
+                        height: 10,
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          backgroundColor: Colors.white.withValues(alpha: 0.10),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color.lerp(const Color(0xFF33D6FF),
+                                const Color(0xFFFF4BD8), 1.0 - progress)!,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 14),
+                    ),
+                    const SizedBox(height: 14),
+                    Text(
+                      _prompt.isNotEmpty
+                          ? _prompt
+                          : (q["prompt"]?.toString() ?? ''),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          height: 1.25,
+                          fontWeight: FontWeight.w900),
+                    ),
+                    if (revealed &&
+                        showReading &&
+                        (q["reading"] as String?)?.trim().isNotEmpty ==
+                            true) ...[
+                      const SizedBox(height: 8),
                       Text(
-                        _prompt.isNotEmpty
-                            ? _prompt
-                            : (q["prompt"]?.toString() ?? ''),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            height: 1.25,
-                            fontWeight: FontWeight.w900),
-                      ),
-                      if (revealed &&
-                          showReading &&
-                          (q["reading"] as String?)?.trim().isNotEmpty ==
-                              true) ...[
-                        const SizedBox(height: 8),
-                        Text(
-                          q["reading"] as String,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Colors.white.withOpacity(0.55),
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                      const SizedBox(height: 10),
-                      Text(
-                        q["translation"],
+                        q["reading"] as String,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: Colors.white.withOpacity(0.80),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700),
+                            color: Colors.white.withValues(alpha: 0.55),
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w600),
                       ),
                     ],
-                  ),
+                    const SizedBox(height: 10),
+                    Text(
+                      q["translation"],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.80),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 14),
-                _TtsControls(
-                  rates: const [0.75, 1.0, 1.25],
-                  selectedRate: _speechRate,
-                  onRateSelected: (rate) {
-                    setState(() => _speechRate = rate);
-                    ttsService.setRate(rate);
-                  },
-                  onSpeak: _onSpeakTap,
-                  disabled: !revealed,
-                ),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: ListView.separated(
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: choices.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (_, i) {
-                      final isSel = selected == i;
-                      final isCorrect = i == _correctIndex;
+              ),
+              const SizedBox(height: 14),
+              _TtsControls(
+                rates: const [0.75, 1.0, 1.25],
+                selectedRate: _speechRate,
+                onRateSelected: (rate) {
+                  setState(() => _speechRate = rate);
+                  ttsService.setRate(rate);
+                },
+                onSpeak: _onSpeakTap,
+                disabled: !revealed,
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView.separated(
+                  physics: const BouncingScrollPhysics(),
+                  itemCount: choices.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (_, i) {
+                    final isSel = selected == i;
+                    final isCorrect = i == _correctIndex;
 
-                      Color bg = Colors.white.withOpacity(0.06);
-                      Color border = Colors.white.withOpacity(0.14);
+                    Color bg = Colors.white.withValues(alpha: 0.06);
+                    Color border = Colors.white.withValues(alpha: 0.14);
 
-                      if (revealed) {
-                        if (isCorrect) {
-                          bg = const Color(0xFF2AFADF).withOpacity(0.14);
-                          border = const Color(0xFF2AFADF).withOpacity(0.85);
-                        } else if (isSel) {
-                          bg = const Color(0xFFFF4FD8).withOpacity(0.12);
-                          border = const Color(0xFFFF4FD8).withOpacity(0.85);
-                        }
-                      } else {
-                        if (isSel) {
-                          bg = Colors.white.withOpacity(0.12);
-                          border = Colors.white.withOpacity(0.28);
-                        }
+                    if (revealed) {
+                      if (isCorrect) {
+                        bg = const Color(0xFF2AFADF).withValues(alpha: 0.14);
+                        border = const Color(0xFF2AFADF).withValues(alpha: 0.85);
+                      } else if (isSel) {
+                        bg = const Color(0xFFFF4FD8).withValues(alpha: 0.12);
+                        border = const Color(0xFFFF4FD8).withValues(alpha: 0.85);
                       }
+                    } else {
+                      if (isSel) {
+                        bg = Colors.white.withValues(alpha: 0.12);
+                        border = Colors.white.withValues(alpha: 0.28);
+                      }
+                    }
 
-                      return StaggeredIn(
-                        index: i,
-                        child: PressableScale(
-                          onTap: revealed
-                              ? null
-                              : () {
-                                  setState(() => selected = i);
-                                  _submit();
-                                },
-                          child: AnimatedScale(
-                            scale: revealed && isCorrect ? 1.02 : 1,
+                    return StaggeredIn(
+                      index: i,
+                      child: PressableScale(
+                        onTap: revealed
+                            ? null
+                            : () {
+                                setState(() => selected = i);
+                                _submit();
+                              },
+                        child: AnimatedScale(
+                          scale: revealed && isCorrect ? 1.02 : 1,
+                          duration: MotionTokens.short,
+                          curve: MotionTokens.standardCurve,
+                          child: AnimatedContainer(
                             duration: MotionTokens.short,
                             curve: MotionTokens.standardCurve,
-                            child: AnimatedContainer(
-                              duration: MotionTokens.short,
-                              curve: MotionTokens.standardCurve,
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(18),
-                                color: bg,
-                                border: Border.all(color: border),
-                                boxShadow: revealed && isCorrect
-                                    ? [
-                                        BoxShadow(
-                                          color: const Color(0xFF2AFADF).withOpacity(0.35),
-                                          blurRadius: 16,
-                                          spreadRadius: 1,
-                                        ),
-                                      ]
-                                    : [],
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      choices[i],
-                                      style: TextStyle(
-                                          color: Colors.white.withOpacity(0.92),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w800),
-                                    ),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18),
+                              color: bg,
+                              border: Border.all(color: border),
+                              boxShadow: revealed && isCorrect
+                                  ? [
+                                      BoxShadow(
+                                        color: const Color(0xFF2AFADF).withValues(alpha: 0.35),
+                                        blurRadius: 16,
+                                        spreadRadius: 1,
+                                      ),
+                                    ]
+                                  : [],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    choices[i],
+                                    style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.92),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w800),
                                   ),
-                                  if (revealed && isCorrect) ...[
-                                    const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
-                                    const SizedBox(width: 6),
-                                    const RewardSparkle(show: true),
-                                  ] else if (revealed && isSel && !isCorrect)
-                                    const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8))
-                                ],
-                              ),
+                                ),
+                                if (revealed && isCorrect) ...[
+                                  const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
+                                  const SizedBox(width: 6),
+                                  const RewardSparkle(show: true),
+                                ] else if (revealed && isSel && !isCorrect)
+                                  const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8))
+                              ],
                             ),
                           ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
-                const SizedBox(height: 10),
-                if (revealed && widget.timePerQuestion == null)
-                  NeonButton(
-                    label: "Next",
-                    onTap: _next,
-                  ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 10),
+              if (revealed && widget.timePerQuestion == null)
+                NeonButton(
+                  label: "Next",
+                  onTap: _next,
+                ),
+            ],
           ),
         ),
       ),
@@ -606,7 +604,7 @@ class _IconGlass extends StatelessWidget {
         child: Glass(
             radius: BorderRadius.circular(16),
             padding: const EdgeInsets.all(10),
-            child: Icon(icon, color: Colors.white.withOpacity(0.92))),
+            child: Icon(icon, color: Colors.white.withValues(alpha: 0.92))),
       );
 }
 
@@ -667,7 +665,7 @@ class _TtsControls extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(6),
                 child: Icon(Icons.volume_up_rounded,
-                    color: Colors.white.withOpacity(0.9)),
+                    color: Colors.white.withValues(alpha: 0.9)),
               ),
             ),
           ],
@@ -699,12 +697,12 @@ class _SpeedChip extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
           color: selected
-              ? Colors.white.withOpacity(0.16)
-              : Colors.white.withOpacity(0.08),
+              ? Colors.white.withValues(alpha: 0.16)
+              : Colors.white.withValues(alpha: 0.08),
           border: Border.all(
               color: selected
-                  ? Colors.white.withOpacity(0.32)
-                  : Colors.white.withOpacity(0.16)),
+                  ? Colors.white.withValues(alpha: 0.32)
+                  : Colors.white.withValues(alpha: 0.16)),
         ),
         alignment: Alignment.center,
         child: Text(
@@ -728,12 +726,12 @@ class _Pill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withOpacity(0.08),
-        border: Border.all(color: Colors.white.withOpacity(0.14)),
+        color: Colors.white.withValues(alpha: 0.08),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.white.withOpacity(0.9)),
+          Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.9)),
           const SizedBox(width: 6),
           Text(text,
               style: const TextStyle(

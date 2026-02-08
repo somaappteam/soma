@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/motion.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/staggered_in.dart';
 import '../../data/chat_repository.dart';
@@ -41,11 +41,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
     super.dispose();
   }
 
-  void _jumpToBottom() {
-    if (!_scroll.hasClients) return;
-    _scroll.jumpTo(_scroll.position.maxScrollExtent);
-  }
-
   void _send() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
@@ -71,8 +66,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Column(
             children: [
               _TopBar(
@@ -107,7 +101,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         return Center(
                             child: Text("Say hi to ${widget.otherName}! 👋",
                                 style: TextStyle(
-                                    color: Colors.white.withOpacity(0.5))));
+                                    color: Colors.white.withValues(alpha: 0.5))));
                       }
 
                       return ListView.builder(
@@ -160,7 +154,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
               ),
             ],
           ),
-        ),
       ),
     );
   }
@@ -224,7 +217,7 @@ class _TimeChip extends StatelessWidget {
       child: Text(
         time,
         style: TextStyle(
-          color: Colors.white.withOpacity(0.70),
+          color: Colors.white.withValues(alpha: 0.70),
           fontSize: 12,
           fontWeight: FontWeight.w800,
         ),
@@ -261,18 +254,18 @@ class _Bubble extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: radius,
             color: isMe
-                ? Colors.white.withOpacity(0.12)
-                : Colors.white.withOpacity(0.07),
+                ? Colors.white.withValues(alpha: 0.12)
+                : Colors.white.withValues(alpha: 0.07),
             border: Border.all(
               color: isMe
-                  ? Colors.white.withOpacity(0.24)
-                  : Colors.white.withOpacity(0.12),
+                  ? Colors.white.withValues(alpha: 0.24)
+                  : Colors.white.withValues(alpha: 0.12),
             ),
           ),
           child: Text(
             text,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.92),
+              color: Colors.white.withValues(alpha: 0.92),
               fontWeight: FontWeight.w700,
               height: 1.25,
               fontSize: 14.5,
@@ -312,7 +305,7 @@ class _InputBar extends StatelessWidget {
                 maxLines: 4,
                 decoration: InputDecoration(
                   hintText: "Message…",
-                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.45)),
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.45)),
                   border: InputBorder.none,
                   isDense: true,
                 ),
@@ -327,11 +320,11 @@ class _InputBar extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: Colors.white.withOpacity(0.10),
-                  border: Border.all(color: Colors.white.withOpacity(0.16)),
+                  color: Colors.white.withValues(alpha: 0.10),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
                 ),
                 child: Icon(Icons.send_rounded,
-                    color: Colors.white.withOpacity(0.92)),
+                    color: Colors.white.withValues(alpha: 0.92)),
               ),
             ),
           ],
@@ -354,7 +347,7 @@ class _IconGlass extends StatelessWidget {
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withOpacity(0.92), size: 20),
+        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 20),
       ),
     );
   }

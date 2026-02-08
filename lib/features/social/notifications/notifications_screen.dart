@@ -5,7 +5,7 @@ import '../../../data/notifications_store.dart';
 import '../../../data/notifications_repository.dart';
 import '../../../data/auth_repository.dart';
 import '../../../core/widgets/responsive.dart';
-import '../../../core/widgets/soma_background.dart';
+
 import '../../../data/circles_repository.dart';
 import '../../../data/social_repository.dart';
 import '../../circles/circle_lobby_screen.dart';
@@ -48,8 +48,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final activeTab = tabs.any((t) => t.value == tab) ? tab : tabs.first.value;
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: ResponsiveFrame(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
@@ -202,7 +201,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 
@@ -604,7 +602,6 @@ class _NotifCard extends StatelessWidget {
       case NotifType.circle:
         return Icons.radio_button_checked_rounded;
       case NotifType.system:
-      default:
         return Icons.auto_awesome_rounded;
     }
   }
@@ -619,7 +616,6 @@ class _NotifCard extends StatelessWidget {
       case NotifType.circle:
         return l10n.notificationTypeCircle;
       case NotifType.system:
-      default:
         return l10n.notificationTypeSystem;
     }
   }

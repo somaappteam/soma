@@ -115,6 +115,7 @@ class _AppShellState extends State<AppShell> {
         final isWide = constraints.maxWidth >= SomaBreakpoints.medium;
 
         return Scaffold(
+          backgroundColor: Colors.transparent,
           body: isWide
               ? Row(
                   children: [
@@ -372,21 +373,6 @@ class _RailItem extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _PlaceholderPage extends StatelessWidget {
-  final String title;
-  const _PlaceholderPage({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Text(title, style: const TextStyle(color: Colors.white)),
-      ),
-      backgroundColor: Colors.black,
     );
   }
 }

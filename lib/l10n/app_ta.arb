@@ -1,0 +1,781 @@
+{
+  "@@locale": "ta",
+  "appTitle": "SOMA",
+  "welcomeTagline": "கற்க. போட்டியிட. தேர்ச்சி பெற.",
+  "signUp": "பதிவு செய்",
+  "signIn": "உள்நுழைக",
+  "skipForNow": "இப்போதைக்குத் தவிர்",
+  "authFillAllFields": "தயவுசெய்து எல்லா புலங்களையும் நிரப்புக",
+  "authError": "பிழை: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "மின்னஞ்சல்",
+  "authPassword": "கடவுச்சொல்",
+  "authUsername": "பயனர்பெயர்",
+  "authContinue": "தொடரவும்",
+  "authSigningIn": "உள்நுழைகிறது...",
+  "authCreateAccount": "கணக்கை உருவாக்கு",
+  "authCreating": "உருவாக்குகிறது...",
+  "authNeedAccount": "கணக்கு இல்லையா? ",
+  "authHaveAccount": "ஏற்கனவே கணக்கு உள்ளதா? ",
+  "dialogAuthRequiredTitle": "Circles-ல் சேர உள்நுழையவும்",
+  "dialogAuthRequiredBody": "Circles பல்விளையாட்டு அறைகள். நேரலை போட்டிகளில் சேரவும், நண்பர்களை அழைக்கவும், முன்னேற்றத்தைச் சேமிக்கவும் கணக்கை உருவாக்கவும்.",
+  "notNow": "இப்போது இல்லை",
+  "navHome": "முகப்பு",
+  "navCircles": "Circles",
+  "navProfile": "சுயவிவரம்",
+  "removeCourseTitle": "பாடத்திட்டத்தை நீக்கவா?",
+  "removeCourseBody": "{course} உங்கள் பட்டியலில் இருந்து நீக்கப்படும்",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "ரத்துசெய்",
+  "remove": "நீக்கு",
+  "welcomeBack": "மீண்டும் வருக, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "பாடத்திட்டங்களைத் தொகு",
+  "done": "முடிந்தது",
+  "noCoursesToEdit": "தொகுக்க பாடத்திட்டங்கள் இல்லை",
+  "addCourse": "பாடத்திட்டத்தைச் சேர்",
+  "unknown": "தெரியாத",
+  "iSpeak": "நான் பேசுவது",
+  "iWantToLearn": "நான் கற்க விரும்புவது",
+  "chooseYourLanguage": "உங்கள் மொழியைத் தேர்வுசெய்க",
+  "chooseLearningLanguage": "கற்கும் மொழியைத் தேர்வுசெய்க",
+  "chooseTwoDifferentLanguages": "தயவுசெய்து இரண்டு வெவ்வேறு மொழிகளைத் தேர்வுசெய்க",
+  "createCourse": "பாடத்திட்டத்தை உருவாக்கு",
+  "soloCourseTitle": "தனிப் பாடத்திட்டம்",
+  "searchLanguage": "மொழியைத் தேடு",
+  "noMatches": "பொருத்தங்கள் இல்லை",
+  "chooseCourseType": "பாடத்திட்ட வகையைத் தேர்வுசெய்க",
+  "soloStudyDescription": "Circles போன்ற வினாடி வினாக்களுடன் தனியாகப் பயிற்சி செய்யுங்கள் - ஆனால் அறைகள், அரட்டை, பார்வையாளர்கள் அல்லது தொகுப்பாளர் விருப்பங்கள் இல்லாமல்",
+  "soloModeVocabulary": "சொற்களஞ்சியம்",
+  "soloModeSentences": "வாக்கியங்கள்",
+  "soloModeReview": "மதிப்பாய்வு",
+  "soloModeVocabularySubtitle": "பல தேர்வு, பொருள்கள், ஒத்தச்சொற்கள், பயன்பாடு",
+  "soloModeSentencesSubtitle": "காலியிடங்களை நிரப்பு + மொழிபெயர்ப்பு + வாசிப்பு",
+  "soloModeReviewDescription": "கற்றவற்றைப் பயிற்சி செய்யுங்கள்: பலவீனமான சொற்கள், சமீபத்திய பிழைகள் மற்றும் இடைவெளி முறையிலான மறுலாய்வு",
+  "startReview": "மதிப்பாய்வைத் துவங்கு",
+  "soloSetupTitle": "{mode} அமைப்பு",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "கடினத்தன்மை",
+  "numberOfQuestions": "கேள்விகள் எண்ணிக்கை",
+  "timerPerQuestion": "கேள்விக்கான நேரம்",
+  "noTimer": "நேரம் இல்லை",
+  "start": "துவங்கு",
+  "profileTitle": "சுயவிவரம்",
+  "profileSignInToMessage": "செய்தி அனுப்ப உள்நுழையவும்",
+  "profileThatsYourProfile": "இது உங்கள் சுயவிவரம்",
+  "profileSignInToAddFriends": "நண்பர்களைச் சேர்க்க உள்நுழையவும்",
+  "profileCantAddYourself": "உங்களை நீங்களே சேர்க்க முடியாது",
+  "profileRequestSent": "@{username}-க்கு கோரிக்கை அனுப்பப்பட்டது",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "கோரிக்கை அனுப்புவதில் தோல்வி",
+  "profileDefaultDisplayName": "புதிய பயனர்",
+  "profileDefaultBio": "கற்கத் தயார்!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "விருந்தினர்",
+  "guestUsername": "விருந்தினர்",
+  "guestSessionLabel": "விருந்தினர் அமர்வு",
+  "unlockFullProfile": "முழு சுயவிவரத்தைத் திற",
+  "guestBenefitSync": "எல்லா சாதனங்களிலும் முன்னேற்றத்தை ஒத்திசைக்கவும்",
+  "guestBenefitCircles": "Circles-ல் சேரவும் நேரலையில் விளையாடவும்",
+  "guestBenefitNotifications": "அறிவிப்புகள் மற்றும் நட்பு கோரிக்கைகளைப் பெறவும்",
+  "progressStaysOnDevice": "நீங்கள் உள்நுழையும் வரை முன்னேற்றம் இந்த சாதனத்தில் இருக்கும்",
+  "profileGoalLabel": "இலக்கு: {minutes} நிமி",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP முன்னேற்றம்",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "வெற்றிகள்",
+  "profileStreak": "தொடர்",
+  "profileFriendsTitle": "நண்பர்கள்",
+  "profileViewAll": "எல்லாவற்றையும் பார்",
+  "profileAchievementsTitle": "சாதனைகள்",
+  "profileNoAchievements": "இன்னும் சாதனைகள் இல்லை",
+  "profileRequested": "கோரப்பட்டது",
+  "profileSending": "அனுப்புகிறது...",
+  "profileAddFriend": "நண்பரைச் சேர்",
+  "profileConnectTitle": "இணை",
+  "profileMessage": "செய்தி",
+  "profileSnapshot": "சுயவிவரப் படம்",
+  "profileLocationHidden": "இடம் மறைக்கப்பட்டது",
+  "profileBioHidden": "வாழ்க்கைக்குறிப்பு மறைக்கப்பட்டது",
+  "profileDailyGoal": "தினசரி இலக்கு {minutes} நிமி",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle அழைப்பு",
+  "circleIdLabel": "Circle ஐடி: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "சேர உள்நுழையவும்",
+  "joiningCircle": "சேருகிறது...",
+  "joinCircle": "Circles-ல் சேரவும்",
+  "circleJoinedAsPlayer": "வீரராகச் சேர்ந்தார்",
+  "circleJoinedAsSpectator": "பார்வையாளராகச் சேர்ந்தார்",
+  "accept": "ஏற்றுக்கொள்",
+  "decline": "நிராகரி",
+  "open": "திற",
+  "circleCountdownTitle": "தயாராகுங்கள்",
+  "circleCountdownSubtitle": "Circle துவங்குகிறது...",
+  "userFallbackName": "பயனர்",
+  "micOff": "மைக் ஆஃப்",
+  "micOn": "மைக் ஆன்",
+  "roleHost": "தொகுப்பாளர்",
+  "roleSpectator": "பார்வையாளர்",
+  "tagHost": "ஹோஸ்ட்",
+  "tagYou": "நீங்கள்",
+  "statusCorrect": "சரி",
+  "statusWrong": "தவறு",
+  "statusWaiting": "காத்திருக்கிறது",
+  "statusNone": "-",
+  "pointsAbbrev": "pts",
+  "pointsLabel": "புள்ளிகள்",
+  "statCorrect": "சரி",
+  "statAnswers": "பதில்கள்",
+  "statTotal": "மொத்தம்",
+  "statQuestions": "கேள்விகள்",
+  "statAccuracy": "துல்லியம்",
+  "statRate": "விகிதம்",
+  "statRank": "தரவரிசை",
+  "statPosition": "நிலை",
+  "statMode": "பயன்முறை",
+  "statType": "வகை",
+  "next": "அடுத்து",
+  "submit": "சமர்ப்பி",
+  "continueLabel": "தொடரவும்",
+  "save": "சேமி",
+  "playAgain": "மீண்டும் விளையாடு",
+  "backToCourse": "பாடத்திட்டத்திற்குத் திரும்பு",
+  "resultsTitle": "முடிவுகள்",
+  "shareLater": "பிறகு பகிரவும்",
+  "delete": "நீக்கு",
+  "ok": "சரி",
+  "minutesShort": "{minutes} நிமி",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} நிமி",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} மணி",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} நாட்கள்",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "இப்போதுதான்",
+  "timeMinutesAgo": "{count} நிமி முன்",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} மணி முன்",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} நாட்கள் முன்",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "தொகுப்பாளருக்காகக் காத்திருக்கிறது...",
+  "liveQuizJoinRequestSent": "சேரும் கோரிக்கை அனுப்பப்பட்டது",
+  "liveQuizJoinRequestFailed": "கோரிக்கை அனுப்புவதில் தோல்வி: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "தொகுப்பாளர் கட்டுப்பாடுகள்",
+  "liveQuizSpectatorModeTitle": "பார்வையாளர் பயன்முறை",
+  "liveQuizHostControlsSubtitle": "அனைவரும் பதிலளிக்கும்போது அல்லது நேரம் முடியும்போது சுற்றுகள் தானாகவே முன்னேறும்",
+  "liveQuizSpectatorModeSubtitle": "கேள்விகள் மற்றும் லீடர்போர்டுகளை நேரலையில் பாருங்கள். உங்களால் பதிலளிக்க முடியாது",
+  "liveQuizQuestionCounter": "கேள்வி {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "கோரிக்கை அனுப்பப்பட்டது",
+  "liveQuizRequestToJoin": "சேரக் கோரிக்கை",
+  "liveQuizSpectatorFooter": "நீங்கள் நேரலையில் பார்க்கிறீர்கள். கேள்விகள் மற்றும் லீடர்போர்டுகளை ரசியுங்கள்",
+  "circleNotFound": "Circle காணப்படவில்லை",
+  "resultsRematchStartFailed": "மீண்டும் விளையாடத் துவங்குவதில் தோல்வி: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "போட்டி முடிவுகள்",
+  "resultsNiceWork": "நன்று, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "முதல் இடம்",
+  "resultsPlaceSecond": "இரண்டாம் இடம்",
+  "resultsPlaceThird": "மூன்றாம் இடம்",
+  "resultsPlaceNth": "{rank}-ம் இடம்",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "{players} வீரர்களில்",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "சாம்பியன்! இந்தச் சுற்றில் நீங்கள் ஆதிக்கம் செலுத்தினீர்கள்",
+  "resultsHighlightGreatAccuracy": "சிறந்த துல்லியம் - மிகவும் துல்லியமாக!",
+  "resultsHighlightKeepGoing": "தொடருங்கள் - நிலைத்தன்மையும் வேகத்தை வெல்கிறது",
+  "resultsLeaderboardTitle": "லீடர்போர்டு",
+  "resultsPlayersCount": "{count} வீரர்கள்",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Circles-க்குத் திரும்பு",
+  "resultsRematch": "மீண்டும் விளையாடு",
+  "resultsPlayAgain": "மீண்டும் விளையாடு",
+  "leaderboardGlobalTitle": "உலகளாவிய லீடர்போர்டு",
+  "leaderboardEmpty": "தரவரிசை இன்னும் இல்லை",
+  "aboutTitle": "விவரம்",
+  "aboutVersion": "பதிப்பு {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA ஒரு விளையாட்டு சார்ந்த மொழி கற்றல் தளம், புதிய மொழிகளில் தேர்ச்சி பெறுவதை வேடிக்கையாகவும் சமூகமாகவும் மாற்றுகிறது. Circles-ல் போட்டியிடவும், தனியாகப் பயிற்சி செய்யவும் மற்றும் உங்கள் முன்னேற்றத்தைக் கண்காணிக்கவும்.",
+  "aboutTerms": "பயன்பாட்டு விதிமுறைகள்",
+  "aboutPrivacy": "தனியுரிமைக் கொள்கை",
+  "aboutOpenSource": "திறந்த மூல உரிமங்கள்",
+  "addFriendTitle": "நண்பரைச் சேர்",
+  "addFriendFindByUsername": "பயனர்பெயர் மூலம் கண்டுபிடி",
+  "addFriendUsernameHint": "பயனர்பெயரை உள்ளிடவும்...",
+  "addFriendTip": "குறிப்பு: QR குறியீடு + நண்பர் ஐடி ஆதரவு விரைவில் வரும்",
+  "addFriendSending": "அனுப்புகிறது...",
+  "addFriendSendRequest": "கோரிக்கையை அனுப்பு",
+  "addFriendUserNotFound": "பயனர் @{username} காணப்படவில்லை",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "செயல் தோல்வியடைந்தது அல்லது ஏற்கனவே அனுப்பப்பட்டது: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "நண்பர்கள்",
+  "searchFriendsHint": "நண்பர்களைத் தேடு...",
+  "somaLearnerSubtitle": "Soma கற்பவர்",
+  "friendRequestLabel": "கோரிக்கை",
+  "friendRequestSentLabel": "கோரிக்கை அனுப்பப்பட்டது",
+  "friendIncomingRequestLabel": "வரும் கோரிக்கை",
+  "friendRequestsSection": "கோரிக்கைகள்",
+  "friendPendingSection": "நிலுவையில்",
+  "friendAllSection": "எல்லா நண்பர்களும்",
+  "friendsEmptyState": "இன்னும் நண்பர்கள் இல்லை. உங்கள் முதல் நண்பரைச் சேர்க்கவும்!",
+  "friendsEmptyShort": "இன்னும் நண்பர்கள் இல்லை",
+  "noMatchForQuery": "\\\"{query}\\\"-க்குப் பொருத்தங்கள் இல்லை",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "இன்பாக்ஸ்",
+  "searchChatsHint": "அரட்டைகளைத் தேடு...",
+  "inboxEmptyState": "இன்னும் அரட்டைகள் இல்லை. நண்பருடன் உரையாடலைத் துவங்குங்கள்!",
+  "newMessageTitle": "புதிய செய்தி",
+  "chatCallLater": "குரல் அழைப்பு விரைவில் (அடுத்த Circle குரல்)",
+  "errorWithDetails": "பிழை: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "{name}-க்கு ஹலோ சொல்லுங்கள்!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "செய்தி...",
+  "notificationsTitle": "அறிவிப்புகள்",
+  "notificationsTabAll": "எல்லாம்",
+  "notificationsTabCourses": "பாடத்திட்டங்கள்",
+  "notificationsTabSocial": "சமூகம்",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "அமைப்பு",
+  "notificationsEmpty": "அறிவிப்புகள் இல்லை",
+  "notificationsDeleted": "அறிவிப்பு நீக்கப்பட்டது",
+  "notificationTitleFallback": "அறிவிப்பு",
+  "notificationTypeCourse": "பாடத்திட்டம்",
+  "notificationTypeSocial": "சமூகம்",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "அமைப்பு",
+  "notificationsFriendAccepted": "நட்பு கோரிக்கை ஏற்கப்பட்டது",
+  "notificationsFriendAcceptFailed": "நட்பு கோரிக்கையை ஏற்க முடியவில்லை: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "நட்பு கோரிக்கை நிராகரிக்கப்பட்டது",
+  "notificationsFriendDeclineFailed": "நட்பு கோரிக்கையை நிராகரிக்க முடியவில்லை: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Circle-ல் சேர முடியவில்லை: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "திறக்கிறது",
+  "notificationsOpened": "திறக்கப்பட்டது",
+  "notificationsActionMessage": "{action} அறிவிப்பு",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "அமைப்புகள்",
+  "settingsSectionAccount": "கணக்கு",
+  "settingsEditProfile": "சுயவிவரத்தைத் தொகு",
+  "settingsPrivacy": "தனியுரிமை",
+  "settingsSecurity": "பாதுகாப்பு",
+  "settingsSectionGameplay": "விளையாட்டு முறை",
+  "settingsShowTranslationLine": "மொழிபெயர்ப்பு வரியைக் காட்டு",
+  "settingsShowReadingLine": "வாசிப்பைக் காட்டு (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "கேள்விக்கான இயல்புநிலை டைமர்",
+  "settingsMatchDifficulty": "போட்டி கடினத்தன்மை",
+  "settingsMatchDifficultyAdaptive": "தகவமைக்கும்",
+  "settingsSectionSoundFeel": "ஒலி & உணர்வு",
+  "settingsMusic": "இசை",
+  "settingsSoundEffects": "ஒலி விளைவுகள்",
+  "settingsHaptics": "அதிர்வுகள்",
+  "settingsSectionNotifications": "அறிவிப்புகள்",
+  "settingsPushNotifications": "புஷ் அறிவிப்புகள்",
+  "settingsDailyReminder": "தினசரி நினைவூட்டல்",
+  "settingsSectionAppearance": "தோற்றம்",
+  "settingsTheme": "தீம்",
+  "settingsUiLanguage": "UI மொழி",
+  "settingsSectionAbout": "பற்றி",
+  "settingsVersion": "பதிப்பு",
+  "settingsTermsPrivacy": "விதிமுறைகள் & தனியுரிமை",
+  "settingsSupport": "ஆதரவு",
+  "settingsLogout": "வெளியேறு",
+  "themeSystem": "அமைப்பு",
+  "themeDark": "டார்க்",
+  "themeLight": "லைட்",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "فارسی",
+  "languagePunjabi": "ਪੰਜਾਬੀ",
+  "languageTamil": "தமிழ்",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "சுயவிவரம் புதுப்பிக்கப்பட்டது",
+  "editProfileTitle": "சுயவிவரத்தைத் தொகு",
+  "editProfilePhotoLabel": "சுயவிவரப் படம்",
+  "editProfilePhotoSubtitle": "Supabase Storage வழியாக அவதார் தேர்வு விரைவில்",
+  "editProfileChangePhoto": "மாற்று",
+  "editProfileAvatarUploadSoon": "அவதார் பதிவேற்றம் விரைவில் வரும்",
+  "editProfileDisplayNameLabel": "காட்சிப் பெயர்",
+  "editProfileDisplayNameHint": "உங்கள் பெயர்",
+  "editProfileDisplayNameRequired": "உங்கள் பெயரை உள்ளிடவும்",
+  "editProfileDisplayNameTooShort": "மிகவும் சிறியது",
+  "editProfileUsernameLabel": "பயனர்பெயர்",
+  "editProfileUsernameHint": "learner_ali",
+  "editProfileUsernameRequired": "பயனர்பெயரை உள்ளிடவும்",
+  "editProfileUsernameTooShort": "குறைந்தது 3 எழுத்துக்கள்",
+  "editProfileUsernameInvalid": "எழுத்துக்கள், எண்கள், _ மட்டும்",
+  "editProfileBioLabel": "வாழ்க்கைக்குறிப்பு",
+  "editProfileBioHint": "ஒரு சிறிய குறிப்பு...",
+  "editProfileBioTooLong": "அதிகபட்சம் 120 எழுத்துக்கள்",
+  "editProfileLocationLabel": "இடம்",
+  "editProfileLocationHint": "நகரம் / நாடு",
+  "editProfileDailyGoalTitle": "தினசரி இலக்கு",
+  "editProfileDailyGoalSubtitle": "தினமும் எத்தனை நிமிடங்கள் படிக்க விரும்புகிறீர்கள் என்பதைத் தேர்வுசெய்க",
+  "securityTitle": "பாதுகாப்பு",
+  "securitySectionPassword": "கடவுச்சொல்",
+  "securityChangePasswordTitle": "கடவுச்சொல்லை மாற்று",
+  "securityChangePasswordSubtitle": "உங்கள் கடவுச்சொல்லை ஒழுங்காகப் புதுப்பிக்கவும்",
+  "securitySectionTwoFactor": "இரண்டு காரணி அங்கீகாரம்",
+  "securityEnable2faTitle": "2FA-ஐ இயக்கு",
+  "securityEnable2faSubtitle": "உள்நுழையும்போது கூடுதல் பாதுகாப்பு",
+  "securitySectionAppLock": "செயலி பூட்டு",
+  "securityBiometricTitle": "பயோமெட்ரிக் திறப்பு",
+  "securityBiometricSubtitle": "SOMA-ஐத் திறக்க FaceID/TouchID பயன்படுத்தவும்",
+  "securityAppLockTitle": "செயலி பூட்டு",
+  "securityAppLockSubtitle": "நீங்கள் வெளியேறும்போது SOMA-ஐப் பூட்டவும்",
+  "securitySectionSessions": "செயலில் உள்ள அமர்வுகள்",
+  "securityNoSessions": "செயலில் உள்ள அமர்வுகள் இல்லை",
+  "securityThisDevice": "இந்தச் சாதனம்",
+  "securityDevice": "சாதனம்",
+  "securityActiveLabel": "செயலில்",
+  "securitySignInToEnable2fa": "2FA-ஐ இயக்க உள்நுழையவும்",
+  "securityEnable2faFailed": "2FA-ஐ இயக்க முடியவில்லை: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FA-ஐ முடக்க முடியவில்லை: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA அமைப்பு",
+  "securitySecretKeyLabel": "ரகசிய விசை",
+  "securityCodeHint": "6-இலக்க குறியீடு",
+  "security2faEnabled": "2FA இயக்கப்பட்டது",
+  "securityVerifyCodeFailed": "குறியீட்டைச் சரிபார்க்க முடியவில்லை: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "சரிபார்க்கிறது...",
+  "securityVerify": "சரிபார்",
+  "securityCurrentPasswordHint": "தற்போதைய கடவுச்சொல்",
+  "securityNewPasswordHint": "புதிய கடவுச்சொல் (குறைந்தது 8 எழுத்துக்கள்)",
+  "securityConfirmPasswordHint": "புதிய கடவுச்சொல்லை உறுதிப்படுத்தவும்",
+  "securitySignInToChangePassword": "கடவுச்சொல்லை மாற்ற உள்நுழையவும்",
+  "securityEnterCurrentPassword": "உங்கள் தற்போதைய கடவுச்சொல்லை உள்ளிடவும்",
+  "securityPasswordMinLength": "புதிய கடவுச்சொல் குறைந்தது 8 எழுத்துக்கள் இருக்க வேண்டும்",
+  "securityPasswordsDoNotMatch": "கடவுச்சொற்கள் பொருந்தவில்லை",
+  "securityPasswordUpdated": "கடவுச்சொல் புதுப்பிக்கப்பட்டது",
+  "securityPasswordUpdateFailed": "கடவுச்சொல்லைப் புதுப்பிக்க முடியவில்லை: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "தானியங்கி பூட்டு நேரம்",
+  "privacyTitle": "தனியுரிமை",
+  "privacySectionVisibility": "தோற்றம்",
+  "privacyProfileVisibilityTitle": "சுயவிவரத் தோற்றம்",
+  "privacyVisibilityPublic": "பொது",
+  "privacyVisibilityFriends": "நண்பர்கள்",
+  "privacyVisibilityPrivate": "தனிப்பட்ட",
+  "privacyVisibilityPublicSubtitle": "யார் வேண்டுமானாலும் உங்கள் சுயவிவரத்தைப் பார்க்கலாம்",
+  "privacyVisibilityFriendsSubtitle": "நண்பர்கள் மட்டுமே உங்கள் சுயவிவரத்தைப் பார்க்க முடியும்",
+  "privacyVisibilityPrivateSubtitle": "நீங்கள் மட்டுமே உங்கள் சுயவிவரத்தைப் பார்க்க முடியும்",
+  "privacySectionActivity": "செயல்பாடு",
+  "privacyShowOnlineTitle": "ஆன்லைன் நிலையைத் காட்டு",
+  "privacyShowOnlineSubtitle": "நீங்கள் ஆன்லைனில் இருப்பதை வீரர்கள் பார்க்க அனுமதி",
+  "privacyShowActivityTitle": "கற்றல் செயல்பாட்டைக் காட்டு",
+  "privacyShowActivitySubtitle": "தொடர், XP மற்றும் சமீபத்திய முன்னேற்றத்தைக் காட்டு",
+  "privacySectionSocial": "சமூகம்",
+  "privacyAllowRequestsTitle": "நட்பு கோரிக்கைகளை அனுமதி",
+  "privacyAllowRequestsSubtitle": "மக்கள் உங்களுக்கு நட்பு கோரிக்கைகளை அனுப்ப அனுமதி",
+  "privacyWhoCanDmTitle": "யார் DM அனுப்பலாம்",
+  "privacyDmEveryone": "எல்லோரும்",
+  "privacyDmFriends": "நண்பர்கள்",
+  "privacyDmNoOne": "யாரும் இல்லை",
+  "privacyDmEveryoneSubtitle": "யார் வேண்டுமானாலும் உங்களுக்கு செய்தி அனுப்பலாம்",
+  "privacyDmFriendsSubtitle": "நண்பர்கள் மட்டுமே உங்களுக்கு செய்தி அனுப்ப முடியும்",
+  "privacyDmNoOneSubtitle": "யாரும் உங்களுக்கு செய்தி அனுப்ப முடியாது",
+  "privacySectionBlockedUsers": "தடுக்கப்பட்ட பயனர்கள்",
+  "privacyBlockedUsersComingSoon": "தடுக்கப்பட்ட பயனர்கள் மேலாண்மை விரைவில்",
+  "privacySectionDataControls": "தரவு கட்டுப்பாடுகள்",
+  "privacyExportDataTitle": "எனது தரவை ஏற்றுமதி செய்",
+  "privacyExportDataSubtitle": "உங்கள் செயல்பாடு மற்றும் பாடத்திட்டங்களைப் பதிவிறக்குங்கள்",
+  "privacyExportInfoTitle": "தரவு ஏற்றுமதி",
+  "privacyExportInfoBody": "அடுத்த கட்டம்: JSON/CSV ஏற்றுமதியை உருவாக்கி மின்னஞ்சல் அல்லது உள்ளூர் பதிவிறக்கம்",
+  "privacyDeleteAccountTitle": "கணக்கை நீக்கு",
+  "privacyDeleteAccountSubtitle": "இது உங்கள் கணக்கையும் தரவையும் நிரந்தரமாக நீக்கும்",
+  "privacyDeleteConfirmTitle": "கணக்கை நீக்கவா?",
+  "privacyDeleteConfirmBody": "இதை மாற்ற முடியாது. உங்கள் சுயவிவரம், பாடத்திட்டங்கள், நண்பர்கள் மற்றும் செய்திகள் நீக்கப்படும்",
+  "privacyDeleteComingSoon": "நீக்குதல் பின்னர் Supabase உடன் இணைக்கப்படும்",
+  "soloLabel": "தனி",
+  "soloResultsCompletedTitle": "தனி அமர்வு முடிந்தது",
+  "soloResultsFeedbackElite": "சிறப்பு செயல்திறன் - தொடரைத் தக்கவைக்கவும்",
+  "soloResultsFeedbackStrong": "வலுவான வேலை - வேகமாக மேம்படுகிறது",
+  "soloResultsFeedbackProgress": "நல்ல முன்னேற்றம் - பிழைகளை மதிப்பாய்வு செய்து மீண்டும் முயற்சிக்கவும்",
+  "soloResultsFeedbackTryAgain": "அழுத்தம் இல்லை - குறைவான கேள்விகளுடன் மீண்டும் முயற்சிக்கவும் மற்றும் கவனம் செலுத்தவும்",
+  "soloResultsPerfectScore": "முழு மதிப்பெண்! மதிப்பாய்வு செய்ய பிழைகள் இல்லை",
+  "soloResultsReviewPrompt": "வேகமாகக் கற்க பிழைகளை மதிப்பாய்வு செய்யவும். உங்கள் தவறான பதில்கள் கீழே",
+  "soloResultsReviewMistakes": "பிழைகளை மதிப்பாய்வு செய் ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "உள்நுழையவில்லை",
+  "genericUser": "பயனர்",
+  "loading": "ஏற்றுகிறது...",
+  "edit": "தொகு",
+  "send": "அனுப்பு",
+  "join": "சேர்",
+  "leave": "விலகு",
+  "ready": "தயார்",
+  "levelBeginner": "தொடக்கநிலை",
+  "levelIntermediate": "இடைநிலை",
+  "levelAdvanced": "மேம்பட்ட",
+  "questionsShort": "{count} கேள்விகள்",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} வினாடிகள்",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "எல்லா பாடத்திட்டங்களும்",
+  "circlesAllModes": "எல்லா முறைகளும்",
+  "circlesAllLevels": "எல்லா நிலைகளும்",
+  "circlesAddNewCourse": "புதிய பாடத்திட்டத்தைச் சேர்",
+  "circlesCoursesTitle": "பாடத்திட்டங்கள்",
+  "circlesModeTitle": "முறை",
+  "circlesLevelTitle": "நிலை",
+  "circlesNoActiveForFilters": "இந்த வடிப்பான்களுக்கு செயலில் உள்ள Circle இல்லை",
+  "circlesUnknownRoom": "தெரியாத அறை",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Circle உருவாக்கு",
+  "circlesCircleName": "Circle பெயர்",
+  "circlesEnterName": "பெயரை உள்ளிடுக",
+  "circlesLanguages": "மொழிகள்",
+  "circlesRoomSetup": "அறை அமைப்பு",
+  "circlesPlayers": "வீரர்கள்",
+  "circlesEmptySlot": "காலியிடம்",
+  "circlesPlayersRange": "1-5 வீரர்கள்",
+  "circlesQuestions": "கேள்விகள்",
+  "circlesQuestionsSubtitle": "கேள்விகள் எண்ணிக்கை",
+  "circlesTimePerQuestion": "கேள்விக்கான நேரம்",
+  "circlesSecondsPerQuestion": "வினாடி/கேள்வி",
+  "circlesAdvanced": "மேம்பட்ட",
+  "circlesAllowSpectators": "பார்வையாளர்களை அனுமதி",
+  "circlesAllowSpectatorsSubtitle": "Let others watch without playing.",
+  "circlesLiveVoiceChat": "நேரலை குரல் அரட்டை",
+  "circlesLiveVoiceChatSubtitle": "போட்டிகளின் போது குரல் தொடர்புகளை இயக்கு",
+  "circlesLiveTextChat": "நேரலை உரை அரட்டை",
+  "circlesLiveTextChatSubtitle": "போட்டிகளின் போது அரட்டையை இயக்கு",
+  "circlesCreatedSuccess": "Circle உருவாக்கப்பட்டது",
+  "circlesCreateError": "Circle உருவாக்கத்தை தோல்வி: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "குறிப்பு: உருவாக்கிய பிறகு நண்பர்களை அழைக்கலாம்",
+  "circlesJoinError": "Circle-ல் சேர முடியவில்லை: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Circle காத்திருப்பு அறை",
+  "circlesCodeLine": "குறியீடு: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "போட்டி அமைப்புகள்",
+  "circlesLevelWithValue": "நிலை {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "கடினத்தன்மை",
+  "circlesPerQuestionShort": "ஒவ்வொரு கேள்விக்கும்",
+  "circlesInvite": "அழை",
+  "circlesCopyId": "ஐடியை நகலெடு",
+  "circlesCopiedId": "ஐடி நகலெடுக்கப்பட்டது",
+  "circlesMatchInProgress": "போட்டி நடைபெறுகிறது",
+  "circlesSpectatorQueuedBody": "போட்டி நடைபெறுகிறது. நீங்கள் பார்வையாளராகச் சேருவீர்கள்",
+  "circlesHostStartWhenReady": "அனைவரும் தயாரானதும் தொகுppாளர் துவங்குவார்",
+  "circlesSpectators": "பார்வையாளர்கள்",
+  "circlesSpectator": "பார்வையாளர்",
+  "circlesSpectatorCanWatch": "பார்வையாளர்கள் நேரலையில் பார்க்கலாம்",
+  "circlesJoinRequests": "சேரும் கோரிக்கைகள்",
+  "circlesAcceptSpectatorsHint": "போட்டியைத் துவங்கும் முன் பார்வையாளர்களை ஏற்கவும்",
+  "circlesStartGame": "விளையாட்டைத் துவங்கு",
+  "circlesWaitingForPlayers": "வீரர்களுக்காகக் காத்திருக்கிறது",
+  "circlesLeaveCircle": "Circle-லிருந்து விலகு",
+  "circlesRequestSent": "கோரிக்கை அனுப்பப்பட்டது",
+  "circlesRequestToJoin": "சேரக் கோரிக்கை",
+  "circlesWatchLive": "நேரலையில் பார்",
+  "circlesPlayerTip": "நீங்கள் தயாரானதும் 'தயார்' அழுத்தவும். தொகுப்பாளர் போட்டியைத் துவங்குவார்",
+  "circlesSpectatorTip": "நீங்கள் பார்க்கிறீர்கள். தொகுப்பாளர் துவங்கியதும் நேரலையில் பாருங்கள்",
+  "circlesHostControls": "தொகுப்பாளர் கட்டுப்பாடுகள்",
+  "circlesTransferHostFailed": "தொகுப்பாளரை மாற்ற முடியவில்லை: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Circle-ஐ முடிக்க முடியவில்லை: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "பயனர் @{username} காணப்படவில்லை",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "செல்லுபடியாகாத பயனர்",
+  "circlesCantInviteSelf": "உங்களை நீங்களே அழைக்க முடியாது",
+  "circlesUserAlreadyInCircle": "@{username} ஏற்கனவே Circle-ல் உள்ளார்",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "தொகுப்பாளர்",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "பயனர்பெயர் மூலம் அழை",
+  "circlesInviteSent": "@{username}-க்கு அழைப்பு அனுப்பப்பட்டது",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "அழைப்பு அனுப்புவதில் தோல்வி: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "சேரும் கோரிக்கை அனுப்பப்பட்டது",
+  "circlesJoinRequestFailed": "கோரிக்கை அனுப்புவதில் தோல்வி: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle நிரம்பியுள்ளது",
+  "circlesSpectatorAdded": "பார்வையாளர் சேர்க்கப்பட்டார்",
+  "circlesApproveFailed": "ஏற்க முடியவில்லை: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "கோரிக்கை நிராகரிக்கப்பட்டது",
+  "circlesDeclineFailed": "நிராகரிக்க முடியவில்லை: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "பங்கேற்பாளர்",
+  "circlesLeavePromptTitle": "Circle-லிருந்து விலகவா?",
+  "circlesLeavePromptTransfer": "விலகும் முன் தொகுப்பாளரை மாற்றவும்",
+  "circlesLeavePromptEndOnly": "Circle-ஐ முடித்து வெளியேறு",
+  "circlesTransferHost": "தொகுப்பாளரை மாற்று",
+  "circlesEndCircle": "Circle-ஐ முடி",
+  "circlesTransferHostTitle": "தொகுப்பாளர் மாற்றம்",
+  "circlesShareId": "Circle ஐடி: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

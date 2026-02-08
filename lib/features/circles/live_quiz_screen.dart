@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/theme/motion.dart';
+import '../../core/theme/tokens.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/responsive.dart';
 import '../../core/widgets/pressable_scale.dart';
 import '../../core/widgets/staggered_in.dart';
@@ -15,7 +16,6 @@ import '../common/results_screen.dart';
 import '../../models/leaderboard_player.dart';
 import '../../data/circles_repository.dart';
 import '../../data/circle_voice_service.dart';
-import '../../data/auth_repository.dart';
 import '../../data/profile_repository.dart';
 import '../../data/profile_store.dart';
 import '../../data/agora_voice_service.dart';
@@ -251,8 +251,6 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
   Timer? _ttsTimer;
   final Map<String, int> _answersByUser = {};
   final Map<String, int> _answerTimeByUser = {};
-  final List<Timer> _answerTimers = [];
-  final Random _random = Random();
 
   // Timer per question
   late int t;
@@ -586,11 +584,9 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
       ..sort((a, b) => b.score.compareTo(a.score));
     final meKey = _currentUserKey;
     final isLocked = meKey != null && _answersByUser.containsKey(meKey);
-    final canParticipate = canPlay && !isLocked;
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
             child: ResponsiveFrame(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
@@ -828,8 +824,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                 ),
               ),
             ),
-        ),
-    ),
+      ),
     );
   }
 }
@@ -879,6 +874,8 @@ class _LiveLeaderboardRow extends StatelessWidget {
       duration: MotionTokens.short,
       curve: MotionTokens.standardCurve,
       child: AnimatedContainer(
+        duration: MotionTokens.short,
+        curve: MotionTokens.standardCurve,
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
@@ -888,9 +885,9 @@ class _LiveLeaderboardRow extends StatelessWidget {
         boxShadow: pulse
             ? [
                 BoxShadow(
-                  color: const Color(0xFF2AFADF).withValues(alpha: 0.35),
-                  blurRadius: 16,
-                  spreadRadius: 1,
+                  color: const Color(0xFF2AFADF).withValues(alpha: 0.25),
+                  blurRadius: 12,
+                  spreadRadius: 0,
                 ),
               ]
             : [],
@@ -911,10 +908,10 @@ class _LiveLeaderboardRow extends StatelessWidget {
             InkWell(
               borderRadius: BorderRadius.circular(12),
               onTap: onToggleMute,
-              child: _VoiceBadge(muted: leader.isMuted, speaking: leader.isSpeaking),
+              child: _LiveVoiceBadge(muted: leader.isMuted, speaking: leader.isSpeaking),
             )
           else
-            _VoiceBadge(muted: leader.isMuted, speaking: leader.isSpeaking),
+            _LiveVoiceBadge(muted: leader.isMuted, speaking: leader.isSpeaking),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -1040,13 +1037,11 @@ class _AvatarBubble extends StatelessWidget {
       height: 36,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2AFADF), Color(0xFF7C7CFF), Color(0xFFFF4ECD)],
-        ),
+        gradient: T.neonGradient,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.25),
-            blurRadius: 8,
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 6,
             offset: const Offset(0, 2),
           ),
         ],
@@ -1071,11 +1066,11 @@ class _AvatarBubble extends StatelessWidget {
   }
 }
 
-class _VoiceBadge extends StatelessWidget {
+class _LiveVoiceBadge extends StatelessWidget {
   final bool muted;
   final bool speaking;
 
-  const _VoiceBadge({required this.muted, required this.speaking});
+  const _LiveVoiceBadge({required this.muted, required this.speaking});
 
   @override
   Widget build(BuildContext context) {
@@ -1095,9 +1090,9 @@ class _VoiceBadge extends StatelessWidget {
             boxShadow: speaking
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF2AFADF).withValues(alpha: 0.45),
-                      blurRadius: 12,
-                      spreadRadius: 1,
+                      color: const Color(0xFF2AFADF).withValues(alpha: 0.25),
+                      blurRadius: 8,
+                      spreadRadius: 0,
                     ),
                   ]
                 : null,
@@ -1276,7 +1271,6 @@ class _RoleCallout extends StatelessWidget {
 class _SpectatorFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Glass(
       radius: BorderRadius.circular(22),
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
@@ -1286,7 +1280,7 @@ class _SpectatorFooter extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              l10n.liveQuizSpectatorFooter,
+              AppLocalizations.of(context).liveQuizSpectatorFooter,
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.75),
                 fontWeight: FontWeight.w700,
@@ -1321,15 +1315,7 @@ class _QuizProgressBar extends StatelessWidget {
             widthFactor: progress.clamp(0, 1),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF2AFADF), Color(0xFF7C7CFF), Color(0xFFFF4FD8)],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF7C7CFF).withValues(alpha: 0.55),
-                    blurRadius: 12,
-                  )
-                ],
+                gradient: T.neonGradient,
               ),
             ),
           ),
@@ -1394,9 +1380,9 @@ class _AnswerTile extends StatelessWidget {
             boxShadow: state == _AnswerState.correct
                 ? [
                     BoxShadow(
-                      color: const Color(0xFF2AFADF).withValues(alpha: 0.35),
-                      blurRadius: 16,
-                      spreadRadius: 1,
+                      color: const Color(0xFF2AFADF).withValues(alpha: 0.20),
+                      blurRadius: 12,
+                      spreadRadius: 0,
                     ),
                   ]
                 : [],

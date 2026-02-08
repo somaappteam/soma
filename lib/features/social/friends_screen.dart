@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/glass.dart';
 import '../../models/friend.dart';
 import '../../data/social_repository.dart';
 import 'add_friend_screen.dart';
 import 'dm_chat_screen.dart';
+import 'package:soma/l10n/gen/app_localizations.dart';
 
 class FriendsScreen extends StatefulWidget {
   const FriendsScreen({super.key});
@@ -13,104 +14,39 @@ class FriendsScreen extends StatefulWidget {
   State<FriendsScreen> createState() => _FriendsScreenState();
 }
 
+
+
 class _FriendsScreenState extends State<FriendsScreen> {
   String query = "";
-  List<Friend> _friends = [];
-  List<Friend> _incoming = [];
-  List<Friend> _outgoing =
-      []; // We might skip implementation if repo doesn't support it yet
-  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
-  }
-
-  Future<void> _loadData() async {
-    setState(() => _isLoading = true);
-
-    // Fetch friends
-    final friendsData = await socialRepository.getFriends();
-    _friends = friendsData
-        .map((data) => Friend(
-              id: data['id'],
-              username: data['username'] ?? 'User',
-              subtitle: data['location'] ?? 'Soma Learner',
-              status: FriendStatus.friend,
-              // isOnline is not in profile, default false or implement realtime later
-            ))
-        .toList();
-
-    // Fetch incoming
-    final incomingData = await socialRepository.getIncomingRequests();
-    _incoming = incomingData.map((data) {
-      final requester = data['requester'] ?? {};
-      return Friend(
-        id: data['id'], // Set this to the FRIENDSHIP ID (bigint/string)
-        username: requester['username'] ?? 'User',
-        subtitle: 'Request',
-        status: FriendStatus.incomingRequest,
-      );
-    }).toList();
-
-    // Fetch outgoing
-    final outgoingData = await socialRepository.getOutgoingRequests();
-    _outgoing = outgoingData.map((data) {
-      final addressee = data['addressee'] ?? {};
-      return Friend(
-        id: data['id'],
-        username: addressee['username'] ?? 'User',
-        subtitle: 'Request sent',
-        status: FriendStatus.outgoingRequest,
-      );
-    }).toList();
-
-    // Note: Our repository getIncomingRequests returns friendship rows with requester expanded.
-    // We need to keep track of friendship ID to accept/decline.
-    // For simplicity in this iteration, I might just reload data on action.
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
   }
 
   // Simplified handling for mapping friendship ID
   Future<void> _accept(String friendshipId) async {
     await socialRepository.acceptFriendRequest(friendshipId);
-    _loadData();
   }
 
   Future<void> _decline(String friendshipId) async {
     await socialRepository.declineFriendRequest(friendshipId);
-    _loadData();
   }
 
   Future<void> _cancelOutgoing(String friendshipId) async {
     await socialRepository.cancelFriendRequest(friendshipId);
-    _loadData();
   }
 
   Future<void> _removeFriend(String friendUserId) async {
     await socialRepository.removeFriend(friendUserId);
-    _loadData();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Replace mock store with local state
-    final allFriends = _friends;
-    final incoming = _incoming;
-    final outgoing = _outgoing;
-
-    final filtered = allFriends.where((f) {
-      if (query.trim().isEmpty) return true;
-      return f.username.toLowerCase().contains(query.toLowerCase());
-    }).toList();
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
             child: Column(
@@ -122,9 +58,9 @@ class _FriendsScreenState extends State<FriendsScreen> {
                       onTap: () => Navigator.pop(context),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      "Friends",
-                      style: TextStyle(
+                     Text(
+                      l10n.friendsTitle,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
@@ -140,7 +76,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
                               builder: (_) => const AddFriendScreen()),
                         );
                         if (!mounted) return;
-                        _loadData(); // Refresh on return
                       },
                     ),
                   ],
@@ -156,7 +91,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                   child: Row(
                     children: [
                       Icon(Icons.search_rounded,
-                          color: Colors.white.withOpacity(0.7)),
+                          color: Colors.white.withValues(alpha: 0.7)),
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
@@ -165,9 +100,9 @@ class _FriendsScreenState extends State<FriendsScreen> {
                               color: Colors.white, fontWeight: FontWeight.w700),
                           cursorColor: Colors.white,
                           decoration: InputDecoration(
-                            hintText: "Search friends…",
+                            hintText: l10n.searchFriendsHint,
                             hintStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.45)),
+                                color: Colors.white.withValues(alpha: 0.45)),
                             border: InputBorder.none,
                             isDense: true,
                           ),
@@ -177,7 +112,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                         GestureDetector(
                           onTap: () => setState(() => query = ""),
                           child: Icon(Icons.close_rounded,
-                              color: Colors.white.withOpacity(0.7)),
+                              color: Colors.white.withValues(alpha: 0.7)),
                         ),
                     ],
                   ),
@@ -210,9 +145,9 @@ class _FriendsScreenState extends State<FriendsScreen> {
                               final friends = friendsData
                                   .map((data) => Friend(
                                         id: data['id'],
-                                        username: data['username'] ?? 'User',
+                                        username: data['username'] ?? l10n.genericUser,
                                         subtitle:
-                                            data['location'] ?? 'Soma Learner',
+                                            data['location'] ?? l10n.somaLearnerSubtitle,
                                         status: FriendStatus.friend,
                                       ))
                                   .toList();
@@ -221,8 +156,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                 final requester = data['requester'] ?? {};
                                 return Friend(
                                   id: data['id'].toString(),
-                                  username: requester['username'] ?? 'User',
-                                  subtitle: 'Incoming Request',
+                                  username: requester['username'] ?? l10n.genericUser,
+                                  subtitle: l10n.friendIncomingRequestLabel,
                                   status: FriendStatus.incomingRequest,
                                 );
                               }).toList();
@@ -231,8 +166,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                 final addressee = data['addressee'] ?? {};
                                 return Friend(
                                   id: data['id'].toString(),
-                                  username: addressee['username'] ?? 'User',
-                                  subtitle: 'Request sent',
+                                  username: addressee['username'] ?? l10n.genericUser,
+                                  subtitle: l10n.friendRequestSentLabel,
                                   status: FriendStatus.outgoingRequest,
                                 );
                               }).toList();
@@ -248,7 +183,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                 physics: const BouncingScrollPhysics(),
                                 children: [
                                   if (incoming.isNotEmpty) ...[
-                                    _SectionTitle("Requests"),
+                                    _SectionTitle(l10n.friendRequestsSection),
                                     const SizedBox(height: 10),
                                     Glass(
                                       radius: BorderRadius.circular(22),
@@ -266,7 +201,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                     const SizedBox(height: 16),
                                   ],
                                   if (outgoing.isNotEmpty) ...[
-                                    _SectionTitle("Pending"),
+                                    _SectionTitle(l10n.friendPendingSection),
                                     const SizedBox(height: 10),
                                     Glass(
                                       radius: BorderRadius.circular(22),
@@ -283,7 +218,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                     ),
                                     const SizedBox(height: 16),
                                   ],
-                                  _SectionTitle("All Friends"),
+                                  _SectionTitle(l10n.friendAllSection),
                                   const SizedBox(height: 10),
                                   if (filtered.isEmpty)
                                     Glass(
@@ -291,10 +226,10 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                       padding: const EdgeInsets.all(16),
                                       child: Text(
                                         query.isEmpty
-                                            ? "No friends yet. Add your first friend!"
-                                            : "No match for \"$query\"",
+                                            ? l10n.friendsEmptyState
+                                            : l10n.noMatchForQuery(query),
                                         style: TextStyle(
-                                          color: Colors.white.withOpacity(0.75),
+                                          color: Colors.white.withValues(alpha: 0.75),
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
@@ -338,7 +273,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
               ],
             ),
           ),
-        ),
       ),
     );
   }
@@ -355,13 +289,14 @@ class _SectionTitle extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        color: Colors.white.withOpacity(0.85),
+        color: Colors.white.withValues(alpha: 0.85),
         fontSize: 14,
         fontWeight: FontWeight.w900,
       ),
     );
   }
 }
+
 
 class _IconGlass extends StatelessWidget {
   final IconData icon;
@@ -376,7 +311,7 @@ class _IconGlass extends StatelessWidget {
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withOpacity(0.92)),
+        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92)),
       ),
     );
   }
@@ -393,8 +328,8 @@ class _AvatarDot extends StatelessWidget {
       height: 40,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withOpacity(0.10),
-        border: Border.all(color: Colors.white.withOpacity(0.16)),
+        color: Colors.white.withValues(alpha: 0.10),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
       ),
       child: Stack(
         children: [
@@ -402,7 +337,7 @@ class _AvatarDot extends StatelessWidget {
             child: Text(
               "🙂",
               style:
-                  TextStyle(fontSize: 18, color: Colors.white.withOpacity(0.9)),
+                  TextStyle(fontSize: 18, color: Colors.white.withValues(alpha: 0.9)),
             ),
           ),
           Positioned(
@@ -415,9 +350,9 @@ class _AvatarDot extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: online
                     ? const Color(0xFF58F7B6)
-                    : Colors.white.withOpacity(0.25),
+                    : Colors.white.withValues(alpha: 0.25),
                 border:
-                    Border.all(color: Colors.black.withOpacity(0.35), width: 2),
+                    Border.all(color: Colors.black.withValues(alpha: 0.35), width: 2),
               ),
             ),
           ),
@@ -446,8 +381,8 @@ class _FriendRow extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.white.withOpacity(0.06),
-          border: Border.all(color: Colors.white.withOpacity(0.14)),
+          color: Colors.white.withValues(alpha: 0.06),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
@@ -470,7 +405,7 @@ class _FriendRow extends StatelessWidget {
                     Text(
                       friend.subtitle!,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.60),
+                        color: Colors.white.withValues(alpha: 0.60),
                         fontWeight: FontWeight.w700,
                         fontSize: 12,
                       ),
@@ -509,8 +444,8 @@ class _RequestRow extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.white.withOpacity(0.06),
-          border: Border.all(color: Colors.white.withOpacity(0.14)),
+          color: Colors.white.withValues(alpha: 0.06),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
@@ -550,8 +485,8 @@ class _PendingRow extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.white.withOpacity(0.06),
-          border: Border.all(color: Colors.white.withOpacity(0.14)),
+          color: Colors.white.withValues(alpha: 0.06),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
@@ -573,7 +508,7 @@ class _PendingRow extends StatelessWidget {
                   Text(
                     "Request sent",
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.60),
+                      color: Colors.white.withValues(alpha: 0.60),
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -604,10 +539,10 @@ class _MiniAction extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          color: Colors.white.withOpacity(0.08),
-          border: Border.all(color: Colors.white.withOpacity(0.14)),
+          color: Colors.white.withValues(alpha: 0.08),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
         ),
-        child: Icon(icon, color: Colors.white.withOpacity(0.92), size: 20),
+        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 20),
       ),
     );
   }

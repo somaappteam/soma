@@ -33,6 +33,7 @@ dev_dependencies:
   flutter_driver:
     sdk: flutter
 
+  supabase: any
 flutter:
   generate: true
   uses-material-design: true

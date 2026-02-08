@@ -1,0 +1,781 @@
+{
+  "@@locale": "de",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Lernen. Konkurrieren. Meistern.",
+  "signUp": "Registrieren",
+  "signIn": "Anmelden",
+  "skipForNow": "Vorerst überspringen",
+  "authFillAllFields": "Bitte füllen Sie alle Felder aus",
+  "authError": "Fehler: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "E-Mail",
+  "authPassword": "Passwort",
+  "authUsername": "Benutzername",
+  "authContinue": "Weiter",
+  "authSigningIn": "Anmelden...",
+  "authCreateAccount": "Konto erstellen",
+  "authCreating": "Erstellen...",
+  "authNeedAccount": "Sie haben noch kein Konto? ",
+  "authHaveAccount": "Sie haben bereits ein Konto? ",
+  "dialogAuthRequiredTitle": "Melden Sie sich an, um auf Circles zuzugreifen",
+  "dialogAuthRequiredBody": "Circles sind Mehrspieler-Räume. Erstellen Sie ein Konto, um an Live-Matches teilzunehmen, Freunde einzuladen und Fortschritte zu speichern.",
+  "notNow": "Nicht jetzt",
+  "navHome": "Start",
+  "navCircles": "Circles",
+  "navProfile": "Profil",
+  "removeCourseTitle": "Kurs entfernen?",
+  "removeCourseBody": "{course} wird aus Ihrer Startliste entfernt.",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Abbrechen",
+  "remove": "Entfernen",
+  "welcomeBack": "Willkommen zurück, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Kurse bearbeiten",
+  "done": "Fertig",
+  "noCoursesToEdit": "Keine Kurse zum Bearbeiten.",
+  "addCourse": "Kurs hinzufügen",
+  "unknown": "Unbekannt",
+  "iSpeak": "Ich spreche",
+  "iWantToLearn": "Ich möchte lernen",
+  "chooseYourLanguage": "Wählen Sie Ihre Sprache",
+  "chooseLearningLanguage": "Wählen Sie die Lernsprache",
+  "chooseTwoDifferentLanguages": "Wählen Sie zwei verschiedene Sprachen.",
+  "createCourse": "Kurs erstellen",
+  "soloCourseTitle": "Solo-Kurs",
+  "searchLanguage": "Sprache suchen",
+  "noMatches": "Keine Treffer",
+  "chooseCourseType": "Wählen Sie einen Kurstyp",
+  "soloStudyDescription": "Lernen Sie allein mit dem gleichen Quiz-Stil wie Circles - aber ohne Räume, Chat, Zuschauer oder Host-Optionen.",
+  "soloModeVocabulary": "Vokabular",
+  "soloModeSentences": "Sätze",
+  "soloModeReview": "Wiederholung",
+  "soloModeVocabularySubtitle": "Multiple Choice Bedeutungen, Synonyme, Verwendung",
+  "soloModeSentencesSubtitle": "Lückentext + Übersetzung + Lesung",
+  "soloModeReviewDescription": "Üben Sie, was Sie gelernt haben: schwache Wörter, aktuelle Fehler und verteilte Wiederholung.",
+  "startReview": "Wiederholung starten",
+  "soloSetupTitle": "{mode} Einrichtung",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Schwierigkeit",
+  "numberOfQuestions": "Anzahl der Fragen",
+  "timerPerQuestion": "Timer pro Frage",
+  "noTimer": "Kein Timer",
+  "start": "Starten",
+  "profileTitle": "Profil",
+  "profileSignInToMessage": "Anmelden, um Nachricht zu senden",
+  "profileThatsYourProfile": "Das ist Ihr Profil",
+  "profileSignInToAddFriends": "Anmelden, um Freunde hinzuzufügen",
+  "profileCantAddYourself": "Sie können sich nicht selbst hinzufügen",
+  "profileRequestSent": "Anfrage an @{username} gesendet",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Anfrage konnte nicht gesendet werden",
+  "profileDefaultDisplayName": "Neuer Benutzer",
+  "profileDefaultBio": "Bereit zu lernen!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Gast",
+  "guestUsername": "gast",
+  "guestSessionLabel": "Gastsitzung",
+  "unlockFullProfile": "Schalten Sie Ihr vollständiges Profil frei",
+  "guestBenefitSync": "Synchronisieren Sie Fortschritte auf allen Geräten",
+  "guestBenefitCircles": "Treten Sie Circles bei und spielen Sie live",
+  "guestBenefitNotifications": "Erhalten Sie Benachrichtigungen und Freundesanfragen",
+  "progressStaysOnDevice": "Der Fortschritt bleibt auf diesem Gerät, bis Sie sich anmelden.",
+  "profileGoalLabel": "Ziel: {minutes}m",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP-Fortschritt",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Siege",
+  "profileStreak": "Serie",
+  "profileFriendsTitle": "Meine Freunde",
+  "profileViewAll": "Alle anzeigen",
+  "profileAchievementsTitle": "Erfolge",
+  "profileNoAchievements": "Noch keine Erfolge.",
+  "profileRequested": "Angefragt",
+  "profileSending": "Senden...",
+  "profileAddFriend": "Freund hinzufügen",
+  "profileConnectTitle": "Verbinden",
+  "profileMessage": "Nachricht",
+  "profileSnapshot": "Profil-Schnappschuss",
+  "profileLocationHidden": "Standort verborgen",
+  "profileBioHidden": "Bio verborgen",
+  "profileDailyGoal": "Tagesziel {minutes}m",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle-Einladung",
+  "circleIdLabel": "Circle-ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Anmelden zum Beitreten",
+  "joiningCircle": "Beitreten...",
+  "joinCircle": "Circle beitreten",
+  "circleJoinedAsPlayer": "Als Spieler beigetreten",
+  "circleJoinedAsSpectator": "Als Zuschauer beigetreten",
+  "accept": "Akzeptieren",
+  "decline": "Ablehnen",
+  "open": "Öffnen",
+  "circleCountdownTitle": "Mach dich bereit",
+  "circleCountdownSubtitle": "Circle startet...",
+  "userFallbackName": "Benutzer",
+  "micOff": "Mikrofon aus",
+  "micOn": "Mikrofon an",
+  "roleHost": "Host",
+  "roleSpectator": "Zuschauer",
+  "tagHost": "HOST",
+  "tagYou": "SIE",
+  "statusCorrect": "Richtig",
+  "statusWrong": "Falsch",
+  "statusWaiting": "Warten",
+  "statusNone": "-",
+  "pointsAbbrev": "Pkt",
+  "pointsLabel": "Punkte",
+  "statCorrect": "Richtig",
+  "statAnswers": "Antworten",
+  "statTotal": "Gesamt",
+  "statQuestions": "Fragen",
+  "statAccuracy": "Genauigkeit",
+  "statRate": "Rate",
+  "statRank": "Rang",
+  "statPosition": "Position",
+  "statMode": "Modus",
+  "statType": "Typ",
+  "next": "Weiter",
+  "submit": "Absenden",
+  "continueLabel": "Weiter",
+  "save": "Speichern",
+  "playAgain": "Nochmal spielen",
+  "backToCourse": "Zurück zum Kurs",
+  "resultsTitle": "Ergebnisse",
+  "shareLater": "Später teilen",
+  "delete": "Löschen",
+  "ok": "OK",
+  "minutesShort": "{minutes}m",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}m",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}h",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}T",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "gerade eben",
+  "timeMinutesAgo": "vor {count}m",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "vor {count}h",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "vor {count}T",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Warten auf Host...",
+  "liveQuizJoinRequestSent": "Beitrittsanfrage gesendet",
+  "liveQuizJoinRequestFailed": "Anfrage fehlgeschlagen: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Host-Steuerung",
+  "liveQuizSpectatorModeTitle": "Zuschauermodus",
+  "liveQuizHostControlsSubtitle": "Runden werden automatisch fortgesetzt, wenn alle geantwortet haben oder die Zeit abgelaufen ist.",
+  "liveQuizSpectatorModeSubtitle": "Sehen Sie sich die Fragen und die Live-Bestenliste an. Sie können nicht antworten.",
+  "liveQuizQuestionCounter": "Frage {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Anfrage gesendet",
+  "liveQuizRequestToJoin": "Anfrage zum Beitreten",
+  "liveQuizSpectatorFooter": "Sie schauen live zu. Genießen Sie die Fragen und die Bestenliste.",
+  "circleNotFound": "Circle nicht gefunden",
+  "resultsRematchStartFailed": "Revanche starten fehlgeschlagen: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Match-Ergebnisse",
+  "resultsNiceWork": "Gute Arbeit, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1. Platz",
+  "resultsPlaceSecond": "2. Platz",
+  "resultsPlaceThird": "3. Platz",
+  "resultsPlaceNth": "Platz {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "Von {players} Spielern",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Champion! Sie haben diesen Circle dominiert.",
+  "resultsHighlightGreatAccuracy": "Großartige Genauigkeit. Sie sind nah an der Spitze!",
+  "resultsHighlightKeepGoing": "Weiter so - Beständigkeit schlägt Geschwindigkeit.",
+  "resultsLeaderboardTitle": "Bestenliste",
+  "resultsPlayersCount": "{count} Spieler",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Zurück zu Circles",
+  "resultsRematch": "Revanche",
+  "resultsPlayAgain": "Nochmal spielen",
+  "leaderboardGlobalTitle": "Globale Rangliste",
+  "leaderboardEmpty": "Noch keine Rangliste.",
+  "aboutTitle": "Info",
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA ist eine gamifizierte Sprachlernplattform, die das Beherrschen neuer Sprachen ansprechend und sozial gestaltet. Nehmen Sie an Circles teil, üben Sie solo und verfolgen Sie Ihren Fortschritt.",
+  "aboutTerms": "Nutzungsbedingungen",
+  "aboutPrivacy": "Datenschutzrichtlinie",
+  "aboutOpenSource": "Open-Source-Lizenzen",
+  "addFriendTitle": "Freund hinzufügen",
+  "addFriendFindByUsername": "Nach Benutzername suchen",
+  "addFriendUsernameHint": "Benutzername eingeben...",
+  "addFriendTip": "Tipp: Später können wir QR-Code + Freunde-ID unterstützen.",
+  "addFriendSending": "Senden...",
+  "addFriendSendRequest": "Anfrage senden",
+  "addFriendUserNotFound": "Benutzer @{username} nicht gefunden",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Aktion fehlgeschlagen oder bereits gesendet: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Freunde",
+  "searchFriendsHint": "Freunde suchen...",
+  "somaLearnerSubtitle": "Soma-Lernender",
+  "friendRequestLabel": "Anfrage",
+  "friendRequestSentLabel": "Anfrage gesendet",
+  "friendIncomingRequestLabel": "Eingehende Anfrage",
+  "friendRequestsSection": "Anfragen",
+  "friendPendingSection": "Ausstehend",
+  "friendAllSection": "Alle Freunde",
+  "friendsEmptyState": "Noch keine Freunde. Fügen Sie Ihren ersten Freund hinzu!",
+  "friendsEmptyShort": "Noch keine Freunde.",
+  "noMatchForQuery": "Keine Übereinstimmung für \"{query}\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Posteingang",
+  "searchChatsHint": "Chats durchsuchen...",
+  "inboxEmptyState": "Noch keine Unterhaltungen. Beginnen Sie mit einem Freund zu chatten!",
+  "newMessageTitle": "Neue Nachricht",
+  "chatCallLater": "Sprachanruf später (Circle-Sprache kommt als nächstes)",
+  "errorWithDetails": "Fehler: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Sagen Sie Hallo zu {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Nachricht...",
+  "notificationsTitle": "Benachrichtigungen",
+  "notificationsTabAll": "Alle",
+  "notificationsTabCourses": "Kurse",
+  "notificationsTabSocial": "Soziales",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "System",
+  "notificationsEmpty": "Keine Benachrichtigungen hier.",
+  "notificationsDeleted": "Benachrichtigung gelöscht",
+  "notificationTitleFallback": "Benachrichtigung",
+  "notificationTypeCourse": "Kurs",
+  "notificationTypeSocial": "Soziales",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "System",
+  "notificationsFriendAccepted": "Freundschaftsanfrage akzeptiert",
+  "notificationsFriendAcceptFailed": "Freundschaftsanfrage konnte nicht akzeptiert werden: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Freundschaftsanfrage abgelehnt",
+  "notificationsFriendDeclineFailed": "Freundschaftsanfrage konnte nicht abgelehnt werden: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Circle konnte nicht beigetreten werden: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Öffnen",
+  "notificationsOpened": "Geöffnet",
+  "notificationsActionMessage": "{action} Benachrichtigung",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Einstellungen",
+  "settingsSectionAccount": "Konto",
+  "settingsEditProfile": "Profil bearbeiten",
+  "settingsPrivacy": "Privatsphäre",
+  "settingsSecurity": "Sicherheit",
+  "settingsSectionGameplay": "Gameplay",
+  "settingsShowTranslationLine": "Übersetzungszeile anzeigen",
+  "settingsShowReadingLine": "Lesung anzeigen (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "Standard-Timer pro Frage",
+  "settingsMatchDifficulty": "Match-Schwierigkeit",
+  "settingsMatchDifficultyAdaptive": "Adaptiv",
+  "settingsSectionSoundFeel": "Ton & Haptik",
+  "settingsMusic": "Musik",
+  "settingsSoundEffects": "Soundeffekte",
+  "settingsHaptics": "Haptik",
+  "settingsSectionNotifications": "Benachrichtigungen",
+  "settingsPushNotifications": "Push-Benachrichtigungen",
+  "settingsDailyReminder": "Tägliche Erinnerung",
+  "settingsSectionAppearance": "Erscheinungsbild",
+  "settingsTheme": "Design",
+  "settingsUiLanguage": "UI-Sprache",
+  "settingsSectionAbout": "Über",
+  "settingsVersion": "Version",
+  "settingsTermsPrivacy": "Bedingungen & Datenschutz",
+  "settingsSupport": "Support",
+  "settingsLogout": "Abmelden",
+  "themeSystem": "System",
+  "themeDark": "Dunkel",
+  "themeLight": "Hell",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Profil aktualisiert",
+  "editProfileTitle": "Profil bearbeiten",
+  "editProfilePhotoLabel": "Profilbild",
+  "editProfilePhotoSubtitle": "Avatar-Auswahl über Supabase Storage demnächst.",
+  "editProfileChangePhoto": "Ändern",
+  "editProfileAvatarUploadSoon": "Avatar-Upload demnächst verfügbar",
+  "editProfileDisplayNameLabel": "Anzeigename",
+  "editProfileDisplayNameHint": "Ihr Name",
+  "editProfileDisplayNameRequired": "Geben Sie Ihren Namen ein",
+  "editProfileDisplayNameTooShort": "Zu kurz",
+  "editProfileUsernameLabel": "Benutzername",
+  "editProfileUsernameHint": "alex_lerner",
+  "editProfileUsernameRequired": "Benutzername eingeben",
+  "editProfileUsernameTooShort": "Min. 3 Zeichen",
+  "editProfileUsernameInvalid": "Nur Buchstaben, Zahlen, _",
+  "editProfileBioLabel": "Bio",
+  "editProfileBioHint": "Kurze Bio...",
+  "editProfileBioTooLong": "Max. 120 Zeichen",
+  "editProfileLocationLabel": "Standort",
+  "editProfileLocationHint": "Stadt / Land",
+  "editProfileDailyGoalTitle": "Tagesziel",
+  "editProfileDailyGoalSubtitle": "Wählen Sie, wie viele Minuten Sie täglich lernen möchten.",
+  "securityTitle": "Sicherheit",
+  "securitySectionPassword": "Passwort",
+  "securityChangePasswordTitle": "Passwort ändern",
+  "securityChangePasswordSubtitle": "Aktualisieren Sie Ihr Passwort regelmäßig.",
+  "securitySectionTwoFactor": "Zwei-Faktor-Authentifizierung",
+  "securityEnable2faTitle": "2FA aktivieren",
+  "securityEnable2faSubtitle": "Zusätzlicher Schutz beim Anmelden.",
+  "securitySectionAppLock": "App-Sperre",
+  "securityBiometricTitle": "Biometrisches Entsperren",
+  "securityBiometricSubtitle": "Verwenden Sie FaceID/TouchID zum Entsperren von SOMA.",
+  "securityAppLockTitle": "App-Sperre",
+  "securityAppLockSubtitle": "Sperren Sie SOMA, wenn Sie die App verlassen.",
+  "securitySectionSessions": "Aktive Sitzungen",
+  "securityNoSessions": "Keine aktiven Sitzungen gefunden.",
+  "securityThisDevice": "Dieses Gerät",
+  "securityDevice": "Gerät",
+  "securityActiveLabel": "Aktiv",
+  "securitySignInToEnable2fa": "Melden Sie sich an, um 2FA zu aktivieren",
+  "securityEnable2faFailed": "2FA konnte nicht aktiviert werden: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FA konnte nicht deaktiviert werden: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA einrichten",
+  "securitySecretKeyLabel": "Geheimer Schlüssel",
+  "securityCodeHint": "6-stelliger Code",
+  "security2faEnabled": "2FA aktiviert",
+  "securityVerifyCodeFailed": "Code konnte nicht verifiziert werden: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Verifizieren...",
+  "securityVerify": "Verifizieren",
+  "securityCurrentPasswordHint": "Aktuelles Passwort",
+  "securityNewPasswordHint": "Neues Passwort (min. 8 Zeichen)",
+  "securityConfirmPasswordHint": "Neues Passwort bestätigen",
+  "securitySignInToChangePassword": "Melden Sie sich an, um Ihr Passwort zu ändern",
+  "securityEnterCurrentPassword": "Geben Sie Ihr aktuelles Passwort ein",
+  "securityPasswordMinLength": "Das neue Passwort muss mindestens 8 Zeichen lang sein",
+  "securityPasswordsDoNotMatch": "Passwörter stimmen nicht überein",
+  "securityPasswordUpdated": "Passwort aktualisiert",
+  "securityPasswordUpdateFailed": "Passwort konnte nicht aktualisiert werden: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Automatisch sperren nach",
+  "privacyTitle": "Privatsphäre",
+  "privacySectionVisibility": "Sichtbarkeit",
+  "privacyProfileVisibilityTitle": "Profil-Sichtbarkeit",
+  "privacyVisibilityPublic": "Öffentlich",
+  "privacyVisibilityFriends": "Freunde",
+  "privacyVisibilityPrivate": "Privat",
+  "privacyVisibilityPublicSubtitle": "Jeder kann Ihr Profil sehen.",
+  "privacyVisibilityFriendsSubtitle": "Nur Freunde können Ihr Profil sehen.",
+  "privacyVisibilityPrivateSubtitle": "Nur Sie können Ihr Profil sehen.",
+  "privacySectionActivity": "Aktivität",
+  "privacyShowOnlineTitle": "Online-Status anzeigen",
+  "privacyShowOnlineSubtitle": "Lassen Sie andere sehen, wenn Sie online sind.",
+  "privacyShowActivityTitle": "Lernaktivität anzeigen",
+  "privacyShowActivitySubtitle": "Serie, XP und aktuellen Fortschritt anzeigen.",
+  "privacySectionSocial": "Soziales",
+  "privacyAllowRequestsTitle": "Freundschaftsanfragen zulassen",
+  "privacyAllowRequestsSubtitle": "Lassen Sie Leute Ihnen Freundschaftsanfragen senden.",
+  "privacyWhoCanDmTitle": "Wer kann Ihnen DMs senden",
+  "privacyDmEveryone": "Jeder",
+  "privacyDmFriends": "Freunde",
+  "privacyDmNoOne": "Niemand",
+  "privacyDmEveryoneSubtitle": "Jeder kann Ihnen Nachrichten senden.",
+  "privacyDmFriendsSubtitle": "Nur Freunde können Ihnen Nachrichten senden.",
+  "privacyDmNoOneSubtitle": "Niemand kann Ihnen Nachrichten senden.",
+  "privacySectionBlockedUsers": "Blockierte Benutzer",
+  "privacyBlockedUsersComingSoon": "Verwaltung blockierter Benutzer demnächst verfügbar.",
+  "privacySectionDataControls": "Datenkontrollen",
+  "privacyExportDataTitle": "Meine Daten exportieren",
+  "privacyExportDataSubtitle": "Laden Sie Ihre Aktivität und Kurse herunter.",
+  "privacyExportInfoTitle": "Daten exportieren",
+  "privacyExportInfoBody": "Nächster Schritt: Generieren Sie einen JSON/CSV-Export und senden Sie ihn per E-Mail oder laden Sie ihn lokal herunter.",
+  "privacyDeleteAccountTitle": "Konto löschen",
+  "privacyDeleteAccountSubtitle": "Dies entfernt dauerhaft Ihr Konto und Ihre Daten.",
+  "privacyDeleteConfirmTitle": "Konto löschen?",
+  "privacyDeleteConfirmBody": "Diese Aktion ist dauerhaft. Ihr Profil, Ihre Kurse, Freunde und Nachrichten werden entfernt.",
+  "privacyDeleteComingSoon": "Löschen wird später mit Supabase verbunden",
+  "soloLabel": "Solo",
+  "soloResultsCompletedTitle": "Solo-Sitzung abgeschlossen",
+  "soloResultsFeedbackElite": "Elite-Leistung. Behalten Sie die Serie bei",
+  "soloResultsFeedbackStrong": "Starke Arbeit. Sie verbessern sich schnell.",
+  "soloResultsFeedbackProgress": "Guter Fortschritt. Überprüfen Sie Fehler und wiederholen Sie.",
+  "soloResultsFeedbackTryAgain": "Kein Stress. Versuchen Sie es erneut mit weniger Fragen und Konzentration.",
+  "soloResultsPerfectScore": "Perfekte Punktzahl! Keine Fehler zu überprüfen.",
+  "soloResultsReviewPrompt": "Überprüfen Sie Fehler, um schneller zu lernen. Wir zeigen Ihnen als nächstes falsche Antworten hier.",
+  "soloResultsReviewMistakes": "Fehler überprüfen ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Sie sind nicht angemeldet",
+  "genericUser": "Benutzer",
+  "loading": "Laden...",
+  "edit": "Bearbeiten",
+  "send": "Senden",
+  "join": "Beitreten",
+  "leave": "Verlassen",
+  "ready": "Bereit",
+  "levelBeginner": "Anfänger",
+  "levelIntermediate": "Fortgeschritten",
+  "levelAdvanced": "Profi",
+  "questionsShort": "{count} F",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count}s",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Alle Kurse",
+  "circlesAllModes": "Alle Modi",
+  "circlesAllLevels": "Alle Stufen",
+  "circlesAddNewCourse": "Neuen Kurs hinzufügen",
+  "circlesCoursesTitle": "Kurse",
+  "circlesModeTitle": "Modus",
+  "circlesLevelTitle": "Stufe",
+  "circlesNoActiveForFilters": "Keine aktiven Circles für diese Filter.",
+  "circlesUnknownRoom": "Unbekannter Raum",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Circle erstellen",
+  "circlesCircleName": "Circle-Name",
+  "circlesEnterName": "Namen eingeben",
+  "circlesLanguages": "Sprachen",
+  "circlesRoomSetup": "Raum-Einrichtung",
+  "circlesPlayers": "Spieler",
+  "circlesEmptySlot": "Leerer Platz",
+  "circlesPlayersRange": "1-5 Spieler",
+  "circlesQuestions": "Fragen",
+  "circlesQuestionsSubtitle": "Anzahl der Fragen",
+  "circlesTimePerQuestion": "Zeit pro Frage",
+  "circlesSecondsPerQuestion": "Sekunden pro Frage",
+  "circlesAdvanced": "Erweitert",
+  "circlesAllowSpectators": "Zuschauer zulassen",
+  "circlesAllowSpectatorsSubtitle": "Lassen Sie andere zusehen, ohne zu spielen.",
+  "circlesLiveVoiceChat": "Live-Sprachchat",
+  "circlesLiveVoiceChatSubtitle": "Aktivieren Sie Live-Sprache während Matches.",
+  "circlesLiveTextChat": "Live-Textchat",
+  "circlesLiveTextChatSubtitle": "Aktivieren Sie Chat während Matches.",
+  "circlesCreatedSuccess": "Circle erstellt",
+  "circlesCreateError": "Circle erstellen fehlgeschlagen: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Tipp: Sie können Freunde nach der Erstellung einladen.",
+  "circlesJoinError": "Circle beitreten fehlgeschlagen: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Circle-Lobby",
+  "circlesCodeLine": "Code: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Match-Einstellungen",
+  "circlesLevelWithValue": "Stufe {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Schwierigkeit",
+  "circlesPerQuestionShort": "pro Frage",
+  "circlesInvite": "Einladen",
+  "circlesCopyId": "ID kopieren",
+  "circlesCopiedId": "ID kopiert",
+  "circlesMatchInProgress": "Match läuft",
+  "circlesSpectatorQueuedBody": "Match läuft. Sie treten als Zuschauer bei.",
+  "circlesHostStartWhenReady": "Host startet, wenn alle bereit sind.",
+  "circlesSpectators": "Zuschauer",
+  "circlesSpectator": "Zuschauer",
+  "circlesSpectatorCanWatch": "Zuschauer können live zusehen.",
+  "circlesJoinRequests": "Beitrittsanfragen",
+  "circlesAcceptSpectatorsHint": "Akzeptieren Sie Zuschauer vor Matchbeginn.",
+  "circlesStartGame": "Spiel starten",
+  "circlesWaitingForPlayers": "Warten auf Spieler",
+  "circlesLeaveCircle": "Circle verlassen",
+  "circlesRequestSent": "Anfrage gesendet",
+  "circlesRequestToJoin": "Anfrage zum Beitreten",
+  "circlesWatchLive": "Live zusehen",
+  "circlesPlayerTip": "Tippen Sie auf Bereit, wenn Sie fertig sind. Der Host startet das Match.",
+  "circlesSpectatorTip": "Sie schauen zu. Sehen Sie live zu, sobald der Host startet.",
+  "circlesHostControls": "Host-Steuerung",
+  "circlesTransferHostFailed": "Host übertragen fehlgeschlagen: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Circle beenden fehlgeschlagen: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "Benutzer @{username} nicht gefunden",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Ungültiger Benutzer",
+  "circlesCantInviteSelf": "Sie können sich nicht selbst einladen",
+  "circlesUserAlreadyInCircle": "Benutzer @{username} ist bereits im Circle",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Host",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "Per Benutzername einladen",
+  "circlesInviteSent": "Einladung an @{username} gesendet",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Einladung senden fehlgeschlagen: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Beitrittsanfrage gesendet",
+  "circlesJoinRequestFailed": "Anfrage fehlgeschlagen: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle ist voll",
+  "circlesSpectatorAdded": "Zuschauer hinzugefügt",
+  "circlesApproveFailed": "Anfrage genehmigen fehlgeschlagen: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Anfrage abgelehnt",
+  "circlesDeclineFailed": "Anfrage ablehnen fehlgeschlagen: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Teilnehmer",
+  "circlesLeavePromptTitle": "Circle verlassen?",
+  "circlesLeavePromptTransfer": "Übertragen Sie den Host, bevor Sie gehen.",
+  "circlesLeavePromptEndOnly": "Beenden Sie den Circle und gehen Sie.",
+  "circlesTransferHost": "Host übertragen",
+  "circlesEndCircle": "Circle beenden",
+  "circlesTransferHostTitle": "Host übertragen",
+  "circlesShareId": "Circle-ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

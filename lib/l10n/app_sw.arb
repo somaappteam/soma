@@ -1,0 +1,781 @@
+{
+  "@@locale": "sw",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Jifunze. Shindana. Umuhimu.",
+  "signUp": "Jisajili",
+  "signIn": "Ingia",
+  "skipForNow": "Ruka kwa sasa",
+  "authFillAllFields": "Tafadhali jaza sehemu zote",
+  "authError": "Hitilafu: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "Baruapepe",
+  "authPassword": "Nenosiri",
+  "authUsername": "Jina la mtumiaji",
+  "authContinue": "Endelea",
+  "authSigningIn": "inaingia...",
+  "authCreateAccount": "Fungua Akaunti",
+  "authCreating": "inatengeneza...",
+  "authNeedAccount": "Huna akaunti? ",
+  "authHaveAccount": "Una akaunti tayari? ",
+  "dialogAuthRequiredTitle": "Ingia ili kujiunga na Circles",
+  "dialogAuthRequiredBody": "Circles ni vyumba vya wachezaji wengi. Fungua akaunti ili kujiunga na mechi za moja kwa moja, kualika marafiki, na kuhifadhi maendeleo.",
+  "notNow": "Sio sasa",
+  "navHome": "Nyumbani",
+  "navCircles": "Circles",
+  "navProfile": "Wasifu",
+  "removeCourseTitle": "Ondoa kozi?",
+  "removeCourseBody": "{course} itaondolewa kwenye orodha yako",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Ghairi",
+  "remove": "Ondoa",
+  "welcomeBack": "Karibu tena, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Hariri Kozi",
+  "done": "Tayari",
+  "noCoursesToEdit": "Hakuna kozi za kuhariri",
+  "addCourse": "Ongeza Kozi",
+  "unknown": "Haijulikani",
+  "iSpeak": "Ninazungumza",
+  "iWantToLearn": "Ninataka kujifunza",
+  "chooseYourLanguage": "Chagua lugha yako",
+  "chooseLearningLanguage": "Chagua lugha ya kujifunza",
+  "chooseTwoDifferentLanguages": "Tafadhali chagua lugha mbili tofauti",
+  "createCourse": "Unda Kozi",
+  "soloCourseTitle": "Kozi ya Solo",
+  "searchLanguage": "Tafuta lugha",
+  "noMatches": "Hakuna matokeo",
+  "chooseCourseType": "Chagua aina ya kozi",
+  "soloStudyDescription": "Fanya mazoezi peke yako na maswali kama ya Circles - lakini bila vyumba, mazungumzo, au mwenyeji",
+  "soloModeVocabulary": "Msamiati",
+  "soloModeSentences": "Sentensi",
+  "soloModeReview": "Mapitio",
+  "soloModeVocabularySubtitle": "Chaguo nyingi, maana, visawe, matumizi",
+  "soloModeSentencesSubtitle": "Jaza nafasi + tafsiri + kusoma",
+  "soloModeReviewDescription": "Fanya mazoezi uliyojifunza: maneno magumu, makosa ya hivi karibuni",
+  "startReview": "Anza Mapitio",
+  "soloSetupTitle": "Mipangilio ya {mode}",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Ugumu",
+  "numberOfQuestions": "Idadi ya maswali",
+  "timerPerQuestion": "Muda kwa swali",
+  "noTimer": "Hakuna muda",
+  "start": "Anza",
+  "profileTitle": "Wasifu",
+  "profileSignInToMessage": "Ingia kutuma ujumbe",
+  "profileThatsYourProfile": "Hiyo ni wasifu wako",
+  "profileSignInToAddFriends": "Ingia kuongeza marafiki",
+  "profileCantAddYourself": "Huwezi kujiongeza mwenyewe",
+  "profileRequestSent": "Ombi limetumwa kwa @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Imeshindwa kutuma ombi",
+  "profileDefaultDisplayName": "Mtumiaji Mpya",
+  "profileDefaultBio": "Tayari kujifunza!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Mgeni",
+  "guestUsername": "Mgeni",
+  "guestSessionLabel": "Kikao cha Mgeni",
+  "unlockFullProfile": "Fungua Wasifu Kamili",
+  "guestBenefitSync": "Hifadhi maendeleo kwenye vifaa vyote",
+  "guestBenefitCircles": "Jiunge na Circles na ucheze moja kwa moja",
+  "guestBenefitNotifications": "Pata arifa na maombi ya urafiki",
+  "progressStaysOnDevice": "Maendeleo yanabaki kwenye kifaa hiki hadi uingie",
+  "profileGoalLabel": "Lengo: dkk {minutes}",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "Maendeleo ya XP",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Ushindi",
+  "profileStreak": "Mfululizo",
+  "profileFriendsTitle": "Marafiki",
+  "profileViewAll": "Ona zote",
+  "profileAchievementsTitle": "Mafanikio",
+  "profileNoAchievements": "Bado hakuna mafanikio",
+  "profileRequested": "Imeombwa",
+  "profileSending": "Inatuma...",
+  "profileAddFriend": "Ongeza Rafiki",
+  "profileConnectTitle": "Ungana",
+  "profileMessage": "Ujumbe",
+  "profileSnapshot": "Picha ya Wasifu",
+  "profileLocationHidden": "Mahali pamefichwa",
+  "profileBioHidden": "Wasifu umefichwa",
+  "profileDailyGoal": "Lengo la kila siku dkk {minutes}",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Mwaliko wa Circle",
+  "circleIdLabel": "Kitambulisho cha Circle: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Ingia ili kujiunga",
+  "joiningCircle": "Inajiunga...",
+  "joinCircle": "Jiunge na Circles",
+  "circleJoinedAsPlayer": "Amejiunga kama mchezaji",
+  "circleJoinedAsSpectator": "Amejiunga kama mtazamaji",
+  "accept": "Kubali",
+  "decline": "Kataa",
+  "open": "Fungua",
+  "circleCountdownTitle": "Jitayarishe",
+  "circleCountdownSubtitle": "Circle inaanza...",
+  "userFallbackName": "Mtumiaji",
+  "micOff": "Maikrofoni Imezimwa",
+  "micOn": "Maikrofoni Imewashwa",
+  "roleHost": "Mwenyeji",
+  "roleSpectator": "Mtazamaji",
+  "tagHost": "MWENYEJI",
+  "tagYou": "WEWE",
+  "statusCorrect": "SAHIHI",
+  "statusWrong": "KOSA",
+  "statusWaiting": "INASUBIRI",
+  "statusNone": "-",
+  "pointsAbbrev": "pts",
+  "pointsLabel": "Alama",
+  "statCorrect": "Sahihi",
+  "statAnswers": "Majibu",
+  "statTotal": "Jumla",
+  "statQuestions": "Maswali",
+  "statAccuracy": "Usahihi",
+  "statRate": "Kiwango",
+  "statRank": "Nafasi",
+  "statPosition": "Nafasi",
+  "statMode": "Modi",
+  "statType": "Aina",
+  "next": "Inayofuata",
+  "submit": "Wasilisha",
+  "continueLabel": "Endelea",
+  "save": "Hifadhi",
+  "playAgain": "Cheza Tena",
+  "backToCourse": "Rudi kwenye Kozi",
+  "resultsTitle": "Matokeo",
+  "shareLater": "Shiriki baadaye",
+  "delete": "Futa",
+  "ok": "Sawa",
+  "minutesShort": "dkk {minutes}",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "dkk {count}",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "saa {count}",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "siku {count}",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "sasa hivi",
+  "timeMinutesAgo": "dkk {count} zilizopita",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "saa {count} zilizopita",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "siku {count} zilizopita",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Inamsubiri mwenyeji...",
+  "liveQuizJoinRequestSent": "Ombi la kujiunga limetumwa",
+  "liveQuizJoinRequestFailed": "Ombi limeshindwa: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Udhibiti wa Mwenyeji",
+  "liveQuizSpectatorModeTitle": "Modi ya Mtazamaji",
+  "liveQuizHostControlsSubtitle": "Raundi zitasonga mbele kiotomatiki wakati kila mtu amejibu au muda unapoisha",
+  "liveQuizSpectatorModeSubtitle": "Angalia maswali na bao la kuongoza moja kwa moja. Huwezi kujibu",
+  "liveQuizQuestionCounter": "Swali {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Ombi limetumwa",
+  "liveQuizRequestToJoin": "Omba kujiunga",
+  "liveQuizSpectatorFooter": "Unatazama moja kwa moja. Furahia maswali na ubao wa kuongoza",
+  "circleNotFound": "Circle haikupatikana",
+  "resultsRematchStartFailed": "Imeshindwa kuanza mechi mpya: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Matokeo ya Mechi",
+  "resultsNiceWork": "Kazi nzuri, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "Nafasi ya 1",
+  "resultsPlaceSecond": "Nafasi ya 2",
+  "resultsPlaceThird": "Nafasi ya 3",
+  "resultsPlaceNth": "Nafasi ya {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "kati ya wachezaji {players}",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Bingwa! Ulitawala raundi hii",
+  "resultsHighlightGreatAccuracy": "Usahihi mkubwa - karibu kabisa!",
+  "resultsHighlightKeepGoing": "Endelea - uthabiti unashinda kasi",
+  "resultsLeaderboardTitle": "Ubao wa kuongoza",
+  "resultsPlayersCount": "Wachezaji {count}",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Rudi kwenye Circles",
+  "resultsRematch": "Mechi Mpya",
+  "resultsPlayAgain": "Cheza Tena",
+  "leaderboardGlobalTitle": "Ubao wa Kimataifa",
+  "leaderboardEmpty": "Bado hakuna nafasi",
+  "aboutTitle": "Kuhusu",
+  "aboutVersion": "Toleo {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA ni jukwaa la kujifunza lugha kwa njia ya mchezo ambalo hufanya umilisi wa lugha mpya kuwa wa kufurahisha na wa kijamii. Shindana katika Circles, fanya mazoezi peke yako, na fuatilia maendeleo yako.",
+  "aboutTerms": "Masharti ya Huduma",
+  "aboutPrivacy": "Sera ya Faragha",
+  "aboutOpenSource": "Leseni za Chanzo Huria",
+  "addFriendTitle": "Ongeza Rafiki",
+  "addFriendFindByUsername": "Tafuta kwa Jina la Mtumiaji",
+  "addFriendUsernameHint": "Andika jina la mtumiaji...",
+  "addFriendTip": "Kidokezo: Usaidizi wa msimbo wa QR + Kitambulisho cha Rafiki unakuja hivi karibuni",
+  "addFriendSending": "Inatuma...",
+  "addFriendSendRequest": "Tuma Ombi",
+  "addFriendUserNotFound": "Mtumiaji @{username} hakupatikana",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Kitendo kimeshindwa au tayari kimetumwa: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Marafiki",
+  "searchFriendsHint": "Tafuta marafiki...",
+  "somaLearnerSubtitle": "Mwanafunzi wa Soma",
+  "friendRequestLabel": "Ombi",
+  "friendRequestSentLabel": "Ombi limetumwa",
+  "friendIncomingRequestLabel": "Ombi linalokuja",
+  "friendRequestsSection": "Maombi",
+  "friendPendingSection": "Inasubiri",
+  "friendAllSection": "Marafiki Wote",
+  "friendsEmptyState": "Bado hakuna marafiki. Ongeza rafiki yako wa kwanza!",
+  "friendsEmptyShort": "Bado hakuna marafiki",
+  "noMatchForQuery": "Hakuna matokeo kwa \"{query}\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Kikasha",
+  "searchChatsHint": "Tafuta mazungumzo...",
+  "inboxEmptyState": "Bado hakuna mazungumzo. Anzisha mazungumzo na rafiki!",
+  "newMessageTitle": "Ujumbe Mpya",
+  "chatCallLater": "Simu ya sauti hivi karibuni (sauti ya Circle inayofuata)",
+  "errorWithDetails": "Hitilafu: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Sema Jambo kwa {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Ujumbe...",
+  "notificationsTitle": "Arifa",
+  "notificationsTabAll": "Zote",
+  "notificationsTabCourses": "Kozi",
+  "notificationsTabSocial": "Kijamii",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "Mfumo",
+  "notificationsEmpty": "Hakuna arifa",
+  "notificationsDeleted": "Arifa imefutwa",
+  "notificationTitleFallback": "Arifa",
+  "notificationTypeCourse": "Kozi",
+  "notificationTypeSocial": "Kijamii",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "Mfumo",
+  "notificationsFriendAccepted": "Ombi la urafiki limekubaliwa",
+  "notificationsFriendAcceptFailed": "Imeshindwa kukubali ombi la urafiki: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Ombi la urafiki limekataliwa",
+  "notificationsFriendDeclineFailed": "Imeshindwa kukataa ombi la urafiki: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Imeshindwa kujiunga na Circle: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Inafungua",
+  "notificationsOpened": "Imefunguliwa",
+  "notificationsActionMessage": "Arifa ya {action}",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Mipangilio",
+  "settingsSectionAccount": "Akaunti",
+  "settingsEditProfile": "Hariri Wasifu",
+  "settingsPrivacy": "Faragha",
+  "settingsSecurity": "Usalama",
+  "settingsSectionGameplay": "Uchezaji",
+  "settingsShowTranslationLine": "Onyesha Mstari wa Tafsiri",
+  "settingsShowReadingLine": "Onyesha Mstari wa Kusoma (Pinyin/Romanji)",
+  "settingsDefaultTimerPerQuestion": "Muda wa Kila Swali",
+  "settingsMatchDifficulty": "Ugumu wa Mechi",
+  "settingsMatchDifficultyAdaptive": "Inayobadilika",
+  "settingsSectionSoundFeel": "Sauti na Mguso",
+  "settingsMusic": "Muziki",
+  "settingsSoundEffects": "Athari za Sauti",
+  "settingsHaptics": "Mtetemo",
+  "settingsSectionNotifications": "Arifa",
+  "settingsPushNotifications": "Arifa za Push",
+  "settingsDailyReminder": "Kikumbusho cha Kila Siku",
+  "settingsSectionAppearance": "Muonekano",
+  "settingsTheme": "Mandhari",
+  "settingsUiLanguage": "Lugha ya UI",
+  "settingsSectionAbout": "Kuhusu",
+  "settingsVersion": "Toleo",
+  "settingsTermsPrivacy": "Masharti na Faragha",
+  "settingsSupport": "Msaada",
+  "settingsLogout": "Ondoka",
+  "themeSystem": "Mfumo",
+  "themeDark": "Giza",
+  "themeLight": "Mwanga",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "فارسی",
+  "languagePunjabi": "ਪੰਜਾਬੀ",
+  "languageTamil": "தமிழ்",
+  "languageTelugu": "తెలుగు",
+  "languageSwahili": "Kiswahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Wasifu Umesasishwa",
+  "editProfileTitle": "Hariri Wasifu",
+  "editProfilePhotoLabel": "Picha ya Wasifu",
+  "editProfilePhotoSubtitle": "Uchaguzi wa Avatar wa Supabase Storage unakuja hivi karibuni",
+  "editProfileChangePhoto": "Badilisha",
+  "editProfileAvatarUploadSoon": "Upakiaji wa Avatar hivi karibuni",
+  "editProfileDisplayNameLabel": "Jina la Kuonyesha",
+  "editProfileDisplayNameHint": "Jina lako",
+  "editProfileDisplayNameRequired": "Tafadhali ingiza jina lako",
+  "editProfileDisplayNameTooShort": "Fupi mno",
+  "editProfileUsernameLabel": "Jina la Mtumiaji",
+  "editProfileUsernameHint": "learner_ali",
+  "editProfileUsernameRequired": "Tafadhali ingiza jina la mtumiaji",
+  "editProfileUsernameTooShort": "Angalau herufi 3",
+  "editProfileUsernameInvalid": "Herufi, nambari, _ pekee",
+  "editProfileBioLabel": "Wasifu",
+  "editProfileBioHint": "Maelezo mafupi kukuhusu...",
+  "editProfileBioTooLong": "Upeo wa herufi 120",
+  "editProfileLocationLabel": "Mahali",
+  "editProfileLocationHint": "Mji / Nchi",
+  "editProfileDailyGoalTitle": "Lengo la Kila Siku",
+  "editProfileDailyGoalSubtitle": "Chagua dakika ngapi unataka kujifunza kwa siku",
+  "securityTitle": "Usalama",
+  "securitySectionPassword": "Nenosiri",
+  "securityChangePasswordTitle": "Badilisha Nenosiri",
+  "securityChangePasswordSubtitle": "Sasisha nenosiri lako mara kwa mara",
+  "securitySectionTwoFactor": "Uthibitishaji wa Hatua Mbili",
+  "securityEnable2faTitle": "Wezesha 2FA",
+  "securityEnable2faSubtitle": "Usalama wa ziada kwa kuingia",
+  "securitySectionAppLock": "Kufunga Programu",
+  "securityBiometricTitle": "Kufungua kwa Biometriska",
+  "securityBiometricSubtitle": "Tumia FaceID/TouchID kufungua SOMA",
+  "securityAppLockTitle": "Kufunga Programu",
+  "securityAppLockSubtitle": "Funga SOMA unapoondoka",
+  "securitySectionSessions": "Vipindi Vinavyoendelea",
+  "securityNoSessions": "Hakuna vipindi vinavyoendelea",
+  "securityThisDevice": "Kifaa Hiki",
+  "securityDevice": "Kifaa",
+  "securityActiveLabel": "Amilifu",
+  "securitySignInToEnable2fa": "Ingia ili kuwezesha 2FA",
+  "securityEnable2faFailed": "Imeshindwa kuwezesha 2FA: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "Imeshindwa kulemaza 2FA: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "Usanidi wa 2FA",
+  "securitySecretKeyLabel": "Ufunguo wa Siri",
+  "securityCodeHint": "Msimbo wa tarakimu 6",
+  "security2faEnabled": "2FA Imewezeshwa",
+  "securityVerifyCodeFailed": "Imeshindwa kuthibitisha msimbo: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Inathibitisha...",
+  "securityVerify": "Thibitisha",
+  "securityCurrentPasswordHint": "Nenosiri la Sasa",
+  "securityNewPasswordHint": "Nenosiri Mpya (angalau herufi 8)",
+  "securityConfirmPasswordHint": "Thibitisha nenosiri mpya",
+  "securitySignInToChangePassword": "Ingia ili kubadilisha nenosiri",
+  "securityEnterCurrentPassword": "Ingiza nenosiri lako la sasa",
+  "securityPasswordMinLength": "Nenosiri mpya lazima liwe na angalau herufi 8",
+  "securityPasswordsDoNotMatch": "Nywila hazilingani",
+  "securityPasswordUpdated": "Nenosiri limesasishwa",
+  "securityPasswordUpdateFailed": "Imeshindwa kusasisha nenosiri: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Saa ya Kufunga Kiotomatiki",
+  "privacyTitle": "Faragha",
+  "privacySectionVisibility": "Mwonekano",
+  "privacyProfileVisibilityTitle": "Mwonekano wa Wasifu",
+  "privacyVisibilityPublic": "Umma",
+  "privacyVisibilityFriends": "Marafiki",
+  "privacyVisibilityPrivate": "Binafsi",
+  "privacyVisibilityPublicSubtitle": "Mtu yeyote anaweza kuona wasifu wako",
+  "privacyVisibilityFriendsSubtitle": "Marafiki pekee ndio wanaoweza kuona wasifu wako",
+  "privacyVisibilityPrivateSubtitle": "Wewe pekee ndiye unayeweza kuona wasifu wako",
+  "privacySectionActivity": "Shughuli",
+  "privacyShowOnlineTitle": "Onyesha Hali ya Mtandaoni",
+  "privacyShowOnlineSubtitle": "Waruhusu wachezaji waone unapokuwa mtandaoni",
+  "privacyShowActivityTitle": "Onyesha Shughuli ya Kujifunza",
+  "privacyShowActivitySubtitle": "Onyesha mfululizo, XP, na maendeleo ya hivi majuzi",
+  "privacySectionSocial": "Kijamii",
+  "privacyAllowRequestsTitle": "Ruhusu Maombi ya Urafiki",
+  "privacyAllowRequestsSubtitle": "Ruhusu watu wakutumie maombi ya urafiki",
+  "privacyWhoCanDmTitle": "Nani Anaweza DM",
+  "privacyDmEveryone": "Kila mtu",
+  "privacyDmFriends": "Marafiki",
+  "privacyDmNoOne": "Hakuna mtu",
+  "privacyDmEveryoneSubtitle": "Mtu yeyote anaweza kukutumia ujumbe",
+  "privacyDmFriendsSubtitle": "Marafiki pekee ndio wanaoweza kukutumia ujumbe",
+  "privacyDmNoOneSubtitle": "Hakuna mtu anayeweza kukutumia ujumbe",
+  "privacySectionBlockedUsers": "Watumiaji Waliozuiwa",
+  "privacyBlockedUsersComingSoon": "Usimamizi wa watumiaji waliozuiwa unakuja hivi karibuni",
+  "privacySectionDataControls": "Udhibiti wa Data",
+  "privacyExportDataTitle": "Hamisha Data Yangu",
+  "privacyExportDataSubtitle": "Pakua shughuli zako na kozi",
+  "privacyExportInfoTitle": "Uhamishaji wa Data",
+  "privacyExportInfoBody": "Nyingine: Tengeneza usafirishaji wa JSON/CSV na barua pepe au upakuaji wa kawaida",
+  "privacyDeleteAccountTitle": "Futa Akaunti",
+  "privacyDeleteAccountSubtitle": "Hii itafuta akaunti yako na data kabisa",
+  "privacyDeleteConfirmTitle": "Futa Akaunti?",
+  "privacyDeleteConfirmBody": "Hii haiwezi kubatilishwa. Wasifu wako, kozi, marafiki, na ujumbe vitafutwa",
+  "privacyDeleteComingSoon": "Ufutaji utaunganishwa na Supabase baadaye",
+  "soloLabel": "Solo",
+  "soloResultsCompletedTitle": "Kikao cha Solo kimekamilika",
+  "soloResultsFeedbackElite": "Utendaji bora - weka mfululizo hai",
+  "soloResultsFeedbackStrong": "Kazi nzuri - inaboresha haraka",
+  "soloResultsFeedbackProgress": "Maendeleo mazuri - kagua makosa na jaribu tena",
+  "soloResultsFeedbackTryAgain": "Hakuna shinikizo - jaribu tena na maswali machache na uzingatie",
+  "soloResultsPerfectScore": "Alama kamili! Hakuna makosa ya kukagua",
+  "soloResultsReviewPrompt": "Kagua makosa ili ujifunze haraka zaidi. Majibu yako yasiyo sahihi yako hapa chini",
+  "soloResultsReviewMistakes": "Kagua Makosa ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Hujaingia",
+  "genericUser": "Mtumiaji",
+  "loading": "Inapakia...",
+  "edit": "Hariri",
+  "send": "Tuma",
+  "join": "Jiunge",
+  "leave": "Ondoka",
+  "ready": "Tayari",
+  "levelBeginner": "Mwanzilishi",
+  "levelIntermediate": "Wakati",
+  "levelAdvanced": "Juu",
+  "questionsShort": "Maswali {count}",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "Sekunde {count}",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Kozi Zote",
+  "circlesAllModes": "Modi Zote",
+  "circlesAllLevels": "Ngazi Zote",
+  "circlesAddNewCourse": "Ongeza Kozi Mpya",
+  "circlesCoursesTitle": "Kozi",
+  "circlesModeTitle": "Modi",
+  "circlesLevelTitle": "Ngazi",
+  "circlesNoActiveForFilters": "Hakuna Circle inayotumika kwa vichungi hivi",
+  "circlesUnknownRoom": "Chumba Kisichojulikana",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Unda Circle",
+  "circlesCircleName": "Jina la Circle",
+  "circlesEnterName": "Ingiza jina",
+  "circlesLanguages": "Lugha",
+  "circlesRoomSetup": "Mpangilio wa Chumba",
+  "circlesPlayers": "Wachezaji",
+  "circlesEmptySlot": "Nafasi Tupu",
+  "circlesPlayersRange": "Wachezaji 1-5",
+  "circlesQuestions": "Maswali",
+  "circlesQuestionsSubtitle": "Kiasi cha maswali",
+  "circlesTimePerQuestion": "Muda kwa Swali",
+  "circlesSecondsPerQuestion": "Sek/Swali",
+  "circlesAdvanced": "Juu",
+  "circlesAllowSpectators": "Ruhusu Watazamaji",
+  "circlesAllowSpectatorsSubtitle": "Ruhusu wengine kutazama bila kucheza",
+  "circlesLiveVoiceChat": "Mazungumzo ya Sauti ya Moja kwa Moja",
+  "circlesLiveVoiceChatSubtitle": "Wezesha mwingiliano wa sauti wakati wa mechi",
+  "circlesLiveTextChat": "Mazungumzo ya Maandishi ya Moja kwa Moja",
+  "circlesLiveTextChatSubtitle": "Wezesha kutuma ujumbe wakati wa mechi",
+  "circlesCreatedSuccess": "Circle imeundwa",
+  "circlesCreateError": "Imeshindwa kuunda Circle: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Kidokezo: Unaweza kualika marafiki baada ya kuunda",
+  "circlesJoinError": "Imeshindwa kujiunga na Circle: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Lobby ya Circle",
+  "circlesCodeLine": "Msimbo: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Mipangilio ya Mechi",
+  "circlesLevelWithValue": "Ngazi {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Ugumu",
+  "circlesPerQuestionShort": "Kwa kila swali",
+  "circlesInvite": "Alika",
+  "circlesCopyId": "Nakili ID",
+  "circlesCopiedId": "ID imenakiliwa",
+  "circlesMatchInProgress": "Mechi inaendelea",
+  "circlesSpectatorQueuedBody": "Mechi inaendelea. Utajiunga kama mtazamaji",
+  "circlesHostStartWhenReady": "Mwenyeji ataanza wakati kila mtu yuko tayari",
+  "circlesSpectators": "Watazamaji",
+  "circlesSpectator": "Mtazamaji",
+  "circlesSpectatorCanWatch": "Watazamaji wanaweza kutazama moja kwa moja",
+  "circlesJoinRequests": "Maombi ya Kujiunga",
+  "circlesAcceptSpectatorsHint": "Kubali watazamaji kabla ya kuanza mechi",
+  "circlesStartGame": "Anza Mchezo",
+  "circlesWaitingForPlayers": "Inasubiri wachezaji",
+  "circlesLeaveCircle": "Ondoka kwenye Circle",
+  "circlesRequestSent": "Ombi limetumwa",
+  "circlesRequestToJoin": "Omba kujiunga",
+  "circlesWatchLive": "Tazama Moja kwa Moja",
+  "circlesPlayerTip": "Gonga 'Tayari' unapokuwa tayari. Mwenyeji ataanza mechi",
+  "circlesSpectatorTip": "Unatazama. Tazama hatua moja kwa moja mwenyeji anapoanza",
+  "circlesHostControls": "Udhibiti wa Mwenyeji",
+  "circlesTransferHostFailed": "Imeshindwa kuhamisha uwenyeji: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Imeshindwa kumaliza Circle: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "Mtumiaji @{username} hakupatikana",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Mtumiaji batili",
+  "circlesCantInviteSelf": "Huwezi kujialika mwenyewe",
+  "circlesUserAlreadyInCircle": "@{username} tayari yuko kwenye Circle",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Mwenyeji",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "Kupitia Jina la Mtumiaji",
+  "circlesInviteSent": "Mwaliko umetumwa kwa @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Imeshindwa kutuma mwaliko: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Ombi la kujiunga limetumwa",
+  "circlesJoinRequestFailed": "Ombi limeshindwa: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle imejaa",
+  "circlesSpectatorAdded": "Mtazamaji ameongezwa",
+  "circlesApproveFailed": "Imeshindwa kuidhinisha: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Ombi limekataliwa",
+  "circlesDeclineFailed": "Imeshindwa kukataa: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Mshiriki",
+  "circlesLeavePromptTitle": "Ondoka kwenye Circle?",
+  "circlesLeavePromptTransfer": "Hamisha uwenyeji kabla ya kuondoka",
+  "circlesLeavePromptEndOnly": "Maliza Circle na uondoke",
+  "circlesTransferHost": "Hamisha Mwenyeji",
+  "circlesEndCircle": "Maliza Circle",
+  "circlesTransferHostTitle": "Uhamisho wa Mwenyeji",
+  "circlesShareId": "Kitambulisho cha Circle: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

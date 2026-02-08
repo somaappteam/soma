@@ -6,7 +6,7 @@ import '../../core/widgets/neon_button.dart';
 import '../../data/auth_repository.dart';
 import '../../data/profile_store.dart';
 import '../../core/widgets/responsive.dart';
-import '../../core/widgets/soma_background.dart';
+
 
 class SignInScreen extends StatefulWidget {
   final VoidCallback? onSignedIn;
@@ -82,107 +82,105 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
-          child: ResponsiveFrame(
-            maxWidth: 430,
-            child: ResponsiveScroll(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                      // top row
-                      Row(
+      body: SafeArea(
+        child: ResponsiveFrame(
+          maxWidth: 430,
+          child: ResponsiveScroll(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                    // top row
+                    Row(
+                      children: [
+                        _IconGlassButton(
+                          icon: Icons.arrow_back_rounded,
+                          onTap: () => Navigator.pop(context),
+                        ),
+                        const Spacer(),
+                        _IconGlassButton(
+                          icon: Icons.star_rounded,
+                          onTap: () {},
+                        ),
+                      ],
+                    ),
+
+                    const Spacer(flex: 10),
+
+                    // Title
+                    Center(
+                      child: Text(
+                        l10n.signIn,
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // glass card
+                    Glass(
+                      radius: BorderRadius.circular(26),
+                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                      child: Column(
                         children: [
-                          _IconGlassButton(
-                            icon: Icons.arrow_back_rounded,
-                            onTap: () => Navigator.pop(context),
+                          _GlassTextField(
+                            controller: _email,
+                            hint: l10n.authEmail,
+                            icon: Icons.mail_outline_rounded,
+                            keyboardType: TextInputType.emailAddress,
+                            obscure: false,
+                            onToggleObscure: null,
                           ),
-                          const Spacer(),
-                          _IconGlassButton(
-                            icon: Icons.star_rounded,
-                            onTap: () {},
+                          const SizedBox(height: 12),
+                          _GlassTextField(
+                            controller: _password,
+                            hint: l10n.authPassword,
+                            icon: Icons.lock_outline_rounded,
+                            keyboardType: TextInputType.visiblePassword,
+                            obscure: _obscure,
+                            onToggleObscure: () => setState(() => _obscure = !_obscure),
+                          ),
+                          const SizedBox(height: 18),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: NeonButton(
+                              label: _isLoading ? l10n.authSigningIn : l10n.authContinue,
+                              onTap: _isLoading ? () {} : _handleSignIn,
+                            ),
                           ),
                         ],
                       ),
+                    ),
 
-                      const Spacer(flex: 10),
+                    const SizedBox(height: 14),
 
-                      // Title
-                      Center(
-                        child: Text(
-                          l10n.signIn,
-                          style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
+                    // bottom link
+                    Center(
+                      child: Text.rich(
+                        TextSpan(
+                          text: l10n.authNeedAccount,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Colors.white.withValues(alpha: 0.72),
                               ),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-
-                      // glass card
-                      Glass(
-                        radius: BorderRadius.circular(26),
-                        padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
-                        child: Column(
                           children: [
-                            _GlassTextField(
-                              controller: _email,
-                              hint: l10n.authEmail,
-                              icon: Icons.mail_outline_rounded,
-                              keyboardType: TextInputType.emailAddress,
-                              obscure: false,
-                              onToggleObscure: null,
-                            ),
-                            const SizedBox(height: 12),
-                            _GlassTextField(
-                              controller: _password,
-                              hint: l10n.authPassword,
-                              icon: Icons.lock_outline_rounded,
-                              keyboardType: TextInputType.visiblePassword,
-                              obscure: _obscure,
-                              onToggleObscure: () => setState(() => _obscure = !_obscure),
-                            ),
-                            const SizedBox(height: 18),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: NeonButton(
-                                label: _isLoading ? l10n.authSigningIn : l10n.authContinue,
-                                onTap: _isLoading ? () {} : _handleSignIn,
-                              ),
+                            TextSpan(
+                              text: l10n.signUp,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                             ),
                           ],
                         ),
                       ),
+                    ),
 
-                      const SizedBox(height: 14),
-
-                      // bottom link
-                      Center(
-                        child: Text.rich(
-                          TextSpan(
-                            text: l10n.authNeedAccount,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.72),
-                                ),
-                            children: [
-                              TextSpan(
-                                text: l10n.signUp,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      const Spacer(flex: 16),
-                  ],
-                ),
+                    const Spacer(flex: 16),
+                ],
               ),
             ),
           ),

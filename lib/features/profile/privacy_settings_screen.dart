@@ -3,7 +3,6 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../data/settings_repository.dart';
 import '../../core/widgets/responsive.dart';
-import '../../core/widgets/soma_background.dart';
 
 // Enum definitions (could be in a model file, but keeping here for simplicity as they were in privacy_store)
 enum ProfileVisibility { public, friends, private }
@@ -29,8 +28,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
             child: ResponsiveFrame(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
@@ -193,7 +191,6 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               ),
             ),
           ),
-      ),
     );
   }
 
@@ -298,7 +295,6 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 10),
       child: Text(

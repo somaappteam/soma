@@ -1,0 +1,781 @@
+{
+  "@@locale": "hu",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Learn. Compete. Master.",
+  "signUp": "Sign Up",
+  "signIn": "Sign In",
+  "skipForNow": "Skip for Now",
+  "authFillAllFields": "Please fill in all fields",
+  "authError": "Error: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "Email",
+  "authPassword": "Password",
+  "authUsername": "Username",
+  "authContinue": "Continue",
+  "authSigningIn": "Signing In...",
+  "authCreateAccount": "Create Account",
+  "authCreating": "Creating...",
+  "authNeedAccount": "Don't have an account? ",
+  "authHaveAccount": "Already have an account? ",
+  "dialogAuthRequiredTitle": "Sign in to access Circles",
+  "dialogAuthRequiredBody": "Circles are multiplayer rooms. Create an account to join live matches, invite friends, and save progress.",
+  "notNow": "Not now",
+  "navHome": "Home",
+  "navCircles": "Circles",
+  "navProfile": "Profile",
+  "removeCourseTitle": "Remove course?",
+  "removeCourseBody": "{course} will be removed from your home list.",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "Cancel",
+  "remove": "Remove",
+  "welcomeBack": "Welcome back, {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Edit courses",
+  "done": "Done",
+  "noCoursesToEdit": "No courses to edit.",
+  "addCourse": "Add Course",
+  "unknown": "Unknown",
+  "iSpeak": "I speak",
+  "iWantToLearn": "I want to learn",
+  "chooseYourLanguage": "Choose your language",
+  "chooseLearningLanguage": "Choose learning language",
+  "chooseTwoDifferentLanguages": "Choose two different languages.",
+  "createCourse": "Create Course",
+  "soloCourseTitle": "Solo Course",
+  "searchLanguage": "Search language",
+  "noMatches": "No matches",
+  "chooseCourseType": "Choose a course type",
+  "soloStudyDescription": "Study alone with the same quiz style as circles - but without rooms, chat, spectators, or host options.",
+  "soloModeVocabulary": "Vocabulary",
+  "soloModeSentences": "Sentences",
+  "soloModeReview": "Review",
+  "soloModeVocabularySubtitle": "Multiple choice meanings, synonyms, usage",
+  "soloModeSentencesSubtitle": "Fill in the blank + translation + reading",
+  "soloModeReviewDescription": "Practice what you learned: weak words, recent mistakes, and spaced repetition.",
+  "startReview": "Start Review",
+  "soloSetupTitle": "{mode} Setup",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Difficulty",
+  "numberOfQuestions": "Number of questions",
+  "timerPerQuestion": "Timer per question",
+  "noTimer": "No timer",
+  "start": "Start",
+  "profileTitle": "Profile",
+  "profileSignInToMessage": "Sign in to message",
+  "profileThatsYourProfile": "That's your profile",
+  "profileSignInToAddFriends": "Sign in to add friends",
+  "profileCantAddYourself": "You can't add yourself",
+  "profileRequestSent": "Request sent to @{username}",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "Couldn't send request",
+  "profileDefaultDisplayName": "New User",
+  "profileDefaultBio": "Ready to learn!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Guest",
+  "guestUsername": "guest",
+  "guestSessionLabel": "Guest session",
+  "unlockFullProfile": "Unlock your full profile",
+  "guestBenefitSync": "Sync progress across devices",
+  "guestBenefitCircles": "Join Circles and play live",
+  "guestBenefitNotifications": "Get notifications and friend requests",
+  "progressStaysOnDevice": "Progress stays on this device until you sign in.",
+  "profileGoalLabel": "Goal: {minutes}m",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP Progress",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Wins",
+  "profileStreak": "Streak",
+  "profileFriendsTitle": "My Friends",
+  "profileViewAll": "View all",
+  "profileAchievementsTitle": "Achievements",
+  "profileNoAchievements": "Még nincsenek eredmények",
+  "profileRequested": "Requested",
+  "profileSending": "Sending...",
+  "profileAddFriend": "Add Friend",
+  "profileConnectTitle": "Connect",
+  "profileMessage": "Message",
+  "profileSnapshot": "Profile Snapshot",
+  "profileLocationHidden": "Location hidden",
+  "profileBioHidden": "Bio hidden",
+  "profileDailyGoal": "Daily goal {minutes}m",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle invite",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Sign In to Join",
+  "joiningCircle": "Joining...",
+  "joinCircle": "Join Circle",
+  "circleJoinedAsPlayer": "Joined as player",
+  "circleJoinedAsSpectator": "Joined as spectator",
+  "accept": "Accept",
+  "decline": "Decline",
+  "open": "Open",
+  "circleCountdownTitle": "Get Ready",
+  "circleCountdownSubtitle": "Circle is starting...",
+  "userFallbackName": "User",
+  "micOff": "Mic Off",
+  "micOn": "Mic On",
+  "roleHost": "Host",
+  "roleSpectator": "Spectator",
+  "tagHost": "HOST",
+  "tagYou": "YOU",
+  "statusCorrect": "Correct",
+  "statusWrong": "Wrong",
+  "statusWaiting": "Waiting",
+  "statusNone": "-",
+  "pointsAbbrev": "pts",
+  "pointsLabel": "Points",
+  "statCorrect": "Correct",
+  "statAnswers": "answers",
+  "statTotal": "Total",
+  "statQuestions": "questions",
+  "statAccuracy": "Accuracy",
+  "statRate": "rate",
+  "statRank": "Rank",
+  "statPosition": "position",
+  "statMode": "Mode",
+  "statType": "type",
+  "next": "Next",
+  "submit": "Submit",
+  "continueLabel": "Continue",
+  "save": "Save",
+  "playAgain": "Play Again",
+  "backToCourse": "Back to Course",
+  "resultsTitle": "Results",
+  "shareLater": "Share later",
+  "delete": "Delete",
+  "ok": "OK",
+  "minutesShort": "{minutes}m",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}m",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}h",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}d",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "just now",
+  "timeMinutesAgo": "{count}m ago",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count}h ago",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count}d ago",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Waiting for host...",
+  "liveQuizJoinRequestSent": "Join request sent",
+  "liveQuizJoinRequestFailed": "Failed to request join: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Host controls",
+  "liveQuizSpectatorModeTitle": "Spectator mode",
+  "liveQuizHostControlsSubtitle": "Rounds auto-advance when everyone answers or time runs out.",
+  "liveQuizSpectatorModeSubtitle": "Watch questions and the live leaderboard. You can't answer.",
+  "liveQuizQuestionCounter": "Question {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "Request Sent",
+  "liveQuizRequestToJoin": "Request to Join",
+  "liveQuizSpectatorFooter": "You're watching live. Enjoy the questions and leaderboard.",
+  "circleNotFound": "Circle not found",
+  "resultsRematchStartFailed": "Failed to start rematch: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Match Results",
+  "resultsNiceWork": "Nice work, {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1st Place",
+  "resultsPlaceSecond": "2nd Place",
+  "resultsPlaceThird": "3rd Place",
+  "resultsPlaceNth": "Place {rank}",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "Out of {players} players",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Champion! You dominated this circle.",
+  "resultsHighlightGreatAccuracy": "Great accuracy. You're close to the top!",
+  "resultsHighlightKeepGoing": "Keep going - consistency beats speed.",
+  "resultsLeaderboardTitle": "Leaderboard",
+  "resultsPlayersCount": "{count} players",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Back to Circles",
+  "resultsRematch": "Rematch",
+  "resultsPlayAgain": "Play Again",
+  "leaderboardGlobalTitle": "Global Ranking",
+  "leaderboardEmpty": "No rankings yet.",
+  "aboutTitle": "Info",
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA is a gamified language learning platform designed to make mastering new languages engaging and social. Compete in circles, practice solo, and track your progress.",
+  "aboutTerms": "Terms of Service",
+  "aboutPrivacy": "Privacy Policy",
+  "aboutOpenSource": "Open Source Licenses",
+  "addFriendTitle": "Add Friend",
+  "addFriendFindByUsername": "Find by username",
+  "addFriendUsernameHint": "Type username...",
+  "addFriendTip": "Tip: later we can support QR code + friend ID.",
+  "addFriendSending": "Sending...",
+  "addFriendSendRequest": "Send Request",
+  "addFriendUserNotFound": "User @{username} not found",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "Action failed or already sent: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Friends",
+  "searchFriendsHint": "Search friends...",
+  "somaLearnerSubtitle": "Soma Learner",
+  "friendRequestLabel": "Request",
+  "friendRequestSentLabel": "Request sent",
+  "friendIncomingRequestLabel": "Incoming Request",
+  "friendRequestsSection": "Requests",
+  "friendPendingSection": "Pending",
+  "friendAllSection": "All Friends",
+  "friendsEmptyState": "No friends yet. Add your first friend!",
+  "friendsEmptyShort": "No friends yet.",
+  "noMatchForQuery": "No match for \"{query}\"",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Inbox",
+  "searchChatsHint": "Search chats...",
+  "inboxEmptyState": "No conversations yet. Start chatting with a friend!",
+  "newMessageTitle": "New message",
+  "chatCallLater": "Voice call later (Circle voice is next)",
+  "errorWithDetails": "Error: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "Say hi to {name}!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Message...",
+  "notificationsTitle": "Értesítések",
+  "notificationsTabAll": "All",
+  "notificationsTabCourses": "Courses",
+  "notificationsTabSocial": "Social",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "System",
+  "notificationsEmpty": "Nincsenek még értesítések",
+  "notificationsDeleted": "Notification deleted",
+  "notificationTitleFallback": "Notification",
+  "notificationTypeCourse": "Course",
+  "notificationTypeSocial": "Social",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "System",
+  "notificationsFriendAccepted": "Friend request accepted",
+  "notificationsFriendAcceptFailed": "Couldn't accept friend request: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Friend request declined",
+  "notificationsFriendDeclineFailed": "Couldn't decline friend request: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Nem sikerült csatlakozni a Körhöz: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Megnyitás",
+  "notificationsOpened": "Megnyitva",
+  "notificationsActionMessage": "{action} értesítés",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Beállítások",
+  "settingsSectionAccount": "Fiók",
+  "settingsEditProfile": "Profil Szerkesztése",
+  "settingsPrivacy": "Adatvédelem",
+  "settingsSecurity": "Biztonság",
+  "settingsSectionGameplay": "Játékmenet",
+  "settingsShowTranslationLine": "Fordítás Megjelenítése",
+  "settingsShowReadingLine": "Olvasási Segédlet (Pinyin/Romanji)",
+  "settingsDefaultTimerPerQuestion": "Idő per Kérdés",
+  "settingsMatchDifficulty": "Meccs Nehézsége",
+  "settingsMatchDifficultyAdaptive": "Adaptív",
+  "settingsSectionSoundFeel": "Hang és Érzet",
+  "settingsMusic": "Zene",
+  "settingsSoundEffects": "Hangeffektek",
+  "settingsHaptics": "Rezgés",
+  "settingsSectionNotifications": "Értesítések",
+  "settingsPushNotifications": "Push Értesítések",
+  "settingsDailyReminder": "Napi Emlékeztető",
+  "settingsSectionAppearance": "Megjelenés",
+  "settingsTheme": "Téma",
+  "settingsUiLanguage": "Felület Nyelve",
+  "settingsSectionAbout": "Névjegy",
+  "settingsVersion": "Verzió",
+  "settingsTermsPrivacy": "Feltételek és Adatvédelem",
+  "settingsSupport": "Támogatás",
+  "settingsLogout": "Kijelentkezés",
+  "themeSystem": "Rendszer",
+  "themeDark": "Sötét",
+  "themeLight": "Világos",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "فارسی",
+  "languagePunjabi": "ਪੰਜਾਬੀ",
+  "languageTamil": "தமிழ்",
+  "languageTelugu": "తెలుగు",
+  "languageSwahili": "Kiswahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Profil Frissítve",
+  "editProfileTitle": "Profil Szerkesztése",
+  "editProfilePhotoLabel": "Profilkép",
+  "editProfilePhotoSubtitle": "Supabase Storage Avatarválasztó hamarosan",
+  "editProfileChangePhoto": "Módosít",
+  "editProfileAvatarUploadSoon": "Avatar feltöltés hamarosan",
+  "editProfileDisplayNameLabel": "Megjelenített Név",
+  "editProfileDisplayNameHint": "A neved",
+  "editProfileDisplayNameRequired": "Kérlek add meg a neved",
+  "editProfileDisplayNameTooShort": "Túl rövid",
+  "editProfileUsernameLabel": "Felhasználónév",
+  "editProfileUsernameHint": "learner_ali",
+  "editProfileUsernameRequired": "Kérlek add meg a felhasználóneved",
+  "editProfileUsernameTooShort": "Legalább 3 karakter",
+  "editProfileUsernameInvalid": "Csak betűk, számok, _",
+  "editProfileBioLabel": "Bemutatkozás",
+  "editProfileBioHint": "Rövid leírás rólad...",
+  "editProfileBioTooLong": "Maximum 120 karakter",
+  "editProfileLocationLabel": "Helyszín",
+  "editProfileLocationHint": "Város / Ország",
+  "editProfileDailyGoalTitle": "Napi Cél",
+  "editProfileDailyGoalSubtitle": "Válaszd ki, hány percet szeretnél tanulni naponta",
+  "securityTitle": "Biztonság",
+  "securitySectionPassword": "Jelszó",
+  "securityChangePasswordTitle": "Jelszó Megváltoztatása",
+  "securityChangePasswordSubtitle": "Frissítsd a jelszavad rendszeresen",
+  "securitySectionTwoFactor": "Kétlépcsős Azonosítás",
+  "securityEnable2faTitle": "2FA Engedélyezése",
+  "securityEnable2faSubtitle": "Extra biztonság bejelentkezéskor",
+  "securitySectionAppLock": "Alkalmazás Zárolása",
+  "securityBiometricTitle": "Biometrikus Feloldás",
+  "securityBiometricSubtitle": "Használj FaceID/TouchID-t a SOMA feloldásához",
+  "securityAppLockTitle": "Alkalmazás Zárolása",
+  "securityAppLockSubtitle": "Zárold a SOMA-t, ha távozol",
+  "securitySectionSessions": "Aktív Munkamenetek",
+  "securityNoSessions": "Nincsenek aktív munkamenetek",
+  "securityThisDevice": "Ez az Eszköz",
+  "securityDevice": "Eszköz",
+  "securityActiveLabel": "Aktív",
+  "securitySignInToEnable2fa": "Jelentkezz be a 2FA engedélyezéséhez",
+  "securityEnable2faFailed": "Nem sikerült engedélyezni a 2FA-t: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "Nem sikerült kikapcsolni a 2FA-t: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA Beállítás",
+  "securitySecretKeyLabel": "Titkos Kulcs",
+  "securityCodeHint": "6 jegyű kód",
+  "security2faEnabled": "2FA Engedélyezve",
+  "securityVerifyCodeFailed": "Kód ellenőrzése sikertelen: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Ellenőrzés...",
+  "securityVerify": "Ellenőrzés",
+  "securityCurrentPasswordHint": "Jelenlegi Jelszó",
+  "securityNewPasswordHint": "Új Jelszó (min 8 karakter)",
+  "securityConfirmPasswordHint": "Új jelszó megerősítése",
+  "securitySignInToChangePassword": "Jelentkezz be a jelszó megváltoztatásához",
+  "securityEnterCurrentPassword": "Add meg a jelenlegi jelszavad",
+  "securityPasswordMinLength": "Az új jelszónak legalább 8 karakternek kell lennie",
+  "securityPasswordsDoNotMatch": "A jelszavak nem egyeznek",
+  "securityPasswordUpdated": "Jelszó frissítve",
+  "securityPasswordUpdateFailed": "Nem sikerült frissíteni a jelszót: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Automatikus Zárolás",
+  "privacyTitle": "Adatvédelem",
+  "privacySectionVisibility": "Láthatóság",
+  "privacyProfileVisibilityTitle": "Profil Láthatósága",
+  "privacyVisibilityPublic": "Nyilvános",
+  "privacyVisibilityFriends": "Barátok",
+  "privacyVisibilityPrivate": "Privát",
+  "privacyVisibilityPublicSubtitle": "Bárki láthatja a profilodat",
+  "privacyVisibilityFriendsSubtitle": "Csak barátok láthatják a profilodat",
+  "privacyVisibilityPrivateSubtitle": "Csak te láthatod a profilodat",
+  "privacySectionActivity": "Tevékenység",
+  "privacyShowOnlineTitle": "Online Állapot Mutatása",
+  "privacyShowOnlineSubtitle": "Láthatják a játékosok, ha online vagy",
+  "privacyShowActivityTitle": "Tanulási Tevékenység Mutatása",
+  "privacyShowActivitySubtitle": "Sorozat, XP és legutóbbi haladás mutatása",
+  "privacySectionSocial": "Közösségi",
+  "privacyAllowRequestsTitle": "Barátkérések Engedélyezése",
+  "privacyAllowRequestsSubtitle": "Engedélyezd, hogy barátkérést küldjenek neked",
+  "privacyWhoCanDmTitle": "Ki Küldhet Üzenetet",
+  "privacyDmEveryone": "Bárki",
+  "privacyDmFriends": "Barátok",
+  "privacyDmNoOne": "Senki",
+  "privacyDmEveryoneSubtitle": "Bárki küldhet neked üzenetet",
+  "privacyDmFriendsSubtitle": "Csak barátok küldhetnek üzenetet",
+  "privacyDmNoOneSubtitle": "Senki sem küldhet üzenetet",
+  "privacySectionBlockedUsers": "Tiltott Felhasználók",
+  "privacyBlockedUsersComingSoon": "Tiltott felhasználók kezelése hamarosan",
+  "privacySectionDataControls": "Adatkezelés",
+  "privacyExportDataTitle": "Adataim Exportálása",
+  "privacyExportDataSubtitle": "Töltsd le a tevékenységed és kurzusaid",
+  "privacyExportInfoTitle": "Adatexportálás",
+  "privacyExportInfoBody": "Egyéb: JSON/CSV export generálása és küldés emailben vagy letöltés",
+  "privacyDeleteAccountTitle": "Fiók Törlése",
+  "privacyDeleteAccountSubtitle": "Ez véglegesen törli a fiókod és adataid",
+  "privacyDeleteConfirmTitle": "Törlöd a Fiókot?",
+  "privacyDeleteConfirmBody": "Ez nem visszavonható. A profilod, kurzusaid, barátaid és üzeneteid törlésre kerülnek",
+  "privacyDeleteComingSoon": "A törlés később lesz integrálva a Supabase-szel",
+  "soloLabel": "Szóló",
+  "soloResultsCompletedTitle": "Szóló Szekció Kész",
+  "soloResultsFeedbackElite": "Elit teljesítmény - tartsd életben a sorozatot",
+  "soloResultsFeedbackStrong": "Szép munka - gyorsan fejlődsz",
+  "soloResultsFeedbackProgress": "Jó haladás - nézd át a hibákat és próbáld újra",
+  "soloResultsFeedbackTryAgain": "Semmi gond - próbáld újra kevesebb kérdéssel és koncentrálj",
+  "soloResultsPerfectScore": "Tökéletes pontszám! Nincs mit átnézni",
+  "soloResultsReviewPrompt": "Nézd át a hibákat a gyorsabb tanulásért. A rossz válaszaid lentebb vannak",
+  "soloResultsReviewMistakes": "Hibák Áttekintése ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Nincs bejelentkezve",
+  "genericUser": "Felhasználó",
+  "loading": "Betöltés...",
+  "edit": "Szerkesztés",
+  "send": "Küldés",
+  "join": "Csatlakozás",
+  "leave": "Kilépés",
+  "ready": "Kész",
+  "levelBeginner": "Kezdő",
+  "levelIntermediate": "Középhaladó",
+  "levelAdvanced": "Haladó",
+  "questionsShort": "{count} Kérdés",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} Másodperc",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Összes Kurzus",
+  "circlesAllModes": "Összes Mód",
+  "circlesAllLevels": "Összes Szint",
+  "circlesAddNewCourse": "Új Kurzus Hozzáadása",
+  "circlesCoursesTitle": "Kurzusok",
+  "circlesModeTitle": "Mód",
+  "circlesLevelTitle": "Szint",
+  "circlesNoActiveForFilters": "Nincs aktív Kör ezekkel a szűrőkkel",
+  "circlesUnknownRoom": "Ismeretlen Szoba",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Kör Létrehozása",
+  "circlesCircleName": "Kör Neve",
+  "circlesEnterName": "Add meg a nevet",
+  "circlesLanguages": "Nyelvek",
+  "circlesRoomSetup": "Szoba Beállítás",
+  "circlesPlayers": "Játékosok",
+  "circlesEmptySlot": "Üres Hely",
+  "circlesPlayersRange": "1-5 Játékos",
+  "circlesQuestions": "Kérdések",
+  "circlesQuestionsSubtitle": "Kérdések mennyisége",
+  "circlesTimePerQuestion": "Idő per Kérdés",
+  "circlesSecondsPerQuestion": "Mp/Kérdés",
+  "circlesAdvanced": "Haladó",
+  "circlesAllowSpectators": "Nézők Engedélyezése",
+  "circlesAllowSpectatorsSubtitle": "Mások nézhetik játék nélkül",
+  "circlesLiveVoiceChat": "Élő Hangcsevegés",
+  "circlesLiveVoiceChatSubtitle": "Hangos interakció engedélyezése meccs közben",
+  "circlesLiveTextChat": "Élő Szöveges Csevegés",
+  "circlesLiveTextChatSubtitle": "Üzenetküldés engedélyezése meccs közben",
+  "circlesCreatedSuccess": "Kör létrehozva",
+  "circlesCreateError": "Nem sikerült létrehozni a Kört: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "Tipp: Létrehozás után meghívhatsz barátokat",
+  "circlesJoinError": "Nem sikerült csatlakozni a Körhöz: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Kör Előszoba",
+  "circlesCodeLine": "Kód: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Meccs Beállítások",
+  "circlesLevelWithValue": "{level} Szint",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Nehézség",
+  "circlesPerQuestionShort": "Kérdésenként",
+  "circlesInvite": "Meghívás",
+  "circlesCopyId": "ID Másolása",
+  "circlesCopiedId": "ID másolva",
+  "circlesMatchInProgress": "Meccs folyamatban",
+  "circlesSpectatorQueuedBody": "Meccs folyamatban. Nézőként fogsz csatlakozni",
+  "circlesHostStartWhenReady": "A házigazda indít, ha mindenki kész",
+  "circlesSpectators": "Nézők",
+  "circlesSpectator": "Néző",
+  "circlesSpectatorCanWatch": "A nézők élőben nézhetik",
+  "circlesJoinRequests": "Csatlakozási Kérések",
+  "circlesAcceptSpectatorsHint": "Fogadd el a nézőket a meccs kezdése előtt",
+  "circlesStartGame": "Játék Indítása",
+  "circlesWaitingForPlayers": "Várakozás játékosokra",
+  "circlesLeaveCircle": "Kör Elhagyása",
+  "circlesRequestSent": "Kérés elküldve",
+  "circlesRequestToJoin": "Csatlakozás Kérése",
+  "circlesWatchLive": "Élőben Nézés",
+  "circlesPlayerTip": "Nyomj a 'Kész'-re, ha készen állsz. A házigazda indítja a meccset",
+  "circlesSpectatorTip": "Néző vagy. Nézd az akciót élőben, amint a házigazda indít",
+  "circlesHostControls": "Házigazda Kezelése",
+  "circlesTransferHostFailed": "Házigazda átadása sikertelen: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Kör bezárása sikertelen: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "@{username} felhasználó nem található",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Érvénytelen felhasználó",
+  "circlesCantInviteSelf": "Nem hívhatod meg magad",
+  "circlesUserAlreadyInCircle": "@{username} már a Körben van",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Házigazda",
+  "circlesDefaultTitle": "Kör",
+  "circlesInviteByUsername": "Felhasználónév Alapján",
+  "circlesInviteSent": "Meghívó elküldve: @{username}",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Nem sikerült elküldeni a meghívót: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Csatlakozási kérés elküldve",
+  "circlesJoinRequestFailed": "A kérés sikertelen: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "A Kör megtelt",
+  "circlesSpectatorAdded": "Néző hozzáadva",
+  "circlesApproveFailed": "Jóváhagyás sikertelen: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "Kérés elutasítva",
+  "circlesDeclineFailed": "Elutasítás sikertelen: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Résztvevő",
+  "circlesLeavePromptTitle": "Elhagyod a Kört?",
+  "circlesLeavePromptTransfer": "Add át a házigazda szerepet távozás előtt",
+  "circlesLeavePromptEndOnly": "Kör bezárása és távozás",
+  "circlesTransferHost": "Házigazda Átadása",
+  "circlesEndCircle": "Kör Bezárása",
+  "circlesTransferHostTitle": "Házigazda Átadása",
+  "circlesShareId": "Kör ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

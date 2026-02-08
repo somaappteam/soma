@@ -3,7 +3,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../models/solo_course.dart';
 import '../../core/widgets/responsive.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../data/languages.dart';
 
 class AddCourseScreen extends StatefulWidget {
@@ -26,12 +26,11 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     final valid = speak.code != learn.code;
 
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: ResponsiveFrame(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
@@ -50,7 +49,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                             height: 44,
                             child: Center(
                               child: Icon(Icons.arrow_back_ios_new_rounded,
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                   size: 20),
                             ),
                           ),
@@ -109,7 +108,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                           Text(
                             l10n.chooseTwoDifferentLanguages,
                             style: TextStyle(
-                                color: Colors.white.withOpacity(0.75),
+                                color: Colors.white.withValues(alpha: 0.75),
                                 fontWeight: FontWeight.w800),
                           ),
                         ],
@@ -145,7 +144,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                           child: Text(
                             l10n.createCourse,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(valid ? 1 : 0.45),
+                              color: Colors.white.withValues(alpha: valid ? 1 : 0.45),
                               fontSize: 16,
                               fontWeight: FontWeight.w900,
                             ),
@@ -161,7 +160,6 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 }
@@ -189,12 +187,12 @@ class _SelectTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.black.withOpacity(0.14),
-          border: Border.all(color: Colors.white.withOpacity(0.14)),
+          color: Colors.black.withValues(alpha: 0.14),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white.withOpacity(0.9)),
+            Icon(icon, color: Colors.white.withValues(alpha: 0.9)),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -204,7 +202,7 @@ class _SelectTile extends StatelessWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.65),
+                      color: Colors.white.withValues(alpha: 0.65),
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -223,7 +221,7 @@ class _SelectTile extends StatelessWidget {
               ),
             ),
             Icon(Icons.expand_more_rounded,
-                color: Colors.white.withOpacity(0.65)),
+                color: Colors.white.withValues(alpha: 0.65)),
           ],
         ),
       ),
@@ -237,7 +235,7 @@ Future<LangOption?> _pickLanguage(
   required List<LangOption> items,
   required LangOption current,
 }) async {
-  final l10n = AppLocalizations.of(context)!;
+  final l10n = AppLocalizations.of(context);
   return showModalBottomSheet<LangOption>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -298,13 +296,13 @@ Future<LangOption?> _pickLanguage(
                               showSearch
                                   ? Icons.search_off_rounded
                                   : Icons.search_rounded,
-                              color: Colors.white.withOpacity(0.85),
+                              color: Colors.white.withValues(alpha: 0.85),
                             ),
                           ),
                           IconButton(
                             onPressed: () => Navigator.pop(ctx),
                             icon: Icon(Icons.close_rounded,
-                                color: Colors.white.withOpacity(0.85)),
+                                color: Colors.white.withValues(alpha: 0.85)),
                           ),
                         ],
                       ),
@@ -315,9 +313,9 @@ Future<LangOption?> _pickLanguage(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
-                            color: Colors.black.withOpacity(0.12),
+                            color: Colors.black.withValues(alpha: 0.12),
                             border: Border.all(
-                                color: Colors.white.withOpacity(0.12)),
+                                color: Colors.white.withValues(alpha: 0.12)),
                           ),
                           child: TextField(
                             focusNode: searchFocus,
@@ -330,10 +328,10 @@ Future<LangOption?> _pickLanguage(
                             decoration: InputDecoration(
                               hintText: l10n.searchLanguage,
                               hintStyle: TextStyle(
-                                  color: Colors.white.withOpacity(0.5)),
+                                  color: Colors.white.withValues(alpha: 0.5)),
                               border: InputBorder.none,
                               prefixIcon: Icon(Icons.search_rounded,
-                                  color: Colors.white.withOpacity(0.7)),
+                                  color: Colors.white.withValues(alpha: 0.7)),
                             ),
                           ),
                         ),
@@ -345,7 +343,7 @@ Future<LangOption?> _pickLanguage(
                           child: Text(
                             l10n.noMatches,
                             style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 fontWeight: FontWeight.w700),
                           ),
                         )
@@ -363,12 +361,12 @@ Future<LangOption?> _pickLanguage(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
                                 color: selected
-                                    ? Colors.white.withOpacity(0.10)
-                                    : Colors.black.withOpacity(0.10),
+                                    ? Colors.white.withValues(alpha: 0.10)
+                                    : Colors.black.withValues(alpha: 0.10),
                                 border: Border.all(
                                   color: selected
-                                      ? Colors.white.withOpacity(0.26)
-                                      : Colors.white.withOpacity(0.10),
+                                      ? Colors.white.withValues(alpha: 0.26)
+                                      : Colors.white.withValues(alpha: 0.10),
                                 ),
                               ),
                               child: Row(
@@ -384,7 +382,7 @@ Future<LangOption?> _pickLanguage(
                                   ),
                                   if (selected)
                                     Icon(Icons.check_rounded,
-                                        color: Colors.white.withOpacity(0.9)),
+                                        color: Colors.white.withValues(alpha: 0.9)),
                                 ],
                               ),
                             ),

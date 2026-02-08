@@ -6,7 +6,6 @@ import '../../data/settings_repository.dart';
 import '../../data/auth_repository.dart';
 import '../../data/session_repository.dart';
 import '../../core/widgets/responsive.dart';
-import '../../core/widgets/soma_background.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SecuritySettingsScreen extends StatefulWidget {
@@ -47,8 +46,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
             child: ResponsiveFrame(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
@@ -260,7 +258,6 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
               ),
             ),
           ),
-      ),
     );
   }
 
@@ -292,7 +289,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
       final totp = enroll.totp;
       if (totp == null) throw Exception('Failed to create TOTP');
 
-      if (!mounted) return;
+      if (!context.mounted) return;
       await showModalBottomSheet(
         context: context,
         backgroundColor: Colors.transparent,
@@ -309,7 +306,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
 
       await _loadMfaStatus();
     } catch (e) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.securityEnable2faFailed(e.toString()))),
       );
@@ -329,7 +326,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
 
       await _loadMfaStatus();
     } catch (e) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.securityDisable2faFailed(e.toString()))),
       );
@@ -565,56 +562,6 @@ class _IconBox extends StatelessWidget {
   }
 }
 
-class _InfoSheet extends StatelessWidget {
-  final String title;
-  final String body;
-  final String primary;
-  final VoidCallback onPrimary;
-
-  const _InfoSheet({
-    required this.title,
-    required this.body,
-    required this.primary,
-    required this.onPrimary,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      child: Glass(
-        radius: BorderRadius.circular(24),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)),
-            const SizedBox(height: 8),
-            Text(body, style: TextStyle(color: Colors.white.withValues(alpha: 0.70), fontWeight: FontWeight.w700, height: 1.2)),
-            const SizedBox(height: 12),
-            InkWell(
-              borderRadius: BorderRadius.circular(999),
-              onTap: onPrimary,
-              child: Container(
-                height: 46,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(999),
-                  color: Colors.white.withValues(alpha: 0.10),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-                ),
-                alignment: Alignment.center,
-                child: Text(primary,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14)),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _MfaSetupSheet extends StatefulWidget {
   final String factorId;
@@ -697,13 +644,13 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
                       try {
                         await Supabase.instance.client.auth.mfa
                             .challengeAndVerify(factorId: widget.factorId, code: code);
-                        if (!mounted) return;
+                        if (!context.mounted) return;
                         widget.onVerified();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(l10n.security2faEnabled)),
                         );
                       } catch (e) {
-                        if (!mounted) return;
+                        if (!context.mounted) return;
                         setState(() => _isVerifying = false);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(l10n.securityVerifyCodeFailed(e.toString()))),

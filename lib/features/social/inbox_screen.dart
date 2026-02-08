@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../core/widgets/soma_background.dart';
+
 import '../../core/widgets/glass.dart';
 import '../../data/chat_repository.dart';
 import 'dm_chat_screen.dart';
 import 'select_friend_screen.dart';
+import 'package:soma/l10n/gen/app_localizations.dart';
 
 class InboxScreen extends StatefulWidget {
   const InboxScreen({super.key});
@@ -11,6 +12,8 @@ class InboxScreen extends StatefulWidget {
   @override
   State<InboxScreen> createState() => _InboxScreenState();
 }
+
+
 
 class _InboxScreenState extends State<InboxScreen> {
   final String meId = "me"; // later: auth user id
@@ -28,9 +31,9 @@ class _InboxScreenState extends State<InboxScreen> {
   @override
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
             child: Column(
@@ -43,9 +46,9 @@ class _InboxScreenState extends State<InboxScreen> {
                       onTap: () => Navigator.pop(context),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      "Inbox",
-                      style: TextStyle(
+                     Text(
+                      l10n.inboxTitle,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
@@ -75,7 +78,7 @@ class _InboxScreenState extends State<InboxScreen> {
                   child: Row(
                     children: [
                       Icon(Icons.search_rounded,
-                          color: Colors.white.withOpacity(0.7)),
+                          color: Colors.white.withValues(alpha: 0.7)),
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
@@ -84,9 +87,9 @@ class _InboxScreenState extends State<InboxScreen> {
                               color: Colors.white, fontWeight: FontWeight.w700),
                           cursorColor: Colors.white,
                           decoration: InputDecoration(
-                            hintText: "Search chats…",
+                            hintText: l10n.searchChatsHint,
                             hintStyle: TextStyle(
-                                color: Colors.white.withOpacity(0.45)),
+                                color: Colors.white.withValues(alpha: 0.45)),
                             border: InputBorder.none,
                             isDense: true,
                           ),
@@ -96,7 +99,7 @@ class _InboxScreenState extends State<InboxScreen> {
                         GestureDetector(
                           onTap: () => setState(() => query = ""),
                           child: Icon(Icons.close_rounded,
-                              color: Colors.white.withOpacity(0.7)),
+                              color: Colors.white.withValues(alpha: 0.7)),
                         ),
                     ],
                   ),
@@ -128,10 +131,10 @@ class _InboxScreenState extends State<InboxScreen> {
                           padding: const EdgeInsets.all(16),
                           child: Text(
                             query.isEmpty
-                                ? "No conversations yet. Start chatting with a friend!"
-                                : "No match for \"$query\"",
+                                ? l10n.inboxEmptyState
+                                : l10n.noMatchForQuery(query),
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.75),
+                              color: Colors.white.withValues(alpha: 0.75),
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -144,7 +147,7 @@ class _InboxScreenState extends State<InboxScreen> {
                         child: Column(
                           children: filtered.map((t) {
                             return _ThreadRow(
-                              name: t['otherName'] ?? 'Unknown',
+                              name: t['otherName'] ?? l10n.unknown,
                               lastText: t['lastMsg'] ?? '',
                               time: _fmtTime(t['time'] as DateTime),
                               unreadCount: t['unreadCount'] ?? 0,
@@ -156,7 +159,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                       meId:
                                           chatRepository.currentUserId ?? "me",
                                       otherId: t['otherId'],
-                                      otherName: t['otherName'] ?? 'User',
+                                      otherName: t['otherName'] ?? l10n.genericUser,
                                     ),
                                   ),
                                 );
@@ -172,7 +175,6 @@ class _InboxScreenState extends State<InboxScreen> {
               ],
             ),
           ),
-        ),
       ),
     );
   }
@@ -199,7 +201,7 @@ class _IconGlass extends StatelessWidget {
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withOpacity(0.92)),
+        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92)),
       ),
     );
   }
@@ -234,12 +236,12 @@ class _ThreadRow extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             color: highlight
-                ? Colors.white.withOpacity(0.10)
-                : Colors.white.withOpacity(0.06),
+                ? Colors.white.withValues(alpha: 0.10)
+                : Colors.white.withValues(alpha: 0.06),
             border: Border.all(
               color: highlight
-                  ? Colors.white.withOpacity(0.24)
-                  : Colors.white.withOpacity(0.14),
+                  ? Colors.white.withValues(alpha: 0.24)
+                  : Colors.white.withValues(alpha: 0.14),
             ),
           ),
           child: Row(
@@ -265,7 +267,7 @@ class _ThreadRow extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.65),
+                        color: Colors.white.withValues(alpha: 0.65),
                         fontWeight: FontWeight.w700,
                         fontSize: 12.5,
                       ),
@@ -280,7 +282,7 @@ class _ThreadRow extends StatelessWidget {
                   Text(
                     time,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.55),
+                      color: Colors.white.withValues(alpha: 0.55),
                       fontWeight: FontWeight.w800,
                       fontSize: 11.5,
                     ),
@@ -292,9 +294,9 @@ class _ThreadRow extends StatelessWidget {
                           horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(999),
-                        color: Colors.white.withOpacity(0.16),
+                        color: Colors.white.withValues(alpha: 0.16),
                         border:
-                            Border.all(color: Colors.white.withOpacity(0.22)),
+                            Border.all(color: Colors.white.withValues(alpha: 0.22)),
                       ),
                       child: Text(
                         unreadCount.toString(),
@@ -307,7 +309,7 @@ class _ThreadRow extends StatelessWidget {
                     )
                   else
                     Icon(Icons.chevron_right_rounded,
-                        color: Colors.white.withOpacity(0.45)),
+                        color: Colors.white.withValues(alpha: 0.45)),
                 ],
               ),
             ],
@@ -326,13 +328,13 @@ class _Avatar extends StatelessWidget {
       height: 40,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withOpacity(0.10),
-        border: Border.all(color: Colors.white.withOpacity(0.16)),
+        color: Colors.white.withValues(alpha: 0.10),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
       ),
       child: Center(
         child: Text(
           "🙂",
-          style: TextStyle(fontSize: 18, color: Colors.white.withOpacity(0.9)),
+          style: TextStyle(fontSize: 18, color: Colors.white.withValues(alpha: 0.9)),
         ),
       ),
     );

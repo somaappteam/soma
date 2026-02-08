@@ -1,0 +1,781 @@
+{
+  "@@locale": "ko",
+  "appTitle": "SOMA",
+  "welcomeTagline": "배우고. 경쟁하고. 마스터하세요.",
+  "signUp": "가입하기",
+  "signIn": "로그인",
+  "skipForNow": "지금은 건너뛰기",
+  "authFillAllFields": "모든 필드를 입력해주세요",
+  "authError": "오류: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "이메일",
+  "authPassword": "비밀번호",
+  "authUsername": "사용자 이름",
+  "authContinue": "계속",
+  "authSigningIn": "로그인 중...",
+  "authCreateAccount": "계정 만들기",
+  "authCreating": "생성 중...",
+  "authNeedAccount": "계정이 없으신가요? ",
+  "authHaveAccount": "이미 계정이 있으신가요? ",
+  "dialogAuthRequiredTitle": "Circles에 접근하려면 로그인하세요",
+  "dialogAuthRequiredBody": "Circles는 멀티플레이어 룸입니다. 계정을 만들어 라이브 매치에 참여하고, 친구를 초대하고, 진행 상황을 저장하세요.",
+  "notNow": "나중에",
+  "navHome": "홈",
+  "navCircles": "Circles",
+  "navProfile": "프로필",
+  "removeCourseTitle": "코스를 삭제하시겠습니까?",
+  "removeCourseBody": "홈 목록에서 {course}를 제거합니다.",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "취소",
+  "remove": "삭제",
+  "welcomeBack": "환영합니다, {name}님!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "코스 편집",
+  "done": "완료",
+  "noCoursesToEdit": "편집할 코스가 없습니다.",
+  "addCourse": "코스 추가",
+  "unknown": "알 수 없음",
+  "iSpeak": "사용 언어",
+  "iWantToLearn": "배우고 싶은 언어",
+  "chooseYourLanguage": "언어 선택",
+  "chooseLearningLanguage": "배우고 싶은 언어를 선택하세요",
+  "chooseTwoDifferentLanguages": "두 개의 다른 언어를 선택해주세요.",
+  "createCourse": "코스 만들기",
+  "soloCourseTitle": "솔로 코스",
+  "searchLanguage": "언어 검색",
+  "noMatches": "일치하는 항목 없음",
+  "chooseCourseType": "코스 유형 선택",
+  "soloStudyDescription": "Circles 스타일의 퀴즈로 혼자 공부하세요 - 룸, 채팅, 관전자, 호스트 옵션 없음.",
+  "soloModeVocabulary": "어휘",
+  "soloModeSentences": "문장",
+  "soloModeReview": "복습",
+  "soloModeVocabularySubtitle": "의미, 동의어, 사용법 객관식",
+  "soloModeSentencesSubtitle": "빈칸 채우기 + 번역 + 읽기",
+  "soloModeReviewDescription": "배운 내용을 연습하세요: 약한 단어, 최근 실수, 간격 반복.",
+  "startReview": "복습 시작",
+  "soloSetupTitle": "{mode} 설정",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "난이도",
+  "numberOfQuestions": "문제 수",
+  "timerPerQuestion": "문제당 타이머",
+  "noTimer": "타이머 없음",
+  "start": "시작",
+  "profileTitle": "프로필",
+  "profileSignInToMessage": "메시지를 보내려면 로그인하세요",
+  "profileThatsYourProfile": "이것은 당신의 프로필입니다",
+  "profileSignInToAddFriends": "친구를 추가하려면 로그인하세요",
+  "profileCantAddYourself": "자신을 추가할 수 없습니다",
+  "profileRequestSent": "@{username}에게 요청을 보냈습니다",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "요청 전송 실패",
+  "profileDefaultDisplayName": "새 사용자",
+  "profileDefaultBio": "배울 준비 완료!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "게스트",
+  "guestUsername": "게스트",
+  "guestSessionLabel": "게스트 세션",
+  "unlockFullProfile": "전체 프로필 잠금 해제",
+  "guestBenefitSync": "모든 기기에서 진행 상황 동기화",
+  "guestBenefitCircles": "Circles에 참여하여 라이브 플레이",
+  "guestBenefitNotifications": "알림 및 친구 요청 받기",
+  "progressStaysOnDevice": "로그인하기 전까지 진행 상황은 이 기기에 저장됩니다.",
+  "profileGoalLabel": "목표: {minutes}분",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "경험치 진행 상황",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "승리",
+  "profileStreak": "연속 일수",
+  "profileFriendsTitle": "친구",
+  "profileViewAll": "전체 보기",
+  "profileAchievementsTitle": "업적",
+  "profileNoAchievements": "아직 업적이 없습니다.",
+  "profileRequested": "요청됨",
+  "profileSending": "전송 중...",
+  "profileAddFriend": "친구 추가",
+  "profileConnectTitle": "연결",
+  "profileMessage": "메시지",
+  "profileSnapshot": "프로필 스냅샷",
+  "profileLocationHidden": "위치 숨김",
+  "profileBioHidden": "소개 숨김",
+  "profileDailyGoal": "일일 목표 {minutes}분",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle 초대",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "참여하려면 로그인하세요",
+  "joiningCircle": "참여 중...",
+  "joinCircle": "Circle 참여",
+  "circleJoinedAsPlayer": "플레이어로 참여했습니다",
+  "circleJoinedAsSpectator": "관전자로 참여했습니다",
+  "accept": "수락",
+  "decline": "거절",
+  "open": "열기",
+  "circleCountdownTitle": "준비하세요",
+  "circleCountdownSubtitle": "Circle이 시작됩니다...",
+  "userFallbackName": "사용자",
+  "micOff": "마이크 끄기",
+  "micOn": "마이크 켜기",
+  "roleHost": "호스트",
+  "roleSpectator": "관전자",
+  "tagHost": "호스트",
+  "tagYou": "나",
+  "statusCorrect": "정답",
+  "statusWrong": "오답",
+  "statusWaiting": "대기 중",
+  "statusNone": "-",
+  "pointsAbbrev": "점",
+  "pointsLabel": "점수",
+  "statCorrect": "정답",
+  "statAnswers": "답변",
+  "statTotal": "합계",
+  "statQuestions": "문제",
+  "statAccuracy": "정확도",
+  "statRate": "비율",
+  "statRank": "순위",
+  "statPosition": "위치",
+  "statMode": "모드",
+  "statType": "유형",
+  "next": "다음",
+  "submit": "제출",
+  "continueLabel": "계속",
+  "save": "저장",
+  "playAgain": "다시 플레이",
+  "backToCourse": "코스로 돌아가기",
+  "resultsTitle": "결과",
+  "shareLater": "나중에 공유",
+  "delete": "삭제",
+  "ok": "확인",
+  "minutesShort": "{minutes}분",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count}분",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count}시간",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count}일",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "방금",
+  "timeMinutesAgo": "{count}분 전",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count}시간 전",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count}일 전",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "호스트 대기 중...",
+  "liveQuizJoinRequestSent": "참여 요청을 보냈습니다",
+  "liveQuizJoinRequestFailed": "요청 실패: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "호스트 컨트롤",
+  "liveQuizSpectatorModeTitle": "관전 모드",
+  "liveQuizHostControlsSubtitle": "모든 사람이 답변하거나 시간이 초과되면 라운드가 자동으로 진행됩니다.",
+  "liveQuizSpectatorModeSubtitle": "질문과 리더보드를 실시간으로 시청합니다. 답변할 수 없습니다.",
+  "liveQuizQuestionCounter": "질문 {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "요청을 보냈습니다",
+  "liveQuizRequestToJoin": "참여 요청",
+  "liveQuizSpectatorFooter": "실시간 시청 중입니다. 질문과 리더보드를 즐기세요.",
+  "circleNotFound": "Circle을 찾을 수 없습니다",
+  "resultsRematchStartFailed": "재대결 시작 실패: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "매치 결과",
+  "resultsNiceWork": "잘했어요, {name}님",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1위",
+  "resultsPlaceSecond": "2위",
+  "resultsPlaceThird": "3위",
+  "resultsPlaceNth": "{rank}위",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "{players}명 중",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "챔피언! 이 Circle을 정복했습니다.",
+  "resultsHighlightGreatAccuracy": "훌륭한 정확도. 거의 1위에 가깝습니다!",
+  "resultsHighlightKeepGoing": "계속 하세요 - 안정성이 속도를 이깁니다.",
+  "resultsLeaderboardTitle": "리더보드",
+  "resultsPlayersCount": "{count}명의 플레이어",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Circles로 돌아가기",
+  "resultsRematch": "재대결",
+  "resultsPlayAgain": "다시 플레이",
+  "leaderboardGlobalTitle": "글로벌 리더보드",
+  "leaderboardEmpty": "아직 리더보드가 없습니다.",
+  "aboutTitle": "정보",
+  "aboutVersion": "버전 {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA는 새로운 언어를 배우는 것을 재미있고 사회적으로 만드는 게임화 언어 학습 플랫폼입니다. Circles에 참여하고, 혼자 연습하고, 진행 상황을 추적하세요.",
+  "aboutTerms": "이용 약관",
+  "aboutPrivacy": "개인정보 보호정책",
+  "aboutOpenSource": "오픈소스 라이선스",
+  "addFriendTitle": "친구 추가",
+  "addFriendFindByUsername": "사용자 이름으로 찾기",
+  "addFriendUsernameHint": "사용자 이름 입력...",
+  "addFriendTip": "팁: 나중에 QR 코드 + 친구 ID를 지원할 수 있습니다.",
+  "addFriendSending": "전송 중...",
+  "addFriendSendRequest": "요청 보내기",
+  "addFriendUserNotFound": "@{username}을(를) 찾을 수 없습니다",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "작업 실패 또는 이미 전송됨: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "친구",
+  "searchFriendsHint": "친구 검색...",
+  "somaLearnerSubtitle": "Soma 학습자",
+  "friendRequestLabel": "요청",
+  "friendRequestSentLabel": "요청 전송됨",
+  "friendIncomingRequestLabel": "받은 요청",
+  "friendRequestsSection": "요청",
+  "friendPendingSection": "대기 중",
+  "friendAllSection": "모든 친구",
+  "friendsEmptyState": "아직 친구가 없습니다. 첫 번째 친구를 추가하세요!",
+  "friendsEmptyShort": "아직 친구가 없습니다.",
+  "noMatchForQuery": "\\\"{query}\\\"에 일치하는 항목 없음",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "받은편지함",
+  "searchChatsHint": "채팅 검색...",
+  "inboxEmptyState": "아직 채팅이 없습니다. 친구와 채팅을 시작하세요!",
+  "newMessageTitle": "새 메시지",
+  "chatCallLater": "나중에 음성 통화 (Circle 언어 곧 출시)",
+  "errorWithDetails": "오류: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "{name}님에게 인사하세요!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "메시지...",
+  "notificationsTitle": "알림",
+  "notificationsTabAll": "전체",
+  "notificationsTabCourses": "코스",
+  "notificationsTabSocial": "소셜",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "시스템",
+  "notificationsEmpty": "여기에 알림이 없습니다.",
+  "notificationsDeleted": "알림을 삭제했습니다",
+  "notificationTitleFallback": "알림",
+  "notificationTypeCourse": "코스",
+  "notificationTypeSocial": "소셜",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "시스템",
+  "notificationsFriendAccepted": "친구 요청을 수락했습니다",
+  "notificationsFriendAcceptFailed": "친구 요청 수락 실패: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "친구 요청을 거절했습니다",
+  "notificationsFriendDeclineFailed": "친구 요청 거절 실패: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Circle 참여 실패: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "여는 중",
+  "notificationsOpened": "열었습니다",
+  "notificationsActionMessage": "{action} 알림",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "설정",
+  "settingsSectionAccount": "계정",
+  "settingsEditProfile": "프로필 편집",
+  "settingsPrivacy": "개인정보",
+  "settingsSecurity": "보안",
+  "settingsSectionGameplay": "게임플레이",
+  "settingsShowTranslationLine": "번역 줄 표시",
+  "settingsShowReadingLine": "읽기 표시 (병음/로마자)",
+  "settingsDefaultTimerPerQuestion": "문제당 기본 타이머",
+  "settingsMatchDifficulty": "매치 난이도",
+  "settingsMatchDifficultyAdaptive": "적응형",
+  "settingsSectionSoundFeel": "사운드 및 느낌",
+  "settingsMusic": "음악",
+  "settingsSoundEffects": "효과음",
+  "settingsHaptics": "햅틱 피드백",
+  "settingsSectionNotifications": "알림",
+  "settingsPushNotifications": "푸시 알림",
+  "settingsDailyReminder": "일일 알림",
+  "settingsSectionAppearance": "모양",
+  "settingsTheme": "테마",
+  "settingsUiLanguage": "UI 언어",
+  "settingsSectionAbout": "정보",
+  "settingsVersion": "버전",
+  "settingsTermsPrivacy": "약관 및 개인정보",
+  "settingsSupport": "지원",
+  "settingsLogout": "로그아웃",
+  "themeSystem": "시스템",
+  "themeDark": "다크",
+  "themeLight": "라이트",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "프로필을 업데이트했습니다",
+  "editProfileTitle": "프로필 편집",
+  "editProfilePhotoLabel": "프로필 사진",
+  "editProfilePhotoSubtitle": "Supabase Storage를 통한 아바타 선택 곧 출시.",
+  "editProfileChangePhoto": "변경",
+  "editProfileAvatarUploadSoon": "아바타 업로드 곧 출시",
+  "editProfileDisplayNameLabel": "표시 이름",
+  "editProfileDisplayNameHint": "당신의 이름",
+  "editProfileDisplayNameRequired": "이름을 입력하세요",
+  "editProfileDisplayNameTooShort": "너무 짧습니다",
+  "editProfileUsernameLabel": "사용자 이름",
+  "editProfileUsernameHint": "kim_learner",
+  "editProfileUsernameRequired": "사용자 이름을 입력하세요",
+  "editProfileUsernameTooShort": "최소 3자",
+  "editProfileUsernameInvalid": "문자, 숫자, _만 가능",
+  "editProfileBioLabel": "소개",
+  "editProfileBioHint": "짧은 자기소개...",
+  "editProfileBioTooLong": "최대 120자",
+  "editProfileLocationLabel": "위치",
+  "editProfileLocationHint": "도시 / 국가",
+  "editProfileDailyGoalTitle": "일일 목표",
+  "editProfileDailyGoalSubtitle": "매일 얼마나 공부하고 싶은지 선택하세요.",
+  "securityTitle": "보안",
+  "securitySectionPassword": "비밀번호",
+  "securityChangePasswordTitle": "비밀번호 변경",
+  "securityChangePasswordSubtitle": "정기적으로 비밀번호를 업데이트하세요.",
+  "securitySectionTwoFactor": "2단계 인증",
+  "securityEnable2faTitle": "2FA 활성화",
+  "securityEnable2faSubtitle": "로그인 시 추가 보안.",
+  "securitySectionAppLock": "앱 잠금",
+  "securityBiometricTitle": "생체 인증 잠금 해제",
+  "securityBiometricSubtitle": "Face ID/Touch ID로 SOMA 잠금 해제.",
+  "securityAppLockTitle": "앱 잠금",
+  "securityAppLockSubtitle": "종료 시 SOMA 잠금.",
+  "securitySectionSessions": "활성 세션",
+  "securityNoSessions": "활성 세션을 찾을 수 없습니다.",
+  "securityThisDevice": "이 기기",
+  "securityDevice": "기기",
+  "securityActiveLabel": "활성",
+  "securitySignInToEnable2fa": "2FA를 활성화하려면 로그인하세요",
+  "securityEnable2faFailed": "2FA 활성화 실패: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FA 비활성화 실패: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA 설정",
+  "securitySecretKeyLabel": "비밀 키",
+  "securityCodeHint": "6자리 코드",
+  "security2faEnabled": "2FA를 활성화했습니다",
+  "securityVerifyCodeFailed": "코드 확인 실패: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "확인 중...",
+  "securityVerify": "확인",
+  "securityCurrentPasswordHint": "현재 비밀번호",
+  "securityNewPasswordHint": "새 비밀번호 (최소 8자)",
+  "securityConfirmPasswordHint": "새 비밀번호 확인",
+  "securitySignInToChangePassword": "비밀번호를 변경하려면 로그인하세요",
+  "securityEnterCurrentPassword": "현재 비밀번호를 입력하세요",
+  "securityPasswordMinLength": "새 비밀번호는 최소 8자 이상이어야 합니다",
+  "securityPasswordsDoNotMatch": "비밀번호가 일치하지 않습니다",
+  "securityPasswordUpdated": "비밀번호를 업데이트했습니다",
+  "securityPasswordUpdateFailed": "비밀번호 업데이트 실패: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "자동 잠금까지",
+  "privacyTitle": "개인정보",
+  "privacySectionVisibility": "공개 범위",
+  "privacyProfileVisibilityTitle": "프로필 공개 범위",
+  "privacyVisibilityPublic": "공개",
+  "privacyVisibilityFriends": "친구",
+  "privacyVisibilityPrivate": "비공개",
+  "privacyVisibilityPublicSubtitle": "누구나 프로필을 볼 수 있습니다.",
+  "privacyVisibilityFriendsSubtitle": "친구만 프로필을 볼 수 있습니다.",
+  "privacyVisibilityPrivateSubtitle": "나만 프로필을 볼 수 있습니다.",
+  "privacySectionActivity": "활동",
+  "privacyShowOnlineTitle": "온라인 상태 표시",
+  "privacyShowOnlineSubtitle": "다른 사람이 온라인 상태를 볼 수 있습니다.",
+  "privacyShowActivityTitle": "학습 활동 표시",
+  "privacyShowActivitySubtitle": "연속 일수, XP, 현재 진행 상황 표시.",
+  "privacySectionSocial": "소셜",
+  "privacyAllowRequestsTitle": "친구 요청 허용",
+  "privacyAllowRequestsSubtitle": "다른 사람이 친구 요청을 보낼 수 있습니다.",
+  "privacyWhoCanDmTitle": "DM을 보낼 수 있는 사람",
+  "privacyDmEveryone": "모든 사람",
+  "privacyDmFriends": "친구",
+  "privacyDmNoOne": "없음",
+  "privacyDmEveryoneSubtitle": "누구나 DM을 보낼 수 있습니다.",
+  "privacyDmFriendsSubtitle": "친구만 DM을 보낼 수 있습니다.",
+  "privacyDmNoOneSubtitle": "아무도 DM을 보낼 수 없습니다.",
+  "privacySectionBlockedUsers": "차단된 사용자",
+  "privacyBlockedUsersComingSoon": "차단된 사용자 관리 곧 출시.",
+  "privacySectionDataControls": "데이터 관리",
+  "privacyExportDataTitle": "데이터 내보내기",
+  "privacyExportDataSubtitle": "활동 및 코스 다운로드.",
+  "privacyExportInfoTitle": "데이터 내보내기",
+  "privacyExportInfoBody": "다음 단계: JSON/CSV 내보내기를 만들어 이메일로 보내거나 로컬로 다운로드합니다.",
+  "privacyDeleteAccountTitle": "계정 삭제",
+  "privacyDeleteAccountSubtitle": "계정과 데이터가 영구적으로 삭제됩니다.",
+  "privacyDeleteConfirmTitle": "계정을 삭제하시겠습니까?",
+  "privacyDeleteConfirmBody": "이 작업은 영구적입니다. 프로필, 코스, 친구, 메시지가 삭제됩니다.",
+  "privacyDeleteComingSoon": "삭제 기능은 나중에 Supabase에 연결됩니다",
+  "soloLabel": "솔로",
+  "soloResultsCompletedTitle": "솔로 세션 완료",
+  "soloResultsFeedbackElite": "엘리트 성과. 연속 기록을 유지하세요.",
+  "soloResultsFeedbackStrong": "강력합니다. 빠르게 향상되고 있습니다.",
+  "soloResultsFeedbackProgress": "좋은 진전. 실수를 복습하고 반복하세요.",
+  "soloResultsFeedbackTryAgain": "스트레스 없이. 적은 문제와 집중으로 다시 시도하세요.",
+  "soloResultsPerfectScore": "완벽한 점수! 복습할 실수가 없습니다.",
+  "soloResultsReviewPrompt": "더 빨리 배우기 위해 실수를 복습하세요. 오답은 아래와 같습니다.",
+  "soloResultsReviewMistakes": "실수 복습 ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "로그인되지 않음",
+  "genericUser": "사용자",
+  "loading": "로딩 중...",
+  "edit": "편집",
+  "send": "보내기",
+  "join": "참여",
+  "leave": "나가기",
+  "ready": "준비",
+  "levelBeginner": "초급",
+  "levelIntermediate": "중급",
+  "levelAdvanced": "고급",
+  "questionsShort": "{count}문제",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count}초",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "모든 코스",
+  "circlesAllModes": "모든 모드",
+  "circlesAllLevels": "모든 레벨",
+  "circlesAddNewCourse": "새 코스 추가",
+  "circlesCoursesTitle": "코스",
+  "circlesModeTitle": "모드",
+  "circlesLevelTitle": "레벨",
+  "circlesNoActiveForFilters": "이 필터에 활성 Circle이 없습니다.",
+  "circlesUnknownRoom": "알 수 없는 룸",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Circle 만들기",
+  "circlesCircleName": "Circle 이름",
+  "circlesEnterName": "이름 입력",
+  "circlesLanguages": "언어",
+  "circlesRoomSetup": "룸 설정",
+  "circlesPlayers": "플레이어",
+  "circlesEmptySlot": "빈 슬롯",
+  "circlesPlayersRange": "1-5명의 플레이어",
+  "circlesQuestions": "문제",
+  "circlesQuestionsSubtitle": "문제 수",
+  "circlesTimePerQuestion": "문제당 시간",
+  "circlesSecondsPerQuestion": "문제당 초",
+  "circlesAdvanced": "고급",
+  "circlesAllowSpectators": "관전자 허용",
+  "circlesAllowSpectatorsSubtitle": "다른 사람이 플레이하지 않고 시청할 수 있습니다.",
+  "circlesLiveVoiceChat": "라이브 음성 채팅",
+  "circlesLiveVoiceChatSubtitle": "매치 중 라이브 음성 활성화.",
+  "circlesLiveTextChat": "라이브 텍스트 채팅",
+  "circlesLiveTextChatSubtitle": "매치 중 채팅 활성화.",
+  "circlesCreatedSuccess": "Circle을 만들었습니다",
+  "circlesCreateError": "Circle 생성 실패: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "팁: 만든 후 친구를 초대할 수 있습니다.",
+  "circlesJoinError": "Circle 참여 실패: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Circle 로비",
+  "circlesCodeLine": "코드: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "매치 설정",
+  "circlesLevelWithValue": "레벨 {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "난이도",
+  "circlesPerQuestionShort": "문제당",
+  "circlesInvite": "초대",
+  "circlesCopyId": "ID 복사",
+  "circlesCopiedId": "ID를 복사했습니다",
+  "circlesMatchInProgress": "매치 진행 중",
+  "circlesSpectatorQueuedBody": "매치 진행 중. 관전자로 참여합니다.",
+  "circlesHostStartWhenReady": "모두 준비되면 호스트가 시작합니다.",
+  "circlesSpectators": "관전자",
+  "circlesSpectator": "관전자",
+  "circlesSpectatorCanWatch": "관전자는 실시간으로 시청할 수 있습니다.",
+  "circlesJoinRequests": "참여 요청",
+  "circlesAcceptSpectatorsHint": "매치 시작 전에 관전자를 승인하세요.",
+  "circlesStartGame": "게임 시작",
+  "circlesWaitingForPlayers": "플레이어 대기 중",
+  "circlesLeaveCircle": "Circle 나가기",
+  "circlesRequestSent": "요청을 보냈습니다",
+  "circlesRequestToJoin": "참여 요청",
+  "circlesWatchLive": "실시간 시청",
+  "circlesPlayerTip": "준비가 되면 준비를 탭하세요. 호스트가 매치를 시작합니다.",
+  "circlesSpectatorTip": "시청 중입니다. 호스트가 시작하면 실시간으로 시청하세요.",
+  "circlesHostControls": "호스트 컨트롤",
+  "circlesTransferHostFailed": "호스트 이전 실패: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Circle 종료 실패: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "@{username}을(를) 찾을 수 없습니다",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "유효하지 않은 사용자",
+  "circlesCantInviteSelf": "자신을 초대할 수 없습니다",
+  "circlesUserAlreadyInCircle": "@{username}은(는) 이미 Circle에 있습니다",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "호스트",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "사용자 이름으로 초대",
+  "circlesInviteSent": "@{username}에게 초대를 보냈습니다",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "초대 전송 실패: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "참여 요청을 보냈습니다",
+  "circlesJoinRequestFailed": "요청 실패: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle이 가득 찼습니다",
+  "circlesSpectatorAdded": "관전자를 추가했습니다",
+  "circlesApproveFailed": "요청 승인 실패: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "요청을 거절했습니다",
+  "circlesDeclineFailed": "요청 거절 실패: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "참가자",
+  "circlesLeavePromptTitle": "Circle을 나가시겠습니까?",
+  "circlesLeavePromptTransfer": "나가기 전에 호스트를 이전하세요.",
+  "circlesLeavePromptEndOnly": "Circle을 종료하고 나갑니다.",
+  "circlesTransferHost": "호스트 이전",
+  "circlesEndCircle": "Circle 종료",
+  "circlesTransferHostTitle": "호스트 이전",
+  "circlesShareId": "Circle ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/soma_background.dart';
 import '../../core/widgets/glass.dart';
 import '../../features/info/about_screen.dart';
 import '../../data/settings_repository.dart';
@@ -156,9 +155,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ];
     final languageItems = <_DropdownItem>[
       _DropdownItem('English', l10n.languageEnglish),
-      _DropdownItem('French', l10n.languageFrench),
       _DropdownItem('Spanish', l10n.languageSpanish),
+      _DropdownItem('French', l10n.languageFrench),
+      _DropdownItem('German', l10n.languageGerman),
+      _DropdownItem('Italian', l10n.languageItalian),
       _DropdownItem('Portuguese', l10n.languagePortuguese),
+      _DropdownItem('Russian', l10n.languageRussian),
+      _DropdownItem('Japanese', l10n.languageJapanese),
+      _DropdownItem('Chinese', l10n.languageChinese),
+      _DropdownItem('Arabic', l10n.languageArabic),
+      _DropdownItem('Hindi', l10n.languageHindi),
+      _DropdownItem('Indonesian', l10n.languageIndonesian),
+      _DropdownItem('Bengali', l10n.languageBengali),
+      _DropdownItem('Urdu', l10n.languageUrdu),
+      _DropdownItem('Vietnamese', l10n.languageVietnamese),
+      _DropdownItem('Turkish', l10n.languageTurkish),
+      _DropdownItem('Korean', l10n.languageKorean),
+      _DropdownItem('Thai', l10n.languageThai),
+      _DropdownItem('Polish', l10n.languagePolish),
+      _DropdownItem('Ukrainian', l10n.languageUkrainian),
+      _DropdownItem('Dutch', l10n.languageDutch),
+      _DropdownItem('Persian', l10n.languagePersian),
+      _DropdownItem('Punjabi', l10n.languagePunjabi),
+      _DropdownItem('Tamil', l10n.languageTamil),
+      _DropdownItem('Telugu', l10n.languageTelugu),
+      _DropdownItem('Swahili', l10n.languageSwahili),
+      _DropdownItem('Malay', l10n.languageMalay),
+      _DropdownItem('Romanian', l10n.languageRomanian),
+      _DropdownItem('Greek', l10n.languageGreek),
+      _DropdownItem('Hungarian', l10n.languageHungarian),
+      _DropdownItem('Czech', l10n.languageCzech),
+      _DropdownItem('Swedish', l10n.languageSwedish),
+      _DropdownItem('Hebrew', l10n.languageHebrew),
+      _DropdownItem('Norwegian', l10n.languageNorwegian),
+      _DropdownItem('Danish', l10n.languageDanish),
+      _DropdownItem('Finnish', l10n.languageFinnish),
     ];
     final guestThemeValue = themeItems.any((item) => item.value == _guestThemeMode)
         ? _guestThemeMode
@@ -343,13 +374,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ];
     final languageItems = <_DropdownItem>[
       _DropdownItem('English', l10n.languageEnglish),
-      _DropdownItem('French', l10n.languageFrench),
       _DropdownItem('Spanish', l10n.languageSpanish),
+      _DropdownItem('French', l10n.languageFrench),
+      _DropdownItem('German', l10n.languageGerman),
+      _DropdownItem('Italian', l10n.languageItalian),
       _DropdownItem('Portuguese', l10n.languagePortuguese),
+      _DropdownItem('Russian', l10n.languageRussian),
+      _DropdownItem('Japanese', l10n.languageJapanese),
+      _DropdownItem('Chinese', l10n.languageChinese),
+      _DropdownItem('Arabic', l10n.languageArabic),
+      _DropdownItem('Hindi', l10n.languageHindi),
+      _DropdownItem('Indonesian', l10n.languageIndonesian),
+      _DropdownItem('Bengali', l10n.languageBengali),
+      _DropdownItem('Urdu', l10n.languageUrdu),
+      _DropdownItem('Vietnamese', l10n.languageVietnamese),
+      _DropdownItem('Turkish', l10n.languageTurkish),
+      _DropdownItem('Korean', l10n.languageKorean),
+      _DropdownItem('Thai', l10n.languageThai),
+      _DropdownItem('Polish', l10n.languagePolish),
+      _DropdownItem('Ukrainian', l10n.languageUkrainian),
+      _DropdownItem('Dutch', l10n.languageDutch),
+      _DropdownItem('Persian', l10n.languagePersian),
+      _DropdownItem('Punjabi', l10n.languagePunjabi),
+      _DropdownItem('Tamil', l10n.languageTamil),
+      _DropdownItem('Telugu', l10n.languageTelugu),
+      _DropdownItem('Swahili', l10n.languageSwahili),
+      _DropdownItem('Malay', l10n.languageMalay),
+      _DropdownItem('Romanian', l10n.languageRomanian),
+      _DropdownItem('Greek', l10n.languageGreek),
+      _DropdownItem('Hungarian', l10n.languageHungarian),
+      _DropdownItem('Czech', l10n.languageCzech),
+      _DropdownItem('Swedish', l10n.languageSwedish),
+      _DropdownItem('Hebrew', l10n.languageHebrew),
+      _DropdownItem('Norwegian', l10n.languageNorwegian),
+      _DropdownItem('Danish', l10n.languageDanish),
+      _DropdownItem('Finnish', l10n.languageFinnish),
     ];
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
             child: Column(
@@ -611,12 +673,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               onTap: () async {
                                 await authRepository.signOut();
                                 profileStore.reset();
-                                if (mounted) {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-                                    (route) => false,
-                                  );
-                                }
+                                if (!context.mounted) return;
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+                                  (route) => false,
+                                );
                               },
                             ),
                           ),
@@ -631,8 +692,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 

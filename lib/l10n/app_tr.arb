@@ -1,0 +1,781 @@
+{
+  "@@locale": "tr",
+  "appTitle": "SOMA",
+  "welcomeTagline": "Öğren, Yarış, Fethet",
+  "signUp": "Kaydol",
+  "signIn": "Giriş Yap",
+  "skipForNow": "Şimdilik Geç",
+  "authFillAllFields": "Lütfen tüm alanları doldurun",
+  "authError": "Hata: {error}",
+  "@authError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "authEmail": "E-posta",
+  "authPassword": "Şifre",
+  "authUsername": "Kullanıcı Adı",
+  "authContinue": "Devam Et",
+  "authSigningIn": "Giriş yapılıyor...",
+  "authCreateAccount": "Hesap Oluştur",
+  "authCreating": "Oluşturuluyor...",
+  "authNeedAccount": "Hesabınız yok mu? ",
+  "authHaveAccount": "Zaten hesabınız var mı? ",
+  "dialogAuthRequiredTitle": "Circles'a Erişmek İçin Giriş Yapın",
+  "dialogAuthRequiredBody": "Circles çok oyunculu bir alandır. Canlı yarışmalara katılmak, arkadaş davet etmek ve ilerlemenizi kaydetmek için bir hesap oluşturun.",
+  "notNow": "Şimdi Değil",
+  "navHome": "Ana Sayfa",
+  "navCircles": "Circles",
+  "navProfile": "Profil",
+  "removeCourseTitle": "Kurs Kaldırılsın mı?",
+  "removeCourseBody": "{course} ana sayfa listenizden kaldırılıyor",
+  "@removeCourseBody": {
+    "placeholders": {
+      "course": {}
+    }
+  },
+  "cancel": "İptal",
+  "remove": "Kaldır",
+  "welcomeBack": "Tekrar hoş geldin {name}!",
+  "@welcomeBack": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "editCourses": "Kursları Düzenle",
+  "done": "Tamam",
+  "noCoursesToEdit": "Düzenlenecek kurs yok",
+  "addCourse": "Kurs Ekle",
+  "unknown": "Bilinmiyor",
+  "iSpeak": "Ben konuşuyorum",
+  "iWantToLearn": "Öğrenmek istiyorum",
+  "chooseYourLanguage": "Dilinizi seçin",
+  "chooseLearningLanguage": "Öğrenmek istediğiniz dili seçin",
+  "chooseTwoDifferentLanguages": "Lütfen iki farklı dil seçin",
+  "createCourse": "Kurs Oluştur",
+  "soloCourseTitle": "Solo Kurs",
+  "searchLanguage": "Dil ara",
+  "noMatches": "Eşleşme bulunamadı",
+  "chooseCourseType": "Kurs Türünü Seçin",
+  "soloStudyDescription": "Circles tarzı testlerle kendi başınıza çalışın - oda, sohbet, izleyici veya host seçeneği yok",
+  "soloModeVocabulary": "Kelime Bilgisi",
+  "soloModeSentences": "Cümleler",
+  "soloModeReview": "Gözden Geçir",
+  "soloModeVocabularySubtitle": "Çoktan seçmeli, anlamlar, eş anlamlılar, kullanım",
+  "soloModeSentencesSubtitle": "Boşluk doldurma + çeviri + okuma",
+  "soloModeReviewDescription": "Öğrendiklerinizi pratik edin: unutulan kelimeler, son hatalar, aralıklı tekrar",
+  "startReview": "Gözden Geçirmeyi Başlat",
+  "soloSetupTitle": "{mode} Kurulumu",
+  "@soloSetupTitle": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "difficulty": "Zorluk",
+  "numberOfQuestions": "Soru Sayısı",
+  "timerPerQuestion": "Soru Başına Zamanlayıcı",
+  "noTimer": "Zamanlayıcı Yok",
+  "start": "Başla",
+  "profileTitle": "Profil",
+  "profileSignInToMessage": "Mesaj göndermek için giriş yapın",
+  "profileThatsYourProfile": "Bu senin profilin",
+  "profileSignInToAddFriends": "Arkadaş eklemek için giriş yapın",
+  "profileCantAddYourself": "Kendinizi ekleyemezsiniz",
+  "profileRequestSent": "@{username} kullanıcısına istek gönderildi",
+  "@profileRequestSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "profileRequestFailed": "İstek gönderilemedi",
+  "profileDefaultDisplayName": "Yeni Kullanıcı",
+  "profileDefaultBio": "Öğrenmeye hazır!",
+  "profileDefaultLocation": "Soma",
+  "guestDisplayName": "Misafir",
+  "guestUsername": "misafir",
+  "guestSessionLabel": "Misafir Oturumu",
+  "unlockFullProfile": "Tam Profili Aç",
+  "guestBenefitSync": "İlerlemenizi tüm cihazlarda senkronize edin",
+  "guestBenefitCircles": "Canlı oynamak için Circles'a katılın",
+  "guestBenefitNotifications": "Bildirimler ve arkadaşlık istekleri alın",
+  "progressStaysOnDevice": "Giriş yapana kadar ilerlemeniz bu cihazda kalır",
+  "profileGoalLabel": "Hedef: {minutes} dakika",
+  "@profileGoalLabel": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "profileXpProgress": "XP İlerlemesi",
+  "profileXpValue": "{xp} XP",
+  "@profileXpValue": {
+    "placeholders": {
+      "xp": {}
+    }
+  },
+  "profileWins": "Galibiyet",
+  "profileStreak": "Seri",
+  "profileFriendsTitle": "Arkadaşlar",
+  "profileViewAll": "Tümünü Gör",
+  "profileAchievementsTitle": "Başarılar",
+  "profileNoAchievements": "Henüz başarı yok",
+  "profileRequested": "İstek Gönderildi",
+  "profileSending": "Gönderiliyor...",
+  "profileAddFriend": "Arkadaş Ekle",
+  "profileConnectTitle": "Bağlan",
+  "profileMessage": "Mesaj",
+  "profileSnapshot": "Profil Görüntüsü",
+  "profileLocationHidden": "Konum gizli",
+  "profileBioHidden": "Biyografi gizli",
+  "profileDailyGoal": "Günlük {minutes} dakika hedef",
+  "@profileDailyGoal": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "circleInviteTitle": "Circle Daveti",
+  "circleIdLabel": "Circle ID: {id}",
+  "@circleIdLabel": {
+    "placeholders": {
+      "id": {}
+    }
+  },
+  "signInToJoin": "Katılmak için giriş yapın",
+  "joiningCircle": "Katılınıyor...",
+  "joinCircle": "Circle'a Katıl",
+  "circleJoinedAsPlayer": "Oyuncu olarak katıldınız",
+  "circleJoinedAsSpectator": "İzleyici olarak katıldınız",
+  "accept": "Kabul Et",
+  "decline": "Reddet",
+  "open": "Aç",
+  "circleCountdownTitle": "Hazırlanın",
+  "circleCountdownSubtitle": "Circle başlıyor...",
+  "userFallbackName": "Kullanıcı",
+  "micOff": "Mikrofon Kapalı",
+  "micOn": "Mikrofon Açık",
+  "roleHost": "Host",
+  "roleSpectator": "İzleyici",
+  "tagHost": "Host",
+  "tagYou": "Sen",
+  "statusCorrect": "Doğru",
+  "statusWrong": "Yanlış",
+  "statusWaiting": "Bekliyor",
+  "statusNone": "-",
+  "pointsAbbrev": "puan",
+  "pointsLabel": "Puan",
+  "statCorrect": "Doğru",
+  "statAnswers": "Cevaplar",
+  "statTotal": "Toplam",
+  "statQuestions": "Sorular",
+  "statAccuracy": "Doğruluk",
+  "statRate": "Oran",
+  "statRank": "Sıra",
+  "statPosition": "Konum",
+  "statMode": "Mod",
+  "statType": "Tür",
+  "next": "İleri",
+  "submit": "Gönder",
+  "continueLabel": "Devam Et",
+  "save": "Kaydet",
+  "playAgain": "Tekrar Oyna",
+  "backToCourse": "Kursa Dön",
+  "resultsTitle": "Sonuçlar",
+  "shareLater": "Sonra Paylaş",
+  "delete": "Sil",
+  "ok": "Tamam",
+  "minutesShort": "{minutes} dk",
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {}
+    }
+  },
+  "timeShortMinutes": "{count} dk",
+  "@timeShortMinutes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortHours": "{count} sa",
+  "@timeShortHours": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeShortDays": "{count} gün",
+  "@timeShortDays": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeJustNow": "Az önce",
+  "timeMinutesAgo": "{count} dakika önce",
+  "@timeMinutesAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeHoursAgo": "{count} saat önce",
+  "@timeHoursAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "timeDaysAgo": "{count} gün önce",
+  "@timeDaysAgo": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "liveQuizWaitingForHost": "Host bekleniyor...",
+  "liveQuizJoinRequestSent": "Katılma isteği gönderildi",
+  "liveQuizJoinRequestFailed": "İstek başarısız: {error}",
+  "@liveQuizJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "liveQuizHostControlsTitle": "Host Kontrolleri",
+  "liveQuizSpectatorModeTitle": "İzleyici Modu",
+  "liveQuizHostControlsSubtitle": "Turlar herkes cevap verdiğinde veya süre dolduğunda otomatik ilerler",
+  "liveQuizSpectatorModeSubtitle": "Soruları ve puan tablosunu canlı izleyin. Cevap veremezsiniz",
+  "liveQuizQuestionCounter": "Soru {current}/{total}",
+  "@liveQuizQuestionCounter": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "liveQuizRequestSent": "İstek gönderildi",
+  "liveQuizRequestToJoin": "Katılmak İçin İstek",
+  "liveQuizSpectatorFooter": "Canlı izliyorsunuz. Soruların ve puan tablosunun keyfini çıkarın",
+  "circleNotFound": "Circle bulunamadı",
+  "resultsRematchStartFailed": "Rövanş başlatılamadı: {error}",
+  "@resultsRematchStartFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resultsMatchTitle": "Maç Sonuçları",
+  "resultsNiceWork": "İyi iş {name}",
+  "@resultsNiceWork": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "resultsPlaceFirst": "1.",
+  "resultsPlaceSecond": "2.",
+  "resultsPlaceThird": "3.",
+  "resultsPlaceNth": "{rank}.",
+  "@resultsPlaceNth": {
+    "placeholders": {
+      "rank": {}
+    }
+  },
+  "resultsOutOfPlayers": "{players} oyuncudan",
+  "@resultsOutOfPlayers": {
+    "placeholders": {
+      "players": {}
+    }
+  },
+  "resultsHighlightChampion": "Şampiyon! Bu Circle'ı fethettiniz",
+  "resultsHighlightGreatAccuracy": "Harika doğruluk - zirveye çok yakınsınız!",
+  "resultsHighlightKeepGoing": "Devam edin - tutarlılık hızı yener",
+  "resultsLeaderboardTitle": "Lider Tablosu",
+  "resultsPlayersCount": "{count} oyuncu",
+  "@resultsPlayersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "resultsBackToCircles": "Circles'a Dön",
+  "resultsRematch": "Rövanş",
+  "resultsPlayAgain": "Tekrar Oyna",
+  "leaderboardGlobalTitle": "Küresel Lider Tablosu",
+  "leaderboardEmpty": "Henüz lider tablosu yok",
+  "aboutTitle": "Hakkında",
+  "aboutVersion": "Sürüm {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "aboutDescription": "SOMA, yeni bir dil öğrenmeyi eğlenceli ve sosyal hale getiren oyunlaştırılmış bir dil öğrenme platformudur. Circles'a katılın, solo pratik yapın ve ilerlemenizi takip edin.",
+  "aboutTerms": "Hizmet Şartları",
+  "aboutPrivacy": "Gizlilik Politikası",
+  "aboutOpenSource": "Açık Kaynak Lisansları",
+  "addFriendTitle": "Arkadaş Ekle",
+  "addFriendFindByUsername": "Kullanıcı adına göre bul",
+  "addFriendUsernameHint": "Kullanıcı adı girin...",
+  "addFriendTip": "İpucu: QR kodu + arkadaş kodu desteği yakında eklenecek",
+  "addFriendSending": "Gönderiliyor...",
+  "addFriendSendRequest": "İstek Gönder",
+  "addFriendUserNotFound": "@{username} bulunamadı",
+  "@addFriendUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "addFriendRequestFailed": "İşlem başarısız veya zaten gönderildi: {error}",
+  "@addFriendRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "friendsTitle": "Arkadaşlar",
+  "searchFriendsHint": "Arkadaş ara...",
+  "somaLearnerSubtitle": "Soma Öğrencisi",
+  "friendRequestLabel": "İstek",
+  "friendRequestSentLabel": "İstek Gönderildi",
+  "friendIncomingRequestLabel": "Gelen İstek",
+  "friendRequestsSection": "İstekler",
+  "friendPendingSection": "Bekleyen",
+  "friendAllSection": "Tüm Arkadaşlar",
+  "friendsEmptyState": "Henüz arkadaş yok. İlk arkadaşınızı ekleyin!",
+  "friendsEmptyShort": "Henüz arkadaş yok",
+  "noMatchForQuery": "\\\"{query}\\\" için sonuç bulunamadı",
+  "@noMatchForQuery": {
+    "placeholders": {
+      "query": {}
+    }
+  },
+  "inboxTitle": "Gelen Kutusu",
+  "searchChatsHint": "Sohbetlerde ara...",
+  "inboxEmptyState": "Henüz sohbet yok. Arkadaşlarınızla sohbet başlatın!",
+  "newMessageTitle": "Yeni Mesaj",
+  "chatCallLater": "Daha sonra sesli arama (Circle dili yakında)",
+  "errorWithDetails": "Hata: {error}",
+  "@errorWithDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "chatSayHi": "{name} ile merhaba de!",
+  "@chatSayHi": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatMessageHint": "Mesaj...",
+  "notificationsTitle": "Bildirimler",
+  "notificationsTabAll": "Tümü",
+  "notificationsTabCourses": "Kurslar",
+  "notificationsTabSocial": "Sosyal",
+  "notificationsTabCircles": "Circles",
+  "notificationsTabSystem": "Sistem",
+  "notificationsEmpty": "Bildirim yok",
+  "notificationsDeleted": "Bildirim silindi",
+  "notificationTitleFallback": "Bildirim",
+  "notificationTypeCourse": "Kurs",
+  "notificationTypeSocial": "Sosyal",
+  "notificationTypeCircle": "Circle",
+  "notificationTypeSystem": "Sistem",
+  "notificationsFriendAccepted": "Arkadaşlık isteği kabul edildi",
+  "notificationsFriendAcceptFailed": "İstek kabul edilemedi: {error}",
+  "@notificationsFriendAcceptFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsFriendDeclined": "Arkadaşlık isteği reddedildi",
+  "notificationsFriendDeclineFailed": "İstek reddedilemedi: {error}",
+  "@notificationsFriendDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsJoinCircleFailed": "Circle'a katılınamadı: {error}",
+  "@notificationsJoinCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "notificationsOpening": "Açılıyor",
+  "notificationsOpened": "Açıldı",
+  "notificationsActionMessage": "Bildirimi {action}",
+  "@notificationsActionMessage": {
+    "placeholders": {
+      "action": {}
+    }
+  },
+  "settingsTitle": "Ayarlar",
+  "settingsSectionAccount": "Hesap",
+  "settingsEditProfile": "Profili Düzenle",
+  "settingsPrivacy": "Gizlilik",
+  "settingsSecurity": "Güvenlik",
+  "settingsSectionGameplay": "Oynanış",
+  "settingsShowTranslationLine": "Çeviri Satırını Göster",
+  "settingsShowReadingLine": "Okumayı Göster (Pinyin/Romaji)",
+  "settingsDefaultTimerPerQuestion": "Varsayılan Soru Başına Zamanlayıcı",
+  "settingsMatchDifficulty": "Maç Zorluğu",
+  "settingsMatchDifficultyAdaptive": "Uyarlanabilir",
+  "settingsSectionSoundFeel": "Ses ve His",
+  "settingsMusic": "Müzik",
+  "settingsSoundEffects": "Ses Efektleri",
+  "settingsHaptics": "Titreşimler",
+  "settingsSectionNotifications": "Bildirimler",
+  "settingsPushNotifications": "Anlık Bildirimler",
+  "settingsDailyReminder": "Günlük Hatırlatma",
+  "settingsSectionAppearance": "Görünüm",
+  "settingsTheme": "Tema",
+  "settingsUiLanguage": "Arayüz Dili",
+  "settingsSectionAbout": "Hakkında",
+  "settingsVersion": "Sürüm",
+  "settingsTermsPrivacy": "Şartlar ve Gizlilik",
+  "settingsSupport": "Destek",
+  "settingsLogout": "Çıkış Yap",
+  "themeSystem": "Sistem",
+  "themeDark": "Koyu",
+  "themeLight": "Açık",
+  "languageEnglish": "English",
+  "languageFrench": "Français",
+  "languageSpanish": "Español",
+  "languageGerman": "Deutsch",
+  "languageItalian": "Italiano",
+  "languagePortuguese": "Português",
+  "languageRussian": "Русский",
+  "languageJapanese": "日本語",
+  "languageChinese": "中文",
+  "languageArabic": "العربية",
+  "languageHindi": "हिन्दी",
+  "languageIndonesian": "Bahasa Indonesia",
+  "languageBengali": "বাংলা",
+  "languageUrdu": "اردو",
+  "languageVietnamese": "Tiếng Việt",
+  "languageTurkish": "Türkçe",
+  "languageKorean": "한국어",
+  "languageThai": "ไทย",
+  "languagePolish": "Polski",
+  "languageUkrainian": "Українська",
+  "languageDutch": "Nederlands",
+  "languagePersian": "Persian",
+  "languagePunjabi": "Punjabi",
+  "languageTamil": "Tamil",
+  "languageTelugu": "Telugu",
+  "languageSwahili": "Swahili",
+  "languageMalay": "Malay",
+  "languageRomanian": "Romanian",
+  "languageGreek": "Greek",
+  "languageHungarian": "Hungarian",
+  "languageCzech": "Czech",
+  "languageSwedish": "Swedish",
+  "languageHebrew": "Hebrew",
+  "languageNorwegian": "Norwegian",
+  "languageDanish": "Danish",
+  "languageFinnish": "Finnish",
+  "editProfileUpdated": "Profil güncellendi",
+  "editProfileTitle": "Profili Düzenle",
+  "editProfilePhotoLabel": "Profil Fotoğrafı",
+  "editProfilePhotoSubtitle": "Supabase Storage üzerinden avatar seçimi yakında",
+  "editProfileChangePhoto": "Değiştir",
+  "editProfileAvatarUploadSoon": "Avatar yükleme yakında",
+  "editProfileDisplayNameLabel": "Görünen Ad",
+  "editProfileDisplayNameHint": "Adınız",
+  "editProfileDisplayNameRequired": "Lütfen bir ad girin",
+  "editProfileDisplayNameTooShort": "Çok kısa",
+  "editProfileUsernameLabel": "Kullanıcı Adı",
+  "editProfileUsernameHint": "ahmet_ogrenci",
+  "editProfileUsernameRequired": "Lütfen bir kullanıcı adı girin",
+  "editProfileUsernameTooShort": "En az 3 karakter",
+  "editProfileUsernameInvalid": "Sadece harf, rakam, _",
+  "editProfileBioLabel": "Biyografi",
+  "editProfileBioHint": "Kısa bir biyografi...",
+  "editProfileBioTooLong": "Maksimum 120 karakter",
+  "editProfileLocationLabel": "Konum",
+  "editProfileLocationHint": "Şehir / Ülke",
+  "editProfileDailyGoalTitle": "Günlük Hedef",
+  "editProfileDailyGoalSubtitle": "Her gün çalışmak istediğiniz dakika sayısını seçin",
+  "securityTitle": "Güvenlik",
+  "securitySectionPassword": "Şifre",
+  "securityChangePasswordTitle": "Şifre Değiştir",
+  "securityChangePasswordSubtitle": "Şifrenizi düzenli olarak güncelleyin",
+  "securitySectionTwoFactor": "İki Faktörlü Kimlik Doğrulama",
+  "securityEnable2faTitle": "2FA'yı Etkinleştir",
+  "securityEnable2faSubtitle": "Giriş yaparken ekstra güvenlik",
+  "securitySectionAppLock": "Uygulama Kilidi",
+  "securityBiometricTitle": "Biyometrik ile Kilidi Aç",
+  "securityBiometricSubtitle": "SOMA'nın kilidini açmak için FaceID/TouchID kullanın",
+  "securityAppLockTitle": "Uygulamayı Kilitle",
+  "securityAppLockSubtitle": "Çıkıldığında SOMA'yı kilitle",
+  "securitySectionSessions": "Aktif Oturumlar",
+  "securityNoSessions": "Aktif oturum bulunamadı",
+  "securityThisDevice": "Bu Cihaz",
+  "securityDevice": "Cihaz",
+  "securityActiveLabel": "Aktif",
+  "securitySignInToEnable2fa": "2FA'yı etkinleştirmek için giriş yapın",
+  "securityEnable2faFailed": "2FA etkinleştirilemedi: {error}",
+  "@securityEnable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityDisable2faFailed": "2FA devre dışı bırakılamadı: {error}",
+  "@securityDisable2faFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securitySetup2faTitle": "2FA Kurulumu",
+  "securitySecretKeyLabel": "Gizli Anahtar",
+  "securityCodeHint": "6 haneli kod",
+  "security2faEnabled": "2FA etkinleştirildi",
+  "securityVerifyCodeFailed": "Kod doğrulanamadı: {error}",
+  "@securityVerifyCodeFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityVerifying": "Doğrulanıyor...",
+  "securityVerify": "Doğrula",
+  "securityCurrentPasswordHint": "Mevcut şifre",
+  "securityNewPasswordHint": "Yeni şifre (en az 8 karakter)",
+  "securityConfirmPasswordHint": "Yeni şifreyi onayla",
+  "securitySignInToChangePassword": "Şifre değiştirmek için giriş yapın",
+  "securityEnterCurrentPassword": "Lütfen mevcut şifrenizi girin",
+  "securityPasswordMinLength": "Yeni şifre en az 8 karakter olmalı",
+  "securityPasswordsDoNotMatch": "Şifreler eşleşmiyor",
+  "securityPasswordUpdated": "Şifre güncellendi",
+  "securityPasswordUpdateFailed": "Şifre güncellenemedi: {error}",
+  "@securityPasswordUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "securityAutoLockAfter": "Şu süre sonra otomatik kilitle",
+  "privacyTitle": "Gizlilik",
+  "privacySectionVisibility": "Görünürlük",
+  "privacyProfileVisibilityTitle": "Profil Görünürlüğü",
+  "privacyVisibilityPublic": "Herkese Açık",
+  "privacyVisibilityFriends": "Arkadaşlar",
+  "privacyVisibilityPrivate": "Özel",
+  "privacyVisibilityPublicSubtitle": "Herkes profilinizi görebilir",
+  "privacyVisibilityFriendsSubtitle": "Sadece arkadaşlarınız profilinizi görebilir",
+  "privacyVisibilityPrivateSubtitle": "Sadece siz profilinizi görebilirsiniz",
+  "privacySectionActivity": "Aktivite",
+  "privacyShowOnlineTitle": "Çevrimiçi Durumunu Göster",
+  "privacyShowOnlineSubtitle": "Başkalarının çevrimiçi olduğunuzu görmesine izin ver",
+  "privacyShowActivityTitle": "Öğrenme Aktivitesini Göster",
+  "privacyShowActivitySubtitle": "Seri, XP ve mevcut ilerleme istatistiklerini göster",
+  "privacySectionSocial": "Sosyal",
+  "privacyAllowRequestsTitle": "Arkadaşlık İsteklerine İzin Ver",
+  "privacyAllowRequestsSubtitle": "Başkalarının sana arkadaşlık isteği göndermesine izin ver",
+  "privacyWhoCanDmTitle": "Kimler DM Gönderebilir",
+  "privacyDmEveryone": "Herkes",
+  "privacyDmFriends": "Arkadaşlar",
+  "privacyDmNoOne": "Kimse",
+  "privacyDmEveryoneSubtitle": "Herkes size DM gönderebilir",
+  "privacyDmFriendsSubtitle": "Sadece arkadaşlarınız size DM gönderebilir",
+  "privacyDmNoOneSubtitle": "Kimse size DM gönderemez",
+  "privacySectionBlockedUsers": "Engellenen Kullanıcılar",
+  "privacyBlockedUsersComingSoon": "Engellenen kullanıcı yönetimi yakında",
+  "privacySectionDataControls": "Veri Kontrolleri",
+  "privacyExportDataTitle": "Verileri Dışa Aktar",
+  "privacyExportDataSubtitle": "Aktivite ve kurslarınızı indirin",
+  "privacyExportInfoTitle": "Verileri Dışa Aktar",
+  "privacyExportInfoBody": "Sonraki adım: JSON/CSV dışa aktarma dosyası oluştur ve e-posta ile gönder veya yerel olarak indir",
+  "privacyDeleteAccountTitle": "Hesabı Sil",
+  "privacyDeleteAccountSubtitle": "Bu işlem hesabınızı ve verilerinizi kalıcı olarak siler",
+  "privacyDeleteConfirmTitle": "Hesap Silinsin mi?",
+  "privacyDeleteConfirmBody": "Bu işlem geri alınamaz. Profiliniz, kurslarınız, arkadaşlarınız ve mesajlarınız silinecek",
+  "privacyDeleteComingSoon": "Silme işlemi daha sonra Supabase'e bağlanacak",
+  "soloLabel": "Solo",
+  "soloResultsCompletedTitle": "Solo Oturum Tamamlandı",
+  "soloResultsFeedbackElite": "Elit performans - serinizi koruyun",
+  "soloResultsFeedbackStrong": "Güçlü - hızla büyüyorsunuz",
+  "soloResultsFeedbackProgress": "İyi ilerleme - hataları gözden geçirin ve tekrar deneyin",
+  "soloResultsFeedbackTryAgain": "Stres yapmayın - daha az soruyla tekrar deneyin ve odaklanın",
+  "soloResultsPerfectScore": "Mükemmel puan! Gözden geçirilecek hata yok",
+  "soloResultsReviewPrompt": "Daha hızlı öğrenmek için hataları gözden geçirin. Yanlış cevaplarınız aşağıda",
+  "soloResultsReviewMistakes": "Hataları Gözden Geçir ({count})",
+  "@soloResultsReviewMistakes": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "authNotSignedIn": "Giriş yapılmadı",
+  "genericUser": "Kullanıcı",
+  "loading": "Yükleniyor...",
+  "edit": "Düzenle",
+  "send": "Gönder",
+  "join": "Katıl",
+  "leave": "Ayrıl",
+  "ready": "Hazır",
+  "levelBeginner": "Başlangıç",
+  "levelIntermediate": "Orta",
+  "levelAdvanced": "İleri",
+  "questionsShort": "{count} soru",
+  "@questionsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "secondsShort": "{count} sn",
+  "@secondsShort": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "circlesAllCourses": "Tüm Kurslar",
+  "circlesAllModes": "Tüm Modlar",
+  "circlesAllLevels": "Tüm Seviyeler",
+  "circlesAddNewCourse": "Yeni Kurs Ekle",
+  "circlesCoursesTitle": "Kurslar",
+  "circlesModeTitle": "Mod",
+  "circlesLevelTitle": "Seviye",
+  "circlesNoActiveForFilters": "Bu filtreler için aktif Circle yok",
+  "circlesUnknownRoom": "Bilinmeyen oda",
+  "circlesRoomLine": "{from} -> {to} - {mode} - {level}",
+  "@circlesRoomLine": {
+    "placeholders": {
+      "from": {},
+      "to": {},
+      "mode": {},
+      "level": {}
+    }
+  },
+  "circlesCreateCircle": "Circle Oluştur",
+  "circlesCircleName": "Circle Adı",
+  "circlesEnterName": "Ad girin",
+  "circlesLanguages": "Diller",
+  "circlesRoomSetup": "Oda Kurulumu",
+  "circlesPlayers": "Oyuncular",
+  "circlesEmptySlot": "Boş slot",
+  "circlesPlayersRange": "1-5 oyuncu",
+  "circlesQuestions": "Sorular",
+  "circlesQuestionsSubtitle": "Soru sayısı",
+  "circlesTimePerQuestion": "Soru Başına Süre",
+  "circlesSecondsPerQuestion": "Soru başına saniye",
+  "circlesAdvanced": "Gelişmiş",
+  "circlesAllowSpectators": "İzleyicilere İzin Ver",
+  "circlesAllowSpectatorsSubtitle": "Başkalarının oynamadan izlemesine izin ver",
+  "circlesLiveVoiceChat": "Canlı Sesli Sohbet",
+  "circlesLiveVoiceChatSubtitle": "Maç sırasında canlı ses etkinleştir",
+  "circlesLiveTextChat": "Canlı Metin Sohbeti",
+  "circlesLiveTextChatSubtitle": "Maç sırasında sohbeti etkinleştir",
+  "circlesCreatedSuccess": "Circle oluşturuldu",
+  "circlesCreateError": "Circle oluşturulamadı: {error}",
+  "@circlesCreateError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesHostTip": "İpucu: Oluşturduktan sonra arkadaş davet edebilirsiniz",
+  "circlesJoinError": "Circle'a katılınamadı: {error}",
+  "@circlesJoinError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLobbyTitle": "Circle Lobisi",
+  "circlesCodeLine": "Kod: {code} - {current}/{max}",
+  "@circlesCodeLine": {
+    "placeholders": {
+      "code": {},
+      "current": {},
+      "max": {}
+    }
+  },
+  "circlesMatchSettings": "Maç Ayarları",
+  "circlesLevelWithValue": "Seviye {level}",
+  "@circlesLevelWithValue": {
+    "placeholders": {
+      "level": {}
+    }
+  },
+  "circlesDifficulty": "Zorluk",
+  "circlesPerQuestionShort": "Soru başına",
+  "circlesInvite": "Davet Et",
+  "circlesCopyId": "ID Kopyala",
+  "circlesCopiedId": "ID kopyalandı",
+  "circlesMatchInProgress": "Maç devam ediyor",
+  "circlesSpectatorQueuedBody": "Maç devam ediyor. İzleyici olarak katılın",
+  "circlesHostStartWhenReady": "Host herkes hazır olduğunda başlatacak",
+  "circlesSpectators": "İzleyiciler",
+  "circlesSpectator": "İzleyici",
+  "circlesSpectatorCanWatch": "İzleyiciler canlı izleyebilir",
+  "circlesJoinRequests": "Katılma İstekleri",
+  "circlesAcceptSpectatorsHint": "Maçı başlatmadan önce izleyicileri onaylayın",
+  "circlesStartGame": "Oyunu Başlat",
+  "circlesWaitingForPlayers": "Oyuncular bekleniyor",
+  "circlesLeaveCircle": "Circle'dan Ayrıl",
+  "circlesRequestSent": "İstek gönderildi",
+  "circlesRequestToJoin": "Katılmak İçin İstek",
+  "circlesWatchLive": "Canlı İzle",
+  "circlesPlayerTip": "Hazır olduğunuzda hazır olarak işaretleyin. Host maçı başlatacak",
+  "circlesSpectatorTip": "İzliyorsunuz. Host başlattığında canlı izleyin",
+  "circlesHostControls": "Host Kontrolleri",
+  "circlesTransferHostFailed": "Host aktarılamadı: {error}",
+  "@circlesTransferHostFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesEndCircleFailed": "Circle sonlandırılamadı: {error}",
+  "@circlesEndCircleFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesUserNotFound": "@{username} bulunamadı",
+  "@circlesUserNotFound": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInvalidUser": "Geçersiz kullanıcı",
+  "circlesCantInviteSelf": "Kendinizi davet edemezsiniz",
+  "circlesUserAlreadyInCircle": "@{username} zaten Circle'da",
+  "@circlesUserAlreadyInCircle": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesDefaultHost": "Host",
+  "circlesDefaultTitle": "Circle",
+  "circlesInviteByUsername": "Kullanıcı Adıyla Davet Et",
+  "circlesInviteSent": "@{username} kullanıcısına davet gönderildi",
+  "@circlesInviteSent": {
+    "placeholders": {
+      "username": {}
+    }
+  },
+  "circlesInviteFailed": "Davet gönderilemedi: {error}",
+  "@circlesInviteFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesJoinRequestSent": "Katılma isteği gönderildi",
+  "circlesJoinRequestFailed": "İstek başarısız: {error}",
+  "@circlesJoinRequestFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesFull": "Circle dolu",
+  "circlesSpectatorAdded": "İzleyici eklendi",
+  "circlesApproveFailed": "İstek onaylanamadı: {error}",
+  "@circlesApproveFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesRequestDeclined": "İstek reddedildi",
+  "circlesDeclineFailed": "İstek reddedilemedi: {error}",
+  "@circlesDeclineFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesParticipant": "Katılımcı",
+  "circlesLeavePromptTitle": "Circle'dan Ayrılınsın mı?",
+  "circlesLeavePromptTransfer": "Lütfen ayrılmadan önce host'u aktarın",
+  "circlesLeavePromptEndOnly": "Circle'ı sonlandır ve ayrıl",
+  "circlesTransferHost": "Host'u Aktar",
+  "circlesEndCircle": "Circle'ı Sonlandır",
+  "circlesTransferHostTitle": "Host'u Aktar",
+  "circlesShareId": "Circle ID: {id}",
+  "@circlesShareId": {
+    "placeholders": {
+      "id": {}
+    }
+  }
+}

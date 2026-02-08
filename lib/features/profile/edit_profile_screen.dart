@@ -4,7 +4,6 @@ import '../../core/widgets/glass.dart';
 import '../../data/profile_repository.dart';
 import '../../models/user_profile.dart';
 import '../../core/widgets/responsive.dart';
-import '../../core/widgets/soma_background.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final UserProfile? initialProfile; // optional in case we create fresh
@@ -84,8 +83,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      body: SomaBackground(
-        child: SafeArea(
+      body: SafeArea(
           child: ResponsiveFrame(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
@@ -298,7 +296,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           ),
         ),
-      ),
     );
   }
 }
@@ -364,7 +361,6 @@ class _ChipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
