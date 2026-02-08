@@ -20,6 +20,7 @@ import '../auth/sign_up_screen.dart';
 import '../leaderboard/leaderboard_screen.dart';
 import '../social/friends_screen.dart';
 import '../social/dm_chat_screen.dart';
+import '../../core/theme/spacing.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? userId;
@@ -153,9 +154,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     }
     if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: T.bg0,
-        body: Center(child: CircularProgressIndicator(color: T.neonB)),
+      final scheme = Theme.of(context).colorScheme;
+      return Scaffold(
+        backgroundColor: scheme.background,
+        body: Center(
+          child: CircularProgressIndicator(color: scheme.primary),
+        ),
       );
     }
     
@@ -172,7 +176,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+            padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
             child: Column(
               children: [
                 _TopBar(
@@ -190,14 +194,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                 ),
 
-                const SizedBox(height: 14),
+                const SizedBox(height: S.sm),
 
                 Expanded(
                   child: ListView(
                     physics: const BouncingScrollPhysics(),
                     children: [
                       _HeaderCard(profile: profile),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: S.sm),
+                      _ProfileSpotlightCard(profile: profile),
+                      const SizedBox(height: S.sm),
                       if (_isVisitorView) ...[
                         _VisitorActionsCard(
                           isSending: _isRequestSending,
@@ -205,29 +211,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onMessage: () => _openMessage(profile),
                           onAddFriend: () => _sendFriendRequest(profile),
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: S.sm),
                         _VisitorStatsCard(profile: profile),
                       ] else ...[
                         FutureBuilder<UserStats>(
                           future: _statsFuture,
                           builder: (context, snapshot) {
-                            final stats = snapshot.data ?? UserStats.empty();
-                            return _StatsRow(wins: stats.totalWins, streak: stats.streakDays);
+                            return AnimatedSwitcher(
+                              duration: MotionTokens.short,
+                              child: snapshot.connectionState == ConnectionState.waiting
+                                  ? const _StatsSkeleton()
+                                  : _StatsRow(
+                                      wins: (snapshot.data ?? UserStats.empty()).totalWins,
+                                      streak: (snapshot.data ?? UserStats.empty()).streakDays,
+                                    ),
+                            );
                           },
                         ),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: S.sm),
                         const _FriendsCard(),
-                        const SizedBox(height: 14),
+                        const SizedBox(height: S.sm),
                         FutureBuilder<List<Achievement>>(
                           future: _achievementsFuture,
                           builder: (context, snapshot) {
-                            final items = snapshot.data ?? const <Achievement>[];
-                            return _AchievementsCard(achievements: items);
+                            return AnimatedSwitcher(
+                              duration: MotionTokens.short,
+                              child: snapshot.connectionState == ConnectionState.waiting
+                                  ? const _AchievementsSkeleton()
+                                  : _AchievementsCard(
+                                      achievements: snapshot.data ?? const <Achievement>[],
+                                    ),
+                            );
                           },
                         ),
                       ],
-                      const SizedBox(height: 14),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: S.sm),
+                      const SizedBox(height: S.xl),
                     ],
                   ),
                 ),
@@ -249,6 +268,8 @@ class _TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final resolvedTitle = title.isEmpty ? l10n.profileTitle : title;
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Row(
       children: [
         if (onBack != null) ...[
@@ -256,13 +277,12 @@ class _TopBar extends StatelessWidget {
             icon: Icons.arrow_back_ios_new_rounded,
             onTap: onBack!,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: S.xs),
         ],
         Text(
           resolvedTitle,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
+          style: textTheme.headlineMedium?.copyWith(
+            color: scheme.onSurface,
             fontWeight: FontWeight.w800,
             height: 1.1,
           ),
@@ -296,57 +316,56 @@ class _GuestProfileView extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final displayName = profile.displayName.isNotEmpty ? profile.displayName : l10n.guestDisplayName;
     final username = profile.username.isNotEmpty ? profile.username : l10n.guestUsername;
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
       body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+            padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
             child: Column(
               children: [
                 _TopBar(onSettings: onSettings, title: l10n.profileTitle),
-                const SizedBox(height: 14),
+                const SizedBox(height: S.sm),
                 Expanded(
                   child: ListView(
                     physics: const BouncingScrollPhysics(),
                     children: [
                       Glass(
                         radius: BorderRadius.circular(22),
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
                         child: Row(
                           children: [
                             _AvatarGlow(
                               size: 64,
                               image: const AssetImage("assets/avatar/avatar_1.png"),
                             ),
-                            const SizedBox(width: 14),
+                            const SizedBox(width: S.sm),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     displayName,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
+                                    style: textTheme.titleLarge?.copyWith(
+                                      color: scheme.onSurface,
                                       fontWeight: FontWeight.w800,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: S.xxs),
                                   Text(
                                     "@$username • ${l10n.guestSessionLabel}",
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.65),
-                                      fontSize: 13,
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: scheme.onSurface.withValues(alpha: 0.65),
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   if (profile.bio.isNotEmpty) ...[
-                                    const SizedBox(height: 6),
+                                    const SizedBox(height: S.xs),
                                     Text(
                                       profile.bio,
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.6),
-                                        fontSize: 12.5,
+                                      style: textTheme.bodySmall?.copyWith(
+                                        color: scheme.onSurface.withValues(alpha: 0.6),
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -357,32 +376,31 @@ class _GuestProfileView extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: S.sm),
                       Glass(
                         radius: BorderRadius.circular(22),
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               l10n.unlockFullProfile,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
+                              style: textTheme.titleMedium?.copyWith(
+                                color: scheme.onSurface,
                                 fontWeight: FontWeight.w900,
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: S.xs),
                             _GuestInfoRow(
                               icon: Icons.cloud_done_rounded,
                               text: l10n.guestBenefitSync,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: S.xs),
                             _GuestInfoRow(
                               icon: Icons.public_rounded,
                               text: l10n.guestBenefitCircles,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: S.xs),
                             _GuestInfoRow(
                               icon: Icons.notifications_active_rounded,
                               text: l10n.guestBenefitNotifications,
@@ -390,12 +408,12 @@ class _GuestProfileView extends StatelessWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 18),
+                      const SizedBox(height: S.lg),
                       NeonButton(
                         label: l10n.authCreateAccount,
                         onTap: onSignUp,
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: S.sm),
                       Glass(
                         radius: BorderRadius.circular(999),
                         padding: EdgeInsets.zero,
@@ -407,9 +425,8 @@ class _GuestProfileView extends StatelessWidget {
                             child: Center(
                               child: Text(
                                 l10n.signIn,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
+                                style: textTheme.titleMedium?.copyWith(
+                                  color: scheme.onSurface,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
@@ -417,18 +434,17 @@ class _GuestProfileView extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: S.xs),
                       Center(
                         child: Text(
                           l10n.progressStaysOnDevice,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.55),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: scheme.onSurface.withValues(alpha: 0.55),
                             fontWeight: FontWeight.w600,
-                            fontSize: 12,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: S.xs),
                     ],
                   ),
                 ),
@@ -448,17 +464,18 @@ class _GuestInfoRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Row(
       children: [
-        Icon(icon, color: const Color(0xFF2AFADF), size: 18),
-        const SizedBox(width: 10),
+        Icon(icon, color: scheme.secondary, size: 18),
+        const SizedBox(width: S.xs),
         Expanded(
           child: Text(
             text,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.75),
+            style: textTheme.bodySmall?.copyWith(
+              color: scheme.onSurface.withValues(alpha: 0.75),
               fontWeight: FontWeight.w700,
-              fontSize: 12.5,
             ),
           ),
         ),
@@ -477,9 +494,11 @@ class _HeaderCard extends StatelessWidget {
     final heroTag = profile.id != null && profile.id!.isNotEmpty
         ? "profile-avatar-${profile.id}"
         : "profile-avatar-${profile.username}";
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Glass(
       radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
       child: Column(
         children: [
           Row(
@@ -493,25 +512,23 @@ class _HeaderCard extends StatelessWidget {
                       : const AssetImage("assets/avatar/avatar_1.png"),
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: S.sm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       profile.displayName,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
+                      style: textTheme.titleLarge?.copyWith(
+                        color: scheme.onSurface,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: S.xxs),
                     Text(
                       "@${profile.username} • ${profile.bio}",
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.65),
-                        fontSize: 13,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurface.withValues(alpha: 0.65),
                         fontWeight: FontWeight.w600,
                       ),
                       maxLines: 1,
@@ -526,7 +543,7 @@ class _HeaderCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: S.sm),
 
           // XP Progress
           GestureDetector(
@@ -543,9 +560,8 @@ class _HeaderCard extends StatelessWidget {
                   children: [
                     Text(
                       l10n.profileXpProgress,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.75),
-                        fontSize: 13,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurface.withValues(alpha: 0.75),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -561,23 +577,200 @@ class _HeaderCard extends StatelessWidget {
                           },
                           child: Text(
                             l10n.profileXpValue(profile.totalXp),
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.75),
-                              fontSize: 13,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: scheme.onSurface.withValues(alpha: 0.75),
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        const SizedBox(width: S.xs),
                         RewardSparkle(show: profile.totalXp > 0, size: 14),
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: S.xs),
                 // XP Progress Bar - arbitrary max for now, say 1000 for next level
                 _NeonProgressBar(value: (profile.totalXp % 1000) / 1000),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileSpotlightCard extends StatelessWidget {
+  final UserProfile profile;
+  const _ProfileSpotlightCard({required this.profile});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Glass(
+      radius: BorderRadius.circular(22),
+      padding: const EdgeInsets.all(S.md),
+      child: Row(
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                colors: [
+                  scheme.primary.withValues(alpha: 0.9),
+                  scheme.tertiary.withValues(alpha: 0.9),
+                ],
+              ),
+            ),
+            child: Icon(Icons.local_fire_department_rounded, color: scheme.onPrimary, size: 22),
+          ),
+          const SizedBox(width: S.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.profileStreak,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurface.withValues(alpha: 0.65),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: S.xxs),
+                Text(
+                  l10n.profileGoalLabel(profile.dailyGoalMinutes),
+                  style: textTheme.titleMedium?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: S.xxs),
+                Text(
+                  "Keep your streak alive today.",
+                  style: textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurface.withValues(alpha: 0.6),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatsSkeleton extends StatelessWidget {
+  const _StatsSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final base = scheme.onSurface.withValues(alpha: 0.08);
+    return Row(
+      children: [
+        Expanded(child: _SkeletonTile(base: base)),
+        const SizedBox(width: S.sm),
+        Expanded(child: _SkeletonTile(base: base)),
+      ],
+    );
+  }
+}
+
+class _SkeletonTile extends StatelessWidget {
+  final Color base;
+  const _SkeletonTile({required this.base});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(S.sm),
+      decoration: BoxDecoration(
+        color: base,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: base.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(14),
+            ),
+          ),
+          const SizedBox(width: S.sm),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 60,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: base.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+              const SizedBox(height: S.xs),
+              Container(
+                width: 40,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: base.withValues(alpha: 0.8),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AchievementsSkeleton extends StatelessWidget {
+  const _AchievementsSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final base = scheme.onSurface.withValues(alpha: 0.08);
+    return Glass(
+      radius: BorderRadius.circular(22),
+      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 120,
+            height: 12,
+            decoration: BoxDecoration(
+              color: base.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(999),
+            ),
+          ),
+          const SizedBox(height: S.sm),
+          GridView.count(
+            crossAxisCount: 3,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            mainAxisSpacing: S.xs,
+            crossAxisSpacing: S.xs,
+            childAspectRatio: 1.05,
+            children: List.generate(
+              6,
+              (_) => Container(
+                decoration: BoxDecoration(
+                  color: base.withValues(alpha: 0.9),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+              ),
             ),
           ),
         ],
@@ -598,7 +791,7 @@ class _StatsRow extends StatelessWidget {
     return Row(
       children: [
         Expanded(child: _StatTile(title: l10n.profileWins, value: "$wins", icon: Icons.emoji_events_rounded)),
-        const SizedBox(width: 12),
+        const SizedBox(width: S.sm),
         Expanded(child: _StatTile(title: l10n.profileStreak, value: "$streak", icon: Icons.local_fire_department_rounded)),
       ],
     );
@@ -618,39 +811,39 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Glass(
       radius: BorderRadius.circular(20),
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      padding: const EdgeInsets.fromLTRB(S.sm, S.sm, S.sm, S.sm),
       child: Row(
         children: [
           Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.06),
+              color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
             ),
-            child: Icon(icon, color: Colors.white.withValues(alpha: 0.85)),
+            child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.85), size: 20),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: S.sm),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.65),
-                  fontSize: 12.5,
+                style: textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurface.withValues(alpha: 0.65),
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: S.xxs),
               Text(
                 value,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
+                style: textTheme.titleLarge?.copyWith(
+                  color: scheme.onSurface,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -668,9 +861,11 @@ class _FriendsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Glass(
       radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -678,9 +873,8 @@ class _FriendsCard extends StatelessWidget {
             children: [
               Text(
                 l10n.profileFriendsTitle,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
+                style: textTheme.titleMedium?.copyWith(
+                  color: scheme.onSurface,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -694,28 +888,27 @@ class _FriendsCard extends StatelessWidget {
                 },
                 child: Text(
                   l10n.profileViewAll,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.70),
-                    fontSize: 13,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurface.withValues(alpha: 0.70),
                     fontWeight: FontWeight.w700,
                     decoration: TextDecoration.underline,
-                    decorationColor: Colors.white.withValues(alpha: 0.45),
+                    decorationColor: scheme.onSurface.withValues(alpha: 0.45),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: S.sm),
           Row(
             children: const [
               _MiniAvatar(asset: "assets/avatar/avatar_2.png"),
-              SizedBox(width: 10),
+              SizedBox(width: S.xs),
               _MiniAvatar(asset: "assets/avatar/avatar_3.png"),
-              SizedBox(width: 10),
+              SizedBox(width: S.xs),
               _MiniAvatar(asset: "assets/avatar/avatar_4.png"),
-              SizedBox(width: 10),
+              SizedBox(width: S.xs),
               _MiniAvatar(asset: "assets/avatar/avatar_5.png"),
-              SizedBox(width: 10),
+              SizedBox(width: S.xs),
               _MiniAvatarPlus(),
             ],
           ),
@@ -733,36 +926,50 @@ class _AchievementsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Glass(
       radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.profileAchievementsTitle,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
+            style: textTheme.titleMedium?.copyWith(
+              color: scheme.onSurface,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: S.sm),
           if (achievements.isEmpty)
-            Text(
-              l10n.profileNoAchievements,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.7),
-                fontWeight: FontWeight.w700,
-              ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.profileNoAchievements,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurface.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: S.xxs),
+                Text(
+                  "Complete lessons to earn your first badge.",
+                  style: textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurface.withValues(alpha: 0.55),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             )
           else
             GridView.count(
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 10,
+              mainAxisSpacing: S.xs,
+              crossAxisSpacing: S.xs,
               childAspectRatio: 1.05,
               children: achievements.map((a) {
                 return _BadgeTile(
@@ -813,6 +1020,8 @@ class _VisitorActionsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final friendLabel = requestSent
         ? l10n.profileRequested
         : isSending
@@ -821,19 +1030,18 @@ class _VisitorActionsCard extends StatelessWidget {
 
     return Glass(
       radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.profileConnectTitle,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
+            style: textTheme.titleMedium?.copyWith(
+              color: scheme.onSurface,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: S.sm),
           Row(
             children: [
               Expanded(
@@ -844,7 +1052,7 @@ class _VisitorActionsCard extends StatelessWidget {
                   onTap: onMessage,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: S.xs),
               Expanded(
                 child: _ActionButton(
                   icon: Icons.person_add_alt_1_rounded,
@@ -875,18 +1083,22 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final enabled = onTap != null;
     final base = Container(
       height: 52,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: primary ? T.neonGradient : null,
-        color: primary ? null : Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.white.withValues(alpha: primary ? 0.18 : 0.14)),
+        color: primary ? null : scheme.surfaceContainerHighest.withValues(alpha: 0.7),
+        border: Border.all(
+          color: scheme.onSurface.withValues(alpha: primary ? 0.18 : 0.14),
+        ),
         boxShadow: primary
             ? [
                 BoxShadow(
-                  color: T.neonA.withValues(alpha: 0.28),
+                  color: scheme.primary.withValues(alpha: 0.28),
                   blurRadius: 18,
                   spreadRadius: 1,
                 ),
@@ -896,13 +1108,16 @@ class _ActionButton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.white.withValues(alpha: primary ? 0.98 : 0.9), size: 18),
-          const SizedBox(width: 8),
+          Icon(
+            icon,
+            color: (primary ? scheme.onPrimary : scheme.onSurface).withValues(alpha: primary ? 0.98 : 0.9),
+            size: 18,
+          ),
+          const SizedBox(width: S.xs),
           Text(
             label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: primary ? 0.98 : 0.9),
-              fontSize: 13.5,
+            style: textTheme.bodyMedium?.copyWith(
+              color: (primary ? scheme.onPrimary : scheme.onSurface).withValues(alpha: primary ? 0.98 : 0.9),
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -930,28 +1145,29 @@ class _VisitorStatsCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final location = profile.location.isNotEmpty ? profile.location : l10n.profileLocationHidden;
     final bio = profile.bio.isNotEmpty ? profile.bio : l10n.profileBioHidden;
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Glass(
       radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.profileSnapshot,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
+            style: textTheme.titleMedium?.copyWith(
+              color: scheme.onSurface,
               fontWeight: FontWeight.w800,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: S.xs),
           _MetaRow(icon: Icons.info_outline_rounded, label: bio),
-          const SizedBox(height: 8),
+          const SizedBox(height: S.xs),
           _MetaRow(icon: Icons.place_rounded, label: location),
-          const SizedBox(height: 8),
+          const SizedBox(height: S.xs),
           _MetaRow(icon: Icons.auto_graph_rounded, label: l10n.profileXpValue(profile.totalXp)),
-          const SizedBox(height: 8),
+          const SizedBox(height: S.xs),
           _MetaRow(icon: Icons.timer_rounded, label: l10n.profileDailyGoal(profile.dailyGoalMinutes)),
         ],
       ),
@@ -966,17 +1182,18 @@ class _MetaRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Row(
       children: [
-        Icon(icon, color: Colors.white.withValues(alpha: 0.7), size: 16),
-        const SizedBox(width: 8),
+        Icon(icon, color: scheme.onSurface.withValues(alpha: 0.7), size: 16),
+        const SizedBox(width: S.xs),
         Expanded(
           child: Text(
             label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.75),
+            style: textTheme.bodySmall?.copyWith(
+              color: scheme.onSurface.withValues(alpha: 0.75),
               fontWeight: FontWeight.w700,
-              fontSize: 12.5,
             ),
           ),
         ),
@@ -994,12 +1211,13 @@ class _IconGlassButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
       child: Glass(
         radius: BorderRadius.circular(16),
-        padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withValues(alpha: 0.9)),
+        padding: const EdgeInsets.all(S.xs),
+        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.9)),
       ),
     );
   }
@@ -1039,12 +1257,13 @@ class _MiniAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 38,
       height: 38,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.18)),
       ),
       child: ClipOval(
         child: Image.asset(asset, fit: BoxFit.cover),
@@ -1058,15 +1277,16 @@ class _MiniAvatarPlus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 38,
       height: 38,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: 0.07),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.18)),
       ),
-      child: Icon(Icons.add_rounded, color: Colors.white.withValues(alpha: 0.85)),
+      child: Icon(Icons.add_rounded, color: scheme.onSurface.withValues(alpha: 0.85)),
     );
   }
 }
@@ -1079,21 +1299,22 @@ class _BadgeTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final opacity = unlocked ? 1.0 : 0.45;
     return Glass(
       radius: BorderRadius.circular(18),
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(S.xs),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.white.withValues(alpha: 0.90 * opacity), size: 26),
-          const SizedBox(height: 8),
+          Icon(icon, color: scheme.onSurface.withValues(alpha: 0.90 * opacity), size: 26),
+          const SizedBox(height: S.xs),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.75 * opacity),
-              fontSize: 12,
+            style: textTheme.bodySmall?.copyWith(
+              color: scheme.onSurface.withValues(alpha: 0.75 * opacity),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -1110,22 +1331,23 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.xs),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: scheme.surfaceContainerHighest.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.9)),
-          const SizedBox(width: 6),
+          Icon(icon, size: 16, color: scheme.onSurface.withValues(alpha: 0.9)),
+          const SizedBox(width: S.xs),
           Text(
             text,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12.5,
+            style: textTheme.bodySmall?.copyWith(
+              color: scheme.onSurface,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -1141,12 +1363,13 @@ class _NeonProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       height: 12,
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: scheme.onSurface.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(999),

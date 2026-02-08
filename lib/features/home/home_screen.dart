@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/pressable_scale.dart';
@@ -15,6 +16,7 @@ import '../../data/notifications_store.dart';
 import '../../data/auth_repository.dart';
 import '../../core/theme/motion.dart';
 import '../../core/widgets/responsive.dart';
+import '../../core/theme/spacing.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -59,24 +61,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _confirmDeleteCourse(SoloCourse course) async {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     final result = await showDialog<bool>(
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF1C1C1C),
-          title: Text(l10n.removeCourseTitle, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900)),
+          backgroundColor: scheme.surface,
+          title: Text(
+            l10n.removeCourseTitle,
+            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
+          ),
           content: Text(
             l10n.removeCourseBody(course.subtitle),
-            style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontWeight: FontWeight.w600),
+            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.w600),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: Text(l10n.cancel, style: TextStyle(color: Colors.white.withValues(alpha: 0.8))),
+              child: Text(l10n.cancel, style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8))),
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, true),
-              child: Text(l10n.remove, style: const TextStyle(color: Color(0xFFFF4ECD), fontWeight: FontWeight.w800)),
+              child: Text(l10n.remove, style: TextStyle(color: scheme.tertiary, fontWeight: FontWeight.w800)),
             ),
           ],
         );
@@ -91,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildWelcomeRow({required bool editing}) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     return Row(
       children: [
         Expanded(
@@ -100,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
               return Text(
                 l10n.welcomeBack(profileStore.profile.displayName),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
+                      color: scheme.onBackground,
                       fontWeight: FontWeight.w800,
                     ),
               );
@@ -109,13 +116,16 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         InkWell(
           borderRadius: BorderRadius.circular(10),
-          onTap: () => setState(() => _isEditingCourses = !editing),
+          onTap: () {
+            HapticFeedback.selectionClick();
+            setState(() => _isEditingCourses = !editing);
+          },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: S.xs, vertical: S.xs),
             child: Text(
               editing ? l10n.done : l10n.editCourses,
               style: TextStyle(
-                color: editing ? const Color(0xFF2AFADF) : Colors.white.withValues(alpha: 0.85),
+                color: editing ? scheme.primary : scheme.onBackground.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w900,
                 fontSize: 12.5,
               ),
@@ -130,35 +140,33 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = AppLocalizations.of(context);
     if (courses.isEmpty) {
       if (editing) {
-        return Center(
-          child: Text(
-            l10n.noCoursesToEdit,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.6),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+        return _EmptyStateCard(
+          title: l10n.noCoursesToEdit,
+          subtitle: l10n.addCourse,
         );
       }
 
       return ListView(
         physics: const BouncingScrollPhysics(),
         children: [
-          _AddCourseButton(
-            onAdded: (newCourse) {
-              _reloadCourses();
-            },
+          _EmptyStateCard(
+            title: l10n.addCourse,
+            subtitle: l10n.chooseCourseType,
+            action: _AddCourseButton(
+              onAdded: (newCourse) {
+                _reloadCourses();
+              },
+            ),
           ),
         ],
       );
     }
 
     return ListView.separated(
-      physics: const BouncingScrollPhysics(),
-      itemCount: editing ? courses.length : courses.length + 1,
-      separatorBuilder: (_, __) => const SizedBox(height: 14),
-      itemBuilder: (context, i) {
+              physics: const BouncingScrollPhysics(),
+              itemCount: editing ? courses.length : courses.length + 1,
+              separatorBuilder: (_, __) => const SizedBox(height: S.sm),
+              itemBuilder: (context, i) {
         if (!editing && i == courses.length) {
           return _StaggeredIn(
             index: i,
@@ -211,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Stack(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+                padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.sm),
                 child: Column(
                   children: [
                 // Header row
@@ -220,9 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       l10n.appTitle,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: Colors.white,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 1.8,
+                            letterSpacing: 1.4,
                           ),
                     ),
                     const Spacer(),
@@ -260,15 +267,21 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         }
                       ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: S.xs),
                   ],
                 ),
 
-                const SizedBox(height: 18),
+                const SizedBox(height: S.lg),
 
                 // Welcome
                 _buildWelcomeRow(editing: false),
-                const SizedBox(height: 12),
+                const SizedBox(height: S.sm),
+                _HeroCard(
+                  onAdded: (newCourse) {
+                    _reloadCourses();
+                  },
+                ),
+                const SizedBox(height: S.md),
 
                 // Course list
                 Expanded(
@@ -276,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     future: _coursesFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF)));
+                        return const _CoursesSkeleton();
                       }
                        
                       final courses = snapshot.data ?? [];
@@ -298,20 +311,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Positioned.fill(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+                    padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.sm),
                     child: Column(
                       children: [
                         const SizedBox(height: 62),
                         _buildWelcomeRow(editing: true),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: S.sm),
                         Expanded(
                           child: FutureBuilder<List<SoloCourse>>(
                             future: _coursesFuture,
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const Center(
-                                  child: CircularProgressIndicator(color: Color(0xFF2AFADF)),
-                                );
+                                return const _CoursesSkeleton();
                               }
 
                               final courses = snapshot.data ?? [];
@@ -331,6 +342,83 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+class _HeroCard extends StatelessWidget {
+  final void Function(SoloCourse newCourse) onAdded;
+
+  const _HeroCard({required this.onAdded});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Glass(
+      radius: BorderRadius.circular(28),
+      padding: const EdgeInsets.all(S.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.auto_awesome_rounded, color: scheme.primary, size: 26),
+              const SizedBox(width: S.xs),
+              Expanded(
+                child: Text(
+                  l10n.appTitle,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w900,
+                      ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: S.xs),
+          Text(
+            l10n.chooseCourseType,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: scheme.onSurface.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+          const SizedBox(height: S.md),
+          PressableScale(
+            onTap: () async {
+              HapticFeedback.selectionClick();
+              final created = await Navigator.push<SoloCourse>(
+                context,
+                MaterialPageRoute(builder: (_) => const AddCourseScreen()),
+              );
+              if (created != null) {
+                await coursesRepository.addCustomCourse(created);
+                onAdded(created);
+              }
+            },
+            child: Container(
+              height: 48,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                gradient: LinearGradient(
+                  colors: [
+                    scheme.primary.withValues(alpha: 0.9),
+                    scheme.tertiary.withValues(alpha: 0.9),
+                  ],
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                l10n.addCourse,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: scheme.onPrimary,
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SmallIconButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -339,7 +427,7 @@ class _SmallIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(14),
       padding: EdgeInsets.zero,
@@ -349,9 +437,125 @@ class _SmallIconButton extends StatelessWidget {
           width: 44,
           height: 44,
           child: Center(
-            child: Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 22),
+            child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.9), size: 22),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _EmptyStateCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final Widget? action;
+
+  const _EmptyStateCard({
+    required this.title,
+    required this.subtitle,
+    this.action,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: S.sm),
+      child: Glass(
+        radius: BorderRadius.circular(24),
+        padding: const EdgeInsets.all(S.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.auto_awesome_rounded, color: scheme.primary, size: 28),
+            const SizedBox(height: S.sm),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            const SizedBox(height: S.xs),
+            Text(
+              subtitle,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: scheme.onSurface.withValues(alpha: 0.7),
+                  ),
+            ),
+            if (action != null) ...[
+              const SizedBox(height: S.md),
+              action!,
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CoursesSkeleton extends StatelessWidget {
+  const _CoursesSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      physics: const BouncingScrollPhysics(),
+      itemCount: 3,
+      separatorBuilder: (_, __) => const SizedBox(height: S.sm),
+      itemBuilder: (context, index) => const _SkeletonCard(),
+    );
+  }
+}
+
+class _SkeletonCard extends StatelessWidget {
+  const _SkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.3, end: 0.7),
+      duration: const Duration(milliseconds: 900),
+      curve: Curves.easeInOut,
+      builder: (context, value, child) {
+        final base = scheme.onSurface.withValues(alpha: 0.08 + (0.06 * value));
+        return Container(
+          height: 96,
+          decoration: BoxDecoration(
+            color: base,
+            borderRadius: BorderRadius.circular(22),
+          ),
+          padding: const EdgeInsets.all(S.md),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _SkeletonLine(width: 120, color: base.withValues(alpha: 0.9)),
+              const SizedBox(height: S.xs),
+              _SkeletonLine(width: 200, color: base.withValues(alpha: 0.8)),
+              const Spacer(),
+              _SkeletonLine(width: 80, color: base.withValues(alpha: 0.7)),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _SkeletonLine extends StatelessWidget {
+  final double width;
+  final Color color;
+
+  const _SkeletonLine({required this.width, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: 10,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(999),
       ),
     );
   }
@@ -381,6 +585,8 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     final card = Glass(
       radius: BorderRadius.circular(24),
       padding: EdgeInsets.zero,
@@ -397,10 +603,9 @@ class CourseCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       "$fromLang  →  $toLang",
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: textTheme.titleMedium?.copyWith(
+                        color: scheme.onSurface,
                         fontWeight: FontWeight.w800,
-                        fontSize: 16,
                       ),
                     ),
                   ),
@@ -411,11 +616,11 @@ class CourseCard extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(6),
                         child: Icon(Icons.delete_rounded,
-                            color: const Color(0xFFFF4ECD).withValues(alpha: 0.9), size: 18),
+                            color: scheme.tertiary.withValues(alpha: 0.9), size: 18),
                       ),
                     )
                   else
-                    Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.75)),
+                    Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.65)),
                 ],
               ),
               const SizedBox(height: 12),
@@ -425,8 +630,8 @@ class CourseCard extends StatelessWidget {
                 height: 10,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  color: Colors.white.withValues(alpha: 0.08),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                  color: scheme.onSurface.withValues(alpha: 0.08),
+                  border: Border.all(color: scheme.onSurface.withValues(alpha: 0.10)),
                 ),
                 child: Align(
                   alignment: Alignment.centerLeft,
@@ -446,7 +651,7 @@ class CourseCard extends StatelessWidget {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF7C7CFF).withValues(alpha: 0.35),
+                            color: scheme.primary.withValues(alpha: 0.35),
                             blurRadius: 18,
                             spreadRadius: 2, // Reverted to original as BorderRadius is not compatible here
                           ),
@@ -490,21 +695,22 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        color: Colors.black.withValues(alpha: 0.16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        color: scheme.surfaceContainerHighest.withValues(alpha: 0.7),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.9)),
+          Icon(icon, size: 16, color: scheme.onSurface.withValues(alpha: 0.9)),
           const SizedBox(width: 6),
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.92),
+              color: scheme.onSurface.withValues(alpha: 0.92),
               fontWeight: FontWeight.w800,
               fontSize: 13,
             ),
@@ -594,11 +800,13 @@ class _AddCourseButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(26),
       padding: EdgeInsets.zero,
       child: PressableScale(
         onTap: () async {
+          HapticFeedback.selectionClick();
           final created = await Navigator.push<SoloCourse>(
             context,
             MaterialPageRoute(builder: (_) => const AddCourseScreen()),
@@ -614,8 +822,8 @@ class _AddCourseButton extends StatelessWidget {
           child: Center(
             child: Text(
               l10n.addCourse,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: scheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.w900,
               ),
@@ -635,6 +843,7 @@ class _BellWithBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -647,15 +856,15 @@ class _BellWithBadge extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(999),
-                color: const Color(0xFFFF4ECD).withValues(alpha: 0.95),
+                color: scheme.tertiary.withValues(alpha: 0.95),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF7C7CFF).withValues(alpha: 0.35),
+                    color: scheme.primary.withValues(alpha: 0.35),
                     blurRadius: 14,
                     spreadRadius: 1,
                   ),
                 ],
-                border: Border.all(color: Colors.white.withValues(alpha: 0.20)),
+                border: Border.all(color: scheme.onSurface.withValues(alpha: 0.2)),
               ),
               child: Text(
                 count > 99 ? "99+" : "$count",
