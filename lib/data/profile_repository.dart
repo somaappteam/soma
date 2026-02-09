@@ -13,11 +13,12 @@ class ProfileRepository {
     final uid = userId ?? currentUserId;
     if (uid == null) return null;
 
+    UserProfile? localProfile;
     // Try local first
     try {
       final local = await DatabaseHelper.instance.getProfile(uid);
       if (local != null) {
-        return UserProfile(
+        localProfile = UserProfile(
           id: local['id'] ?? uid,
           displayName: local['display_name'] ?? 'User',
           username: local['username'] ?? 'learner',
@@ -26,6 +27,7 @@ class ProfileRepository {
           dailyGoalMinutes: local['daily_goal_minutes'] ?? 10,
           totalXp: local['total_xp'] ?? 0,
           avatarUrl: local['avatar_url'],
+          showOnlineStatus: true,
         );
       }
     } catch (e) {
@@ -47,9 +49,10 @@ class ProfileRepository {
         dailyGoalMinutes: data['daily_goal_minutes'] ?? 10,
         totalXp: data['total_xp'] ?? 0,
         avatarUrl: data['avatar_url'],
+        showOnlineStatus: (data['settings'] as Map<String, dynamic>?)?['show_online_status'] ?? true,
       );
     } catch (e) {
-      return null;
+      return localProfile;
     }
   }
 

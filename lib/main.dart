@@ -15,6 +15,7 @@ import 'core/services/session_tracker.dart';
 import 'core/services/theme_mode_controller.dart';
 import 'core/services/haptics_service.dart';
 import 'core/services/sfx_service.dart';
+import 'core/widgets/app_lock_gate.dart';
 import 'package:flutter/foundation.dart';
 
 enum SyncStatus { idle, syncing, error }
@@ -267,7 +268,8 @@ class _AppState extends State<App> {
               );
             }
 
-            return ValueListenableBuilder<SyncStatus>(
+            return AppLockGate(
+              child: ValueListenableBuilder<SyncStatus>(
               valueListenable: syncStatusNotifier,
               builder: (context, status, _) {
                 return Stack(
@@ -286,6 +288,7 @@ class _AppState extends State<App> {
                   ],
                 );
               },
+              ),
             );
           },
           home: const SplashScreen(),

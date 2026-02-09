@@ -8,6 +8,7 @@ import '../../data/quiz_repository.dart';
 import 'solo_course_detail_screen.dart';
 import 'solo_vocab_quiz_screen.dart';
 import 'solo_sentences_quiz_screen.dart';
+import 'package:share_plus/share_plus.dart';
 
 class SoloResultScreen extends StatefulWidget {
   const SoloResultScreen({
@@ -73,6 +74,15 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
     return l10n.soloResultsFeedbackTryAgain;
   }
 
+  Future<void> _shareResults() async {
+    final l10n = AppLocalizations.of(context);
+    final summary = "${widget.course.subtitle} • ${_modeLabel(l10n)}";
+    final stats = "${l10n.statCorrect}: ${widget.correct}/${widget.total}";
+    final points = "${l10n.pointsLabel}: +${widget.points}";
+    final accuracy = "${l10n.statAccuracy}: ${accuracyPct}%";
+    await Share.share("$summary\n$stats\n$accuracy\n$points");
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -105,11 +115,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                   const Spacer(),
                   _IconGlass(
                     icon: Icons.ios_share_rounded,
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.shareLater)),
-                      );
-                    },
+                    onTap: _shareResults,
                   ),
                 ],
               ),

@@ -152,6 +152,7 @@ class _InboxScreenState extends State<InboxScreen> {
                               lastText: t['lastMsg'] ?? '',
                               time: _fmtTime(t['time'] as DateTime),
                               unreadCount: t['unreadCount'] ?? 0,
+                              showOnlineIndicator: t['isOnline'] == true,
                               onTap: () async {
                                 await Navigator.push(
                                   context,
@@ -214,6 +215,7 @@ class _ThreadRow extends StatelessWidget {
   final String lastText;
   final String time;
   final int unreadCount;
+  final bool showOnlineIndicator;
   final VoidCallback onTap;
 
   const _ThreadRow({
@@ -221,6 +223,7 @@ class _ThreadRow extends StatelessWidget {
     required this.lastText,
     required this.time,
     required this.unreadCount,
+    required this.showOnlineIndicator,
     required this.onTap,
   });
 
@@ -249,7 +252,7 @@ class _ThreadRow extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _Avatar(),
+              _Avatar(showOnlineIndicator: showOnlineIndicator),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -324,6 +327,10 @@ class _ThreadRow extends StatelessWidget {
 }
 
 class _Avatar extends StatelessWidget {
+  final bool showOnlineIndicator;
+
+  const _Avatar({required this.showOnlineIndicator});
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -335,11 +342,29 @@ class _Avatar extends StatelessWidget {
         color: scheme.onSurface.withValues(alpha: 0.10),
         border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
       ),
-      child: Center(
-        child: Text(
-          "🙂",
-          style: TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
-        ),
+      child: Stack(
+        children: [
+          Center(
+            child: Text(
+              "🙂",
+              style: TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
+            ),
+          ),
+          if (showOnlineIndicator)
+            Positioned(
+              bottom: 2,
+              right: 2,
+              child: Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF58F7B6),
+                  border: Border.all(color: scheme.surface.withValues(alpha: 0.7), width: 2),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

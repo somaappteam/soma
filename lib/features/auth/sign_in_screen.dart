@@ -32,8 +32,11 @@ class _SignInScreenState extends State<SignInScreen> {
     final password = _password.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.authFillAllFields)),
+      await showPremiumDialog(
+        context: context,
+        title: l10n.signIn,
+        body: l10n.authFillAllFields,
+        confirmText: l10n.ok,
       );
       return;
     }
@@ -64,8 +67,11 @@ class _SignInScreenState extends State<SignInScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.authError(e.toString()))),
+        await showPremiumDialog(
+          context: context,
+          title: l10n.signIn,
+          body: l10n.authError(e.toString()),
+          confirmText: l10n.ok,
         );
       }
     } finally {

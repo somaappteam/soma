@@ -12,6 +12,7 @@ import '../../data/profile_store.dart';
 import '../../data/social_repository.dart';
 import '../../data/stats_repository.dart';
 import '../../data/achievements_repository.dart';
+import '../../data/presence_repository.dart';
 import '../../models/user_profile.dart';
 import '../../models/user_stats.dart';
 import '../../models/achievement.dart';
@@ -184,12 +185,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onBack: _isVisitorView && Navigator.canPop(context)
                       ? () => Navigator.pop(context)
                       : null,
-                  onLeaderboard: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
-                    );
-                  },
+                  onLeaderboard: _isVisitorView
+                      ? null
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
+                          );
+                        },
                   onSettings: _isVisitorView
                       ? null
                       : () {
@@ -206,7 +209,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ListView(
                     physics: const BouncingScrollPhysics(),
                     children: [
-                      _HeaderCard(profile: profile),
+                      profile.showOnlineStatus && profile.id != null && profile.id!.isNotEmpty
+                          ? StreamBuilder<bool>(
+                              stream: presenceRepository.streamOnlineStatus(profile.id!),
+                              builder: (context, snapshot) => _HeaderCard(
+                                profile: profile,
+                                showOnlineIndicator: snapshot.data == true,
+                              ),
+                            )
+                          : _HeaderCard(profile: profile, showOnlineIndicator: false),
                       const SizedBox(height: S.sm),
                       _ProfileSpotlightCard(profile: profile),
                       const SizedBox(height: S.sm),
@@ -363,6 +374,7 @@ class _GuestProfileView extends StatelessWidget {
                             _AvatarGlow(
                               size: 64,
                               image: const AssetImage("assets/avatar/avatar_1.png"),
+                              showOnlineIndicator: false,
                             ),
                             const SizedBox(width: S.sm),
                             Expanded(
@@ -502,7 +514,9 @@ class _GuestInfoRow extends StatelessWidget {
 
 class _HeaderCard extends StatelessWidget {
   final UserProfile profile;
-  const _HeaderCard({required this.profile});
+  final bool showOnlineIndicator;
+
+  const _HeaderCard({required this.profile, required this.showOnlineIndicator});
 
   @override
   Widget build(BuildContext context) {
@@ -526,6 +540,7 @@ class _HeaderCard extends StatelessWidget {
                   image: (profile.avatarUrl?.isNotEmpty == true)
                       ? NetworkImage(profile.avatarUrl!) as ImageProvider
                       : const AssetImage("assets/avatar/avatar_1.png"),
+                  showOnlineIndicator: showOnlineIndicator,
                 ),
               ),
               const SizedBox(width: S.sm),
@@ -554,54 +569,46 @@ class _HeaderCard extends StatelessWidget {
           const SizedBox(height: S.sm),
 
           // XP Progress
-          GestureDetector(
-            onTap: () {
-               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
-              );
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      l10n.profileXpProgress,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurface.withValues(alpha: 0.75),
-                        fontWeight: FontWeight.w700,
-                      ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    l10n.profileXpProgress,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurface.withValues(alpha: 0.75),
+                      fontWeight: FontWeight.w700,
                     ),
-                    const Spacer(),
-                    Row(
-                      children: [
-                        TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0.98, end: 1.0),
-                          duration: MotionTokens.short,
-                          curve: MotionTokens.standardCurve,
-                          builder: (context, value, child) {
-                            return Transform.scale(scale: value, child: child);
-                          },
-                          child: Text(
-                            l10n.profileXpValue(profile.totalXp),
-                            style: textTheme.bodySmall?.copyWith(
-                              color: scheme.onSurface.withValues(alpha: 0.75),
-                              fontWeight: FontWeight.w700,
-                            ),
+                  ),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.98, end: 1.0),
+                        duration: MotionTokens.short,
+                        curve: MotionTokens.standardCurve,
+                        builder: (context, value, child) {
+                          return Transform.scale(scale: value, child: child);
+                        },
+                        child: Text(
+                          l10n.profileXpValue(profile.totalXp),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: scheme.onSurface.withValues(alpha: 0.75),
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(width: S.xs),
-                        RewardSparkle(show: profile.totalXp > 0, size: 14),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: S.xs),
-                // XP Progress Bar - arbitrary max for now, say 1000 for next level
-                _NeonProgressBar(value: (profile.totalXp % 1000) / 1000),
-              ],
-            ),
+                      ),
+                      const SizedBox(width: S.xs),
+                      RewardSparkle(show: profile.totalXp > 0, size: 14),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: S.xs),
+              // XP Progress Bar - arbitrary max for now, say 1000 for next level
+              _NeonProgressBar(value: (profile.totalXp % 1000) / 1000),
+            ],
           ),
         ],
       ),
@@ -618,6 +625,7 @@ class _ProfileSpotlightCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final bio = profile.bio.isNotEmpty ? profile.bio : l10n.profileBioHidden;
     return Glass(
       radius: BorderRadius.circular(22),
       padding: const EdgeInsets.all(S.md),
@@ -635,7 +643,7 @@ class _ProfileSpotlightCard extends StatelessWidget {
                 ],
               ),
             ),
-            child: Icon(Icons.local_fire_department_rounded, color: scheme.onPrimary, size: 22),
+            child: Icon(Icons.info_outline_rounded, color: scheme.onPrimary, size: 22),
           ),
           const SizedBox(width: S.sm),
           Expanded(
@@ -643,7 +651,7 @@ class _ProfileSpotlightCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n.profileStreak,
+                  l10n.editProfileBioLabel,
                   style: textTheme.bodySmall?.copyWith(
                     color: scheme.onSurface.withValues(alpha: 0.65),
                     fontWeight: FontWeight.w700,
@@ -651,18 +659,10 @@ class _ProfileSpotlightCard extends StatelessWidget {
                 ),
                 const SizedBox(height: S.xxs),
                 Text(
-                  l10n.profileGoalLabel(profile.dailyGoalMinutes),
+                  bio,
                   style: textTheme.titleMedium?.copyWith(
                     color: scheme.onSurface,
                     fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: S.xxs),
-                Text(
-                  "Keep your streak alive today.",
-                  style: textTheme.bodySmall?.copyWith(
-                    color: scheme.onSurface.withValues(alpha: 0.6),
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -1265,11 +1265,17 @@ class _LeaderboardButton extends StatelessWidget {
 class _AvatarGlow extends StatelessWidget {
   final double size;
   final ImageProvider image;
+  final bool showOnlineIndicator;
 
-  const _AvatarGlow({required this.size, required this.image});
+  const _AvatarGlow({
+    required this.size,
+    required this.image,
+    required this.showOnlineIndicator,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: size,
       height: size,
@@ -1277,14 +1283,32 @@ class _AvatarGlow extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.45),
+            color: scheme.primary.withValues(alpha: 0.45),
             blurRadius: 30,
             spreadRadius: 2,
           ),
         ],
       ),
-      child: ClipOval(
-        child: Image(image: image, fit: BoxFit.cover),
+      child: Stack(
+        children: [
+          ClipOval(
+            child: Image(image: image, fit: BoxFit.cover),
+          ),
+          if (showOnlineIndicator)
+            Positioned(
+              bottom: 2,
+              right: 2,
+              child: Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF58F7B6),
+                  border: Border.all(color: scheme.surface.withValues(alpha: 0.7), width: 2),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

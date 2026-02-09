@@ -20,6 +20,11 @@ class SettingsRepository {
   };
   final StreamController<Map<String, dynamic>> _guestSettingsController =
       StreamController<Map<String, dynamic>>.broadcast();
+  final StreamController<Map<String, dynamic>> _userSettingsController =
+      StreamController<Map<String, dynamic>>.broadcast();
+  StreamSubscription<List<Map<String, dynamic>>>? _userSettingsSubscription;
+  Map<String, dynamic> _userSettings = {};
+  String? _userSettingsId;
 
   String? get currentUserId => _supabase.auth.currentUser?.id;
 
@@ -47,16 +52,41 @@ class SettingsRepository {
       });
     }
 
-    return _supabase
+    _ensureUserSettingsStream(uid);
+    return _userSettingsController.stream;
+  }
+
+  void _ensureUserSettingsStream(String uid) {
+    if (_userSettingsId == uid && _userSettingsSubscription != null) {
+      return;
+    }
+    _userSettingsSubscription?.cancel();
+    _userSettingsId = uid;
+    _userSettings = {};
+
+    _bootstrapUserSettings(uid);
+    _userSettingsSubscription = _supabase
         .from('profiles')
         .stream(primaryKey: ['id'])
         .eq('id', uid)
-        .map((event) {
-          if (event.isEmpty) return {};
-          final row = event.first;
-          // Handle case where 'settings' column might be null
-          return (row['settings'] as Map<String, dynamic>?) ?? {};
-        });
+        .listen((event) {
+      if (event.isEmpty) return;
+      final row = event.first;
+      final serverSettings = (row['settings'] as Map<String, dynamic>?) ?? {};
+      _userSettings = Map<String, dynamic>.from(serverSettings);
+      _userSettingsController.add(Map<String, dynamic>.from(_userSettings));
+    });
+  }
+
+  Future<void> _bootstrapUserSettings(String uid) async {
+    try {
+      final resp = await _supabase.from('profiles').select('settings').eq('id', uid).single();
+      final settings = Map<String, dynamic>.from(resp['settings'] ?? {});
+      _userSettings = settings;
+      _userSettingsController.add(Map<String, dynamic>.from(_userSettings));
+    } catch (e) {
+      debugPrint("Error bootstrapping settings: $e");
+    }
   }
 
   /// Updates a specific setting key with a new value.
@@ -69,6 +99,8 @@ class SettingsRepository {
       return;
     }
 
+    _userSettings[key] = value;
+    _userSettingsController.add(Map<String, dynamic>.from(_userSettings));
     try {
       // 1. Fetch current settings to merge
       final resp = await _supabase
@@ -103,6 +135,8 @@ class SettingsRepository {
       return;
     }
 
+    _userSettings.addAll(newValues);
+    _userSettingsController.add(Map<String, dynamic>.from(_userSettings));
     try {
       final resp = await _supabase.from('profiles').select('settings').eq('id', uid).single();
       final currentSettings = Map<String, dynamic>.from(resp['settings'] ?? {});

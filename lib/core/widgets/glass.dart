@@ -18,28 +18,61 @@ class Glass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final glass = Theme.of(context).extension<GlassTheme>();
+    final isLight = Theme.of(context).brightness == Brightness.light;
     final fill = glass?.fill ?? T.glassFill;
     final stroke = glass?.stroke ?? T.glassStroke;
     final shadow = glass?.shadow ?? const Color(0x7A000000);
+    final highlight = Color.lerp(fill, Colors.white, 0.18) ??
+        Colors.white.withValues(alpha: 0.12);
+    final highlightOpacity = (fill.opacity + 0.08).clamp(0.0, 1.0);
+    final rimColor = Color.lerp(stroke, Colors.white, isLight ? 0.45 : 0.2) ??
+        stroke.withValues(alpha: isLight ? 0.5 : 0.3);
 
     return ClipRRect(
       borderRadius: radius,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: fill,
-            borderRadius: radius,
-            border: Border.all(color: stroke, width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: shadow,
-                blurRadius: 28,
-                offset: Offset(0, 16),
+        child: Stack(
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    highlight.withValues(alpha: highlightOpacity),
+                    fill,
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: radius,
+                border: Border.all(color: stroke, width: 1),
+                boxShadow: [
+                  BoxShadow(
+                    color: shadow,
+                    blurRadius: 28,
+                    offset: Offset(0, 16),
+                  ),
+                  if (isLight)
+                    BoxShadow(
+                      color: shadow.withValues(alpha: 0.08),
+                      blurRadius: 60,
+                      offset: Offset(0, 28),
+                    ),
+                ],
               ),
-            ],
-          ),
-          child: Padding(padding: padding, child: child),
+              child: Padding(padding: padding, child: child),
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    borderRadius: radius,
+                    border: Border.all(color: rimColor, width: 0.7),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

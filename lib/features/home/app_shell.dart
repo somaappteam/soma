@@ -36,42 +36,105 @@ class _AppShellState extends State<AppShell> {
     final scheme = Theme.of(context).colorScheme;
     await showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: scheme.surface,
-        title: Text(
-          l10n.dialogAuthRequiredTitle,
-          style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
+      barrierColor: Colors.black.withValues(alpha: 0.6),
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Glass(
+          radius: BorderRadius.circular(24),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    colors: [
+                      scheme.primary.withValues(alpha: 0.9),
+                      scheme.tertiary.withValues(alpha: 0.9),
+                    ],
+                  ),
+                ),
+                child: Icon(Icons.public_rounded, color: scheme.onPrimary, size: 24),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l10n.dialogAuthRequiredTitle,
+                style: TextStyle(
+                  color: scheme.onSurface,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.dialogAuthRequiredBody,
+                style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.75),
+                  fontWeight: FontWeight.w600,
+                  height: 1.35,
+                ),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: scheme.onSurface,
+                        side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.25)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: Text(l10n.notNow),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const SignInScreen()),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: scheme.primary,
+                        foregroundColor: scheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: Text(l10n.signIn),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                    );
+                  },
+                  child: Text(
+                    l10n.signUp,
+                    style: TextStyle(color: scheme.tertiary, fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-        content: Text(
-          l10n.dialogAuthRequiredBody,
-          style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.w600),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.notNow, style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75))),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SignInScreen()),
-              );
-            },
-            child: Text(l10n.signIn, style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w800)),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SignUpScreen()),
-              );
-            },
-            child: Text(l10n.signUp, style: TextStyle(color: scheme.tertiary, fontWeight: FontWeight.w800)),
-          ),
-        ],
       ),
     );
   }

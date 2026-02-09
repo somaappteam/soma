@@ -2473,6 +2473,8 @@ class _PlayerRow extends StatelessWidget {
             child: _AvatarDot(
               glow: player.isHost,
               empty: player.isEmpty,
+              muted: player.isMuted,
+              speaking: player.isSpeaking,
             ),
           ),
           const SizedBox(width: 10),
@@ -2752,36 +2754,75 @@ class _MiniAction extends StatelessWidget {
 class _AvatarDot extends StatelessWidget {
   final bool glow;
   final bool empty;
+  final bool muted;
+  final bool speaking;
 
-  const _AvatarDot({required this.glow, required this.empty});
+  const _AvatarDot({
+    required this.glow,
+    required this.empty,
+    required this.muted,
+    required this.speaking,
+  });
 
   @override
   Widget build(BuildContext context) {
     final color =
         empty ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85);
 
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color,
-        boxShadow: glow
-            ? [
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: color,
+            boxShadow: [
+              if (glow)
                 BoxShadow(
                   color: T.neonA.withValues(alpha: 0.15),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
-                )
-              ]
-            : null,
-      ),
-      child: Center(
-        child: Icon(
-          empty ? Icons.person_outline_rounded : Icons.person_rounded,
-          color: Colors.black.withValues(alpha: 0.70),
+                ),
+              if (speaking && !empty)
+                BoxShadow(
+                  color: const Color(0xFF2AFADF).withValues(alpha: 0.35),
+                  blurRadius: 12,
+                  spreadRadius: 1,
+                ),
+            ],
+          ),
+          child: Center(
+            child: Icon(
+              empty ? Icons.person_outline_rounded : Icons.person_rounded,
+              color: Colors.black.withValues(alpha: 0.70),
+            ),
+          ),
         ),
-      ),
+        if (!empty)
+          Positioned(
+            bottom: -1,
+            right: -1,
+            child: Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: muted ? 0.55 : 0.9),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+                  width: 1.5,
+                ),
+              ),
+              child: Icon(
+                muted ? Icons.mic_off_rounded : Icons.mic_rounded,
+                size: 10,
+                color: Theme.of(context).colorScheme.surface,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
