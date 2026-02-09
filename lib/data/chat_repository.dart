@@ -38,6 +38,19 @@ class ChatRepository {
         });
   }
 
+
+  Future<void> markConversationAsRead(String otherUserId) async {
+    final uid = currentUserId;
+    if (uid == null) return;
+
+    await _supabase
+        .from('messages')
+        .update({'is_read': true})
+        .eq('sender_id', otherUserId)
+        .eq('receiver_id', uid)
+        .eq('is_read', false);
+  }
+
   /// Get Inbox (list of conversations)
   /// Note: Supabase doesn't support grouping in Stream easily, and we don't have a 'conversations' table.
   /// For MVP, we will fetch recent messages and process distinct users locally, OR use Friends list.
@@ -62,19 +75,33 @@ class ChatRepository {
 
     // Group by 'other' user
     final Map<String, Map<String, dynamic>> threads = {};
-    
+    final Map<String, int> unreadByOther = {};
+
     for (final msg in response) {
       final isMeSender = msg['sender_id'] == uid;
-      final otherId = isMeSender ? msg['receiver_id'] : msg['sender_id'];
-      
+      final otherId = (isMeSender ? msg['receiver_id'] : msg['sender_id']).toString();
+      final receiverId = msg['receiver_id']?.toString();
+      final senderId = msg['sender_id']?.toString();
+      final isRead = msg['is_read'] == true || msg['is_read'] == 1;
+
       if (!threads.containsKey(otherId)) {
+        final parsed = DateTime.tryParse(msg['created_at']?.toString() ?? '');
         threads[otherId] = {
-            'otherId': otherId,
-            'lastMsg': msg['content'],
-            'time': DateTime.parse(msg['created_at']),
-            'unreadCount': 0, // TODO
+          'otherId': otherId,
+          'lastMsg': msg['content']?.toString() ?? '',
+          'time': parsed ?? DateTime.now(),
+          'unreadCount': 0,
         };
       }
+
+      final isUnreadForMe = receiverId == uid && senderId == otherId && !isRead;
+      if (isUnreadForMe) {
+        unreadByOther[otherId] = (unreadByOther[otherId] ?? 0) + 1;
+      }
+    }
+
+    for (final entry in threads.entries) {
+      entry.value['unreadCount'] = unreadByOther[entry.key] ?? 0;
     }
 
     // We need profiles for names

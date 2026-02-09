@@ -250,7 +250,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
 
                 const SizedBox(height: 14),
 
-                // Mistakes preview (placeholder)
+                // Mistakes preview
                 Glass(
                   radius: BorderRadius.circular(22),
                   padding: const EdgeInsets.all(14),

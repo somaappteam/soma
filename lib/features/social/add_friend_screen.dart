@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../data/social_repository.dart';
+import 'package:soma/l10n/gen/app_localizations.dart';
 
 class AddFriendScreen extends StatefulWidget {
   const AddFriendScreen({super.key});
@@ -25,6 +26,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
     final username = controller.text.trim();
     if (username.isEmpty) return;
 
+    final l10n = AppLocalizations.of(context);
     setState(() => loading = true);
 
     try {
@@ -40,7 +42,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
       if (target.isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("User @$username not found")),
+            SnackBar(content: Text(l10n.addFriendUserNotFound(username))),
           );
           setState(() => loading = false);
         }
@@ -51,7 +53,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
       if (addresseeId == socialRepository.currentUserId) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("You can't add yourself")),
+            SnackBar(content: Text(l10n.profileCantAddYourself)),
           );
           setState(() => loading = false);
         }
@@ -63,14 +65,14 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Request sent to @$username")),
+          SnackBar(content: Text(l10n.profileRequestSent(username))),
         );
         Navigator.pop(context);
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Action failed or already sent: $e")),
+          SnackBar(content: Text(l10n.addFriendRequestFailed(e.toString()))),
         );
         setState(() => loading = false);
       }
@@ -79,6 +81,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
@@ -94,7 +97,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      "Add Friend",
+                      l10n.addFriendTitle,
                       style: TextStyle(
                         color: scheme.onSurface,
                         fontSize: 22,
@@ -111,7 +114,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Find by username",
+                        l10n.addFriendFindByUsername,
                         style: TextStyle(
                           color: scheme.onSurface.withValues(alpha: 0.75),
                           fontWeight: FontWeight.w800,
@@ -128,7 +131,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                               color: scheme.onSurface, fontWeight: FontWeight.w800),
                           cursorColor: scheme.primary,
                           decoration: InputDecoration(
-                            hintText: "Type username…",
+                            hintText: l10n.addFriendUsernameHint,
                             hintStyle: TextStyle(
                                 color: scheme.onSurface.withValues(alpha: 0.45)),
                             border: InputBorder.none,
@@ -137,7 +140,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        "Tip: later we can support QR code + friend ID.",
+                        l10n.addFriendTip,
                         style: TextStyle(
                           color: scheme.onSurface.withValues(alpha: 0.55),
                           fontWeight: FontWeight.w700,
@@ -149,7 +152,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                 ),
                 const Spacer(),
                 NeonButton(
-                  label: loading ? "Sending..." : "Send Request",
+                  label: loading ? l10n.addFriendSending : l10n.addFriendSendRequest,
                   onTap: loading ? () {} : _send,
                 ),
               ],

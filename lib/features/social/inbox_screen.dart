@@ -16,19 +16,8 @@ class InboxScreen extends StatefulWidget {
 
 
 class _InboxScreenState extends State<InboxScreen> {
-  final String meId = "me"; // later: auth user id
   String query = "";
 
-  // Demo map: userId -> display name
-  final Map<String, String> idToName = const {
-    "1": "Mina",
-    "2": "Kenji",
-    "3": "Sara",
-    "4": "Diego",
-    "5": "Aisha",
-  };
-
-  @override
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);

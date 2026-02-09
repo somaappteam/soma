@@ -128,8 +128,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                       borderRadius: BorderRadius.circular(26),
                       onTap: valid
                           ? () {
-                              final id =
-                                  "solo_${speak.code}_${learn.code}_${DateTime.now().millisecondsSinceEpoch}";
+                              final id = "solo_${speak.code}_${learn.code}";
                               final course = SoloCourse(
                                 id: id,
                                 title: l10n.soloCourseTitle,

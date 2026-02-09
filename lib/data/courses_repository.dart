@@ -24,7 +24,7 @@ class CoursesRepository {
   Future<void> addCustomCourse(SoloCourse course) async {
     final uid = currentUserId;
     if (uid == null) {
-      if (!_customCourses.any((c) => c.id == course.id)) {
+      if (!_customCourses.any((c) => _isSameCourse(c, course))) {
         _customCourses.add(course);
       }
       _removedCourseIds.remove(course.id);
@@ -35,7 +35,7 @@ class CoursesRepository {
     try {
       final settings = await settingsRepository.getSettings();
       final customCourses = _parseCustomCourses(settings[_customCoursesKey]);
-      if (!customCourses.any((c) => c.id == course.id)) {
+      if (!customCourses.any((c) => _isSameCourse(c, course))) {
         customCourses.add(course);
       }
 
@@ -51,7 +51,7 @@ class CoursesRepository {
         _removedCoursesKey: removedIds.toList(),
       });
     } catch (e) {
-      if (!_customCourses.any((c) => c.id == course.id)) {
+      if (!_customCourses.any((c) => _isSameCourse(c, course))) {
         _customCourses.add(course);
       }
       _removedCourseIds.remove(course.id);
@@ -189,6 +189,31 @@ class CoursesRepository {
           .where((c) => !_removedCourseIds.contains(c.id))
           .toList();
     }
+  }
+
+  bool _isSameCourse(SoloCourse a, SoloCourse b) {
+    if (a.id == b.id) return true;
+    final aPair = _coursePairKey(a);
+    final bPair = _coursePairKey(b);
+    return aPair != null && aPair == bPair;
+  }
+
+  String? _coursePairKey(SoloCourse course) {
+    final idMatch = RegExp(r'^solo_([a-z]{2,})_([a-z]{2,})(?:_\d+)?$').firstMatch(course.id.toLowerCase());
+    if (idMatch != null) {
+      return '${idMatch.group(1)}->${idMatch.group(2)}';
+    }
+
+    final subtitleMatch = RegExp(r'^\s*(.*?)\s*→\s*(.*?)\s*$').firstMatch(course.subtitle);
+    if (subtitleMatch != null) {
+      final src = subtitleMatch.group(1)?.trim().toLowerCase();
+      final dst = subtitleMatch.group(2)?.trim().toLowerCase();
+      if ((src ?? '').isNotEmpty && (dst ?? '').isNotEmpty) {
+        return '$src->$dst';
+      }
+    }
+
+    return null;
   }
 
   List<SoloCourse> _parseCustomCourses(dynamic raw) {
