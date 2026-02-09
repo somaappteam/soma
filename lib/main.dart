@@ -13,6 +13,8 @@ import 'data/content_sync_service.dart';
 import 'data/settings_repository.dart';
 import 'core/services/session_tracker.dart';
 import 'core/services/theme_mode_controller.dart';
+import 'core/services/haptics_service.dart';
+import 'core/services/sfx_service.dart';
 import 'package:flutter/foundation.dart';
 
 enum SyncStatus { idle, syncing, error }
@@ -40,6 +42,8 @@ Future<void> main() async {
   }
 
   await themeModeController.load();
+  await hapticsService.init();
+  await sfxService.init();
   
   _runContentSync();
   runApp(const App());

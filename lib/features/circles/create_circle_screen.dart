@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
+import '../../core/widgets/premium_dialog.dart';
 import 'circle_lobby_screen.dart';
 import '../../core/theme/tokens.dart';
 import '../../data/circles_repository.dart';
@@ -57,7 +58,14 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                   _TopBar(
                     title: l10n.circlesCreateCircle,
                     onBack: () => Navigator.pop(context),
-                    onHelp: () {},
+                    onHelp: () async {
+                      await showPremiumDialog(
+                        context: context,
+                        title: l10n.circlesCreateHelpTitle,
+                        body: l10n.circlesCreateHelpBody,
+                        confirmText: l10n.ok,
+                      );
+                    },
                   ),
 
                   const SizedBox(height: 14),
@@ -80,7 +88,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 12),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16),
-                                  color: Colors.black.withValues(alpha: 0.12),
+                                  color: T.fieldFill,
                                   border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
                                 ),
                                 child: TextField(
@@ -161,7 +169,6 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                   Expanded(
                                     child: _LevelChip(
                                       label: l10n.levelBeginner,
-                                      code: "A",
                                       selected: level == "A",
                                       onTap: () => setState(() => level = "A"),
                                     ),
@@ -170,7 +177,6 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                   Expanded(
                                     child: _LevelChip(
                                       label: l10n.levelIntermediate,
-                                      code: "B",
                                       selected: level == "B",
                                       onTap: () => setState(() => level = "B"),
                                     ),
@@ -179,7 +185,6 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                   Expanded(
                                     child: _LevelChip(
                                       label: l10n.levelAdvanced,
-                                      code: "C",
                                       selected: level == "C",
                                       onTap: () => setState(() => level = "C"),
                                     ),
@@ -254,7 +259,16 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                         // Create button
                         NeonButton(
                           label: l10n.circlesCreateCircle,
-                          onTap: !canCreate ? null : () async {
+                          onTap: () async {
+                            if (!canCreate) {
+                              await showPremiumDialog(
+                                context: context,
+                                title: l10n.circlesCircleName,
+                                body: l10n.circlesEnterName,
+                                confirmText: l10n.ok,
+                              );
+                              return;
+                            }
                             try {
                               // Fetch questions from Supabase-backed CSV tables
                               String courseId = "$speakLang-$learnLang"; 
@@ -582,13 +596,11 @@ class _SegButton extends StatelessWidget {
 
 class _LevelChip extends StatelessWidget {
   final String label;
-  final String code;
   final bool selected;
   final VoidCallback onTap;
 
   const _LevelChip({
     required this.label,
-    required this.code,
     required this.selected,
     required this.onTap,
   });
@@ -612,21 +624,12 @@ class _LevelChip extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              code,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.95),
-                fontWeight: FontWeight.w900,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
               label,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.70),
-                fontWeight: FontWeight.w700,
-                fontSize: 11.5,
+                color: Colors.white.withValues(alpha: 0.92),
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
               ),
             ),
           ],
@@ -878,7 +881,7 @@ Future<LangOption?> _pickFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
-                            color: Colors.black.withValues(alpha: 0.12),
+                            color: T.fieldFill,
                             border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
                           ),
                           child: TextField(

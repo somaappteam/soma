@@ -85,7 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         builder: (_) => DmChatScreen(
           meId: meId,
           otherId: otherId,
-          otherName: profile.displayName.isNotEmpty ? profile.displayName : profile.username,
+          otherName: profile.username,
         ),
       ),
     );
@@ -184,6 +184,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onBack: _isVisitorView && Navigator.canPop(context)
                       ? () => Navigator.pop(context)
                       : null,
+                  onLeaderboard: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
+                    );
+                  },
                   onSettings: _isVisitorView
                       ? null
                       : () {
@@ -261,8 +267,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 class _TopBar extends StatelessWidget {
   final VoidCallback? onSettings;
   final VoidCallback? onBack;
+  final VoidCallback? onLeaderboard;
   final String title;
-  const _TopBar({this.onSettings, this.onBack, this.title = ""});
+  const _TopBar({
+    this.onSettings,
+    this.onBack,
+    this.onLeaderboard,
+    this.title = "",
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -288,6 +300,10 @@ class _TopBar extends StatelessWidget {
           ),
         ),
         const Spacer(),
+        if (onLeaderboard != null) ...[
+          _LeaderboardButton(onTap: onLeaderboard!),
+          const SizedBox(width: S.xs),
+        ],
         if (onSettings != null)
           _IconGlassButton(
             icon: Icons.settings_rounded,
@@ -314,7 +330,6 @@ class _GuestProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final displayName = profile.displayName.isNotEmpty ? profile.displayName : l10n.guestDisplayName;
     final username = profile.username.isNotEmpty ? profile.username : l10n.guestUsername;
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -325,7 +340,16 @@ class _GuestProfileView extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
             child: Column(
               children: [
-                _TopBar(onSettings: onSettings, title: l10n.profileTitle),
+                _TopBar(
+                  onSettings: onSettings,
+                  onLeaderboard: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
+                    );
+                  },
+                  title: l10n.profileTitle,
+                ),
                 const SizedBox(height: S.sm),
                 Expanded(
                   child: ListView(
@@ -345,14 +369,6 @@ class _GuestProfileView extends StatelessWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    displayName,
-                                    style: textTheme.titleLarge?.copyWith(
-                                      color: scheme.onSurface,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                  const SizedBox(height: S.xxs),
                                   Text(
                                     "@$username • ${l10n.guestSessionLabel}",
                                     style: textTheme.bodySmall?.copyWith(
@@ -518,15 +534,7 @@ class _HeaderCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      profile.displayName,
-                      style: textTheme.titleLarge?.copyWith(
-                        color: scheme.onSurface,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: S.xxs),
-                    Text(
-                      "@${profile.username} • ${profile.bio}",
+                      "@${profile.username}${profile.bio.isNotEmpty ? " • ${profile.bio}" : ""}",
                       style: textTheme.bodySmall?.copyWith(
                         color: scheme.onSurface.withValues(alpha: 0.65),
                         fontWeight: FontWeight.w600,
@@ -1218,6 +1226,37 @@ class _IconGlassButton extends StatelessWidget {
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(S.xs),
         child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.9)),
+      ),
+    );
+  }
+}
+
+class _LeaderboardButton extends StatelessWidget {
+  final VoidCallback onTap;
+  const _LeaderboardButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Glass(
+        radius: BorderRadius.circular(18),
+        padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.xs),
+        child: Row(
+          children: [
+            Icon(Icons.emoji_events_rounded, color: scheme.onSurface, size: 18),
+            const SizedBox(width: 6),
+            Text(
+              l10n.leaderboardGlobalTitle,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+          ],
+        ),
       ),
     );
   }

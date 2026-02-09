@@ -141,10 +141,13 @@ class CoursesRepository {
           .eq('user_id', uid);
       
       final Map<String, int> xpMap = {};
+      final Map<String, DateTime?> lastAccessedMap = {};
       for (final row in response) {
         final cid = row['course_id'] as String;
         final xp = row['progress_xp'] as int;
         xpMap[cid] = xp;
+        final lastAccessedRaw = row['last_accessed']?.toString();
+        lastAccessedMap[cid] = lastAccessedRaw != null ? DateTime.tryParse(lastAccessedRaw) : null;
         // Cache progress in SQLite
         await _dbHelper.upsertUserCourse({
           'user_id': uid,
@@ -160,6 +163,8 @@ class CoursesRepository {
         final cid = row['course_id'] as String;
         if (!xpMap.containsKey(cid)) {
           xpMap[cid] = row['progress_xp'] as int;
+          final lastAccessedRaw = row['last_accessed']?.toString();
+          lastAccessedMap[cid] = lastAccessedRaw != null ? DateTime.tryParse(lastAccessedRaw) : null;
         }
       }
 
@@ -173,7 +178,8 @@ class CoursesRepository {
           .map((c) {
             final isCustom = customIds.contains(c.id);
             final xp = isCustom ? (customProgress[c.id] ?? c.xp) : (xpMap[c.id] ?? c.xp);
-            return c.copyWith(xp: xp);
+            final lastAccessed = isCustom ? null : lastAccessedMap[c.id];
+            return c.copyWith(xp: xp, lastAccessed: lastAccessed);
           })
           .toList();
 

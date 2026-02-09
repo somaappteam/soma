@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import '../../core/services/haptics_service.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
@@ -13,6 +13,7 @@ import 'solo_course_detail_screen.dart';
 import '../../data/quiz_repository.dart';
 import '../../core/services/tts_service.dart';
 import '../../core/theme/motion.dart';
+import '../../data/settings_repository.dart';
 
 class SoloVocabQuizScreen extends StatefulWidget {
   const SoloVocabQuizScreen({
@@ -73,12 +74,21 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
   void initState() {
     super.initState();
     remaining = widget.timePerQuestion ?? 0;
+    _loadSettings();
     if (widget.reviewQuestions != null && widget.reviewQuestions!.isNotEmpty) {
       questions = widget.reviewQuestions!;
       _prepareQuestion();
       _startTimer();
     } else {
       _loadQuestions();
+    }
+  }
+
+  Future<void> _loadSettings() async {
+    final settings = await settingsRepository.getSettings();
+    final readingSetting = settings['show_reading'];
+    if (readingSetting is bool && mounted) {
+      setState(() => showReading = readingSetting);
     }
   }
 
@@ -158,10 +168,10 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
     final ok = !timedOut && selected == _correctIndex;
     if (ok) {
       correctCount++;
-      HapticFeedback.mediumImpact();
+      hapticsService.mediumImpact();
     } else {
       mistakes.add(q);
-      HapticFeedback.lightImpact();
+      hapticsService.lightImpact();
     }
     quizRepository.recordVocabAnswer(
       courseId: widget.course.id,

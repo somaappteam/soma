@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
+import '../../core/theme/tokens.dart';
 import '../../models/solo_course.dart';
 import '../../core/widgets/responsive.dart';
 
@@ -317,7 +318,9 @@ Future<LangOption?> _pickLanguage(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
-                            color: scheme.onSurface.withValues(alpha: 0.1),
+                            color: Theme.of(context).brightness == Brightness.light
+                                ? scheme.onSurface.withValues(alpha: 0.08)
+                                : T.fieldFill,
                             border: Border.all(
                                 color: scheme.onSurface.withValues(alpha: 0.2)),
                           ),

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import '../../core/services/haptics_service.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
@@ -13,6 +13,7 @@ import 'solo_course_detail_screen.dart';
 import '../../data/quiz_repository.dart';
 import '../../core/services/tts_service.dart';
 import '../../core/theme/motion.dart';
+import '../../data/settings_repository.dart';
 
 class SoloSentencesQuizScreen extends StatefulWidget {
   const SoloSentencesQuizScreen({
@@ -62,6 +63,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
   int? selected;
   bool revealed = false;
   bool showReading = true;
+  bool showTranslation = true;
   List<String> _choices = [];
   int _correctIndex = 0;
   String _prompt = '';
@@ -76,6 +78,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
   void initState() {
     super.initState();
     remaining = widget.timePerQuestion ?? 0;
+    _loadSettings();
     if (widget.reviewQuestions != null && widget.reviewQuestions!.isNotEmpty) {
       questions = widget.reviewQuestions!;
       _prepareQuestion();
@@ -83,6 +86,17 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     } else {
       _loadQuestions();
     }
+  }
+
+  Future<void> _loadSettings() async {
+    final settings = await settingsRepository.getSettings();
+    final readingSetting = settings['show_reading'];
+    final translationSetting = settings['show_translation'];
+    if (!mounted) return;
+    setState(() {
+      if (readingSetting is bool) showReading = readingSetting;
+      if (translationSetting is bool) showTranslation = translationSetting;
+    });
   }
 
   Future<void> _loadQuestions() async {
@@ -160,10 +174,10 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
 
     if (ok) {
       correctCount++;
-      HapticFeedback.mediumImpact();
+      hapticsService.mediumImpact();
     } else {
       mistakes.add(q);
-      HapticFeedback.lightImpact();
+      hapticsService.lightImpact();
     }
 
     setState(() {
@@ -460,15 +474,17 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                             fontWeight: FontWeight.w600),
                       ),
                     ],
-                    const SizedBox(height: 10),
-                    Text(
-                      q["translation"],
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: scheme.onSurface.withValues(alpha: 0.80),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700),
-                    ),
+                    if (showTranslation) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        q["translation"],
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: scheme.onSurface.withValues(alpha: 0.80),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ],
                   ],
                 ),
               ),

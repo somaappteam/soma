@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
+import '../../core/widgets/premium_dialog.dart';
 import '../../data/settings_repository.dart';
 import '../../core/widgets/responsive.dart';
 
@@ -246,21 +247,19 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
 
   void _confirmDelete(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    showModalBottomSheet(
+    showPremiumDialog(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => _ConfirmSheet(
-        title: l10n.privacyDeleteConfirmTitle,
-        body: l10n.privacyDeleteConfirmBody,
-        confirmText: l10n.delete,
-        onConfirm: () {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.privacyDeleteComingSoon)),
-          );
-        },
-      ),
-    );
+      title: l10n.privacyDeleteConfirmTitle,
+      body: l10n.privacyDeleteConfirmBody,
+      confirmText: l10n.delete,
+      cancelText: l10n.cancel,
+      destructive: true,
+    ).then((confirmed) {
+      if (confirmed != true) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.privacyDeleteComingSoon)),
+      );
+    });
   }
 }
 
@@ -569,81 +568,6 @@ class _InfoSheet extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Text(l10n.ok, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14)),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ConfirmSheet extends StatelessWidget {
-  final String title;
-  final String body;
-  final String confirmText;
-  final VoidCallback onConfirm;
-
-  const _ConfirmSheet({
-    required this.title,
-    required this.body,
-    required this.confirmText,
-    required this.onConfirm,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      child: Glass(
-        radius: BorderRadius.circular(24),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 16)),
-            const SizedBox(height: 8),
-            Text(body, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70), fontWeight: FontWeight.w700, height: 1.2)),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(999),
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      height: 46,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(999),
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
-                        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(l10n.cancel,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14)),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(999),
-                    onTap: onConfirm,
-                    child: Container(
-                      height: 46,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(999),
-                        color: Theme.of(context).colorScheme.error.withValues(alpha: 0.22),
-                        border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.12)),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(confirmText,
-                          style: TextStyle(color: Theme.of(context).colorScheme.error, fontWeight: FontWeight.w900, fontSize: 14)),
-                    ),
-                  ),
-                ),
-              ],
             ),
           ],
         ),

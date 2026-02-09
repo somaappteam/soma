@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import '../../core/services/haptics_service.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
@@ -15,6 +15,7 @@ import '../../data/courses_repository.dart';
 import '../../data/notifications_repository.dart';
 import '../../data/notifications_store.dart';
 import '../../data/auth_repository.dart';
+import '../../data/settings_repository.dart';
 import '../../core/theme/motion.dart';
 import '../../core/widgets/responsive.dart';
 import '../../core/theme/spacing.dart';
@@ -34,12 +35,14 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<List<SoloCourse>> _coursesFuture;
   bool _isEditingCourses = false;
   int _coursesRevision = 0;
+  bool _isFirstVisit = false;
 
   @override
   void initState() {
     super.initState();
     // Load profile data
     profileStore.load();
+    _loadWelcomeState();
     _coursesRevision = coursesRepository.revision;
     _reloadCourses();
   }
@@ -48,6 +51,17 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _coursesFuture = coursesRepository.getUserCourses();
     });
+  }
+
+  Future<void> _loadWelcomeState() async {
+    if (authRepository.currentUser == null) return;
+    final settings = await settingsRepository.getSettings();
+    final hasSeenHome = settings['has_seen_home'] == true;
+    if (!mounted) return;
+    setState(() => _isFirstVisit = !hasSeenHome);
+    if (!hasSeenHome) {
+      await settingsRepository.updateSetting('has_seen_home', true);
+    }
   }
 
   void _syncCoursesIfNeeded() {
@@ -105,8 +119,12 @@ class _HomeScreenState extends State<HomeScreen> {
           child: AnimatedBuilder(
             animation: profileStore,
             builder: (_, __) {
+              final name = profileStore.profile.username.isNotEmpty
+                  ? profileStore.profile.username
+                  : l10n.guestUsername;
+              final greeting = _isFirstVisit ? l10n.welcome(name) : l10n.welcomeBack(name);
               return Text(
-                l10n.welcomeBack(profileStore.profile.displayName),
+                greeting,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: scheme.onBackground,
                       fontWeight: FontWeight.w800,
@@ -118,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
         InkWell(
           borderRadius: BorderRadius.circular(10),
           onTap: () {
-            HapticFeedback.selectionClick();
+            hapticsService.selectionClick();
             setState(() => _isEditingCourses = !editing);
           },
           child: Padding(
@@ -163,6 +181,8 @@ class _HomeScreenState extends State<HomeScreen> {
         final fallback = l10n.unknown;
         final fromLang = parts.isNotEmpty ? parts.first.trim() : fallback;
         final toLang = parts.length > 1 ? parts[1].trim() : fallback;
+        final progress = _progressForCourse(c.xp);
+        final timeLabel = _formatElapsed(c.lastAccessed);
 
         return _StaggeredIn(
           index: i,
@@ -170,7 +190,8 @@ class _HomeScreenState extends State<HomeScreen> {
             fromLang: fromLang,
             toLang: toLang,
             xp: c.xp,
-            time: "00:00:00",
+            time: timeLabel,
+            progress: progress,
             heroTag: "course-card-${c.id}",
             onTap: editing
                 ? null
@@ -187,6 +208,20 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
+  }
+
+  double _progressForCourse(int xp) {
+    const maxXp = 1000;
+    return (xp / maxXp).clamp(0.0, 1.0);
+  }
+
+  String _formatElapsed(DateTime? lastAccessed) {
+    if (lastAccessed == null) return "00:00:00";
+    final diff = DateTime.now().difference(lastAccessed);
+    final hours = diff.inHours;
+    final minutes = diff.inMinutes.remainder(60);
+    final seconds = diff.inSeconds.remainder(60);
+    return "${hours.toString().padLeft(2, "0")}:${minutes.toString().padLeft(2, "0")}:${seconds.toString().padLeft(2, "0")}";
   }
 
   @override
@@ -419,6 +454,7 @@ class CourseCard extends StatelessWidget {
   final String toLang;
   final int xp;
   final String time;
+  final double progress;
   final String? heroTag;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
@@ -430,6 +466,7 @@ class CourseCard extends StatelessWidget {
     required this.toLang,
     required this.xp,
     required this.time,
+    required this.progress,
     this.heroTag,
     this.onTap,
     this.onDelete,
@@ -489,7 +526,7 @@ class CourseCard extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: FractionallySizedBox(
-                    widthFactor: 0.62,
+                    widthFactor: progress,
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(999),

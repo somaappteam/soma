@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/widgets/glass.dart';
+import '../../core/theme/tokens.dart';
 import '../../data/settings_repository.dart';
 import '../../data/auth_repository.dart';
 import '../../data/session_repository.dart';
@@ -831,7 +832,9 @@ class _Input extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+        color: Theme.of(context).brightness == Brightness.light
+            ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+            : T.fieldFill,
         border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
