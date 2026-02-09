@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
@@ -16,6 +17,7 @@ import '../../data/circle_voice_service.dart';
 import '../../data/profile_store.dart';
 import '../../data/agora_voice_service.dart';
 import '../../data/quiz_repository.dart';
+import '../../data/languages.dart';
 import '../profile/profile_screen.dart';
 
 class CircleLobbyScreen extends StatefulWidget {
@@ -34,6 +36,14 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   bool _hasNavigated = false;
   StreamSubscription<Map<String, VoicePresence>>? _voiceSub;
   StreamSubscription<Map<String, dynamic>>? _circleSub;
+  bool _editingLobbySettings = false;
+  bool _savingLobbySettings = false;
+  String _editSpeakLang = '';
+  String _editLearnLang = '';
+  String _editMode = '';
+  String _editLevel = '';
+  int _editQuestions = 0;
+  int _editTimePerQ = 0;
 
   String? get _myRole {
     final uid = circlesRepository.currentUserId;
@@ -187,6 +197,369 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
         _toast(context, l10n.circlesEndCircleFailed(e.toString()));
       }
     }
+  }
+
+  Future<void> _openLobbyActionsSheet() async {
+    final l10n = AppLocalizations.of(context);
+    if (!mounted) return;
+    await showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return Glass(
+          radius: const BorderRadius.vertical(top: Radius.circular(24)),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    l10n.circlesLobbyTitle,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const Spacer(),
+                  _IconGlassButton(
+                    icon: Icons.close_rounded,
+                    onTap: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              if (isHost) ...[
+                _LobbyActionTile(
+                  icon: Icons.person_add_alt_1_rounded,
+                  title: l10n.circlesInvite,
+                  subtitle: l10n.circlesInviteByUsername,
+                  onTap: () {
+                    Navigator.pop(context);
+                    _inviteByUsername();
+                  },
+                ),
+                const SizedBox(height: 10),
+              ],
+              _LobbyActionTile(
+                icon: Icons.copy_rounded,
+                title: l10n.circlesCopyId,
+                subtitle: l10n.circlesShareId(widget.circleId),
+                onTap: () async {
+                  await Clipboard.setData(ClipboardData(text: widget.circleId));
+                  if (!mounted) return;
+                  Navigator.pop(context);
+                  _toast(context, l10n.circlesCopiedId);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _toggleRoomLock(bool value) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      await circlesRepository.updateCircleLock(widget.circleId, value);
+      if (!mounted) return;
+      setState(() {
+        circleData = {
+          ...?circleData,
+          'is_locked': value,
+        };
+      });
+      _toast(
+        context,
+        value ? l10n.circlesRoomLocked : l10n.circlesRoomUnlocked,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.circlesUpdateFailed(e.toString()))),
+      );
+    }
+  }
+
+  void _beginLobbySettingsEdit() {
+    if (circleData == null) return;
+    setState(() {
+      _editingLobbySettings = true;
+      _editSpeakLang = circleData?['from_lang']?.toString() ?? 'en';
+      _editLearnLang = circleData?['to_lang']?.toString() ?? 'es';
+      _editMode = circleData?['mode']?.toString() ?? 'Vocabulary';
+      _editLevel = circleData?['level']?.toString() ?? 'A';
+      _editQuestions = circleData?['questions_count'] ?? 10;
+      _editTimePerQ = circleData?['time_per_q'] ?? 10;
+    });
+  }
+
+  void _cancelLobbySettingsEdit() {
+    setState(() {
+      _editingLobbySettings = false;
+      _savingLobbySettings = false;
+    });
+  }
+
+  Future<void> _saveLobbySettingsEdit() async {
+    final l10n = AppLocalizations.of(context);
+    if (_savingLobbySettings) return;
+    setState(() => _savingLobbySettings = true);
+    try {
+      await circlesRepository.updateCircleMatchSettings(
+        circleId: widget.circleId,
+        fromLang: _editSpeakLang,
+        toLang: _editLearnLang,
+        mode: _editMode,
+        level: _editLevel,
+        questionsCount: _editQuestions,
+        timePerQ: _editTimePerQ,
+      );
+
+      final courseId = "${_editSpeakLang}-${_editLearnLang}";
+      List<Map<String, dynamic>> newQuestions = [];
+      if (_editMode == "Vocabulary") {
+        newQuestions = await quizRepository.getVocabQuestionsFromSupabase(
+          courseId,
+          _editQuestions,
+        );
+      } else {
+        newQuestions = await quizRepository.getSentenceQuestionsFromSupabase(
+          courseId,
+          _editQuestions,
+        );
+      }
+
+      if (newQuestions.isEmpty) {
+        throw Exception("No questions found for $courseId.");
+      }
+
+      if (newQuestions.isNotEmpty) {
+        await circlesRepository.updateCircleQuestions(
+          widget.circleId,
+          newQuestions,
+        );
+      }
+
+      if (!mounted) return;
+      setState(() {
+        circleData = {
+          ...?circleData,
+          'from_lang': _editSpeakLang,
+          'to_lang': _editLearnLang,
+          'mode': _editMode,
+          'level': _editLevel,
+          'questions_count': _editQuestions,
+          'time_per_q': _editTimePerQ,
+          'questions': newQuestions,
+        };
+        _editingLobbySettings = false;
+      });
+      _toast(context, l10n.circlesSettingsSaved);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.circlesUpdateFailed(e.toString()))),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _savingLobbySettings = false);
+      }
+    }
+  }
+
+  Future<void> _toggleLobbySettingsEdit() async {
+    if (_editingLobbySettings) {
+      await _saveLobbySettingsEdit();
+    } else {
+      _beginLobbySettingsEdit();
+    }
+  }
+
+  String _languageName(String code) {
+    return kLanguages.firstWhere(
+      (l) => l.code == code,
+      orElse: () => kLanguages.first,
+    ).name;
+  }
+
+  Future<LangOption?> _pickLanguage({
+    required String title,
+    required String currentCode,
+  }) async {
+    return showModalBottomSheet<LangOption>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) {
+        String query = "";
+        bool showSearch = false;
+        final searchFocus = FocusNode();
+
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final normalized = query.trim().toLowerCase();
+            final filtered = normalized.isEmpty
+                ? kLanguages
+                : kLanguages
+                    .where((e) =>
+                        e.name.toLowerCase().contains(normalized) ||
+                        e.code.toLowerCase().contains(normalized))
+                    .toList();
+            final current = kLanguages.firstWhere(
+              (l) => l.code == currentCode,
+              orElse: () => kLanguages.first,
+            );
+            final maxHeight = MediaQuery.of(context).size.height * 0.75;
+
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                child: Glass(
+                  radius: BorderRadius.circular(26),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                  child: SizedBox(
+                    height: maxHeight,
+                    child: ListView(
+                      physics: const BouncingScrollPhysics(),
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 16,
+                              ),
+                            ),
+                            const Spacer(),
+                            IconButton(
+                              onPressed: () {
+                                final nextShow = !showSearch;
+                                setModalState(() {
+                                  showSearch = nextShow;
+                                  if (!nextShow) query = "";
+                                });
+                                if (nextShow) {
+                                  Future.delayed(
+                                    Duration.zero,
+                                    () => searchFocus.requestFocus(),
+                                  );
+                                }
+                              },
+                              icon: Icon(
+                                showSearch
+                                    ? Icons.search_off_rounded
+                                    : Icons.search_rounded,
+                                color: Colors.white.withValues(alpha: 0.85),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              icon: Icon(Icons.close_rounded,
+                                  color: Colors.white.withValues(alpha: 0.85)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        if (showSearch) ...[
+                          Container(
+                            height: 44,
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(14),
+                              color: T.fieldFill,
+                              border: Border.all(
+                                  color: Colors.white.withValues(alpha: 0.12)),
+                            ),
+                            child: TextField(
+                              focusNode: searchFocus,
+                              onChanged: (v) =>
+                                  setModalState(() => query = v),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700),
+                              cursorColor: Colors.white,
+                              textInputAction: TextInputAction.search,
+                              decoration: InputDecoration(
+                                hintText: "Search language",
+                                hintStyle: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.5)),
+                                border: InputBorder.none,
+                                prefixIcon: Icon(Icons.search_rounded,
+                                    color:
+                                        Colors.white.withValues(alpha: 0.7)),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                        ],
+                        if (filtered.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 6),
+                            child: Text(
+                              "No matches",
+                              style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.7),
+                                  fontWeight: FontWeight.w700),
+                            ),
+                          )
+                        else
+                          ...filtered.map((e) {
+                            final selected = e.code == current.code;
+                            return InkWell(
+                              borderRadius: BorderRadius.circular(16),
+                              onTap: () => Navigator.pop(ctx, e),
+                              child: Container(
+                                height: 52,
+                                margin: const EdgeInsets.only(bottom: 10),
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 14),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: selected
+                                      ? Colors.white.withValues(alpha: 0.10)
+                                      : Colors.black.withValues(alpha: 0.10),
+                                  border: Border.all(
+                                    color: selected
+                                        ? Colors.white.withValues(alpha: 0.26)
+                                        : Colors.white.withValues(alpha: 0.10),
+                                  ),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        e.name,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                    ),
+                                    if (selected)
+                                      Icon(Icons.check_rounded,
+                                          color:
+                                              Colors.white.withValues(alpha: 0.9)),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   bool _isMutedFor(String userId) =>
@@ -619,7 +992,9 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
         final isSpeaking = userId != null ? _isSpeakingFor(userId) : false;
 
         displayPlayers.add(PlayerSlot(
-          name: profile?['display_name'] ?? l10n.loading,
+          name: profile?['display_name'] ??
+              profile?['username'] ??
+              l10n.loading,
           isHost: role == 'host',
           isReady: isPReady,
           score: 0,
@@ -667,7 +1042,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                         _handleHostExit();
                       },
                       onShare: () {
-                        _toast(context, l10n.circlesShareId(widget.circleId));
+                        _openLobbyActionsSheet();
                       },
                     ),
                     const SizedBox(height: 14),
@@ -688,21 +1063,57 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: _PillInfo(
-                                        icon: Icons.translate_rounded,
-                                        title:
-                                            "${circleData!['from_lang']} → ${circleData!['to_lang']}",
-                                        subtitle: l10n.circlesLanguages,
-                                      ),
+                                      child: _editingLobbySettings
+                                          ? _EditableSelectTile(
+                                              label: l10n.iSpeak,
+                                              value:
+                                                  _languageName(_editSpeakLang),
+                                              icon: Icons.record_voice_over_rounded,
+                                              onTap: () async {
+                                                final next =
+                                                    await _pickLanguage(
+                                                  title: l10n.chooseYourLanguage,
+                                                  currentCode: _editSpeakLang,
+                                                );
+                                                if (next != null) {
+                                                  setState(() => _editSpeakLang =
+                                                      next.code);
+                                                }
+                                              },
+                                            )
+                                          : _PillInfo(
+                                              icon: Icons.translate_rounded,
+                                              title:
+                                                  "${circleData!['from_lang']} → ${circleData!['to_lang']}",
+                                              subtitle: l10n.circlesLanguages,
+                                            ),
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(
-                                      child: _PillInfo(
-                                        icon:
-                                            Icons.local_fire_department_rounded,
-                                        title: modeLabel,
-                                        subtitle: l10n.circlesModeTitle,
-                                      ),
+                                      child: _editingLobbySettings
+                                          ? _EditableSelectTile(
+                                              label: l10n.iWantToLearn,
+                                              value:
+                                                  _languageName(_editLearnLang),
+                                              icon: Icons.translate_rounded,
+                                              onTap: () async {
+                                                final next =
+                                                    await _pickLanguage(
+                                                  title: l10n.chooseLearningLanguage,
+                                                  currentCode: _editLearnLang,
+                                                );
+                                                if (next != null) {
+                                                  setState(() => _editLearnLang =
+                                                      next.code);
+                                                }
+                                              },
+                                            )
+                                          : _PillInfo(
+                                              icon:
+                                                  Icons.local_fire_department_rounded,
+                                              title: modeLabel,
+                                              subtitle: l10n.circlesModeTitle,
+                                            ),
                                     ),
                                   ],
                                 ),
@@ -711,34 +1122,81 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: _PillInfo(
-                                        icon: Icons.stacked_bar_chart_rounded,
-                                        title: l10n
-                                            .circlesLevelWithValue(levelLabel),
-                                        subtitle: l10n.circlesDifficulty,
-                                      ),
+                                      child: _editingLobbySettings
+                                          ? _ModeToggle(
+                                              leftLabel: l10n.soloModeVocabulary,
+                                              leftValue: "Vocabulary",
+                                              rightLabel: l10n.soloModeSentences,
+                                              rightValue: "Sentences",
+                                              value: _editMode,
+                                              onChanged: (value) =>
+                                                  setState(() => _editMode =
+                                                      value),
+                                            )
+                                          : _PillInfo(
+                                              icon: Icons.stacked_bar_chart_rounded,
+                                              title: l10n
+                                                  .circlesLevelWithValue(levelLabel),
+                                              subtitle: l10n.circlesDifficulty,
+                                            ),
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(
-                                      child: _PillInfo(
-                                        icon: Icons.help_outline_rounded,
-                                        title: l10n.questionsShort(
-                                            circleData!['questions_count'] ??
-                                                0),
-                                        subtitle: l10n.circlesQuestions,
-                                      ),
+                                      child: _editingLobbySettings
+                                          ? _LevelPicker(
+                                              level: _editLevel,
+                                              onChanged: (value) =>
+                                                  setState(() => _editLevel =
+                                                      value),
+                                            )
+                                          : _PillInfo(
+                                              icon: Icons.help_outline_rounded,
+                                              title: l10n.questionsShort(
+                                                  circleData!['questions_count'] ??
+                                                      0),
+                                              subtitle: l10n.circlesQuestions,
+                                            ),
                                     ),
                                     const SizedBox(width: 10),
                                     Expanded(
-                                      child: _PillInfo(
-                                        icon: Icons.timer_rounded,
-                                        title: l10n.secondsShort(
-                                            circleData!['time_per_q'] ?? 0),
-                                        subtitle: l10n.circlesPerQuestionShort,
-                                      ),
+                                      child: _editingLobbySettings
+                                          ? _HostSettingRow(
+                                              title: l10n.circlesQuestions,
+                                              value: "$_editQuestions",
+                                              onMinus: _editQuestions > 5
+                                                  ? () => setState(() =>
+                                                      _editQuestions -= 5)
+                                                  : null,
+                                              onPlus: _editQuestions < 50
+                                                  ? () => setState(() =>
+                                                      _editQuestions += 5)
+                                                  : null,
+                                            )
+                                          : _PillInfo(
+                                              icon: Icons.timer_rounded,
+                                              title: l10n.secondsShort(
+                                                  circleData!['time_per_q'] ?? 0),
+                                              subtitle: l10n.circlesPerQuestionShort,
+                                            ),
                                     ),
                                   ],
                                 ),
+
+                                if (_editingLobbySettings) ...[
+                                  const SizedBox(height: 10),
+                                  _HostSettingRow(
+                                    title: l10n.circlesTimePerQuestion,
+                                    value: l10n.secondsShort(_editTimePerQ),
+                                    onMinus: _editTimePerQ > 5
+                                        ? () => setState(() =>
+                                            _editTimePerQ -= 1)
+                                        : null,
+                                    onPlus: _editTimePerQ < 60
+                                        ? () => setState(() =>
+                                            _editTimePerQ += 1)
+                                        : null,
+                                  ),
+                                ],
 
                                 const SizedBox(height: 14),
 
@@ -770,10 +1228,12 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
                                 if (isHost)
                                   _HostControlsRow(
-                                    roomLocked:
-                                        false, // TODO: implement lock in schema
-                                    onToggleLock: (v) {},
-                                    onEdit: () {},
+                                    roomLocked: circleData?['is_locked'] ?? false,
+                                    isEditing: _editingLobbySettings,
+                                    isSaving: _savingLobbySettings,
+                                    onToggleLock: _toggleRoomLock,
+                                    onEdit: _toggleLobbySettingsEdit,
+                                    onCancel: _cancelLobbySettingsEdit,
                                   )
                                 else if (isSpectator)
                                   _SpectatorTip()
@@ -1326,6 +1786,288 @@ class _PillInfo extends StatelessWidget {
   }
 }
 
+class _EditableSelectTile extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _EditableSelectTile({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: onTap,
+      child: Container(
+        height: 64,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          color: Theme.of(context).brightness == Brightness.light
+              ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.12),
+          border: Border.all(
+              color:
+                  Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
+                size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.65),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    value,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.expand_more_rounded,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.65)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ModeToggle extends StatelessWidget {
+  final String leftLabel;
+  final String leftValue;
+  final String rightLabel;
+  final String rightValue;
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  const _ModeToggle({
+    required this.leftLabel,
+    required this.leftValue,
+    required this.rightLabel,
+    required this.rightValue,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 64,
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        color: Theme.of(context).brightness == Brightness.light
+            ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+            : Colors.black.withValues(alpha: 0.14),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _ModeChip(
+              label: leftLabel,
+              selected: value == leftValue,
+              onTap: () => onChanged(leftValue),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: _ModeChip(
+              label: rightLabel,
+              selected: value == rightValue,
+              onTap: () => onChanged(rightValue),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ModeChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ModeChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = selected
+        ? const Color(0xFF2AFADF)
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65);
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: selected
+              ? T.neonA.withValues(alpha: 0.2)
+              : Colors.transparent,
+          border: Border.all(
+            color: selected
+                ? T.neonA.withValues(alpha: 0.45)
+                : Colors.transparent,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: color,
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LevelPicker extends StatelessWidget {
+  final String level;
+  final ValueChanged<String> onChanged;
+
+  const _LevelPicker({
+    required this.level,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Container(
+      height: 64,
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        color: Theme.of(context).brightness == Brightness.light
+            ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+            : Colors.black.withValues(alpha: 0.14),
+        border: Border.all(
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _LevelChip(
+              label: l10n.levelBeginner,
+              selected: level == 'A',
+              onTap: () => onChanged('A'),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: _LevelChip(
+              label: l10n.levelIntermediate,
+              selected: level == 'B',
+              onTap: () => onChanged('B'),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: _LevelChip(
+              label: l10n.levelAdvanced,
+              selected: level == 'C',
+              onTap: () => onChanged('C'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LevelChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _LevelChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: selected
+              ? T.neonA.withValues(alpha: 0.2)
+              : Colors.transparent,
+          border: Border.all(
+            color: selected
+                ? T.neonA.withValues(alpha: 0.45)
+                : Colors.transparent,
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: selected
+                  ? const Color(0xFF2AFADF)
+                  : Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.65),
+              fontWeight: FontWeight.w800,
+              fontSize: 11.5,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _QuickAction extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -1371,15 +2113,148 @@ class _QuickAction extends StatelessWidget {
   }
 }
 
+class _LobbyActionTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _LobbyActionTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          color: Colors.black.withValues(alpha: 0.12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.65),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded,
+                color: Colors.white.withValues(alpha: 0.6)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _HostSettingRow extends StatelessWidget {
+  final String title;
+  final String value;
+  final VoidCallback? onMinus;
+  final VoidCallback? onPlus;
+
+  const _HostSettingRow({
+    required this.title,
+    required this.value,
+    required this.onMinus,
+    required this.onPlus,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        color: Colors.black.withValues(alpha: 0.12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: onMinus,
+            icon: Icon(
+              Icons.remove_circle_outline_rounded,
+              color: onMinus == null
+                  ? Colors.white.withValues(alpha: 0.3)
+                  : Colors.white,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
+              fontSize: 14,
+            ),
+          ),
+          IconButton(
+            onPressed: onPlus,
+            icon: Icon(
+              Icons.add_circle_outline_rounded,
+              color: onPlus == null
+                  ? Colors.white.withValues(alpha: 0.3)
+                  : Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _HostControlsRow extends StatelessWidget {
   final bool roomLocked;
+  final bool isEditing;
+  final bool isSaving;
   final ValueChanged<bool> onToggleLock;
   final VoidCallback onEdit;
+  final VoidCallback onCancel;
 
   const _HostControlsRow({
     required this.roomLocked,
+    required this.isEditing,
+    required this.isSaving,
     required this.onToggleLock,
     required this.onEdit,
+    required this.onCancel,
   });
 
   @override
@@ -1408,10 +2283,18 @@ class _HostControlsRow extends StatelessWidget {
               ),
             ),
           ),
+          if (isEditing)
+            TextButton(
+              onPressed: isSaving ? null : onCancel,
+              child: Text(
+                l10n.cancel,
+                style: const TextStyle(fontWeight: FontWeight.w900),
+              ),
+            ),
           TextButton(
-            onPressed: onEdit,
+            onPressed: isSaving ? null : onEdit,
             child: Text(
-              l10n.edit,
+              isEditing ? l10n.save : l10n.edit,
               style: const TextStyle(fontWeight: FontWeight.w900),
             ),
           ),
@@ -1997,5 +2880,3 @@ void _toast(BuildContext context, String msg) {
     ),
   );
 }
-
-

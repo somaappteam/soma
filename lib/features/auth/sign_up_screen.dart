@@ -6,6 +6,8 @@ import '../../core/widgets/neon_button.dart';
 import '../../data/auth_repository.dart';
 import '../../data/profile_store.dart';
 import '../../core/widgets/responsive.dart';
+import '../../core/theme/tokens.dart';
+import 'sign_in_screen.dart';
 
 
 class SignUpScreen extends StatefulWidget {
@@ -175,7 +177,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     // bottom link
                     Center(
                       child: InkWell(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (_) => const SignInScreen()),
+                        ),
                         child: Text.rich(
                           TextSpan(
                             text: l10n.authHaveAccount,
@@ -263,7 +268,7 @@ class _GlassTextField extends StatelessWidget {
       height: 54,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.black.withValues(alpha: 0.16),
+        color: T.fieldFill,
         border: Border.all(
           color: Colors.white.withValues(alpha: 0.16),
           width: 1,

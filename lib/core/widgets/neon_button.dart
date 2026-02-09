@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import '../services/haptics_service.dart';
+import '../services/sfx_service.dart';
 import '../theme/tokens.dart';
 
 class NeonButton extends StatelessWidget {
@@ -18,7 +19,8 @@ class NeonButton extends StatelessWidget {
       onTap: onTap == null
           ? null
           : () {
-              HapticFeedback.lightImpact();
+              hapticsService.lightImpact();
+              sfxService.click();
               onTap?.call();
             },
       child: Stack(

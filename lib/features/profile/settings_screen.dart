@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
@@ -13,6 +12,8 @@ import '../../data/profile_store.dart';
 import '../auth/welcome_screen.dart';
 import '../../core/services/theme_mode_controller.dart';
 import '../../core/theme/spacing.dart';
+import '../../core/services/haptics_service.dart';
+import '../../core/widgets/premium_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -41,6 +42,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _settingsStream = settingsRepository.getSettingsStream();
     _guestThemeMode = themeModeController.modeSettingValue;
     themeModeController.addListener(_handleThemeModeChange);
+    _loadGuestSettings();
   }
 
   @override
@@ -52,6 +54,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _handleThemeModeChange() {
     if (!mounted) return;
     setState(() => _guestThemeMode = themeModeController.modeSettingValue);
+  }
+
+  Future<void> _loadGuestSettings() async {
+    if (authRepository.currentUser != null) return;
+    final settings = await settingsRepository.getSettings();
+    if (!mounted) return;
+    setState(() {
+      _guestShowTranslation = settings['show_translation'] ?? _guestShowTranslation;
+      _guestShowReading = settings['show_reading'] ?? _guestShowReading;
+      _guestMusic = settings['bg_music'] ?? _guestMusic;
+      _guestSfx = settings['sfx_enabled'] ?? _guestSfx;
+      _guestHaptics = settings['haptics_enabled'] ?? _guestHaptics;
+      _guestNotifications = settings['push_notifications'] ?? _guestNotifications;
+      _guestThemeMode = settings['theme_mode'] ?? _guestThemeMode;
+      _guestLanguageUi = settings['language_ui'] ?? _guestLanguageUi;
+      _guestTimerSeconds = (settings['default_timer_s'] as num?)?.toInt() ?? _guestTimerSeconds;
+      _guestDifficulty = settings['match_difficulty']?.toString() ?? _guestDifficulty;
+      _guestDailyReminder = settings['daily_reminder']?.toString() ?? _guestDailyReminder;
+    });
   }
 
   Future<void> _pickTimerSeconds({required int current, required ValueChanged<int> onSelected}) async {
@@ -257,14 +278,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.translate_rounded,
                 label: l10n.settingsShowTranslationLine,
                 value: _guestShowTranslation,
-                onChanged: (v) => setState(() => _guestShowTranslation = v),
+                onChanged: (v) {
+                  setState(() => _guestShowTranslation = v);
+                  settingsRepository.updateSetting('show_translation', v);
+                },
               ),
               _DividerSoft(),
               _ToggleRow(
                 icon: Icons.text_fields_rounded,
                 label: l10n.settingsShowReadingLine,
                 value: _guestShowReading,
-                onChanged: (v) => setState(() => _guestShowReading = v),
+                onChanged: (v) {
+                  setState(() => _guestShowReading = v);
+                  settingsRepository.updateSetting('show_reading', v);
+                },
               ),
               _DividerSoft(),
               _NavRow(
@@ -273,7 +300,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailingText: "${_guestTimerSeconds}s",
                 onTap: () => _pickTimerSeconds(
                   current: _guestTimerSeconds,
-                  onSelected: (value) => setState(() => _guestTimerSeconds = value),
+                  onSelected: (value) {
+                    setState(() => _guestTimerSeconds = value);
+                    settingsRepository.updateSetting('default_timer_s', value);
+                  },
                 ),
               ),
               _DividerSoft(),
@@ -285,7 +315,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     : _guestDifficulty,
                 onTap: () => _pickDifficulty(
                   current: _guestDifficulty,
-                  onSelected: (value) => setState(() => _guestDifficulty = value),
+                  onSelected: (value) {
+                    setState(() => _guestDifficulty = value);
+                    settingsRepository.updateSetting('match_difficulty', value);
+                  },
                 ),
               ),
             ],
@@ -303,21 +336,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.music_note_rounded,
                 label: l10n.settingsMusic,
                 value: _guestMusic,
-                onChanged: (v) => setState(() => _guestMusic = v),
+                onChanged: (v) {
+                  setState(() => _guestMusic = v);
+                  settingsRepository.updateSetting('bg_music', v);
+                },
               ),
               _DividerSoft(),
               _ToggleRow(
                 icon: Icons.volume_up_rounded,
                 label: l10n.settingsSoundEffects,
                 value: _guestSfx,
-                onChanged: (v) => setState(() => _guestSfx = v),
+                onChanged: (v) {
+                  setState(() => _guestSfx = v);
+                  settingsRepository.updateSetting('sfx_enabled', v);
+                },
               ),
               _DividerSoft(),
               _ToggleRow(
                 icon: Icons.vibration_rounded,
                 label: l10n.settingsHaptics,
                 value: _guestHaptics,
-                onChanged: (v) => setState(() => _guestHaptics = v),
+                onChanged: (v) {
+                  setState(() => _guestHaptics = v);
+                  settingsRepository.updateSetting('haptics_enabled', v);
+                },
               ),
             ],
           ),
@@ -334,7 +376,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.notifications_rounded,
                 label: l10n.settingsPushNotifications,
                 value: _guestNotifications,
-                onChanged: (v) => setState(() => _guestNotifications = v),
+                onChanged: (v) {
+                  setState(() => _guestNotifications = v);
+                  settingsRepository.updateSetting('push_notifications', v);
+                },
               ),
               _DividerSoft(),
               _NavRow(
@@ -343,7 +388,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailingText: _formatTime(_guestDailyReminder),
                 onTap: () => _pickDailyReminder(
                   current: _guestDailyReminder,
-                  onSelected: (value) => setState(() => _guestDailyReminder = value),
+                  onSelected: (value) {
+                    setState(() => _guestDailyReminder = value);
+                    settingsRepository.updateSetting('daily_reminder', value);
+                  },
                 ),
               ),
             ],
@@ -364,6 +412,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 items: themeItems,
                 onChanged: (v) {
                   setState(() => _guestThemeMode = v);
+                  settingsRepository.updateSetting('theme_mode', v);
                   themeModeController.setModeFromSetting(v);
                 },
               ),
@@ -373,7 +422,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 label: l10n.settingsUiLanguage,
                 value: guestLanguageValue,
                 items: languageItems,
-                onChanged: (v) => setState(() => _guestLanguageUi = v),
+                onChanged: (v) {
+                  setState(() => _guestLanguageUi = v);
+                  settingsRepository.updateSetting('language_ui', v);
+                },
               ),
             ],
           ),
@@ -723,6 +775,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               icon: Icons.logout_rounded,
                               label: l10n.settingsLogout,
                               onTap: () async {
+                                final confirmed = await showPremiumDialog(
+                                  context: context,
+                                  title: l10n.settingsLogout,
+                                  body: "You can sign back in at any time to continue your progress.",
+                                  confirmText: l10n.settingsLogout,
+                                  cancelText: l10n.cancel,
+                                  destructive: true,
+                                );
+                                if (confirmed != true) return;
                                 await authRepository.signOut();
                                 profileStore.reset();
                                 if (!context.mounted) return;
@@ -826,7 +887,7 @@ class _NavRow extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: () {
-        HapticFeedback.selectionClick();
+        hapticsService.selectionClick();
         onTap();
       },
       borderRadius: BorderRadius.circular(18),
@@ -899,7 +960,7 @@ class _ToggleRow extends StatelessWidget {
           Switch(
             value: value,
             onChanged: (next) {
-              HapticFeedback.selectionClick();
+              hapticsService.selectionClick();
               onChanged(next);
             },
           ),

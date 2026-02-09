@@ -21,28 +21,6 @@ class WelcomeScreen extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            Positioned.fill(
-              child: IgnorePointer(
-                child: Align(
-                  alignment: const Alignment(0, -0.20),
-                  child: Container(
-                    width: 520,
-                    height: 320,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(999),
-                      color: const Color(0xFF7A5CFF).withValues(alpha: 0.18),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF7A5CFF).withValues(alpha: 0.22),
-                          blurRadius: 90,
-                          spreadRadius: 30,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
             ResponsiveFrame(
               maxWidth: 430,
               child: ResponsiveScroll(

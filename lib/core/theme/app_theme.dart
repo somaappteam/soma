@@ -207,7 +207,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surfaceContainerHighest,
+        fillColor: T.fieldFill,
         border: OutlineInputBorder(borderRadius: T.r20, borderSide: BorderSide.none),
         hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.55)),
         labelStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75)),

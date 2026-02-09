@@ -4,6 +4,7 @@ class SoloCourse {
   final String subtitle;
   final String iconUrl; // or asset path
   final int xp;
+  final DateTime? lastAccessed;
 
   const SoloCourse({
     required this.id,
@@ -11,15 +12,17 @@ class SoloCourse {
     required this.subtitle,
     required this.iconUrl,
     this.xp = 0,
+    this.lastAccessed,
   });
 
-  SoloCourse copyWith({int? xp}) {
+  SoloCourse copyWith({int? xp, DateTime? lastAccessed}) {
     return SoloCourse(
       id: id,
       title: title,
       subtitle: subtitle,
       iconUrl: iconUrl,
       xp: xp ?? this.xp,
+      lastAccessed: lastAccessed ?? this.lastAccessed,
     );
   }
 }

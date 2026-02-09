@@ -178,6 +178,12 @@ abstract class AppLocalizations {
   /// **'Learn. Compete. Master.'**
   String get welcomeTagline;
 
+  /// No description provided for @welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome, {name}!'**
+  String welcome(Object name);
+
   /// No description provided for @signUp.
   ///
   /// In en, this message translates to:
@@ -201,6 +207,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please fill in all fields'**
   String get authFillAllFields;
+
+  /// No description provided for @authForgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot password?'**
+  String get authForgotPassword;
+
+  /// No description provided for @authForgotPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get authForgotPasswordTitle;
+
+  /// No description provided for @authForgotPasswordBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email linked to your account. We'll send a secure reset link.'**
+  String get authForgotPasswordBody;
+
+  /// No description provided for @authSendResetLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send reset link'**
+  String get authSendResetLink;
+
+  /// No description provided for @authResetSentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email'**
+  String get authResetSentTitle;
+
+  /// No description provided for @authResetSentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a password reset link. Follow the instructions to set a new password.'**
+  String get authResetSentBody;
+
+  /// No description provided for @authResetFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset failed'**
+  String get authResetFailedTitle;
 
   /// No description provided for @authError.
   ///
@@ -1591,7 +1639,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsShowReadingLine.
   ///
   /// In en, this message translates to:
-  /// **'Show reading (pinyin/romaji)'**
+  /// **'Show reading (pinyin/transliteration/romanisation)'**
   String get settingsShowReadingLine;
 
   /// No description provided for @settingsDefaultTimerPerQuestion.
@@ -2811,6 +2859,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enable chat during matches.'**
   String get circlesLiveTextChatSubtitle;
+
+  /// No description provided for @circlesRoomLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Room locked'**
+  String get circlesRoomLocked;
+
+  /// No description provided for @circlesRoomUnlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Room unlocked'**
+  String get circlesRoomUnlocked;
+
+  /// No description provided for @circlesSettingsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Room settings saved'**
+  String get circlesSettingsSaved;
+
+  /// No description provided for @circlesUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn't update room: {error}'**
+  String circlesUpdateFailed(Object error);
+
+  /// No description provided for @circlesLiveChatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live chat'**
+  String get circlesLiveChatTitle;
+
+  /// No description provided for @circlesLiveChatPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message'**
+  String get circlesLiveChatPlaceholder;
+
+  /// No description provided for @circlesLiveChatEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet. Start the chat!'**
+  String get circlesLiveChatEmpty;
+
+  /// No description provided for @circlesLiveChatUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Live chat is available inside active circles.'**
+  String get circlesLiveChatUnavailable;
+
+  /// No description provided for @circlesCreateHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a circle'**
+  String get circlesCreateHelpTitle;
+
+  /// No description provided for @circlesCreateHelpBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your languages, mode, and difficulty, then set room limits. Spectators can watch, and live chat lets everyone talk during the match.'**
+  String get circlesCreateHelpBody;
 
   /// No description provided for @circlesCreatedSuccess.
   ///

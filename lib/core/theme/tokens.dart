@@ -14,6 +14,7 @@ class T {
   // Glass
   static const glassFill = Color(0x14FFFFFF); // ~8%
   static const glassStroke = Color(0x26FFFFFF); // ~15%
+  static const fieldFill = Color(0xFF1B1D3A);
 
   // Premium accents
   static const neonA = Color(0xFF6C4DFF); // deeper purple

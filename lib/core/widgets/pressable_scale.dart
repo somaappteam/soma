@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import '../services/haptics_service.dart';
+import '../services/sfx_service.dart';
 import '../theme/motion.dart';
 
 class PressableScale extends StatefulWidget {
@@ -45,7 +46,8 @@ class _PressableScaleState extends State<PressableScale> {
         onTapDown: enabled
             ? (_) {
                 if (widget.enableHaptics) {
-                  HapticFeedback.selectionClick();
+                  hapticsService.selectionClick();
+                  sfxService.click();
                 }
                 _setPressed(true);
               }

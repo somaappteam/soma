@@ -51,6 +51,7 @@ class CirclesRepository {
           'questions_count': questions?.length ?? 0,
           'time_per_q': timePerQ,
           'allow_spectators': allowSpectators,
+          'is_locked': false,
           'status': 'lobby',
           'questions': questions ?? [],
         })
@@ -72,6 +73,14 @@ class CirclesRepository {
       {String role = 'player', bool isReady = false}) async {
     final uid = currentUserId;
     if (uid == null) throw Exception("Not logged in");
+
+    final circle = await getCircleDetails(circleId);
+    if (circle == null) throw Exception("Circle not found");
+    final isLocked = circle['is_locked'] == true;
+    final hostId = circle['host_id']?.toString();
+    if (isLocked && hostId != uid) {
+      throw Exception("Circle is locked");
+    }
 
     // Use upsert to handle case where participant already exists
     await _supabase.from('circle_participants').upsert({
@@ -97,6 +106,9 @@ class CirclesRepository {
 
     final circle = await getCircleDetails(circleId);
     if (circle == null) throw Exception("Circle not found");
+    if (circle['is_locked'] == true && circle['host_id']?.toString() != uid) {
+      throw Exception("Circle is locked");
+    }
 
     final status = (circle['status'] ?? 'lobby').toString();
     if (status == 'ended') {
@@ -200,6 +212,47 @@ class CirclesRepository {
     await _supabase.from('circles').update({
       'questions': questions,
       'questions_count': questions.length,
+    }).eq('id', circleId);
+  }
+
+  Future<void> updateCircleLock(String circleId, bool isLocked) async {
+    await _supabase.from('circles').update({
+      'is_locked': isLocked,
+    }).eq('id', circleId);
+  }
+
+  Future<void> updateCircleMatchSettings({
+    required String circleId,
+    required String fromLang,
+    required String toLang,
+    required String mode,
+    required String level,
+    required int questionsCount,
+    required int timePerQ,
+  }) async {
+    await _supabase.from('circles').update({
+      'from_lang': fromLang,
+      'to_lang': toLang,
+      'mode': mode,
+      'level': level,
+      'questions_count': questionsCount,
+      'time_per_q': timePerQ,
+    }).eq('id', circleId);
+  }
+
+  Future<void> updateCircleSettings({
+    required String circleId,
+    required int maxPlayers,
+    required int questionsCount,
+    required int timePerQ,
+    required bool allowSpectators,
+  }) async {
+    await _supabase.from('circles').update({
+      'max_players': maxPlayers,
+      'questions_count': questionsCount,
+      'time_per_q': timePerQ,
+      'allow_spectators': allowSpectators,
+      'questions': [],
     }).eq('id', circleId);
   }
 

@@ -35,6 +35,10 @@ class AuthRepository {
     await _client.auth.updateUser(UserAttributes(password: newPassword));
   }
 
+  Future<void> resetPassword({required String email}) async {
+    await _client.auth.resetPasswordForEmail(email);
+  }
+
   User? get currentUser => _client.auth.currentUser;
 
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;

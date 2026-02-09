@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
+import '../../core/theme/tokens.dart';
 import '../../data/profile_repository.dart';
 import '../../models/user_profile.dart';
 import '../../core/widgets/responsive.dart';
@@ -18,7 +19,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   late UserProfile draft;
 
-  late final TextEditingController displayNameCtrl;
   late final TextEditingController usernameCtrl;
   late final TextEditingController bioCtrl;
   late final TextEditingController locationCtrl;
@@ -34,7 +34,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       draft = UserProfile(displayName: "", username: "", bio: "", location: "", dailyGoalMinutes: 10);
     }
 
-    displayNameCtrl = TextEditingController(text: draft.displayName);
     usernameCtrl = TextEditingController(text: draft.username);
     bioCtrl = TextEditingController(text: draft.bio);
     locationCtrl = TextEditingController(text: draft.location);
@@ -43,7 +42,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   void dispose() {
-    displayNameCtrl.dispose();
     usernameCtrl.dispose();
     bioCtrl.dispose();
     locationCtrl.dispose();
@@ -55,7 +53,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final l10n = AppLocalizations.of(context);
 
     final next = UserProfile(
-      displayName: displayNameCtrl.text.trim(),
+      displayName: draft.displayName,
       username: usernameCtrl.text.trim(),
       bio: bioCtrl.text.trim(),
       location: locationCtrl.text.trim(),
@@ -177,19 +175,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                _FieldLabel(l10n.editProfileDisplayNameLabel),
-                                _GlassTextField(
-                                  controller: displayNameCtrl,
-                                  hint: l10n.editProfileDisplayNameHint,
-                                  validator: (v) {
-                                    final s = (v ?? "").trim();
-                                    if (s.isEmpty) return l10n.editProfileDisplayNameRequired;
-                                    if (s.length < 2) return l10n.editProfileDisplayNameTooShort;
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 14),
-
                                 _FieldLabel(l10n.editProfileUsernameLabel),
                                 _GlassTextField(
                                   controller: usernameCtrl,
@@ -468,7 +453,7 @@ class _GlassTextField extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         color: Theme.of(context).brightness == Brightness.light
             ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
-            : Colors.black.withValues(alpha: 0.16),
+            : T.fieldFill,
         border: Border.all(
             color: Theme.of(context).brightness == Brightness.light
                 ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)

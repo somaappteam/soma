@@ -4,6 +4,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../models/solo_course.dart';
+import '../../data/settings_repository.dart';
 import 'solo_course_detail_screen.dart';
 import 'solo_vocab_quiz_screen.dart';
 import 'solo_sentences_quiz_screen.dart';
@@ -21,6 +22,20 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
   String level = "A"; // A/B/C
   int questions = 10;
   int? timeLimit;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final settings = await settingsRepository.getSettings();
+    final defaultTimer = settings['default_timer_s'];
+    if (defaultTimer is num && mounted) {
+      setState(() => timeLimit = defaultTimer.toInt());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,11 +82,11 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        _Chip(label: "A", selected: level == "A", onTap: () => setState(() => level = "A")),
+                        _Chip(label: l10n.levelBeginner, selected: level == "A", onTap: () => setState(() => level = "A")),
                         const SizedBox(width: 10),
-                        _Chip(label: "B", selected: level == "B", onTap: () => setState(() => level = "B")),
+                        _Chip(label: l10n.levelIntermediate, selected: level == "B", onTap: () => setState(() => level = "B")),
                         const SizedBox(width: 10),
-                        _Chip(label: "C", selected: level == "C", onTap: () => setState(() => level = "C")),
+                        _Chip(label: l10n.levelAdvanced, selected: level == "C", onTap: () => setState(() => level = "C")),
                       ],
                     ),
 
