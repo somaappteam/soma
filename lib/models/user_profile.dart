@@ -7,6 +7,7 @@ class UserProfile {
   int dailyGoalMinutes;
   int totalXp;
   String? avatarUrl;
+  bool showOnlineStatus;
 
   UserProfile({
     this.id,
@@ -17,6 +18,7 @@ class UserProfile {
     required this.dailyGoalMinutes,
     this.totalXp = 0,
     this.avatarUrl,
+    this.showOnlineStatus = true,
     this.isGuest = false,
   });
 
@@ -31,6 +33,7 @@ class UserProfile {
         dailyGoalMinutes: dailyGoalMinutes,
         totalXp: totalXp,
         avatarUrl: avatarUrl,
+        showOnlineStatus: showOnlineStatus,
         isGuest: isGuest,
       );
 }

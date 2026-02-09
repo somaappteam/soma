@@ -953,6 +953,8 @@ class _LiveLeaderboardRow extends StatelessWidget {
             child: _AvatarBubble(
               name: leader.name,
               heroTag: leader.userId == null ? null : "profile-avatar-${leader.userId}",
+              muted: leader.isMuted,
+              speaking: leader.isSpeaking,
             ),
           ),
           const SizedBox(width: 10),
@@ -1077,37 +1079,73 @@ class _RankChip extends StatelessWidget {
 class _AvatarBubble extends StatelessWidget {
   final String name;
   final String? heroTag;
+  final bool muted;
+  final bool speaking;
 
-  const _AvatarBubble({required this.name, this.heroTag});
+  const _AvatarBubble({
+    required this.name,
+    this.heroTag,
+    required this.muted,
+    required this.speaking,
+  });
 
   @override
   Widget build(BuildContext context) {
     final trimmed = name.trim();
     final initial = trimmed.isNotEmpty ? trimmed.substring(0, 1).toUpperCase() : "?";
-    final avatar = Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: T.neonGradient,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+    final avatar = Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: T.neonGradient,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+              if (speaking)
+                BoxShadow(
+                  color: const Color(0xFF2AFADF).withValues(alpha: 0.4),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+            ],
           ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          initial,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w900,
-            fontSize: 14,
+          child: Center(
+            child: Text(
+              initial,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 14,
+              ),
+            ),
           ),
         ),
-      ),
+        Positioned(
+          bottom: -2,
+          right: -2,
+          child: Container(
+            width: 14,
+            height: 14,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: muted ? 0.6 : 0.95),
+              border: Border.all(color: Colors.black.withValues(alpha: 0.2), width: 1),
+            ),
+            child: Icon(
+              muted ? Icons.mic_off_rounded : Icons.mic_rounded,
+              size: 9,
+              color: Colors.black.withValues(alpha: 0.8),
+            ),
+          ),
+        ),
+      ],
     );
 
     if (heroTag == null) {

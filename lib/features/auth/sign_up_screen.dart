@@ -8,6 +8,7 @@ import '../../data/profile_store.dart';
 import '../../core/widgets/responsive.dart';
 import '../../core/theme/tokens.dart';
 import 'sign_in_screen.dart';
+import '../../core/widgets/premium_dialog.dart';
 
 
 class SignUpScreen extends StatefulWidget {
@@ -33,8 +34,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final password = _password.text.trim();
 
     if (username.isEmpty || email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.authFillAllFields)),
+      await showPremiumDialog(
+        context: context,
+        title: l10n.signUp,
+        body: l10n.authFillAllFields,
+        confirmText: l10n.ok,
       );
       return;
     }
@@ -66,8 +70,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.authError(e.toString()))),
+        await showPremiumDialog(
+          context: context,
+          title: l10n.signUp,
+          body: l10n.authError(e.toString()),
+          confirmText: l10n.ok,
         );
       }
     } finally {

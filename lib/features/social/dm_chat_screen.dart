@@ -4,6 +4,8 @@ import '../../core/theme/motion.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/staggered_in.dart';
 import '../../data/chat_repository.dart';
+import '../../data/presence_repository.dart';
+import '../../data/profile_repository.dart';
 
 class DmChatScreen extends StatefulWidget {
   const DmChatScreen({
@@ -25,11 +27,15 @@ class _DmChatScreenState extends State<DmChatScreen> {
   final _controller = TextEditingController();
   final _scroll = ScrollController();
   late Stream<List<Map<String, dynamic>>> _messagesStream;
+  late Stream<bool> _onlineStream;
+  bool _showOnlineIndicator = true;
 
   @override
   void initState() {
     super.initState();
     _messagesStream = chatRepository.getMessagesStream(widget.otherId);
+    _onlineStream = presenceRepository.streamOnlineStatus(widget.otherId);
+    _loadOnlineVisibility();
     // Auto-scroll on new messages can be handled in builder or listener,
     // but simplified approach: just builder.
   }
@@ -63,23 +69,52 @@ class _DmChatScreenState extends State<DmChatScreen> {
     });
   }
 
+  Future<void> _loadOnlineVisibility() async {
+    try {
+      final data = await profileRepository.fetchProfile(userId: widget.otherId);
+      if (!mounted || data == null) return;
+      setState(() => _showOnlineIndicator = data.showOnlineStatus);
+    } catch (_) {
+      // ignore
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
           child: Column(
             children: [
-              _TopBar(
-                title: widget.otherName,
-                onBack: () => Navigator.pop(context),
-                onCall: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content:
-                            Text("Voice call later (Circle voice is next)")),
-                  );
-                },
-              ),
+              _showOnlineIndicator
+                  ? StreamBuilder<bool>(
+                      stream: _onlineStream,
+                      builder: (context, snapshot) {
+                        return _TopBar(
+                          title: widget.otherName,
+                          showOnlineIndicator: snapshot.data == true,
+                          onBack: () => Navigator.pop(context),
+                          onCall: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text("Voice call later (Circle voice is next)")),
+                            );
+                          },
+                        );
+                      },
+                    )
+                  : _TopBar(
+                      title: widget.otherName,
+                      showOnlineIndicator: false,
+                      onBack: () => Navigator.pop(context),
+                      onCall: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content:
+                                  Text("Voice call later (Circle voice is next)")),
+                        );
+                      },
+                    ),
               const SizedBox(height: 8),
               Expanded(
                 child: StreamBuilder<List<Map<String, dynamic>>>(
@@ -169,11 +204,13 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
 class _TopBar extends StatelessWidget {
   final String title;
+  final bool showOnlineIndicator;
   final VoidCallback onBack;
   final VoidCallback onCall;
 
   const _TopBar({
     required this.title,
+    required this.showOnlineIndicator,
     required this.onBack,
     required this.onCall,
   });
@@ -197,6 +234,20 @@ class _TopBar extends StatelessWidget {
               ),
             ),
           ),
+          if (showOnlineIndicator)
+            Container(
+              width: 8,
+              height: 8,
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF58F7B6),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+                  width: 1.5,
+                ),
+              ),
+            ),
           const SizedBox(width: 10),
           _IconGlass(icon: Icons.call_rounded, onTap: onCall),
         ],

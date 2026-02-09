@@ -60,23 +60,23 @@ class AppTheme {
       primary: Color(0xFF5E4BFF),
       secondary: Color(0xFF2BBEF9),
       tertiary: Color(0xFFFF4CB5),
-      surface: Color(0xFFFFFFFF),
-      surfaceContainerHighest: Color(0xFFF2F1FA),
-      background: Color(0xFFF7F7FB),
+      surface: Color(0xFFFEFEFF),
+      surfaceContainerHighest: Color(0xFFF1F2FA),
+      background: Color(0xFFF6F7FC),
       onPrimary: Colors.white,
       onSecondary: Colors.white,
-      onSurface: Color(0xFF1C1B29),
-      onBackground: Color(0xFF1C1B29),
+      onSurface: Color(0xFF1A1626),
+      onBackground: Color(0xFF1A1626),
     );
 
     const glass = GlassTheme(
-      fill: Color(0xCCFFFFFF),
-      stroke: Color(0x40FFFFFF),
-      shadow: Color(0x14000000),
+      fill: Color(0xD9FFFFFF),
+      stroke: Color(0x99FFFFFF),
+      shadow: Color(0x33000000),
     );
     const background = AppBackgroundTheme(
       gradient: LinearGradient(
-        colors: [Color(0xFFF7F7FB), Color(0xFFEFF1FF), Color(0xFFF9F6FF)],
+        colors: [Color(0xFFF6F7FC), Color(0xFFEDEFFF), Color(0xFFF7F2FF)],
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
       ),
@@ -140,7 +140,7 @@ class AppTheme {
       useMaterial3: true,
     );
     final isLight = brightness == Brightness.light;
-    final cardShadow = isLight ? scheme.shadow.withValues(alpha: 0.16) : Colors.transparent;
+    final cardShadow = isLight ? scheme.shadow.withValues(alpha: 0.14) : Colors.transparent;
 
     return base.copyWith(
       scaffoldBackgroundColor: scaffoldBackground,
@@ -170,7 +170,7 @@ class AppTheme {
         actionTextColor: scheme.primary,
       ),
       cardTheme: CardThemeData(
-        color: scheme.surface,
+        color: isLight ? scheme.surfaceContainerHighest : scheme.surface,
         elevation: isLight ? 3 : 0,
         shadowColor: cardShadow,
         shape: RoundedRectangleBorder(borderRadius: T.r28),
@@ -207,10 +207,23 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: T.fieldFill,
+        fillColor: isLight ? scheme.surfaceContainerHighest : T.fieldFill,
         border: OutlineInputBorder(borderRadius: T.r20, borderSide: BorderSide.none),
-        hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.55)),
-        labelStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: T.r20,
+          borderSide: BorderSide(
+            color: scheme.onSurface.withValues(alpha: isLight ? 0.12 : 0.2),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: T.r20,
+          borderSide: BorderSide(
+            color: scheme.primary.withValues(alpha: 0.55),
+            width: 1.6,
+          ),
+        ),
+        hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.62)),
+        labelStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82)),
       ),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(foregroundColor: scheme.primary),
@@ -223,15 +236,15 @@ class AppTheme {
         ),
       ),
       textTheme: GoogleFonts.poppinsTextTheme(base.textTheme).copyWith(
-        displayLarge: GoogleFonts.poppins(fontSize: 36, fontWeight: FontWeight.w700),
-        displayMedium: GoogleFonts.poppins(fontSize: 30, fontWeight: FontWeight.w700),
-        displaySmall: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.w700),
-        headlineMedium: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w700),
-        titleLarge: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w700),
-        titleMedium: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
-        bodyLarge: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w500),
-        bodyMedium: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500),
-        bodySmall: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500),
+        displayLarge: GoogleFonts.poppins(fontSize: 36, fontWeight: FontWeight.w600),
+        displayMedium: GoogleFonts.poppins(fontSize: 30, fontWeight: FontWeight.w600),
+        displaySmall: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.w600),
+        headlineMedium: GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.w600),
+        titleLarge: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600),
+        titleMedium: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
+        bodyLarge: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w400),
+        bodyMedium: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
+        bodySmall: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w400),
       ).apply(
         bodyColor: scheme.onBackground,
         displayColor: scheme.onBackground,

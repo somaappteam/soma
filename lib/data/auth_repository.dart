@@ -31,6 +31,11 @@ class AuthRepository {
     await _client.auth.signOut();
   }
 
+  Future<void> signOutWithSessionEnd() async {
+    await sessionTracker.endCurrentSession();
+    await _client.auth.signOut();
+  }
+
   Future<void> updatePassword(String newPassword) async {
     await _client.auth.updateUser(UserAttributes(password: newPassword));
   }

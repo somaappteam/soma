@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/premium_dialog.dart';
 import '../../data/settings_repository.dart';
 import '../../core/widgets/responsive.dart';
+import '../../data/auth_repository.dart';
+import '../../data/profile_repository.dart';
+import '../../data/stats_repository.dart';
 
 // Enum definitions (could be in a model file, but keeping here for simplicity as they were in privacy_store)
 enum ProfileVisibility { public, friends, private }
@@ -67,6 +73,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                         final showActivity = data['show_learning_activity'] ?? true;
                         final allowRequests = data['allow_friend_requests'] ?? true;
                         final dmPermission = _parseDmPermission(data['dm_permission']);
+                        final blockedIds = _parseBlockedUsers(data['blocked_user_ids']);
                         // Blocked users would typically be a separate table query, skipping for now or assumed managed elsewhere
 
                         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -150,18 +157,23 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                             const SizedBox(height: 14),
 
                             _SectionTitle(l10n.privacySectionBlockedUsers),
-                            // Placeholder for blocked users list as it requires fetch logic
-                              Glass(
-                                radius: BorderRadius.circular(24),
-                                padding: const EdgeInsets.all(16),
-                                child: Text(
-                                  l10n.privacyBlockedUsersComingSoon,
-                                  style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
-                                    fontWeight: FontWeight.w700,
+                            _Tile(
+                              icon: Icons.block_rounded,
+                              title: l10n.privacySectionBlockedUsers,
+                              subtitle: blockedIds.isEmpty
+                                  ? "No blocked users"
+                                  : "${blockedIds.length} blocked",
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => _BlockedUsersScreen(
+                                      blockedIds: blockedIds,
+                                    ),
                                   ),
-                                ),
-                              ),
+                                );
+                              },
+                            ),
 
                             const SizedBox(height: 14),
 
@@ -170,8 +182,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                               icon: Icons.file_download_rounded,
                               title: l10n.privacyExportDataTitle,
                               subtitle: l10n.privacyExportDataSubtitle,
-                              onTap: () => _showInfo(context, l10n.privacyExportInfoTitle,
-                                  l10n.privacyExportInfoBody),
+                              onTap: () => _exportData(context),
                             ),
                             const SizedBox(height: 10),
                             _TileDanger(
@@ -250,16 +261,222 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     showPremiumDialog(
       context: context,
       title: l10n.privacyDeleteConfirmTitle,
-      body: l10n.privacyDeleteConfirmBody,
+      body: "${l10n.privacyDeleteConfirmBody}\n\nYour account will be scheduled for deletion in 30 days. You can sign back in before then to cancel.",
       confirmText: l10n.delete,
       cancelText: l10n.cancel,
       destructive: true,
     ).then((confirmed) {
       if (confirmed != true) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.privacyDeleteComingSoon)),
-      );
+      _deleteAccount(context);
     });
+  }
+
+  List<String> _parseBlockedUsers(dynamic value) {
+    if (value is List) {
+      return value.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
+    }
+    return [];
+  }
+
+  Future<void> _exportData(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final profile = await profileRepository.fetchProfile();
+      final settings = await settingsRepository.getSettings();
+      final stats = await statsRepository.getStats();
+      final payload = {
+        'profile': {
+          'id': profile?.id,
+          'display_name': profile?.displayName,
+          'username': profile?.username,
+          'bio': profile?.bio,
+          'location': profile?.location,
+          'daily_goal_minutes': profile?.dailyGoalMinutes,
+          'total_xp': profile?.totalXp,
+        },
+        'stats': {
+          'total_wins': stats.totalWins,
+          'streak_days': stats.streakDays,
+          'longest_streak': stats.longestStreak,
+          'total_quizzes': stats.totalQuizzes,
+          'total_correct': stats.totalCorrect,
+          'total_questions': stats.totalQuestions,
+          'perfect_quizzes': stats.perfectQuizzes,
+          'circles_joined': stats.circlesJoined,
+          'last_active_date': stats.lastActiveDate?.toIso8601String(),
+        },
+        'settings': settings,
+        'exported_at': DateTime.now().toIso8601String(),
+      };
+      final jsonData = const JsonEncoder.withIndent('  ').convert(payload);
+      await Share.share(jsonData, subject: 'Soma data export');
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.errorWithDetails(e.toString()))),
+      );
+    }
+  }
+
+  Future<void> _deleteAccount(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      final now = DateTime.now();
+      final scheduled = now.add(const Duration(days: 30));
+      await settingsRepository.updateSettings({
+        'account_delete_requested_at': now.toIso8601String(),
+        'account_delete_scheduled_for': scheduled.toIso8601String(),
+      });
+      await authRepository.signOutWithSessionEnd();
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Account scheduled for deletion on ${scheduled.toLocal().toString().split(' ').first}. You have 30 days to cancel by signing back in.",
+          ),
+        ),
+      );
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.errorWithDetails(e.toString()))),
+      );
+    }
+  }
+}
+
+class _BlockedUsersScreen extends StatefulWidget {
+  final List<String> blockedIds;
+  const _BlockedUsersScreen({required this.blockedIds});
+
+  @override
+  State<_BlockedUsersScreen> createState() => _BlockedUsersScreenState();
+}
+
+class _BlockedUsersScreenState extends State<_BlockedUsersScreen> {
+  late List<String> _blockedIds;
+  late Future<List<Map<String, dynamic>>> _profilesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _blockedIds = List<String>.from(widget.blockedIds);
+    _profilesFuture = profileRepository.getProfilesByIds(_blockedIds);
+  }
+
+  Future<void> _unblock(String userId) async {
+    setState(() {
+      _blockedIds = _blockedIds.where((id) => id != userId).toList();
+      _profilesFuture = profileRepository.getProfilesByIds(_blockedIds);
+    });
+    await settingsRepository.updateSetting('blocked_user_ids', _blockedIds);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      body: SafeArea(
+        child: ResponsiveFrame(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    _IconBtn(
+                      icon: Icons.arrow_back_ios_new_rounded,
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.privacySectionBlockedUsers,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: scheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: _blockedIds.isEmpty
+                      ? Glass(
+                          radius: BorderRadius.circular(24),
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            "No blocked users",
+                            style: TextStyle(
+                              color: scheme.onSurface.withValues(alpha: 0.75),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                      : FutureBuilder<List<Map<String, dynamic>>>(
+                          future: _profilesFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+                            final profiles = snapshot.data ?? [];
+                            return ListView.separated(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: profiles.length,
+                              separatorBuilder: (_, __) => const SizedBox(height: 10),
+                              itemBuilder: (context, index) {
+                                final profile = profiles[index];
+                                final id = profile['id']?.toString() ?? '';
+                                return Glass(
+                                  radius: BorderRadius.circular(24),
+                                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                                  child: Row(
+                                    children: [
+                                      _IconBox(icon: Icons.person_rounded),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              profile['username'] ?? l10n.genericUser,
+                                              style: TextStyle(
+                                                color: scheme.onSurface,
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              profile['display_name'] ?? '',
+                                              style: TextStyle(
+                                                color: scheme.onSurface.withValues(alpha: 0.62),
+                                                fontWeight: FontWeight.w700,
+                                                height: 1.2,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: id.isEmpty ? null : () => _unblock(id),
+                                        child: Text(l10n.remove),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'presence_repository.dart';
 
 class ChatRepository {
   final _supabase = Supabase.instance.client;
@@ -80,16 +81,21 @@ class ChatRepository {
     final otherIds = threads.keys.toList();
     if (otherIds.isEmpty) return [];
 
-    final profiles = await _supabase.from('profiles').select().inFilter('id', otherIds);
+    final profiles = await _supabase.from('profiles').select('id, username, avatar_url, settings').inFilter('id', otherIds);
     final profileMap = {for (var p in profiles) p['id']: p};
+    final onlineStatuses = await presenceRepository.fetchOnlineStatuses(otherIds);
 
     final List<Map<String, dynamic>> result = [];
     for (final t in threads.values) {
        final pid = t['otherId'];
        final p = profileMap[pid];
        if (p != null) {
+         final settings = (p['settings'] as Map<String, dynamic>?) ?? {};
+         final showOnlineStatus = settings['show_online_status'] ?? true;
+         final isOnline = onlineStatuses[pid] ?? false;
          t['otherName'] = p['username'] ?? 'User';
          t['avatar_url'] = p['avatar_url'];
+         t['isOnline'] = showOnlineStatus && isOnline;
          result.add(t);
        }
     }
