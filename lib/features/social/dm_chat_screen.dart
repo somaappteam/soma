@@ -6,6 +6,7 @@ import '../../core/widgets/staggered_in.dart';
 import '../../data/chat_repository.dart';
 import '../../data/presence_repository.dart';
 import '../../data/profile_repository.dart';
+import 'package:soma/l10n/gen/app_localizations.dart';
 
 class DmChatScreen extends StatefulWidget {
   const DmChatScreen({
@@ -29,6 +30,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
   late Stream<List<Map<String, dynamic>>> _messagesStream;
   late Stream<bool> _onlineStream;
   bool _showOnlineIndicator = true;
+  bool _readSyncInFlight = false;
+
+  String get _myUserId => chatRepository.currentUserId ?? widget.meId;
 
   @override
   void initState() {
@@ -36,6 +40,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _messagesStream = chatRepository.getMessagesStream(widget.otherId);
     _onlineStream = presenceRepository.streamOnlineStatus(widget.otherId);
     _loadOnlineVisibility();
+    _markConversationAsRead();
     // Auto-scroll on new messages can be handled in builder or listener,
     // but simplified approach: just builder.
   }
@@ -45,6 +50,19 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _controller.dispose();
     _scroll.dispose();
     super.dispose();
+  }
+
+
+  Future<void> _markConversationAsRead() async {
+    if (_readSyncInFlight) return;
+    _readSyncInFlight = true;
+    try {
+      await chatRepository.markConversationAsRead(widget.otherId);
+    } catch (_) {
+      // ignore read mark failures
+    } finally {
+      _readSyncInFlight = false;
+    }
   }
 
   void _send() {
@@ -95,9 +113,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                           onBack: () => Navigator.pop(context),
                           onCall: () {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text("Voice call later (Circle voice is next)")),
+                              SnackBar(content: Text(AppLocalizations.of(context).chatCallLater)),
                             );
                           },
                         );
@@ -109,9 +125,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       onBack: () => Navigator.pop(context),
                       onCall: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content:
-                                  Text("Voice call later (Circle voice is next)")),
+                          SnackBar(content: Text(AppLocalizations.of(context).chatCallLater)),
                         );
                       },
                     ),
@@ -132,6 +146,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       }
 
                       final msgs = snapshot.data!;
+                      final hasUnread = msgs.any((m) => m['receiver_id'] == _myUserId && (m['is_read'] != true && m['is_read'] != 1));
+                      if (hasUnread) {
+                        _markConversationAsRead();
+                      }
                       if (msgs.isEmpty) {
                         return Center(
                             child: Text("Say hi to ${widget.otherName}! 👋",
@@ -146,7 +164,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         itemBuilder: (context, i) {
                           final m = msgs[i];
                           final senderId = m['sender_id'];
-                          final isMe = senderId == widget.meId;
+                          final isMe = senderId == _myUserId;
                           // Supabase returns ISO string
                           final created =
                               DateTime.parse(m['created_at']).toLocal();

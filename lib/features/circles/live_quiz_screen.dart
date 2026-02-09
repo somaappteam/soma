@@ -116,7 +116,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
           
           return _Question(
             prompt: q['prompt']?.toString() ?? '',
-            choices: (q['choices'] as List?)?.map((e) => e.toString()).toList() ?? const ['...', '...', '...', '...'],
+            choices: (q['choices'] as List?)?.map((e) => e.toString()).toList() ?? const [],
             correctIndex: correctIndex,
             translation: q['translation']?.toString() ?? '',
             reading: q['reading']?.toString() ?? '',
@@ -132,40 +132,17 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
       } catch (e, stackTrace) {
         debugPrint('❌ Error parsing questions: $e');
         debugPrint('Stack trace: $stackTrace');
-        // Fallback to placeholder on error
-        questions = [
-          _Question(
-            prompt: 'Error loading questions',
-            choices: const ["...", "...", "...", "..."],
-            correctIndex: 0,
-            translation: '',
-            reading: '',
-            fullSentence: '',
-            article: '',
-            word: '',
-            gender: '',
-          )
-        ];
+        questions = const [];
       }
     } else {
-      debugPrint('No questions received - using placeholder');
-      questions = [
-        _Question(
-          prompt: _waitingForHostText,
-          choices: const ["...", "...", "...", "..."],
-          correctIndex: 0,
-          translation: '',
-          reading: '',
-          fullSentence: '',
-          article: '',
-          word: '',
-          gender: '',
-        )
-      ];
+      debugPrint('No questions received');
+      questions = const [];
     }
 
-    _prepareQuestion();
-    _startTimer();
+    if (questions.isNotEmpty) {
+      _prepareQuestion();
+      _startTimer();
+    }
     _initialized = true;
   }
 
@@ -200,7 +177,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
         }
 
         return _Leader(
-          profile?['display_name'] ?? profile?['username'] ?? '...',
+          profile?['display_name'] ?? profile?['username'] ?? AppLocalizations.of(context).userFallbackName,
           score,
           isMe,
           correct: 0, // We could track correct answers in DB too, but score is enough for leaderboard
@@ -411,8 +388,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
       _answerTimeByUser.clear();
       leaders = leaders.map((l) => l.copyWith(lastAnswer: LeaderboardAnswer.none)).toList();
     });
-    _prepareQuestion();
-    _startTimer();
+    if (questions.isNotEmpty) {
+      _prepareQuestion();
+      _startTimer();
+    }
   }
 
   void _prepareQuestion() {
@@ -618,6 +597,31 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    if (questions.isEmpty) {
+      return Scaffold(
+        body: SafeArea(
+          child: ResponsiveFrame(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              child: Center(
+                child: Glass(
+                  radius: BorderRadius.circular(24),
+                  padding: const EdgeInsets.all(20),
+                  child: Text(
+                    _waitingForHostText,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     final q = questions[qIndex];
     final progress = (qIndex + 1) / questions.length;
     final hasTranslation = q.translation.trim().isNotEmpty;
