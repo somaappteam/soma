@@ -223,7 +223,7 @@ abstract class AppLocalizations {
   /// No description provided for @authForgotPasswordBody.
   ///
   /// In en, this message translates to:
-  /// **'Enter the email linked to your account. We'll send a secure reset link.'**
+  /// **'Enter the email linked to your account. We\'ll send a secure reset link.'**
   String get authForgotPasswordBody;
 
   /// No description provided for @authSendResetLink.
@@ -2881,7 +2881,7 @@ abstract class AppLocalizations {
   /// No description provided for @circlesUpdateFailed.
   ///
   /// In en, this message translates to:
-  /// **'Couldn't update room: {error}'**
+  /// **'Couldn\'t update room: {error}'**
   String circlesUpdateFailed(Object error);
 
   /// No description provided for @circlesLiveChatTitle.

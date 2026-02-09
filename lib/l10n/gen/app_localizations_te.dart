@@ -15,6 +15,11 @@ class AppLocalizationsTe extends AppLocalizations {
   String get welcomeTagline => 'నేర్చుకోండి. పోటీపడండి. నైపుణ్యం సాధించండి.';
 
   @override
+  String welcome(Object name) {
+    return 'Welcome, $name!';
+  }
+
+  @override
   String get signUp => 'సైన్ అప్';
 
   @override
@@ -25,6 +30,29 @@ class AppLocalizationsTe extends AppLocalizations {
 
   @override
   String get authFillAllFields => 'దయచేసి అన్ని వివరాలను పూరించండి';
+
+  @override
+  String get authForgotPassword => 'Forgot password?';
+
+  @override
+  String get authForgotPasswordTitle => 'Reset password';
+
+  @override
+  String get authForgotPasswordBody =>
+      'Enter the email linked to your account. We\'ll send a secure reset link.';
+
+  @override
+  String get authSendResetLink => 'Send reset link';
+
+  @override
+  String get authResetSentTitle => 'Check your email';
+
+  @override
+  String get authResetSentBody =>
+      'We sent a password reset link. Follow the instructions to set a new password.';
+
+  @override
+  String get authResetFailedTitle => 'Reset failed';
 
   @override
   String authError(Object error) {
@@ -1459,6 +1487,40 @@ class AppLocalizationsTe extends AppLocalizations {
   @override
   String get circlesLiveTextChatSubtitle =>
       'మ్యాచ్‌ల సమయంలో మెసేజింగ్ ఎనేబుల్ చేయండి';
+
+  @override
+  String get circlesRoomLocked => 'Room locked';
+
+  @override
+  String get circlesRoomUnlocked => 'Room unlocked';
+
+  @override
+  String get circlesSettingsSaved => 'Room settings saved';
+
+  @override
+  String circlesUpdateFailed(Object error) {
+    return 'Couldn\'t update room: $error';
+  }
+
+  @override
+  String get circlesLiveChatTitle => 'Live chat';
+
+  @override
+  String get circlesLiveChatPlaceholder => 'Type a message';
+
+  @override
+  String get circlesLiveChatEmpty => 'No messages yet. Start the chat!';
+
+  @override
+  String get circlesLiveChatUnavailable =>
+      'Live chat is available inside active circles.';
+
+  @override
+  String get circlesCreateHelpTitle => 'Create a circle';
+
+  @override
+  String get circlesCreateHelpBody =>
+      'Choose your languages, mode, and difficulty, then set room limits. Spectators can watch, and live chat lets everyone talk during the match.';
 
   @override
   String get circlesCreatedSuccess => 'సర్కిల్ సృష్టించబడింది';

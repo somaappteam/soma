@@ -2505,7 +2505,7 @@ class _PlayerRow extends StatelessWidget {
                           border:
                               Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18)),
                         ),
-                        child: const Text(
+                        child: Text(
                           "HOST",
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,

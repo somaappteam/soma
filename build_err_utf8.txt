@@ -1,0 +1,374 @@
+﻿flutter : [31mIRIS_I
+NCLUDE_DIR: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/i
+ris/lib/iris_4.5.2-bu
+ild.1_DCG_Windows/x64
+/include[39m
+At line:1 char:1
++ flutter build 
+windows --debug 2> 
+build_err.txt
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: ([31mIR   
+ IS_INCLU...64/in    
+clude[39m:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+[31mIRIS_LIB_DIR: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/i
+ris/lib/iris_4.5.2-bu
+ild.1_DCG_Windows/x64
+/Release[39m
+[31mNATIVE_INCLUDE_D
+IR: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/high_level_api/
+include[39m
+[31mNATIVE_LIB_DIR: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/agora_rt
+c_sdk.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/glfw3.dl
+l[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+-fdkaac.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+-ffmpeg.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+-soundtouch.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+-wgc.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_ai_echo_cancellation
+_extension.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_ai_echo_cancellation
+_ll_extension.dll[39
+m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_ai_noise_suppression
+_extension.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_ai_noise_suppression
+_ll_extension.dll[39
+m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_audio_beauty_extensi
+on.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_clear_vision_extensi
+on.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_content_inspect_exte
+nsion.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_face_capture_extensi
+on.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_face_detection_exten
+sion.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_lip_sync_extension.d
+ll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_screen_capture_exten
+sion.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_segmentation_extensi
+on.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_spatial_audio_extens
+ion.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_video_av1_decoder_ex
+tension.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_video_av1_encoder_ex
+tension.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_video_decoder_extens
+ion.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_video_encoder_extens
+ion.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libagora
+_video_quality_analyz
+er_extension.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/libaosl.
+dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/video_de
+c.dll[39m
+[31mAdd bundled 
+library: 
+C:/Users/amosl/soma a
+pp/windows/flutter/ep
+hemeral/.plugin_symli
+nks/agora_rtc_engine/
+windows/third_party/n
+ative/lib/Agora_Nativ
+e_SDK_for_Windows_FUL
+L/sdk/x86_64/video_en
+c.dll[39m

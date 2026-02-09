@@ -266,7 +266,6 @@ class _Bubble extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-            style: TextStyle(
               color: scheme.onSurface.withValues(alpha: 0.92),
               fontWeight: FontWeight.w700,
               height: 1.25,
@@ -290,6 +289,7 @@ class _InputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
       child: Glass(

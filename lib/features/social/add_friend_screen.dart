@@ -77,11 +77,13 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+            padding: EdgeInsets.fromLTRB(16, 14, 16, 18),
             child: Column(
               children: [
                 Row(

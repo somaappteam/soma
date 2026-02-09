@@ -137,10 +137,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         .colorScheme
                                         .onSurface
                                         .withValues(alpha: 0.92),
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 15,
-                                  ),      ),
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 15,
                                       ),
+                                    ),
                                       const SizedBox(height: 4),
                                       Text(
                                         l10n.editProfilePhotoSubtitle,
