@@ -1238,7 +1238,7 @@ class _AvatarGlow extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF7D5CFF).withValues(alpha: 0.45),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.45),
             blurRadius: 30,
             spreadRadius: 2,
           ),
@@ -1378,12 +1378,12 @@ class _NeonProgressBar extends StatelessWidget {
           child: FractionallySizedBox(
             widthFactor: value.clamp(0.0, 1.0),
             child: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0xFF33D6FF),
-                    Color(0xFF7D5CFF),
-                    Color(0xFFFF4BD8),
+                    scheme.primary,
+                    scheme.secondary,
+                    scheme.tertiary,
                   ],
                 ),
               ),

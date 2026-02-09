@@ -25,6 +25,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     final modeLabel = widget.mode == SoloMode.vocabulary
         ? l10n.soloModeVocabulary
         : widget.mode == SoloMode.sentences
@@ -44,7 +45,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                   Expanded(
                     child: Text(
                       l10n.soloSetupTitle(modeLabel),
-                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+                      style: TextStyle(color: scheme.onSurface, fontSize: 20, fontWeight: FontWeight.w900),
                     ),
                   ),
                 ],
@@ -58,11 +59,11 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(widget.course.subtitle,
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w800, fontSize: 12.5)),
+                        style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w800, fontSize: 12.5)),
                     const SizedBox(height: 10),
 
                     Text(l10n.difficulty,
-                        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)),
+                        style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
                     const SizedBox(height: 10),
                     Row(
                       children: [
@@ -76,7 +77,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
 
                     const SizedBox(height: 16),
                     Text(l10n.numberOfQuestions,
-                        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)),
+                        style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
                     const SizedBox(height: 10),
                     Row(
                       children: [
@@ -90,7 +91,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
 
                     const SizedBox(height: 16),
                     Text(l10n.timerPerQuestion,
-                        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900)),
+                        style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
                     const SizedBox(height: 10),
                     Row(
                       children: [
@@ -162,6 +163,7 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Expanded(
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
@@ -170,13 +172,19 @@ class _Chip extends StatelessWidget {
           height: 44,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(999),
-            color: selected ? Colors.white.withValues(alpha: 0.14) : Colors.white.withValues(alpha: 0.07),
-            border: Border.all(color: selected ? Colors.white.withValues(alpha: 0.28) : Colors.white.withValues(alpha: 0.14)),
+            color: selected
+                ? scheme.primary.withValues(alpha: 0.15)
+                : scheme.onSurface.withValues(alpha: 0.1),
+            border: Border.all(
+              color: selected
+                  ? scheme.primary.withValues(alpha: 0.5)
+                  : scheme.onSurface.withValues(alpha: 0.15),
+            ),
           ),
           alignment: Alignment.center,
           child: Text(
             label,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14),
+            style: TextStyle(color: selected ? scheme.primary : scheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14),
           ),
         ),
       ),
@@ -191,13 +199,14 @@ class _IconGlass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92)),
+        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),
       ),
     );
   }

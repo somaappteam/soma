@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../features/info/about_screen.dart';
@@ -106,6 +107,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (result != null) onSelected(result);
   }
 
+  Future<void> _launchEmail() async {
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'somaapp.team@gmail.com',
+      queryParameters: {
+        'subject': 'Soma App Support',
+      },
+    );
+     try {
+      if (await canLaunchUrl(emailLaunchUri)) {
+        await launchUrl(emailLaunchUri);
+      }
+    } catch (e) {
+      // Ignore errors if no email client is installed
+      debugPrint("Could not launch email: $e");
+    }
+  }
+
   void _showSupportSheet() {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
@@ -129,11 +148,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: S.md),
-            Text(
-              "support@soma.app",
-              style: TextStyle(color: scheme.primary, fontWeight: FontWeight.w800),
+            InkWell(
+              onTap: _launchEmail,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                child: Text(
+                  "somaapp.team@gmail.com",
+                  style: TextStyle(
+                    color: scheme.primary, 
+                    fontWeight: FontWeight.w800,
+                    decoration: TextDecoration.underline,
+                    decorationColor: scheme.primary,
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(height: S.xs),
+            const SizedBox(height: S.md),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
@@ -359,13 +390,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.info_rounded,
                 label: l10n.settingsVersion,
                 trailingText: "1.0.0",
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen())),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen(view: AboutView.version))),
               ),
               _DividerSoft(),
               _NavRow(
                 icon: Icons.description_rounded,
                 label: l10n.settingsTermsPrivacy,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen())),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen(view: AboutView.termsAndPrivacy))),
               ),
               _DividerSoft(),
               _NavRow(
@@ -666,13 +697,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     icon: Icons.info_rounded,
                                     label: l10n.settingsVersion,
                                     trailingText: "1.0.0",
-                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen())),
+                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen(view: AboutView.version))),
                                 ),
                                 _DividerSoft(),
                                 _NavRow(
                                     icon: Icons.description_rounded,
                                     label: l10n.settingsTermsPrivacy,
-                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen())),
+                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen(view: AboutView.termsAndPrivacy))),
                                 ),
                                 _DividerSoft(),
                                 _NavRow(
@@ -961,6 +992,7 @@ class _BottomSheetList<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -970,7 +1002,7 @@ class _BottomSheetList<T> extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18),
+              style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900, fontSize: 18),
             ),
             const SizedBox(height: 12),
             ...options.map((value) {
@@ -980,12 +1012,12 @@ class _BottomSheetList<T> extends StatelessWidget {
                 title: Text(
                   labelBuilder(value),
                   style: TextStyle(
-                    color: selected ? const Color(0xFF2AFADF) : Colors.white,
+                    color: selected ? scheme.primary : scheme.onSurface,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 trailing: selected
-                    ? const Icon(Icons.check_rounded, color: Color(0xFF2AFADF))
+                    ? Icon(Icons.check_rounded, color: scheme.primary)
                     : const SizedBox.shrink(),
                 onTap: () => Navigator.pop(context, value),
               );
@@ -1010,6 +1042,7 @@ class _DangerRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
@@ -1029,7 +1062,7 @@ class _DangerRow extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.5)),
+            Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.5)),
           ],
         ),
       ),

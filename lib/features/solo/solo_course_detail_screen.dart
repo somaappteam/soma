@@ -16,6 +16,7 @@ class SoloCourseDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -30,7 +31,7 @@ class SoloCourseDetailScreen extends StatelessWidget {
                     child: Text(
                       course.subtitle,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900),
+                      style: TextStyle(color: scheme.onSurface, fontSize: 20, fontWeight: FontWeight.w900),
                     ),
                   ),
                 ],
@@ -49,7 +50,7 @@ class SoloCourseDetailScreen extends StatelessWidget {
                       children: [
                         Text(
                           course.subtitle,
-                          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900),
+                          style: TextStyle(color: scheme.onSurface, fontSize: 16, fontWeight: FontWeight.w900),
                         ),
                         const SizedBox(height: 8),
                         Row(
@@ -64,8 +65,9 @@ class SoloCourseDetailScreen extends StatelessWidget {
                           height: 10,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(999),
-                            color: Colors.white.withValues(alpha: 0.08),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+                            color: scheme.onSurface.withValues(alpha: 0.1),
+                            border: Border.all(
+                                color: scheme.onSurface.withValues(alpha: 0.2)),
                           ),
                           child: Align(
                             alignment: Alignment.centerLeft,
@@ -97,12 +99,12 @@ class SoloCourseDetailScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(l10n.chooseCourseType,
-                            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
+                            style: TextStyle(color: scheme.onSurface, fontSize: 16, fontWeight: FontWeight.w900)),
                         const SizedBox(height: 10),
                         Text(
                           l10n.soloStudyDescription,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.65),
+                            color: scheme.onSurface.withValues(alpha: 0.65),
                             fontSize: 12.5,
                             fontWeight: FontWeight.w700,
                             height: 1.25,
@@ -141,11 +143,11 @@ class SoloCourseDetailScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(l10n.soloModeReview,
-                              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
+                              style: TextStyle(color: scheme.onSurface, fontSize: 16, fontWeight: FontWeight.w900)),
                           const SizedBox(height: 8),
                           Text(
                             l10n.soloModeReviewDescription,
-                            style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 12.5, fontWeight: FontWeight.w700),
+                            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.65), fontSize: 12.5, fontWeight: FontWeight.w700),
                           ),
                           const SizedBox(height: 12),
                           NeonButton(
@@ -183,6 +185,7 @@ class _ModeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return PressableScale(
       onTap: onTap,
       child: Glass(
@@ -195,24 +198,24 @@ class _ModeCard extends StatelessWidget {
               height: 46,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: Colors.white.withValues(alpha: 0.08),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                color: scheme.onSurface.withValues(alpha: 0.1),
+                border: Border.all(color: scheme.onSurface.withValues(alpha: 0.15)),
               ),
-              child: Icon(icon, color: Colors.white),
+              child: Icon(icon, color: scheme.onSurface),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
+                  Text(title, style: TextStyle(color: scheme.onSurface, fontSize: 16, fontWeight: FontWeight.w900)),
                   const SizedBox(height: 4),
                   Text(subtitle,
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.65), fontSize: 12.5, fontWeight: FontWeight.w700)),
+                      style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.65), fontSize: 12.5, fontWeight: FontWeight.w700)),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.55)),
+            Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.55)),
           ],
         ),
       ),
@@ -227,12 +230,13 @@ class _IconGlass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return PressableScale(
       onTap: onTap,
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92)),
+        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),
       ),
     );
   }
@@ -246,21 +250,22 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        color: Colors.black.withValues(alpha: 0.16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        color: scheme.surfaceContainerHighest.withValues(alpha: 0.7),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.9)),
+          Icon(icon, size: 16, color: scheme.onSurface.withValues(alpha: 0.9)),
           const SizedBox(width: 6),
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.92),
+              color: scheme.onSurface.withValues(alpha: 0.92),
               fontWeight: FontWeight.w800,
               fontSize: 13,
             ),

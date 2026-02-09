@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
+import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/pressable_scale.dart';
 import '../../models/solo_course.dart';
 import '../solo/solo_course_detail_screen.dart';
@@ -138,29 +139,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCourseList(List<SoloCourse> courses, {required bool editing}) {
     final l10n = AppLocalizations.of(context);
-    if (courses.isEmpty) {
-      if (editing) {
-        return _EmptyStateCard(
-          title: l10n.noCoursesToEdit,
-          subtitle: l10n.addCourse,
-        );
-      }
-
-      return ListView(
-        physics: const BouncingScrollPhysics(),
-        children: [
-          _EmptyStateCard(
-            title: l10n.addCourse,
-            subtitle: l10n.chooseCourseType,
-            action: _AddCourseButton(
-              onAdded: (newCourse) {
-                _reloadCourses();
-              },
-            ),
-          ),
-        ],
-      );
-    }
+    // If courses is empty, the ListView.separated below will correctly handle it
+    // by rendering just the AddCourseButton (count = 0 + 1).
 
     return ListView.separated(
               physics: const BouncingScrollPhysics(),
@@ -276,12 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Welcome
                 _buildWelcomeRow(editing: false),
                 const SizedBox(height: S.sm),
-                _HeroCard(
-                  onAdded: (newCourse) {
-                    _reloadCourses();
-                  },
-                ),
-                const SizedBox(height: S.md),
+
 
                 // Course list
                 Expanded(
@@ -342,82 +317,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _HeroCard extends StatelessWidget {
-  final void Function(SoloCourse newCourse) onAdded;
-
-  const _HeroCard({required this.onAdded});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
-    return Glass(
-      radius: BorderRadius.circular(28),
-      padding: const EdgeInsets.all(S.lg),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.auto_awesome_rounded, color: scheme.primary, size: 26),
-              const SizedBox(width: S.xs),
-              Expanded(
-                child: Text(
-                  l10n.appTitle,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
-                      ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: S.xs),
-          Text(
-            l10n.chooseCourseType,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: scheme.onSurface.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          const SizedBox(height: S.md),
-          PressableScale(
-            onTap: () async {
-              HapticFeedback.selectionClick();
-              final created = await Navigator.push<SoloCourse>(
-                context,
-                MaterialPageRoute(builder: (_) => const AddCourseScreen()),
-              );
-              if (created != null) {
-                await coursesRepository.addCustomCourse(created);
-                onAdded(created);
-              }
-            },
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(999),
-                gradient: LinearGradient(
-                  colors: [
-                    scheme.primary.withValues(alpha: 0.9),
-                    scheme.tertiary.withValues(alpha: 0.9),
-                  ],
-                ),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                l10n.addCourse,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: scheme.onPrimary,
-                      fontWeight: FontWeight.w900,
-                    ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _SmallIconButton extends StatelessWidget {
   final IconData icon;
@@ -445,53 +344,7 @@ class _SmallIconButton extends StatelessWidget {
   }
 }
 
-class _EmptyStateCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final Widget? action;
 
-  const _EmptyStateCard({
-    required this.title,
-    required this.subtitle,
-    this.action,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(top: S.sm),
-      child: Glass(
-        radius: BorderRadius.circular(24),
-        padding: const EdgeInsets.all(S.lg),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(Icons.auto_awesome_rounded, color: scheme.primary, size: 28),
-            const SizedBox(height: S.sm),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: S.xs),
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: scheme.onSurface.withValues(alpha: 0.7),
-                  ),
-            ),
-            if (action != null) ...[
-              const SizedBox(height: S.md),
-              action!,
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _CoursesSkeleton extends StatelessWidget {
   const _CoursesSkeleton();
@@ -631,7 +484,7 @@ class CourseCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
                   color: scheme.onSurface.withValues(alpha: 0.08),
-                  border: Border.all(color: scheme.onSurface.withValues(alpha: 0.10)),
+              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
                 ),
                 child: Align(
                   alignment: Alignment.centerLeft,
@@ -801,36 +654,19 @@ class _AddCourseButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    return Glass(
-      radius: BorderRadius.circular(26),
-      padding: EdgeInsets.zero,
-      child: PressableScale(
-        onTap: () async {
-          HapticFeedback.selectionClick();
-          final created = await Navigator.push<SoloCourse>(
-            context,
-            MaterialPageRoute(builder: (_) => const AddCourseScreen()),
-          );
+    return NeonButton(
+      label: l10n.addCourse,
+      onTap: () async {
+        final created = await Navigator.push<SoloCourse>(
+          context,
+          MaterialPageRoute(builder: (_) => const AddCourseScreen()),
+        );
 
-          if (created != null) {
-            await coursesRepository.addCustomCourse(created);
-            onAdded(created);
-          }
-        },
-        child: SizedBox(
-          height: 56,
-          child: Center(
-            child: Text(
-              l10n.addCourse,
-              style: TextStyle(
-                color: scheme.onSurface,
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-          ),
-        ),
-      ),
+        if (created != null) {
+          await coursesRepository.addCustomCourse(created);
+          onAdded(created);
+        }
+      },
     );
   }
 }

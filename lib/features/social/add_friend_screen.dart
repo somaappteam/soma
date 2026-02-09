@@ -77,8 +77,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
           child: Padding(
@@ -92,10 +91,10 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                       onTap: () => Navigator.pop(context),
                     ),
                     const SizedBox(width: 12),
-                    const Text(
+                    Text(
                       "Add Friend",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: scheme.onSurface,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
@@ -112,7 +111,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                       Text(
                         "Find by username",
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.75),
+                          color: scheme.onSurface.withValues(alpha: 0.75),
                           fontWeight: FontWeight.w800,
                         ),
                       ),
@@ -123,13 +122,13 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                             horizontal: 14, vertical: 10),
                         child: TextField(
                           controller: controller,
-                          style: const TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w800),
-                          cursorColor: Colors.white,
+                          style: TextStyle(
+                              color: scheme.onSurface, fontWeight: FontWeight.w800),
+                          cursorColor: scheme.primary,
                           decoration: InputDecoration(
                             hintText: "Type username…",
                             hintStyle: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.45)),
+                                color: scheme.onSurface.withValues(alpha: 0.45)),
                             border: InputBorder.none,
                           ),
                         ),
@@ -138,7 +137,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                       Text(
                         "Tip: later we can support QR code + friend ID.",
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.55),
+                          color: scheme.onSurface.withValues(alpha: 0.55),
                           fontWeight: FontWeight.w700,
                           fontSize: 12,
                         ),
@@ -172,7 +171,7 @@ class _IconGlass extends StatelessWidget {
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92)),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92)),
       ),
     );
   }

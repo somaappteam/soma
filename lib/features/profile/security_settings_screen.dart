@@ -63,7 +63,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                       Text(
                         l10n.securityTitle,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.w900,
                             ),
                       ),
@@ -163,7 +163,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                     return Text(
                                       l10n.securityNoSessions,
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.75),
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
                                         fontWeight: FontWeight.w700,
                                       ),
                                     );
@@ -180,8 +180,8 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                         padding: const EdgeInsets.all(12),
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(18),
-                                          color: Colors.white.withValues(alpha: 0.06),
-                                          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+                                          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
                                         ),
                                         child: Row(
                                           children: [
@@ -190,10 +190,10 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                               height: 40,
                                               decoration: BoxDecoration(
                                                 borderRadius: BorderRadius.circular(14),
-                                                color: Colors.white.withValues(alpha: 0.08),
-                                                border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+                                                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
                                               ),
-                                              child: Icon(Icons.devices_rounded, color: Colors.white.withValues(alpha: 0.9)),
+                                              child: Icon(Icons.devices_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9)),
                                             ),
                                             const SizedBox(width: 12),
                                             Expanded(
@@ -202,8 +202,8 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                                 children: [
                                                   Text(
                                                     label,
-                                                    style: const TextStyle(
-                                                      color: Colors.white,
+                                                    style: TextStyle(
+                                                      color: Theme.of(context).colorScheme.onSurface,
                                                       fontWeight: FontWeight.w900,
                                                       fontSize: 14,
                                                     ),
@@ -212,7 +212,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                                   Text(
                                                     "${platform.toUpperCase()} • ${_formatSeen(s.lastSeen)}",
                                                     style: TextStyle(
-                                                      color: Colors.white.withValues(alpha: 0.65),
+                                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
                                                       fontWeight: FontWeight.w700,
                                                       fontSize: 12,
                                                     ),
@@ -225,13 +225,13 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                                 decoration: BoxDecoration(
                                                   borderRadius: BorderRadius.circular(999),
-                                                  color: Colors.white.withValues(alpha: 0.12),
-                                                  border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+                                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+                                                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.22)),
                                                 ),
                                                 child: Text(
                                                   l10n.securityActiveLabel,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
+                                                  style: TextStyle(
+                                                    color: Theme.of(context).colorScheme.onSurface,
                                                     fontWeight: FontWeight.w800,
                                                     fontSize: 12,
                                                   ),
@@ -363,7 +363,7 @@ class _IconBtn extends StatelessWidget {
           width: 44,
           height: 44,
           child: Center(
-            child: Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 20),
+            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 20),
           ),
         ),
       ),
@@ -382,7 +382,7 @@ class _SectionTitle extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.75),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
           fontWeight: FontWeight.w900,
           fontSize: 12.5,
           letterSpacing: 0.2,
@@ -424,14 +424,14 @@ class _Tile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
                     const SizedBox(height: 4),
                     Text(subtitle,
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.75)),
+              Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75)),
             ],
           ),
         ),
@@ -468,17 +468,17 @@ class _SwitchTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+                Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
                 const SizedBox(height: 4),
                 Text(subtitle,
-                    style: TextStyle(color: Colors.white.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
               ],
             ),
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeThumbColor: const Color(0xFF2AFADF),
+            activeThumbColor: Theme.of(context).colorScheme.primary,
           ),
         ],
       ),
@@ -507,7 +507,7 @@ class _AutoLockRow extends StatelessWidget {
           Expanded(
             child: Text(
               l10n.securityAutoLockAfter,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontWeight: FontWeight.w900, fontSize: 14),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85), fontWeight: FontWeight.w900, fontSize: 14),
             ),
           ),
           Opacity(
@@ -524,12 +524,18 @@ class _AutoLockRow extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(999),
-                        color: selected ? Colors.white.withValues(alpha: 0.14) : Colors.black.withValues(alpha: 0.16),
-                        border: Border.all(color: Colors.white.withValues(alpha: selected ? 0.22 : 0.12)),
+                        color: selected
+                            ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)
+                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: selected ? 0.22 : 0.10)),
                       ),
                       child: Text(
                         l10n.minutesShort(m),
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12.5),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: selected ? 0.95 : 0.70),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 12.5),
                       ),
                     ),
                   ),
@@ -554,10 +560,11 @@ class _IconBox extends StatelessWidget {
       height: 44,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
       ),
-      child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 22),
+      child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92), size: 22),
     );
   }
 }
@@ -610,7 +617,7 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
           children: [
             Text(
               l10n.securitySetup2faTitle,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 16),
             ),
             const SizedBox(height: 10),
             Center(
@@ -623,12 +630,12 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
             const SizedBox(height: 10),
             Text(
               l10n.securitySecretKeyLabel,
-              style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontWeight: FontWeight.w800),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75), fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 6),
             SelectableText(
               widget.secret,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 12),
             _Input(_codeCtrl, hint: l10n.securityCodeHint, obscure: false, onChanged: () => setState(() {})),
@@ -662,13 +669,13 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  color: Colors.white.withValues(alpha: 0.10),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   _isVerifying ? l10n.securityVerifying : l10n.securityVerify,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14),
                 ),
               ),
             ),
@@ -731,7 +738,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n.securityChangePasswordTitle, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)),
+            Text(l10n.securityChangePasswordTitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 16)),
             const SizedBox(height: 12),
 
             _Input(oldCtrl, hint: l10n.securityCurrentPasswordHint, obscure: true, onChanged: () => setState(() {})),
@@ -797,11 +804,11 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  color: Colors.white.withValues(alpha: 0.10),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
                 ),
                 alignment: Alignment.center,
-                child: Text(l10n.save, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14)),
+                child: Text(l10n.save, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14)),
               ),
             ),
           ],
@@ -824,19 +831,19 @@ class _Input extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.black.withValues(alpha: 0.16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: TextField(
         controller: c,
         obscureText: obscure,
         onChanged: (_) => onChanged(),
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14.5),
-        cursorColor: Colors.white,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w800, fontSize: 14.5),
+        cursorColor: Theme.of(context).colorScheme.primary,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontWeight: FontWeight.w700),
+          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45), fontWeight: FontWeight.w700),
           border: InputBorder.none,
           isDense: true,
         ),

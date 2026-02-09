@@ -44,6 +44,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: SafeArea(
@@ -60,8 +61,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
                     const SizedBox(width: 12),
                      Text(
                       l10n.friendsTitle,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: scheme.onSurface,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
@@ -91,18 +92,18 @@ class _FriendsScreenState extends State<FriendsScreen> {
                   child: Row(
                     children: [
                       Icon(Icons.search_rounded,
-                          color: Colors.white.withValues(alpha: 0.7)),
+                          color: scheme.onSurface.withValues(alpha: 0.7)),
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
                           onChanged: (v) => setState(() => query = v),
-                          style: const TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w700),
-                          cursorColor: Colors.white,
+                          style: TextStyle(
+                              color: scheme.onSurface, fontWeight: FontWeight.w700),
+                          cursorColor: scheme.onSurface,
                           decoration: InputDecoration(
                             hintText: l10n.searchFriendsHint,
                             hintStyle: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.45)),
+                                color: scheme.onSurface.withValues(alpha: 0.45)),
                             border: InputBorder.none,
                             isDense: true,
                           ),
@@ -112,7 +113,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                         GestureDetector(
                           onTap: () => setState(() => query = ""),
                           child: Icon(Icons.close_rounded,
-                              color: Colors.white.withValues(alpha: 0.7)),
+                              color: scheme.onSurface.withValues(alpha: 0.7)),
                         ),
                     ],
                   ),
@@ -229,7 +230,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                             ? l10n.friendsEmptyState
                                             : l10n.noMatchForQuery(query),
                                         style: TextStyle(
-                                          color: Colors.white.withValues(alpha: 0.75),
+                                          color: scheme.onSurface.withValues(alpha: 0.75),
                                           fontWeight: FontWeight.w700,
                                         ),
                                       ),
@@ -286,10 +287,11 @@ class _SectionTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Text(
       text,
       style: TextStyle(
-        color: Colors.white.withValues(alpha: 0.85),
+        color: scheme.onSurface.withValues(alpha: 0.85),
         fontSize: 14,
         fontWeight: FontWeight.w900,
       ),
@@ -305,13 +307,14 @@ class _IconGlass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92)),
+        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),
       ),
     );
   }
@@ -323,13 +326,14 @@ class _AvatarDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 40,
       height: 40,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: 0.10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        color: scheme.onSurface.withValues(alpha: 0.10),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
       ),
       child: Stack(
         children: [
@@ -337,7 +341,7 @@ class _AvatarDot extends StatelessWidget {
             child: Text(
               "🙂",
               style:
-                  TextStyle(fontSize: 18, color: Colors.white.withValues(alpha: 0.9)),
+                  TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
             ),
           ),
           Positioned(
@@ -350,9 +354,9 @@ class _AvatarDot extends StatelessWidget {
                 shape: BoxShape.circle,
                 color: online
                     ? const Color(0xFF58F7B6)
-                    : Colors.white.withValues(alpha: 0.25),
+                    : scheme.onSurface.withValues(alpha: 0.25),
                 border:
-                    Border.all(color: Colors.black.withValues(alpha: 0.35), width: 2),
+                    Border.all(color: scheme.surface.withValues(alpha: 0.35), width: 2), // border matches bg
               ),
             ),
           ),
@@ -375,14 +379,15 @@ class _FriendRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.white.withValues(alpha: 0.06),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          color: scheme.onSurface.withValues(alpha: 0.06),
+          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
@@ -394,8 +399,8 @@ class _FriendRow extends StatelessWidget {
                 children: [
                   Text(
                     friend.username,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: scheme.onSurface,
                       fontWeight: FontWeight.w900,
                       fontSize: 14.5,
                     ),
@@ -405,7 +410,7 @@ class _FriendRow extends StatelessWidget {
                     Text(
                       friend.subtitle!,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.60),
+                        color: scheme.onSurface.withValues(alpha: 0.60),
                         fontWeight: FontWeight.w700,
                         fontSize: 12,
                       ),
@@ -438,14 +443,15 @@ class _RequestRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.white.withValues(alpha: 0.06),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          color: scheme.onSurface.withValues(alpha: 0.06),
+          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
@@ -454,8 +460,8 @@ class _RequestRow extends StatelessWidget {
             Expanded(
               child: Text(
                 friend.username,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: scheme.onSurface,
                   fontWeight: FontWeight.w900,
                   fontSize: 14.5,
                 ),
@@ -479,14 +485,15 @@ class _PendingRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.white.withValues(alpha: 0.06),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          color: scheme.onSurface.withValues(alpha: 0.06),
+          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
@@ -498,8 +505,8 @@ class _PendingRow extends StatelessWidget {
                 children: [
                   Text(
                     friend.username,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: scheme.onSurface,
                       fontWeight: FontWeight.w900,
                       fontSize: 14.5,
                     ),
@@ -508,7 +515,7 @@ class _PendingRow extends StatelessWidget {
                   Text(
                     "Request sent",
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.60),
+                      color: scheme.onSurface.withValues(alpha: 0.60),
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -531,6 +538,7 @@ class _MiniAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(14),
       onTap: onTap,
@@ -539,10 +547,10 @@ class _MiniAction extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          color: Colors.white.withValues(alpha: 0.08),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          color: scheme.onSurface.withValues(alpha: 0.08),
+          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
         ),
-        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 20),
+        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92), size: 20),
       ),
     );
   }

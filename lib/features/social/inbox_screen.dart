@@ -32,6 +32,7 @@ class _InboxScreenState extends State<InboxScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
           child: Padding(
@@ -48,8 +49,8 @@ class _InboxScreenState extends State<InboxScreen> {
                     const SizedBox(width: 12),
                      Text(
                       l10n.inboxTitle,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: scheme.onSurface,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
@@ -78,18 +79,18 @@ class _InboxScreenState extends State<InboxScreen> {
                   child: Row(
                     children: [
                       Icon(Icons.search_rounded,
-                          color: Colors.white.withValues(alpha: 0.7)),
+                          color: scheme.onSurface.withValues(alpha: 0.7)),
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
                           onChanged: (v) => setState(() => query = v),
-                          style: const TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w700),
-                          cursorColor: Colors.white,
+                          style: TextStyle(
+                              color: scheme.onSurface, fontWeight: FontWeight.w700),
+                          cursorColor: scheme.onSurface,
                           decoration: InputDecoration(
                             hintText: l10n.searchChatsHint,
                             hintStyle: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.45)),
+                                color: scheme.onSurface.withValues(alpha: 0.45)),
                             border: InputBorder.none,
                             isDense: true,
                           ),
@@ -99,7 +100,7 @@ class _InboxScreenState extends State<InboxScreen> {
                         GestureDetector(
                           onTap: () => setState(() => query = ""),
                           child: Icon(Icons.close_rounded,
-                              color: Colors.white.withValues(alpha: 0.7)),
+                              color: scheme.onSurface.withValues(alpha: 0.7)),
                         ),
                     ],
                   ),
@@ -134,7 +135,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                 ? l10n.inboxEmptyState
                                 : l10n.noMatchForQuery(query),
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.75),
+                              color: scheme.onSurface.withValues(alpha: 0.75),
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -195,13 +196,14 @@ class _IconGlass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92)),
+        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),
       ),
     );
   }
@@ -225,6 +227,7 @@ class _ThreadRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final highlight = unreadCount > 0;
+    final scheme = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -236,12 +239,12 @@ class _ThreadRow extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             color: highlight
-                ? Colors.white.withValues(alpha: 0.10)
-                : Colors.white.withValues(alpha: 0.06),
+                ? scheme.onSurface.withValues(alpha: 0.10)
+                : scheme.onSurface.withValues(alpha: 0.06),
             border: Border.all(
               color: highlight
-                  ? Colors.white.withValues(alpha: 0.24)
-                  : Colors.white.withValues(alpha: 0.14),
+                  ? scheme.onSurface.withValues(alpha: 0.24)
+                  : scheme.onSurface.withValues(alpha: 0.14),
             ),
           ),
           child: Row(
@@ -256,7 +259,7 @@ class _ThreadRow extends StatelessWidget {
                       name,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: scheme.onSurface,
                         fontWeight: FontWeight.w900,
                         fontSize: 14.5,
                       ),
@@ -267,7 +270,7 @@ class _ThreadRow extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.65),
+                        color: scheme.onSurface.withValues(alpha: 0.65),
                         fontWeight: FontWeight.w700,
                         fontSize: 12.5,
                       ),
@@ -282,7 +285,7 @@ class _ThreadRow extends StatelessWidget {
                   Text(
                     time,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.55),
+                      color: scheme.onSurface.withValues(alpha: 0.55),
                       fontWeight: FontWeight.w800,
                       fontSize: 11.5,
                     ),
@@ -294,14 +297,14 @@ class _ThreadRow extends StatelessWidget {
                           horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(999),
-                        color: Colors.white.withValues(alpha: 0.16),
+                        color: scheme.primary.withValues(alpha: 0.16),
                         border:
-                            Border.all(color: Colors.white.withValues(alpha: 0.22)),
+                            Border.all(color: scheme.primary.withValues(alpha: 0.22)),
                       ),
                       child: Text(
                         unreadCount.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: scheme.primary,
                           fontWeight: FontWeight.w900,
                           fontSize: 11,
                         ),
@@ -309,7 +312,7 @@ class _ThreadRow extends StatelessWidget {
                     )
                   else
                     Icon(Icons.chevron_right_rounded,
-                        color: Colors.white.withValues(alpha: 0.45)),
+                        color: scheme.onSurface.withValues(alpha: 0.45)),
                 ],
               ),
             ],
@@ -323,18 +326,19 @@ class _ThreadRow extends StatelessWidget {
 class _Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 40,
       height: 40,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: 0.10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        color: scheme.onSurface.withValues(alpha: 0.10),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
       ),
       child: Center(
         child: Text(
           "🙂",
-          style: TextStyle(fontSize: 18, color: Colors.white.withValues(alpha: 0.9)),
+          style: TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
         ),
       ),
     );

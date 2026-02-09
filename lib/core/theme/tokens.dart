@@ -25,7 +25,7 @@ class T {
   static const r28 = BorderRadius.all(Radius.circular(28));
 
   static const neonGradient = LinearGradient(
-    colors: [neonB, neonA], // Simplified to 2 colors
+    colors: [neonA, neonC], // Purple -> Pink
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

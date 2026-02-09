@@ -125,30 +125,34 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
   Color _choiceBorderColor({
     required bool isCorrect,
     required bool isSelected,
+    required ColorScheme scheme,
   }) {
     if (!_locked) {
-      return Colors.white.withValues(alpha: isSelected ? 0.35 : 0.15);
+      // In light mode, use white for glass borders
+      return scheme.onSurface.withOpacity(isSelected ? 0.4 : 0.2);
     }
     if (isCorrect) return const Color(0xFF58F7B6); // green glow vibe
     if (isSelected && !isCorrect) return const Color(0xFFFF5AA5); // pink/red
-    return Colors.white.withValues(alpha: 0.10);
+    return scheme.onSurface.withOpacity(0.10);
   }
 
   Color _choiceFillColor({
     required bool isCorrect,
     required bool isSelected,
+    required ColorScheme scheme,
   }) {
     if (!_locked) {
-      return Colors.white.withValues(alpha: isSelected ? 0.08 : 0.04);
+      return scheme.onSurface.withValues(alpha: isSelected ? 0.08 : 0.04);
     }
     if (isCorrect) return const Color(0xFF58F7B6).withValues(alpha: 0.10);
     if (isSelected && !isCorrect) return const Color(0xFFFF5AA5).withValues(alpha: 0.10);
-    return Colors.white.withValues(alpha: 0.03);
+    return scheme.onSurface.withValues(alpha: 0.1);
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     final q = _questions[_index];
     final progress = (_secondsLeft / _secondsPerQuestion).clamp(0.0, 1.0);
 
@@ -164,17 +168,17 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                   children: [
                     IconButton(
                       onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                      icon: Icon(Icons.arrow_back_ios_new_rounded, color: scheme.onSurface),
                     ),
                     const Spacer(),
                     _Pill(
                       child: Row(
                         children: [
-                          const Icon(Icons.timer_rounded, color: Colors.white, size: 18),
+                          Icon(Icons.timer_rounded, color: scheme.onSurface, size: 18),
                           const SizedBox(width: 8),
                           Text(
                             "0:${_secondsLeft.toString().padLeft(2, '0')}",
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -183,11 +187,11 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                     _Pill(
                       child: Row(
                         children: [
-                          const Icon(Icons.bolt_rounded, color: Colors.white, size: 18),
+                          Icon(Icons.bolt_rounded, color: scheme.onSurface, size: 18),
                           const SizedBox(width: 8),
                           Text(
                             "+$_score",
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
                           ),
                         ],
                       ),
@@ -209,7 +213,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                           Text(
                             l10n.soloModeSentences,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
+                              color: scheme.onSurface.withValues(alpha: 0.9),
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
                             ),
@@ -217,7 +221,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                           const Spacer(),
                           Text(
                             "${_index + 1}/${_questions.length}",
-                            style: TextStyle(color: Colors.white.withValues(alpha: 0.65)),
+                            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.65)),
                           ),
                         ],
                       ),
@@ -228,7 +232,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                           height: 10,
                           child: Stack(
                             children: [
-                              Container(color: Colors.white.withValues(alpha: 0.10)),
+                              Container(color: scheme.onSurface.withValues(alpha: 0.10)),
                               FractionallySizedBox(
                                 widthFactor: progress,
                                 child: Container(
@@ -257,57 +261,57 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                      Text(
-  q.prompt,
-  textAlign: TextAlign.center,
-  style: const TextStyle(
-    color: Colors.white,
-    fontSize: 22,
-    height: 1.25,
-    fontWeight: FontWeight.w800,
-  ),
-),
+                      q.prompt,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: scheme.onSurface,
+                        fontSize: 22,
+                        height: 1.25,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
 
-const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-// ✅ Translation line
-Text(
-  q.translation,
-  textAlign: TextAlign.center,
-  style: TextStyle(
-    color: Colors.white.withValues(alpha: 0.70),
-    fontSize: 15,
-    height: 1.25,
-    fontWeight: FontWeight.w600,
-  ),
-),
+                    // ✅ Translation line
+                    Text(
+                      q.translation,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.70),
+                        fontSize: 15,
+                        height: 1.25,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
 
-// ✅ Optional reading line (pinyin / romaji / transliteration)
-if (q.reading != null && q.reading!.trim().isNotEmpty) ...[
-  const SizedBox(height: 8),
-  Text(
-    q.reading!,
-    textAlign: TextAlign.center,
-    style: TextStyle(
-      color: Colors.white.withValues(alpha: 0.55),
-      fontSize: 13.5,
-      height: 1.25,
-      fontWeight: FontWeight.w600,
-    ),
-  ),
-],
+                    // ✅ Optional reading line (pinyin / romaji / transliteration)
+                    if (q.reading != null && q.reading!.trim().isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        q.reading!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: scheme.onSurface.withValues(alpha: 0.55),
+                          fontSize: 13.5,
+                          height: 1.25,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
 
-// ✅ Optional hint (unchanged)
-if (q.hint != null) ...[
-  const SizedBox(height: 10),
-  Text(
-    q.hint!,
-    textAlign: TextAlign.center,
-    style: TextStyle(
-      color: Colors.white.withValues(alpha: 0.55),
-      fontSize: 13,
-    ),
-  ),
-],
+                    // ✅ Optional hint (unchanged)
+                    if (q.hint != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        q.hint!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: scheme.onSurface.withValues(alpha: 0.55),
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
 
                     ],
                   ),
@@ -335,12 +339,14 @@ if (q.hint != null) ...[
                               color: _choiceBorderColor(
                                 isCorrect: isCorrect,
                                 isSelected: isSelected,
+                                scheme: scheme,
                               ),
                               width: 1.2,
                             ),
                             color: _choiceFillColor(
                               isCorrect: isCorrect,
                               isSelected: isSelected,
+                              scheme: scheme,
                             ),
                             boxShadow: [
                               if (_locked && isCorrect)
@@ -366,16 +372,16 @@ if (q.hint != null) ...[
                                   height: 22,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+                                    border: Border.all(color: scheme.onSurface.withValues(alpha: 0.35)),
                                   ),
                                   child: isSelected
                                       ? Center(
                                           child: Container(
                                             width: 10,
                                             height: 10,
-                                            decoration: const BoxDecoration(
+                                            decoration: BoxDecoration(
                                               shape: BoxShape.circle,
-                                              color: Colors.white,
+                                              color: scheme.onSurface,
                                             ),
                                           ),
                                         )
@@ -384,8 +390,8 @@ if (q.hint != null) ...[
                                 const SizedBox(width: 12),
                                 Text(
                                   q.choices[i],
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: scheme.onSurface,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 16,
                                   ),

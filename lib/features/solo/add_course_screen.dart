@@ -28,6 +28,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final valid = speak.code != learn.code;
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: SafeArea(
@@ -49,7 +50,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                             height: 44,
                             child: Center(
                               child: Icon(Icons.arrow_back_ios_new_rounded,
-                                  color: Colors.white.withValues(alpha: 0.9),
+                                  color: scheme.onSurface.withValues(alpha: 0.9),
                                   size: 20),
                             ),
                           ),
@@ -59,7 +60,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                       Text(
                         l10n.addCourse,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
+                              color: scheme.onSurface,
                               fontWeight: FontWeight.w900,
                             ),
                       ),
@@ -108,7 +109,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                           Text(
                             l10n.chooseTwoDifferentLanguages,
                             style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.75),
+                                color: scheme.error,
                                 fontWeight: FontWeight.w800),
                           ),
                         ],
@@ -144,7 +145,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                           child: Text(
                             l10n.createCourse,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: valid ? 1 : 0.45),
+                              color: scheme.primary.withValues(alpha: valid ? 1 : 0.45),
                               fontSize: 16,
                               fontWeight: FontWeight.w900,
                             ),
@@ -179,6 +180,7 @@ class _SelectTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: onTap,
@@ -187,12 +189,12 @@ class _SelectTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.black.withValues(alpha: 0.14),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          color: scheme.onSurface.withValues(alpha: 0.1),
+          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.2)),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white.withValues(alpha: 0.9)),
+            Icon(icon, color: scheme.onSurface.withValues(alpha: 0.9)),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -202,7 +204,7 @@ class _SelectTile extends StatelessWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.65),
+                      color: scheme.onSurface.withValues(alpha: 0.65),
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -211,8 +213,8 @@ class _SelectTile extends StatelessWidget {
                   Text(
                     value,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: scheme.onSurface,
                       fontWeight: FontWeight.w900,
                       fontSize: 14.5,
                     ),
@@ -221,7 +223,7 @@ class _SelectTile extends StatelessWidget {
               ),
             ),
             Icon(Icons.expand_more_rounded,
-                color: Colors.white.withValues(alpha: 0.65)),
+                color: scheme.onSurface.withValues(alpha: 0.65)),
           ],
         ),
       ),
@@ -236,6 +238,8 @@ Future<LangOption?> _pickLanguage(
   required LangOption current,
 }) async {
   final l10n = AppLocalizations.of(context);
+  final scheme = Theme.of(context).colorScheme;
+  
   return showModalBottomSheet<LangOption>(
     context: context,
     backgroundColor: Colors.transparent,
@@ -273,8 +277,8 @@ Future<LangOption?> _pickLanguage(
                         children: [
                           Text(
                             title,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: scheme.onSurface,
                               fontWeight: FontWeight.w900,
                               fontSize: 16,
                             ),
@@ -296,13 +300,13 @@ Future<LangOption?> _pickLanguage(
                               showSearch
                                   ? Icons.search_off_rounded
                                   : Icons.search_rounded,
-                              color: Colors.white.withValues(alpha: 0.85),
+                              color: scheme.onSurface.withValues(alpha: 0.85),
                             ),
                           ),
                           IconButton(
                             onPressed: () => Navigator.pop(ctx),
                             icon: Icon(Icons.close_rounded,
-                                color: Colors.white.withValues(alpha: 0.85)),
+                                color: scheme.onSurface.withValues(alpha: 0.85)),
                           ),
                         ],
                       ),
@@ -313,25 +317,25 @@ Future<LangOption?> _pickLanguage(
                           padding: const EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(14),
-                            color: Colors.black.withValues(alpha: 0.12),
+                            color: scheme.onSurface.withValues(alpha: 0.1),
                             border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.12)),
+                                color: scheme.onSurface.withValues(alpha: 0.2)),
                           ),
                           child: TextField(
                             focusNode: searchFocus,
                             onChanged: (v) => setModalState(() => query = v),
-                            style: const TextStyle(
-                                color: Colors.white,
+                            style: TextStyle(
+                                color: scheme.onSurface,
                                 fontWeight: FontWeight.w700),
-                            cursorColor: Colors.white,
+                            cursorColor: scheme.primary,
                             textInputAction: TextInputAction.search,
                             decoration: InputDecoration(
                               hintText: l10n.searchLanguage,
                               hintStyle: TextStyle(
-                                  color: Colors.white.withValues(alpha: 0.5)),
+                                  color: scheme.onSurface.withValues(alpha: 0.5)),
                               border: InputBorder.none,
                               prefixIcon: Icon(Icons.search_rounded,
-                                  color: Colors.white.withValues(alpha: 0.7)),
+                                  color: scheme.onSurface.withValues(alpha: 0.7)),
                             ),
                           ),
                         ),
@@ -343,7 +347,7 @@ Future<LangOption?> _pickLanguage(
                           child: Text(
                             l10n.noMatches,
                             style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.7),
+                                color: scheme.onSurface.withValues(alpha: 0.7),
                                 fontWeight: FontWeight.w700),
                           ),
                         )
@@ -361,12 +365,12 @@ Future<LangOption?> _pickLanguage(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
                                 color: selected
-                                    ? Colors.white.withValues(alpha: 0.10)
-                                    : Colors.black.withValues(alpha: 0.10),
+                                    ? scheme.primary.withValues(alpha: 0.15)
+                                    : scheme.onSurface.withValues(alpha: 0.1),
                                 border: Border.all(
                                   color: selected
-                                      ? Colors.white.withValues(alpha: 0.26)
-                                      : Colors.white.withValues(alpha: 0.10),
+                                      ? scheme.primary.withValues(alpha: 0.5)
+                                      : scheme.onSurface.withValues(alpha: 0.15),
                                 ),
                               ),
                               child: Row(
@@ -374,15 +378,15 @@ Future<LangOption?> _pickLanguage(
                                   Expanded(
                                     child: Text(
                                       e.name,
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                      style: TextStyle(
+                                        color: scheme.onSurface,
                                         fontWeight: FontWeight.w800,
                                       ),
                                     ),
                                   ),
                                   if (selected)
                                     Icon(Icons.check_rounded,
-                                        color: Colors.white.withValues(alpha: 0.9)),
+                                        color: scheme.primary),
                                 ],
                               ),
                             ),

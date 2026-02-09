@@ -240,7 +240,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
                   Text(
                     l10n.navCircles,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w900,
                         ),
                   ),
@@ -313,7 +313,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
                           l10n.circlesNoActiveForFilters,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.6),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -506,14 +506,14 @@ class CircleCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   room.title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.70)),
+              Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70)),
             ],
           ),
 
@@ -523,7 +523,7 @@ class CircleCard extends StatelessWidget {
           Text(
             l10n.circlesRoomLine(room.fromLang, room.toLang, modeLabel, levelLabel),
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.75),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -580,7 +580,7 @@ class _SmallIconButton extends StatelessWidget {
           width: 44,
           height: 44,
           child: Center(
-            child: Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 22),
+            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 22),
           ),
         ),
       ),
@@ -606,25 +606,28 @@ class _FilterChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            color: Colors.black.withValues(alpha: 0.14),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            color: Theme.of(context).brightness == Brightness.light
+                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+                : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            border: Border.all(
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
           ),
           child: Row(
             children: [
-              Icon(icon, size: 18, color: Colors.white.withValues(alpha: 0.85)),
+              Icon(icon, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85)),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   label,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.85),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85),
                     fontWeight: FontWeight.w800,
                     fontSize: 12.5,
                   ),
                 ),
               ),
-              Icon(Icons.expand_more_rounded, size: 18, color: Colors.white.withValues(alpha: 0.65)),
+              Icon(Icons.expand_more_rounded, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65)),
             ],
           ),
         ),
@@ -660,8 +663,8 @@ Future<String?> _pickFilterOption(
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w900,
                           fontSize: 16,
                         ),
@@ -669,7 +672,7 @@ Future<String?> _pickFilterOption(
                       const Spacer(),
                       IconButton(
                         onPressed: () => Navigator.pop(ctx),
-                        icon: Icon(Icons.close_rounded, color: Colors.white.withValues(alpha: 0.85)),
+                        icon: Icon(Icons.close_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85)),
                       ),
                     ],
                   ),
@@ -677,8 +680,8 @@ Future<String?> _pickFilterOption(
                   ...items.map((item) {
                     final selected = !item.isAction && item.value == current;
                     final textColor = item.isAction
-                        ? const Color(0xFF2AFADF)
-                        : Colors.white.withValues(alpha: selected ? 0.98 : 0.92);
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: selected ? 0.98 : 0.92);
                     return InkWell(
                       borderRadius: BorderRadius.circular(16),
                       onTap: () => Navigator.pop(ctx, item.value),
@@ -689,10 +692,17 @@ Future<String?> _pickFilterOption(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           color: selected
-                              ? Colors.white.withValues(alpha: 0.10)
-                              : Colors.black.withValues(alpha: item.isAction ? 0.18 : 0.10),
+                              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.10)
+                              : (Theme.of(context).brightness == Brightness.light
+                                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .surfaceContainerHighest
+                                      .withValues(alpha: item.isAction ? 0.18 : 0.10)),
                           border: Border.all(
-                            color: selected ? Colors.white.withValues(alpha: 0.26) : Colors.white.withValues(alpha: 0.10),
+                            color: selected
+                                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.26)
+                                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
                           ),
                         ),
                         child: Row(
@@ -711,7 +721,7 @@ Future<String?> _pickFilterOption(
                               ),
                             ),
                             if (selected)
-                              Icon(Icons.check_rounded, color: Colors.white.withValues(alpha: 0.9)),
+                              Icon(Icons.check_rounded, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.9)),
                           ],
                         ),
                       ),
@@ -790,7 +800,7 @@ class _LiveDot extends StatelessWidget {
       height: 12,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: live ? const Color(0xFF2AFADF) : Colors.white.withValues(alpha: 0.35),
+        color: live ? const Color(0xFF2AFADF) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
         boxShadow: live
             ? [
                 BoxShadow(

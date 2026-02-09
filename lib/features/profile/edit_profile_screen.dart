@@ -100,7 +100,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       Text(
                         l10n.editProfileTitle,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.w900,
                             ),
                       ),
@@ -135,16 +135,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                       Text(
                                         l10n.editProfilePhotoLabel,
                                         style: TextStyle(
-                                          color: Colors.white.withValues(alpha: 0.92),
-                                          fontWeight: FontWeight.w900,
-                                          fontSize: 15,
-                                        ),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.92),
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 15,
+                                  ),      ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
                                         l10n.editProfilePhotoSubtitle,
                                         style: TextStyle(
-                                          color: Colors.white.withValues(alpha: 0.62),
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62),
                                           fontWeight: FontWeight.w700,
                                           fontSize: 12.5,
                                           height: 1.2,
@@ -236,13 +239,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               children: [
                                 Text(
                                   l10n.editProfileDailyGoalTitle,
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15),
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface,
+                                      fontWeight: FontWeight.w900,
+                                      fontSize: 15),
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
                                   l10n.editProfileDailyGoalSubtitle,
                                   style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.62),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.62),
                                     fontWeight: FontWeight.w700,
                                     fontSize: 12.5,
                                     height: 1.2,
@@ -279,7 +290,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 child: Center(
                                   child: Text(
                                     l10n.save,
-                                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900),
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w900),
                                   ),
                                 ),
                               ),
@@ -320,7 +336,12 @@ class _SmallIconButton extends StatelessWidget {
           width: 44,
           height: 44,
           child: Center(
-            child: Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 22),
+            child: Icon(icon,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.9),
+                size: 22),
           ),
         ),
       ),
@@ -336,19 +357,29 @@ class _Avatar extends StatelessWidget {
       height: 56,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2AFADF), Color(0xFF7C7CFF), Color(0xFFFF4ECD)],
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+            Theme.of(context).colorScheme.tertiary,
+          ],
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF7C7CFF).withValues(alpha: 0.35),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
             blurRadius: 18,
             spreadRadius: 2,
           ),
         ],
       ),
       child: Center(
-        child: Text("🙂", style: TextStyle(fontSize: 22, color: Colors.white.withValues(alpha: 0.95))),
+        child: Text("🙂",
+            style: TextStyle(
+                fontSize: 22,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.95))),
       ),
     );
   }
@@ -368,12 +399,26 @@ class _ChipButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: Colors.black.withValues(alpha: 0.16),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          color: Theme.of(context).brightness == Brightness.light
+              ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.16),
+          border: Border.all(
+              color: Theme.of(context).brightness == Brightness.light
+                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)
+                  : Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.12)),
         ),
         child: Text(
           label,
-          style: TextStyle(color: Colors.white.withValues(alpha: 0.92), fontWeight: FontWeight.w900, fontSize: 12.5),
+          style: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.92),
+              fontWeight: FontWeight.w900,
+              fontSize: 12.5),
         ),
       ),
     );
@@ -391,7 +436,10 @@ class _FieldLabel extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.75),
+          color: Theme.of(context)
+              .colorScheme
+              .onSurface
+              .withValues(alpha: 0.75),
           fontWeight: FontWeight.w900,
           fontSize: 12.5,
         ),
@@ -418,19 +466,35 @@ class _GlassTextField extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.black.withValues(alpha: 0.16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        color: Theme.of(context).brightness == Brightness.light
+            ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+            : Colors.black.withValues(alpha: 0.16),
+        border: Border.all(
+            color: Theme.of(context).brightness == Brightness.light
+                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)
+                : Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.12)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: TextFormField(
         controller: controller,
         validator: validator,
         maxLines: maxLines,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14.5),
-        cursorColor: Colors.white,
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.w800,
+            fontSize: 14.5),
+        cursorColor: Theme.of(context).colorScheme.primary,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontWeight: FontWeight.w700),
+          hintStyle: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.45),
+              fontWeight: FontWeight.w700),
           border: InputBorder.none,
           isDense: true,
         ),
@@ -459,12 +523,34 @@ class _GoalChip extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: selected ? Colors.white.withValues(alpha: 0.14) : Colors.white.withValues(alpha: 0.07),
-          border: Border.all(color: selected ? Colors.white.withValues(alpha: 0.22) : Colors.white.withValues(alpha: 0.12)),
+          color: selected
+              ? (Theme.of(context).brightness == Brightness.light
+                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15)
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14))
+              : (Theme.of(context).brightness == Brightness.light
+                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05)
+                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07)),
+          border: Border.all(
+              color: selected
+                  ? (Theme.of(context).brightness == Brightness.light
+                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
+                      : Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.22))
+                  : (Theme.of(context).brightness == Brightness.light
+                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)
+                      : Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.12))),
         ),
         child: Text(
           l10n.minutesShort(min),
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
+          style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.w900,
+              fontSize: 13),
         ),
       ),
     );

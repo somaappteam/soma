@@ -306,11 +306,10 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
   Widget build(BuildContext context) {
     if (questions.isEmpty) {
       return const Scaffold(
-        body:
-            Center(child: CircularProgressIndicator(color: Color(0xFF33D6FF))),
+        body: Center(child: CircularProgressIndicator(color: Color(0xFF33D6FF))),
       );
     }
-
+    final scheme = Theme.of(context).colorScheme;
     final q = questions[index % questions.length];
     final List<String> choices = _choices;
     final timeLimit = widget.timePerQuestion;
@@ -333,8 +332,8 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                     child: Text(
                       "Solo • ${widget.course.title}",
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          color: Colors.white,
+                      style: TextStyle(
+                          color: scheme.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.w900),
                     ),
@@ -363,7 +362,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                         height: 10,
                         child: LinearProgressIndicator(
                           value: progress,
-                          backgroundColor: Colors.white.withValues(alpha: 0.10),
+                          backgroundColor: scheme.onSurface.withValues(alpha: 0.10),
                           valueColor: AlwaysStoppedAnimation<Color>(
                             Color.lerp(const Color(0xFF33D6FF),
                                 const Color(0xFFFF4BD8), 1.0 - progress)!,
@@ -381,7 +380,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                         q["reading"] as String,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.55),
+                            color: scheme.onSurface.withValues(alpha: 0.55),
                             fontSize: 13.5,
                             fontWeight: FontWeight.w600),
                       ),
@@ -409,8 +408,8 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                     final isSel = selected == i;
                     final isCorrect = i == _correctIndex;
 
-                    Color bg = Colors.white.withValues(alpha: 0.06);
-                    Color border = Colors.white.withValues(alpha: 0.14);
+                    Color bg = scheme.onSurface.withValues(alpha: 0.06);
+                    Color border = scheme.onSurface.withValues(alpha: 0.14);
 
                     if (revealed) {
                       if (isCorrect) {
@@ -423,8 +422,8 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                       }
                     } else {
                       if (isSel) {
-                        bg = Colors.white.withValues(alpha: 0.12);
-                        border = Colors.white.withValues(alpha: 0.28);
+                        bg = scheme.onSurface.withValues(alpha: 0.12);
+                        border = scheme.onSurface.withValues(alpha: 0.28);
                       }
                     }
 
@@ -465,7 +464,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                                   child: Text(
                                     choices[i],
                                     style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.92),
+                                        color: scheme.onSurface.withValues(alpha: 0.92),
                                         fontSize: 16,
                                         fontWeight: FontWeight.w800),
                                   ),
@@ -504,14 +503,17 @@ class _IconGlass extends StatelessWidget {
   final VoidCallback onTap;
   const _IconGlass({required this.icon, required this.onTap});
   @override
-  Widget build(BuildContext context) => InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Glass(
-            radius: BorderRadius.circular(16),
-            padding: const EdgeInsets.all(10),
-            child: Icon(icon, color: Colors.white.withValues(alpha: 0.92))),
-      );
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Glass(
+          radius: BorderRadius.circular(16),
+          padding: const EdgeInsets.all(10),
+          child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92))),
+    );
+  }
 }
 
 class _ChoiceSet {
@@ -536,6 +538,7 @@ class _TtsControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(18),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -559,7 +562,7 @@ class _TtsControls extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(6),
               child: Icon(Icons.volume_up_rounded,
-                  color: Colors.white.withValues(alpha: 0.9)),
+                  color: scheme.onSurface.withValues(alpha: 0.9)),
             ),
           ),
         ],
@@ -581,6 +584,7 @@ class _SpeedChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
@@ -590,18 +594,18 @@ class _SpeedChip extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
           color: selected
-              ? Colors.white.withValues(alpha: 0.16)
-              : Colors.white.withValues(alpha: 0.08),
+              ? scheme.onSurface.withValues(alpha: 0.16)
+              : scheme.onSurface.withValues(alpha: 0.08),
           border: Border.all(
               color: selected
-                  ? Colors.white.withValues(alpha: 0.32)
-                  : Colors.white.withValues(alpha: 0.16)),
+                  ? scheme.onSurface.withValues(alpha: 0.32)
+                  : scheme.onSurface.withValues(alpha: 0.16)),
         ),
         alignment: Alignment.center,
         child: Text(
           label,
-          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12),
+          style: TextStyle(
+              color: scheme.onSurface, fontWeight: FontWeight.w800, fontSize: 12),
         ),
       ),
     );
@@ -615,20 +619,21 @@ class _Pill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        color: scheme.onSurface.withValues(alpha: 0.1),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.9)),
+          Icon(icon, size: 16, color: scheme.onSurface.withValues(alpha: 0.9)),
           const SizedBox(width: 6),
           Text(text,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.w900)),
+              style: TextStyle(
+                  color: scheme.onSurface, fontWeight: FontWeight.w900)),
         ],
       ),
     );
@@ -642,14 +647,15 @@ class _VocabPromptRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final prompt = question["prompt"]?.toString() ?? '';
     final article = question["article"]?.toString().trim() ?? '';
     final word = question["word"]?.toString().trim() ?? '';
     final gender = question["gender"]?.toString().trim() ?? '';
     final hasArticle = article.isNotEmpty && word.isNotEmpty;
 
-    final baseStyle = const TextStyle(
-      color: Colors.white,
+    final baseStyle = TextStyle(
+      color: scheme.onSurface,
       fontSize: 22,
       height: 1.25,
       fontWeight: FontWeight.w900,
@@ -694,6 +700,7 @@ class _GenderChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final trimmed = label.trim();
     final display = trimmed.isEmpty
         ? ""
@@ -704,13 +711,13 @@ class _GenderChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        color: scheme.onSurface.withValues(alpha: 0.10),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.18)),
       ),
       child: Text(
         display,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: scheme.onSurface,
           fontWeight: FontWeight.w800,
           fontSize: 11.5,
           letterSpacing: 0.6,

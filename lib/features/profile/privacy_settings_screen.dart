@@ -45,7 +45,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                       Text(
                         l10n.privacyTitle,
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.w900,
                             ),
                       ),
@@ -156,7 +156,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                                 child: Text(
                                   l10n.privacyBlockedUsersComingSoon,
                                   style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.75),
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -282,7 +282,7 @@ class _IconBtn extends StatelessWidget {
         child: SizedBox(
           width: 44,
           height: 44,
-          child: Center(child: Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 20)),
+          child: Center(child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 20)),
         ),
       ),
     );
@@ -300,7 +300,7 @@ class _SectionTitle extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.75),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
           fontWeight: FontWeight.w900,
           fontSize: 12.5,
           letterSpacing: 0.2,
@@ -338,9 +338,9 @@ class _SwitchTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+                Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
                 const SizedBox(height: 4),
-                Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+                Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
               ],
             ),
           ),
@@ -362,10 +362,11 @@ class _IconBox extends StatelessWidget {
       height: 44,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+        border: Border.all(
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
       ),
-      child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 22),
+      child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92), size: 22),
     );
   }
 }
@@ -398,9 +399,9 @@ class _SegmentedChoice extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+          Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
           const SizedBox(height: 4),
-          Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+          Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
           const SizedBox(height: 12),
           Row(
             children: List.generate(options.length, (i) {
@@ -415,13 +416,16 @@ class _SegmentedChoice extends StatelessWidget {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(999),
-                      color: selected ? Colors.white.withValues(alpha: 0.14) : Colors.black.withValues(alpha: 0.16),
-                      border: Border.all(color: Colors.white.withValues(alpha: selected ? 0.22 : 0.12)),
+                      color: selected
+                          ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)
+                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: selected ? 0.22 : 0.10)),
                     ),
                     child: Text(
                       options[i].label,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: selected ? 0.95 : 0.75),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: selected ? 0.95 : 0.75),
                         fontWeight: FontWeight.w900,
                         fontSize: 12.5,
                       ),
@@ -431,25 +435,26 @@ class _SegmentedChoice extends StatelessWidget {
               );
             }),
           ),
+          const SizedBox(height: 2),
         ],
       ),
     );
   }
 }
-
+ 
 class _Tile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-
+ 
   const _Tile({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
   });
-
+ 
   @override
   Widget build(BuildContext context) {
     return Glass(
@@ -468,13 +473,13 @@ class _Tile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+                    Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
                     const SizedBox(height: 4),
-                    Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+                    Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.75)),
+              Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75)),
             ],
           ),
         ),
@@ -482,20 +487,20 @@ class _Tile extends StatelessWidget {
     );
   }
 }
-
+ 
 class _TileDanger extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
-
+ 
   const _TileDanger({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
   });
-
+ 
   @override
   Widget build(BuildContext context) {
     return Glass(
@@ -514,13 +519,13 @@ class _TileDanger extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+                    Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
                     const SizedBox(height: 4),
-                    Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+                    Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
                   ],
                 ),
               ),
-              Icon(Icons.warning_amber_rounded, color: Colors.white.withValues(alpha: 0.85)),
+              Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.onErrorContainer.withValues(alpha: 0.85)),
             ],
           ),
         ),
@@ -546,9 +551,9 @@ class _InfoSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)),
+            Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 16)),
             const SizedBox(height: 8),
-            Text(body, style: TextStyle(color: Colors.white.withValues(alpha: 0.70), fontWeight: FontWeight.w700, height: 1.2)),
+            Text(body, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70), fontWeight: FontWeight.w700, height: 1.2)),
             const SizedBox(height: 12),
             InkWell(
               borderRadius: BorderRadius.circular(999),
@@ -558,11 +563,11 @@ class _InfoSheet extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  color: Colors.white.withValues(alpha: 0.10),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
                 ),
                 alignment: Alignment.center,
-                child: Text(l10n.ok, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14)),
+                child: Text(l10n.ok, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14)),
               ),
             ),
           ],
@@ -597,9 +602,9 @@ class _ConfirmSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)),
+            Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 16)),
             const SizedBox(height: 8),
-            Text(body, style: TextStyle(color: Colors.white.withValues(alpha: 0.70), fontWeight: FontWeight.w700, height: 1.2)),
+            Text(body, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70), fontWeight: FontWeight.w700, height: 1.2)),
             const SizedBox(height: 12),
             Row(
               children: [
@@ -611,12 +616,12 @@ class _ConfirmSheet extends StatelessWidget {
                       height: 46,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(999),
-                        color: Colors.black.withValues(alpha: 0.16),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+                        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
                       ),
                       alignment: Alignment.center,
                       child: Text(l10n.cancel,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14)),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14)),
                     ),
                   ),
                 ),
@@ -629,12 +634,12 @@ class _ConfirmSheet extends StatelessWidget {
                       height: 46,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(999),
-                        color: Colors.redAccent.withValues(alpha: 0.22),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                        color: Theme.of(context).colorScheme.error.withValues(alpha: 0.22),
+                        border: Border.all(color: Theme.of(context).colorScheme.error.withValues(alpha: 0.12)),
                       ),
                       alignment: Alignment.center,
                       child: Text(confirmText,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14)),
+                          style: TextStyle(color: Theme.of(context).colorScheme.error, fontWeight: FontWeight.w900, fontSize: 14)),
                     ),
                   ),
                 ),

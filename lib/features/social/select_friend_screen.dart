@@ -68,10 +68,10 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
                       onTap: () => Navigator.pop(context),
                     ),
                     const SizedBox(width: 12),
-                    Text(
+                      Text(
                       l10n.newMessageTitle,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
@@ -87,16 +87,16 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   child: Row(
                     children: [
-                      Icon(Icons.search_rounded, color: Colors.white.withValues(alpha: 0.7)),
+                      Icon(Icons.search_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
                           onChanged: (v) => setState(() => query = v),
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                          cursorColor: Colors.white,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w700),
+                          cursorColor: Theme.of(context).colorScheme.primary,
                           decoration: InputDecoration(
                             hintText: l10n.searchFriendsHint,
-                            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.45)),
+                            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45)),
                             border: InputBorder.none,
                             isDense: true,
                           ),
@@ -105,7 +105,7 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
                       if (query.isNotEmpty)
                         GestureDetector(
                           onTap: () => setState(() => query = ""),
-                          child: Icon(Icons.close_rounded, color: Colors.white.withValues(alpha: 0.7)),
+                          child: Icon(Icons.close_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                         ),
                     ],
                   ),
@@ -123,7 +123,7 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
                           child: Text(
                             query.isEmpty ? l10n.friendsEmptyShort : l10n.noMatchForQuery(query),
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.75),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -178,7 +178,7 @@ class _IconGlass extends StatelessWidget {
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92)),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92)),
       ),
     );
   }
@@ -195,6 +195,7 @@ class _PickRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: InkWell(
@@ -204,8 +205,8 @@ class _PickRow extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            color: Colors.white.withValues(alpha: 0.06),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+            color: scheme.onSurface.withValues(alpha: 0.06),
+            border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
           ),
           child: Row(
             children: [
@@ -217,8 +218,8 @@ class _PickRow extends StatelessWidget {
                   children: [
                     Text(
                       friend.username,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: scheme.onSurface,
                         fontWeight: FontWeight.w900,
                         fontSize: 14.5,
                       ),
@@ -228,7 +229,7 @@ class _PickRow extends StatelessWidget {
                       Text(
                         friend.subtitle!,
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.60),
+                          color: scheme.onSurface.withValues(alpha: 0.60),
                           fontWeight: FontWeight.w700,
                           fontSize: 12,
                         ),
@@ -237,7 +238,7 @@ class _PickRow extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.5)),
+              Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.5)),
             ],
           ),
         ),
@@ -252,20 +253,21 @@ class _AvatarDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 40,
       height: 40,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.white.withValues(alpha: 0.10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        color: scheme.onSurface.withValues(alpha: 0.10),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
       ),
       child: Stack(
         children: [
           Center(
             child: Text(
               "🙂",
-              style: TextStyle(fontSize: 18, color: Colors.white.withValues(alpha: 0.9)),
+              style: TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
             ),
           ),
           Positioned(
@@ -276,8 +278,8 @@ class _AvatarDot extends StatelessWidget {
               height: 10,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: online ? const Color(0xFF58F7B6) : Colors.white.withValues(alpha: 0.25),
-                border: Border.all(color: Colors.black.withValues(alpha: 0.35), width: 2),
+                color: online ? const Color(0xFF58F7B6) : scheme.onSurface.withValues(alpha: 0.25),
+                border: Border.all(color: scheme.surface, width: 2), // border matches bg
               ),
             ),
           ),

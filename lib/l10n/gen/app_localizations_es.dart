@@ -868,37 +868,37 @@ class AppLocalizationsEs extends AppLocalizations {
   String get themeLight => 'Claro';
 
   @override
-  String get languageEnglish => '[ES] English';
+  String get languageEnglish => 'English';
 
   @override
-  String get languageFrench => '[ES] Français';
+  String get languageFrench => 'Français';
 
   @override
-  String get languageSpanish => '[ES] Español';
+  String get languageSpanish => 'Español';
 
   @override
-  String get languageGerman => '[ES] Deutsch';
+  String get languageGerman => 'Deutsch';
 
   @override
-  String get languageItalian => '[ES] Italiano';
+  String get languageItalian => 'Italiano';
 
   @override
-  String get languagePortuguese => '[ES] Português';
+  String get languagePortuguese => 'Português';
 
   @override
-  String get languageRussian => '[ES] Русский';
+  String get languageRussian => 'Русский';
 
   @override
-  String get languageJapanese => '[ES] 日本語';
+  String get languageJapanese => '日本語';
 
   @override
-  String get languageChinese => '[ES] 中文';
+  String get languageChinese => '中文';
 
   @override
-  String get languageArabic => '[ES] العربية';
+  String get languageArabic => 'العربية';
 
   @override
-  String get languageHindi => '[ES] हिन्दी';
+  String get languageHindi => 'हिन्दी';
 
   @override
   String get languageIndonesian => 'Bahasa Indonesia';

@@ -71,7 +71,7 @@ class AppTheme {
 
     const glass = GlassTheme(
       fill: Color(0xCCFFFFFF),
-      stroke: Color(0x1F1C1B29),
+      stroke: Color(0x40FFFFFF),
       shadow: Color(0x14000000),
     );
     const background = AppBackgroundTheme(
@@ -148,7 +148,7 @@ class AppTheme {
         color: scheme.onSurface.withValues(alpha: 0.12),
         thickness: 1,
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: scheme.surface,
         titleTextStyle: TextStyle(
           color: scheme.onSurface,
@@ -169,7 +169,7 @@ class AppTheme {
         contentTextStyle: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w600),
         actionTextColor: scheme.primary,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: scheme.surface,
         elevation: isLight ? 3 : 0,
         shadowColor: cardShadow,

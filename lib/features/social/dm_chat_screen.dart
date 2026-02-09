@@ -88,7 +88,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       if (snapshot.hasError) {
                         return Center(
                             child: Text("Error: ${snapshot.error}",
-                                style: const TextStyle(color: Colors.white)));
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface)));
                       }
                       if (!snapshot.hasData) {
                         return const Center(
@@ -101,7 +101,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         return Center(
                             child: Text("Say hi to ${widget.otherName}! 👋",
                                 style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.5))));
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))));
                       }
 
                       return ListView.builder(
@@ -190,8 +190,8 @@ class _TopBar extends StatelessWidget {
             child: Text(
               title,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
               ),
@@ -217,7 +217,7 @@ class _TimeChip extends StatelessWidget {
       child: Text(
         time,
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.70),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
           fontSize: 12,
           fontWeight: FontWeight.w800,
         ),
@@ -245,6 +245,7 @@ class _Bubble extends StatelessWidget {
       bottomRight: Radius.circular(isMe ? 6 : 18),
     );
 
+    final scheme = Theme.of(context).colorScheme;
     return Column(
       crossAxisAlignment: align,
       children: [
@@ -254,18 +255,19 @@ class _Bubble extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: radius,
             color: isMe
-                ? Colors.white.withValues(alpha: 0.12)
-                : Colors.white.withValues(alpha: 0.07),
+                ? scheme.primary.withValues(alpha: 0.12)
+                : scheme.onSurface.withValues(alpha: 0.07),
             border: Border.all(
               color: isMe
-                  ? Colors.white.withValues(alpha: 0.24)
-                  : Colors.white.withValues(alpha: 0.12),
+                  ? scheme.primary.withValues(alpha: 0.24)
+                  : scheme.onSurface.withValues(alpha: 0.12),
             ),
           ),
           child: Text(
             text,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.92),
+            style: TextStyle(
+              color: scheme.onSurface.withValues(alpha: 0.92),
               fontWeight: FontWeight.w700,
               height: 1.25,
               fontSize: 14.5,
@@ -298,14 +300,14 @@ class _InputBar extends StatelessWidget {
             Expanded(
               child: TextField(
                 controller: controller,
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w700),
-                cursorColor: Colors.white,
+                style: TextStyle(
+                    color: scheme.onSurface, fontWeight: FontWeight.w700),
+                cursorColor: scheme.primary,
                 minLines: 1,
                 maxLines: 4,
                 decoration: InputDecoration(
                   hintText: "Message…",
-                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.45)),
+                  hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
                   border: InputBorder.none,
                   isDense: true,
                 ),
@@ -320,11 +322,11 @@ class _InputBar extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  color: Colors.white.withValues(alpha: 0.10),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                  color: scheme.onSurface.withValues(alpha: 0.10),
+                  border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
                 ),
                 child: Icon(Icons.send_rounded,
-                    color: Colors.white.withValues(alpha: 0.92)),
+                    color: scheme.onSurface.withValues(alpha: 0.92)),
               ),
             ),
           ],
@@ -347,7 +349,7 @@ class _IconGlass extends StatelessWidget {
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 20),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92), size: 20),
       ),
     );
   }
