@@ -57,28 +57,35 @@ class AppBackgroundTheme extends ThemeExtension<AppBackgroundTheme> {
 class AppTheme {
   static ThemeData light() {
     const scheme = ColorScheme.light(
-      primary: Color(0xFF5E4BFF),
-      secondary: Color(0xFF2BBEF9),
-      tertiary: Color(0xFFFF4CB5),
-      surface: Color(0xFFFEFEFF),
-      surfaceContainerHighest: Color(0xFFF1F2FA),
-      background: Color(0xFFF6F7FC),
+      // Premium bright palette inspired by the provided references.
+      primary: Color(0xFF19C472), // Fresh green
+      secondary: Color(0xFFF9F319), // Cool yellow
+      tertiary: Color(0xFFFF8B2D), // Energy orange
+      surface: Color(0xFFFCFFFA),
+      surfaceContainerHighest: Color(0xFFF0FAF4),
+      background: Color(0xFFEFFBF3),
       onPrimary: Colors.white,
-      onSecondary: Colors.white,
-      onSurface: Color(0xFF1A1626),
-      onBackground: Color(0xFF1A1626),
+      onSecondary: Color(0xFF172012),
+      onTertiary: Colors.white,
+      onSurface: Color(0xFF0E1F1E),
+      onBackground: Color(0xFF0E1F1E),
     );
 
     const glass = GlassTheme(
-      fill: Color(0xD9FFFFFF),
-      stroke: Color(0x99FFFFFF),
-      shadow: Color(0x33000000),
+      fill: Color(0xCCFFFFFF),
+      stroke: Color(0xA8FFFFFF),
+      shadow: Color(0x1A0A3B24),
     );
     const background = AppBackgroundTheme(
       gradient: LinearGradient(
-        colors: [Color(0xFFF6F7FC), Color(0xFFEDEFFF), Color(0xFFF7F2FF)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
+        colors: [
+          Color(0xFFEFFBF3),
+          Color(0xFFF8FFD7),
+          Color(0xFFFFF2E5),
+        ],
+        stops: [0.08, 0.54, 1],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
       ),
     );
 
@@ -140,12 +147,14 @@ class AppTheme {
       useMaterial3: true,
     );
     final isLight = brightness == Brightness.light;
-    final cardShadow = isLight ? scheme.shadow.withValues(alpha: 0.14) : Colors.transparent;
+    final cardShadow = isLight
+        ? const Color(0xFF0A3B24).withValues(alpha: 0.12)
+        : Colors.transparent;
 
     return base.copyWith(
       scaffoldBackgroundColor: scaffoldBackground,
       dividerTheme: DividerThemeData(
-        color: scheme.onSurface.withValues(alpha: 0.12),
+        color: scheme.primary.withValues(alpha: 0.12),
         thickness: 1,
       ),
       dialogTheme: DialogThemeData(
@@ -165,13 +174,16 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: scheme.surface,
-        contentTextStyle: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w600),
+        backgroundColor: isLight ? Colors.white : scheme.surface,
+        contentTextStyle: TextStyle(
+          color: scheme.onSurface,
+          fontWeight: FontWeight.w600,
+        ),
         actionTextColor: scheme.primary,
       ),
       cardTheme: CardThemeData(
         color: isLight ? scheme.surfaceContainerHighest : scheme.surface,
-        elevation: isLight ? 3 : 0,
+        elevation: isLight ? 5 : 0,
         shadowColor: cardShadow,
         shape: RoundedRectangleBorder(borderRadius: T.r28),
       ),
@@ -187,12 +199,12 @@ class AppTheme {
       ),
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: <TargetPlatform, PageTransitionsBuilder>{
-          TargetPlatform.android: FadeUpwardsPageTransitionsBuilder(),
-          TargetPlatform.iOS: FadeUpwardsPageTransitionsBuilder(),
-          TargetPlatform.linux: FadeUpwardsPageTransitionsBuilder(),
-          TargetPlatform.macOS: FadeUpwardsPageTransitionsBuilder(),
-          TargetPlatform.windows: FadeUpwardsPageTransitionsBuilder(),
-          TargetPlatform.fuchsia: FadeUpwardsPageTransitionsBuilder(),
+          TargetPlatform.android: _FastPageTransitionsBuilder(),
+          TargetPlatform.iOS: _FastPageTransitionsBuilder(),
+          TargetPlatform.linux: _FastPageTransitionsBuilder(),
+          TargetPlatform.macOS: _FastPageTransitionsBuilder(),
+          TargetPlatform.windows: _FastPageTransitionsBuilder(),
+          TargetPlatform.fuchsia: _FastPageTransitionsBuilder(),
         },
       ),
       switchTheme: SwitchThemeData(
@@ -218,7 +230,7 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: T.r20,
           borderSide: BorderSide(
-            color: scheme.primary.withValues(alpha: 0.55),
+            color: scheme.primary.withValues(alpha: 0.68),
             width: 1.6,
           ),
         ),
@@ -226,13 +238,86 @@ class AppTheme {
         labelStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82)),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: scheme.primary),
+        style: TextButton.styleFrom(
+          foregroundColor: scheme.primary,
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+        ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: scheme.onSurface,
-          side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.3)),
+          side: BorderSide(
+            color: isLight
+                ? scheme.primary.withValues(alpha: 0.32)
+                : scheme.onSurface.withValues(alpha: 0.3),
+          ),
           shape: RoundedRectangleBorder(borderRadius: T.r20),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          foregroundColor: scheme.onPrimary,
+          backgroundColor: scheme.primary,
+          elevation: isLight ? 1.5 : 0,
+          shadowColor: isLight
+              ? scheme.primary.withValues(alpha: 0.22)
+              : Colors.transparent,
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+          shape: RoundedRectangleBorder(borderRadius: T.r20),
+        ),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          foregroundColor: scheme.onPrimary,
+          backgroundColor: scheme.primary,
+          textStyle: const TextStyle(fontWeight: FontWeight.w700),
+          shape: RoundedRectangleBorder(borderRadius: T.r20),
+        ),
+      ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: scheme.primary,
+        foregroundColor: scheme.onPrimary,
+      ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: scheme.primary,
+        linearTrackColor: scheme.primary.withValues(alpha: 0.16),
+        circularTrackColor: scheme.primary.withValues(alpha: 0.16),
+      ),
+      chipTheme: base.chipTheme.copyWith(
+        backgroundColor: isLight
+            ? scheme.primary.withValues(alpha: 0.10)
+            : scheme.surfaceContainerHighest,
+        selectedColor: scheme.primary.withValues(alpha: 0.22),
+        labelStyle: TextStyle(
+          color: scheme.onSurface,
+          fontWeight: FontWeight.w600,
+        ),
+        side: BorderSide(
+          color: scheme.primary.withValues(alpha: isLight ? 0.22 : 0.34),
+        ),
+        shape: RoundedRectangleBorder(borderRadius: T.r20),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: isLight
+            ? Colors.white.withValues(alpha: 0.9)
+            : scheme.surface,
+        indicatorColor: scheme.primary.withValues(alpha: isLight ? 0.22 : 0.3),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? scheme.primary
+                : scheme.onSurface.withValues(alpha: 0.65),
+          ),
+        ),
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => TextStyle(
+            color: states.contains(WidgetState.selected)
+                ? scheme.primary
+                : scheme.onSurface.withValues(alpha: 0.68),
+            fontWeight: states.contains(WidgetState.selected)
+                ? FontWeight.w700
+                : FontWeight.w600,
+          ),
         ),
       ),
       textTheme: GoogleFonts.poppinsTextTheme(base.textTheme).copyWith(
@@ -250,6 +335,35 @@ class AppTheme {
         displayColor: scheme.onBackground,
       ),
       extensions: [glass, background],
+    );
+  }
+}
+
+class _FastPageTransitionsBuilder extends PageTransitionsBuilder {
+  const _FastPageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final curved = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeOutCubic,
+    );
+
+    final slide = Tween<Offset>(
+      begin: const Offset(0.02, 0),
+      end: Offset.zero,
+    ).animate(curved);
+
+    return FadeTransition(
+      opacity: curved,
+      child: SlideTransition(position: slide, child: child),
     );
   }
 }

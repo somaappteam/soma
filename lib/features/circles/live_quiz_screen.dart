@@ -47,8 +47,9 @@ class LiveQuizScreen extends StatefulWidget {
 }
 
 class _LiveQuizScreenState extends State<LiveQuizScreen> {
-  static const double _leaderRowHeight = 56;
-  static const double _leaderRowSpacing = 8;
+  static const double _leaderChipWidth = 92;
+  static const double _leaderChipHeight = 96;
+  static const double _leaderChipSpacing = 8;
 
   late List<_Question> questions;
   StreamSubscription<Map<String, VoicePresence>>? _voiceSub;
@@ -186,6 +187,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
           isMuted: _isMutedFor(uid ?? ''),
           isSpeaking: _isSpeakingFor(uid ?? ''),
           userId: uid,
+          avatarUrl: profile?['avatar_url']?.toString(),
         );
       }).toList();
 
@@ -687,6 +689,13 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     final showTranslationLine = showTranslation && hasTranslation;
     final sortedLeaders = List<_Leader>.from(leaders)
       ..sort((a, b) => b.score.compareTo(a.score));
+    _Leader? meLeader;
+    for (final leader in sortedLeaders) {
+      if (leader.isMe) {
+        meLeader = leader;
+        break;
+      }
+    }
     final meKey = _currentUserKey;
     final isLocked = meKey != null && _answersByUser.containsKey(meKey);
     final roleLabel = isHost
@@ -779,24 +788,6 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                       ),
                       const SizedBox(width: 10),
                       _TinyGlass(
-                        onTap: _openChatSheet,
-                        child: const Icon(
-                          Icons.chat_bubble_rounded,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      _TinyGlass(
-                        onTap: () => setState(() => showReading = !showReading),
-                        child: Icon(
-                          showReading ? Icons.text_fields_rounded : Icons.text_fields_outlined,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      _TinyGlass(
                         onTap: _confirmExitCircle,
                         child: const Icon(Icons.close_rounded, color: Colors.white),
                       ),
@@ -817,6 +808,18 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                         : (isSpectator
                             ? l10n.liveQuizSpectatorModeSubtitle
                             : '${l10n.circlesParticipant} • ${l10n.leave}'),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Leaderboard strip (left->right ranking)
+                  _LiveLeaderboardStrip(
+                    leaders: sortedLeaders,
+                    onAvatarTap: (leader) {
+                      if (leader.userId != null) {
+                        _openProfileSheet(leader.userId);
+                      }
+                    },
                   ),
 
                   // Question card
@@ -934,42 +937,16 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                   ],
 
                   const SizedBox(height: 12),
-
-                  // Mini leaderboard
                   Glass(
-                    radius: BorderRadius.circular(22),
-                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-                    child: SizedBox(
-                      height: sortedLeaders.isEmpty
-                          ? 0
-                          : (sortedLeaders.length * (_leaderRowHeight + _leaderRowSpacing)) -
-                              _leaderRowSpacing,
-                      child: Stack(
-                        children: sortedLeaders.asMap().entries.map((entry) {
-                          final i = entry.key;
-                          final l = entry.value;
-                          return AnimatedPositioned(
-                            key: ValueKey(_leaderKey(l)),
-                            duration: MotionTokens.medium,
-                            curve: MotionTokens.movementCurve,
-                            left: 0,
-                            right: 0,
-                            top: i * (_leaderRowHeight + _leaderRowSpacing),
-                            child: StaggeredIn(
-                              index: i,
-                              child: SizedBox(
-                                height: _leaderRowHeight,
-                                child: _LiveLeaderboardRow(
-                                  rank: i + 1,
-                                  leader: l,
-                                  onToggleMute: l.isMe ? () => _toggleMuteFor(l.name) : null,
-                                  onAvatarTap: l.userId != null ? () => _openProfileSheet(l.userId) : null,
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+                    radius: BorderRadius.circular(18),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    child: _BottomActionBar(
+                      isMuted: meLeader?.isMuted ?? false,
+                      isSpeaking: meLeader?.isSpeaking ?? false,
+                      readingEnabled: showReading,
+                      onToggleMute: canPlay ? () => _toggleMuteFor(meLeader?.name ?? '') : null,
+                      onOpenChat: _openChatSheet,
+                      onToggleReading: () => setState(() => showReading = !showReading),
                     ),
                   ),
                   ],
@@ -1001,176 +978,199 @@ class _TinyGlass extends StatelessWidget {
   }
 }
 
-class _LiveLeaderboardRow extends StatelessWidget {
-  final int rank;
-  final _Leader leader;
-  final VoidCallback? onToggleMute;
-  final VoidCallback? onAvatarTap;
+class _LiveLeaderboardStrip extends StatelessWidget {
+  final List<_Leader> leaders;
+  final ValueChanged<_Leader>? onAvatarTap;
 
-  const _LiveLeaderboardRow({
-    required this.rank,
-    required this.leader,
-    this.onToggleMute,
-    this.onAvatarTap,
-  });
+  const _LiveLeaderboardStrip({required this.leaders, this.onAvatarTap});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final baseColor = leader.isMe ? Colors.white.withValues(alpha: 0.14) : Colors.white.withValues(alpha: 0.08);
-    final borderColor = leader.isMe ? Colors.white.withValues(alpha: 0.24) : Colors.white.withValues(alpha: 0.12);
-    final pulse = leader.lastAnswer == LeaderboardAnswer.correct;
+    if (leaders.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
-    return AnimatedScale(
-      scale: pulse ? 1.02 : 1,
-      duration: MotionTokens.short,
-      curve: MotionTokens.standardCurve,
-      child: AnimatedContainer(
-        duration: MotionTokens.short,
-        curve: MotionTokens.standardCurve,
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: baseColor,
-        border: Border.all(color: borderColor),
-        boxShadow: pulse
-            ? [
-                BoxShadow(
-                  color: const Color(0xFF2AFADF).withValues(alpha: 0.25),
-                  blurRadius: 12,
-                  spreadRadius: 0,
+    final totalWidth =
+        (leaders.length * (_LiveQuizScreenState._leaderChipWidth + _LiveQuizScreenState._leaderChipSpacing)) -
+            _LiveQuizScreenState._leaderChipSpacing;
+
+    return Glass(
+      radius: BorderRadius.circular(22),
+      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: SizedBox(
+          width: totalWidth,
+          height: _LiveQuizScreenState._leaderChipHeight,
+          child: Stack(
+            children: leaders.asMap().entries.map((entry) {
+              final index = entry.key;
+              final leader = entry.value;
+              return AnimatedPositioned(
+                key: ValueKey('strip-${leader.userId ?? leader.name}'),
+                duration: MotionTokens.medium,
+                curve: MotionTokens.movementCurve,
+                left: index * (_LiveQuizScreenState._leaderChipWidth + _LiveQuizScreenState._leaderChipSpacing),
+                top: 0,
+                child: _LiveLeaderChip(
+                  rank: index + 1,
+                  leader: leader,
+                  onTap: onAvatarTap == null ? null : () => onAvatarTap!(leader),
                 ),
-              ]
-            : [],
-      ),
-      child: Row(
-        children: [
-          _RankChip(rank: rank),
-          const SizedBox(width: 10),
-          PressableScale(
-            onTap: onAvatarTap,
-            child: _AvatarBubble(
-              name: leader.name,
-              heroTag: leader.userId == null ? null : "profile-avatar-${leader.userId}",
-              muted: leader.isMuted,
-              speaking: leader.isSpeaking,
-            ),
+              );
+            }).toList(),
           ),
-          const SizedBox(width: 10),
-          if (onToggleMute != null)
-            InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: onToggleMute,
-              child: _LiveVoiceBadge(muted: leader.isMuted, speaking: leader.isSpeaking),
-            )
-          else
-            _LiveVoiceBadge(muted: leader.isMuted, speaking: leader.isSpeaking),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        leader.name,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w900,
-                          fontSize: 13.5,
-                        ),
-                      ),
-                    ),
-                    if (leader.isHost) ...[
-                      const SizedBox(width: 6),
-                      _Tag(label: l10n.tagHost),
-                    ],
-                    if (leader.isMe) ...[
-                      const SizedBox(width: 6),
-                      _Tag(label: l10n.tagYou),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    _AnswerIndicator(result: leader.lastAnswer),
-                    const SizedBox(width: 6),
-                    Text(
-                      leader.lastAnswer == LeaderboardAnswer.correct
-                          ? l10n.statusCorrect
-                          : leader.lastAnswer == LeaderboardAnswer.wrong
-                              ? l10n.statusWrong
-                              : l10n.statusWaiting,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 11.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                "${leader.score}",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                l10n.pointsAbbrev,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.55),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 10.5,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+        ),
       ),
     );
   }
 }
 
-class _RankChip extends StatelessWidget {
+class _LiveLeaderChip extends StatelessWidget {
   final int rank;
+  final _Leader leader;
+  final VoidCallback? onTap;
 
-  const _RankChip({required this.rank});
+  const _LiveLeaderChip({required this.rank, required this.leader, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 34,
-      height: 34,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.black.withValues(alpha: 0.18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        "#$rank",
-        style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.8),
-          fontWeight: FontWeight.w900,
-          fontSize: 11,
+    final scoreColor = rank == 1
+        ? const Color(0xFFF9F319)
+        : rank <= 3
+            ? const Color(0xFFB8FF62)
+            : Colors.white.withValues(alpha: 0.9);
+    final borderColor = leader.isMe
+        ? Colors.white.withValues(alpha: 0.4)
+        : Colors.white.withValues(alpha: 0.16);
+
+    return SizedBox(
+      width: _LiveQuizScreenState._leaderChipWidth,
+      child: PressableScale(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: borderColor),
+            color: leader.isMe
+                ? Colors.white.withValues(alpha: 0.10)
+                : Colors.white.withValues(alpha: 0.05),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _AvatarBubble(
+                name: leader.name,
+                heroTag: leader.userId == null ? null : "profile-avatar-${leader.userId}",
+                muted: leader.isMuted,
+                speaking: leader.isSpeaking,
+                avatarUrl: leader.avatarUrl,
+                size: 44,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                leader.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 11.5,
+                ),
+              ),
+              const SizedBox(height: 1),
+              Text(
+                '${leader.score}',
+                style: TextStyle(
+                  color: scoreColor,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 17,
+                ),
+              ),
+            ],
+          ),
         ),
+      ),
+    );
+  }
+}
+
+class _BottomActionBar extends StatelessWidget {
+  final bool isMuted;
+  final bool isSpeaking;
+  final bool readingEnabled;
+  final VoidCallback? onToggleMute;
+  final VoidCallback onOpenChat;
+  final VoidCallback onToggleReading;
+
+  const _BottomActionBar({
+    required this.isMuted,
+    required this.isSpeaking,
+    required this.readingEnabled,
+    required this.onToggleMute,
+    required this.onOpenChat,
+    required this.onToggleReading,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _CircleActionButton(
+          icon: readingEnabled ? Icons.text_fields_rounded : Icons.text_fields_outlined,
+          onTap: onToggleReading,
+        ),
+        const SizedBox(width: 10),
+        _CircleActionButton(
+          icon: Icons.chat_bubble_rounded,
+          onTap: onOpenChat,
+        ),
+        const SizedBox(width: 10),
+        _CircleActionButton(
+          icon: isMuted ? Icons.mic_off_rounded : Icons.mic_rounded,
+          onTap: onToggleMute,
+          highlight: isSpeaking,
+        ),
+      ],
+    );
+  }
+}
+
+class _CircleActionButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onTap;
+  final bool highlight;
+
+  const _CircleActionButton({
+    required this.icon,
+    required this.onTap,
+    this.highlight = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(999),
+      onTap: onTap,
+      child: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white.withValues(alpha: 0.14),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+          boxShadow: highlight
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF2AFADF).withValues(alpha: 0.3),
+                    blurRadius: 10,
+                  ),
+                ]
+              : null,
+        ),
+        child: Icon(icon, color: Colors.white.withValues(alpha: 0.95), size: 20),
       ),
     );
   }
@@ -1181,12 +1181,16 @@ class _AvatarBubble extends StatelessWidget {
   final String? heroTag;
   final bool muted;
   final bool speaking;
+  final String? avatarUrl;
+  final double size;
 
   const _AvatarBubble({
     required this.name,
     this.heroTag,
     required this.muted,
     required this.speaking,
+    this.avatarUrl,
+    this.size = 36,
   });
 
   @override
@@ -1197,8 +1201,8 @@ class _AvatarBubble extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         Container(
-          width: 36,
-          height: 36,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: T.neonGradient,
@@ -1216,15 +1220,34 @@ class _AvatarBubble extends StatelessWidget {
                 ),
             ],
           ),
-          child: Center(
-            child: Text(
-              initial,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-                fontSize: 14,
-              ),
-            ),
+          child: ClipOval(
+            child: (avatarUrl != null && avatarUrl!.trim().isNotEmpty)
+                ? Image.network(
+                    avatarUrl!,
+                    width: size,
+                    height: size,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Center(
+                      child: Text(
+                        initial,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                  )
+                : Center(
+                    child: Text(
+                      initial,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
           ),
         ),
         Positioned(
@@ -1253,124 +1276,6 @@ class _AvatarBubble extends StatelessWidget {
     }
 
     return Hero(tag: heroTag!, child: avatar);
-  }
-}
-
-class _LiveVoiceBadge extends StatelessWidget {
-  final bool muted;
-  final bool speaking;
-
-  const _LiveVoiceBadge({required this.muted, required this.speaking});
-
-  @override
-  Widget build(BuildContext context) {
-    final color = muted ? Colors.white.withValues(alpha: 0.55) : Colors.white.withValues(alpha: 0.92);
-    final bg = muted ? Colors.white.withValues(alpha: 0.08) : Colors.white.withValues(alpha: 0.12);
-
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Container(
-          width: 34,
-          height: 34,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: bg,
-            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-            boxShadow: speaking
-                ? [
-                    BoxShadow(
-                      color: const Color(0xFF2AFADF).withValues(alpha: 0.25),
-                      blurRadius: 8,
-                      spreadRadius: 0,
-                    ),
-                  ]
-                : null,
-          ),
-          child: Icon(
-            muted ? Icons.mic_off_rounded : Icons.mic_rounded,
-            color: color,
-            size: 18,
-          ),
-        ),
-        if (speaking)
-          Positioned(
-            bottom: 4,
-            right: 4,
-            child: Container(
-              width: 8,
-              height: 8,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFF2AFADF),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _AnswerIndicator extends StatelessWidget {
-  final LeaderboardAnswer result;
-
-  const _AnswerIndicator({required this.result});
-
-  @override
-  Widget build(BuildContext context) {
-    final isCorrect = result == LeaderboardAnswer.correct;
-    final isWrong = result == LeaderboardAnswer.wrong;
-    final color = isCorrect
-        ? const Color(0xFF2AFADF)
-        : isWrong
-            ? const Color(0xFFFF4FD8)
-            : Colors.white.withValues(alpha: 0.35);
-
-    final icon = isCorrect
-        ? Icons.check_rounded
-        : isWrong
-            ? Icons.close_rounded
-            : Icons.circle_outlined;
-
-    return Container(
-      width: 18,
-      height: 18,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.black.withValues(alpha: isCorrect || isWrong ? 0.12 : 0.06),
-        border: Border.all(color: color.withValues(alpha: isCorrect || isWrong ? 0.8 : 0.4)),
-      ),
-      child: Center(
-        child: Icon(icon, size: 12, color: color),
-      ),
-    );
-  }
-}
-
-class _Tag extends StatelessWidget {
-  final String label;
-
-  const _Tag({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-      ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w800,
-          fontSize: 9.5,
-          letterSpacing: 0.4,
-        ),
-      ),
-    );
   }
 }
 
@@ -2120,6 +2025,7 @@ class _Leader {
   final bool isMuted;
   final bool isSpeaking;
   final LeaderboardAnswer lastAnswer;
+  final String? avatarUrl;
 
   const _Leader(
     this.name,
@@ -2132,6 +2038,7 @@ class _Leader {
     this.isSpeaking = false,
     this.lastAnswer = LeaderboardAnswer.none,
     this.userId,
+    this.avatarUrl,
   });
 
   _Leader copyWith({
@@ -2143,6 +2050,7 @@ class _Leader {
     bool? isSpeaking,
     LeaderboardAnswer? lastAnswer,
     String? userId,
+    String? avatarUrl,
   }) {
     return _Leader(
       name,
@@ -2155,6 +2063,7 @@ class _Leader {
       isSpeaking: isSpeaking ?? this.isSpeaking,
       lastAnswer: lastAnswer ?? this.lastAnswer,
       userId: userId ?? this.userId,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 }

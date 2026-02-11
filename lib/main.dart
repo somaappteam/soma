@@ -226,7 +226,7 @@ class _AppState extends State<App> {
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           themeMode: themeModeController.mode,
-          themeAnimationDuration: const Duration(milliseconds: 350),
+          themeAnimationDuration: const Duration(milliseconds: 180),
           themeAnimationCurve: Curves.easeOutCubic,
           builder: (context, child) {
             if (child == null) return const SizedBox.shrink();

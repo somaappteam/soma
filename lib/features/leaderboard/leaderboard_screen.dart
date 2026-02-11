@@ -26,6 +26,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
           child: Padding(
@@ -41,8 +42,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                     const SizedBox(width: 12),
                     Text(
                       l10n.leaderboardGlobalTitle,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: scheme.onSurface,
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
                       ),
@@ -55,14 +56,18 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                     future: _leaderboardFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF)));
+                        return Center(
+                          child: CircularProgressIndicator(color: scheme.primary),
+                        );
                       }
                       final data = snapshot.data ?? [];
                       if (data.isEmpty) {
                         return Center(
                           child: Text(
                             l10n.leaderboardEmpty,
-                            style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+                            style: TextStyle(
+                              color: scheme.onSurface.withValues(alpha: 0.62),
+                            ),
                           ),
                         );
                       }
@@ -104,7 +109,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                       child: Text(
                                         "#$rank",
                                         style: TextStyle(
-                                          color: isTop3 ? const Color(0xFF58F7B6) : Colors.white.withValues(alpha: 0.5),
+                                          color: isTop3
+                                              ? scheme.primary
+                                              : scheme.onSurface.withValues(alpha: 0.52),
                                           fontWeight: FontWeight.w900,
                                           fontSize: 16,
                                         ),
@@ -117,7 +124,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                         height: 40,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          color: Colors.white.withValues(alpha: 0.1),
+                                          color: scheme.onSurface.withValues(alpha: 0.08),
                                         ),
                                         child: (avatarUrl != null && avatarUrl.trim().isNotEmpty)
                                             ? ClipOval(
@@ -126,18 +133,21 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                                   width: 40,
                                                   height: 40,
                                                   fit: BoxFit.cover,
-                                                  errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Colors.white),
+                                                  errorBuilder: (_, __, ___) => Icon(
+                                                    Icons.person,
+                                                    color: scheme.onSurface,
+                                                  ),
                                                 ),
                                               )
-                                            : const Icon(Icons.person, color: Colors.white),
+                                            : Icon(Icons.person, color: scheme.onSurface),
                                       ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
                                         name,
-                                        style: const TextStyle(
-                                          color: Colors.white,
+                                        style: TextStyle(
+                                          color: scheme.onSurface,
                                           fontWeight: FontWeight.w700,
                                           fontSize: 16,
                                         ),
@@ -146,7 +156,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                                     Text(
                                       l10n.profileXpValue(user['xp'] ?? 0),
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.9),
+                                        color: scheme.onSurface.withValues(alpha: 0.9),
                                         fontWeight: FontWeight.w800,
                                         fontSize: 14,
                                       ),
@@ -176,13 +186,14 @@ class _IconGlass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Colors.white.withValues(alpha: 0.92)),
+        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),
       ),
     );
   }

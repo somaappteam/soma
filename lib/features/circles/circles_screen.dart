@@ -33,10 +33,12 @@ class _CirclesScreenState extends State<CirclesScreen> {
 
   List<SoloCourse> _courses = [];
   int _coursesRevision = 0;
+  late final Stream<List<Map<String, dynamic>>> _openCirclesStream;
 
   @override
   void initState() {
     super.initState();
+    _openCirclesStream = circlesRepository.getOpenCircles();
     _coursesRevision = coursesRepository.revision;
     _loadCourses();
     _cleanupGhostCircles();
@@ -291,7 +293,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
               // Active circles list
               Expanded(
                 child: StreamBuilder<List<Map<String, dynamic>>>(
-                  stream: circlesRepository.getOpenCircles(),
+                  stream: _openCirclesStream,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(
@@ -323,7 +325,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
                     return ListView.separated(
                       physics: const BouncingScrollPhysics(),
                       itemCount: filtered.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 14),
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
                       itemBuilder: (context, i) {
                         final data = filtered[i];
                         final fromLabel = langLabel(data['from_lang']?.toString() ?? '?');
@@ -493,11 +495,13 @@ class CircleCard extends StatelessWidget {
             : room.mode;
     final levelLabel = _levelLabelForValue(l10n, room.level);
     return Glass(
-      radius: BorderRadius.circular(24),
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      radius: BorderRadius.circular(22),
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 172),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           // Title row
           Row(
             children: [
@@ -508,7 +512,7 @@ class CircleCard extends StatelessWidget {
                   room.title,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 16,
+                    fontSize: 17,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -517,7 +521,7 @@ class CircleCard extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
           // Language + mode line
           Text(
@@ -525,10 +529,11 @@ class CircleCard extends StatelessWidget {
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
               fontWeight: FontWeight.w700,
+              fontSize: 13.5,
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
           // Stats pills
           Wrap(
@@ -542,6 +547,7 @@ class CircleCard extends StatelessWidget {
             ],
           ),
 
+          const Spacer(),
           const SizedBox(height: 14),
 
           // Actions
@@ -556,7 +562,8 @@ class CircleCard extends StatelessWidget {
               ),
             ],
           ),
-        ],
+          ],
+        ),
       ),
     );
   }
