@@ -13,6 +13,7 @@ import '../../data/agora_voice_service.dart';
 import '../../data/circles_repository.dart';
 import '../../data/quiz_repository.dart';
 import '../circles/circle_countdown_screen.dart';
+import '../circles/circle_lobby_screen.dart';
 import '../circles/live_quiz_screen.dart';
 
 
@@ -218,6 +219,73 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
   double get accuracy => widget.total == 0 ? 0 : (widget.correct / widget.total);
 
+  Future<void> _goBackToLobby() async {
+    final circleId = widget.circleId;
+    if (circleId == null) {
+      if (mounted) Navigator.pop(context);
+      return;
+    }
+
+    if (!mounted) return;
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => CircleLobbyScreen(circleId: circleId)),
+      (route) => route.isFirst,
+    );
+  }
+
+  Future<void> _confirmExitCircle() async {
+    final circleId = widget.circleId;
+    if (circleId == null) {
+      if (mounted) Navigator.pop(context);
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final isHost = _isHostMe;
+    final isSpectator = widget.leaderboard.every((p) => !p.isMe);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        final scheme = Theme.of(ctx).colorScheme;
+        return AlertDialog(
+          backgroundColor: scheme.surface,
+          title: Text(
+            l10n.circlesLeavePromptTitle,
+            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
+          ),
+          content: Text(
+            isHost
+                ? l10n.circlesLeavePromptEndOnly
+                : (isSpectator
+                    ? '${l10n.circlesSpectator} • ${l10n.leave}'
+                    : '${l10n.circlesParticipant} • ${l10n.leave}'),
+            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82)),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(isHost ? l10n.circlesEndCircle : l10n.leave),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    if (isHost) {
+      await circlesRepository.endCircle(circleId);
+    }
+    await circlesRepository.leaveCircle(circleId);
+    await circleVoiceService.disconnectIfCircle(circleId);
+    await agoraVoiceService.disconnectIfCircle(circleId);
+    if (!mounted) return;
+    Navigator.popUntil(context, (r) => r.isFirst);
+  }
+
   String _placeLabel(AppLocalizations l10n) {
     if (widget.rank == 1) return l10n.resultsPlaceFirst;
     if (widget.rank == 2) return l10n.resultsPlaceSecond;
@@ -229,6 +297,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final pct = (accuracy * 100).round();
+    final isHost = _isHostMe;
+    final isSpectator = widget.leaderboard.every((p) => !p.isMe);
+    final roleTitle = isHost
+        ? l10n.roleHost
+        : (isSpectator ? l10n.roleSpectator : l10n.circlesParticipant);
+    final roleOptions = isHost
+        ? 'Back to ${l10n.circlesLobbyTitle} • ${l10n.resultsRematch} • ${l10n.leave}'
+        : 'Back to ${l10n.circlesLobbyTitle} • ${l10n.leave}';
 
     return Scaffold(
       body: SafeArea(
@@ -242,12 +318,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: widget.circleId != null ? _confirmExitCircle : () => Navigator.pop(context),
                     ),
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close_rounded, color: Colors.white),
-                      onPressed: () => Navigator.popUntil(context, (r) => r.isFirst),
+                      onPressed: widget.circleId != null ? _confirmExitCircle : () => Navigator.popUntil(context, (r) => r.isFirst),
                     ),
                   ],
                 ),
@@ -271,6 +347,46 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     color: Colors.white.withValues(alpha: 0.70),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+                Glass(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                  radius: BorderRadius.circular(18),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isHost
+                            ? Icons.admin_panel_settings_rounded
+                            : (isSpectator ? Icons.visibility_rounded : Icons.person_rounded),
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              roleTitle,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              roleOptions,
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.72),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
@@ -498,35 +614,34 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 const SizedBox(height: 18),
 
                 // Bottom buttons
-                NeonButton(
-                  label: l10n.resultsBackToCircles,
-                  onTap: () async {
-                    if (widget.circleId != null) {
-                      await circleVoiceService.disconnectIfCircle(widget.circleId);
-                      await agoraVoiceService.disconnectIfCircle(widget.circleId);
-                    }
-                    if (context.mounted) {
-                      Navigator.popUntil(context, (r) => r.settings.name == '/app' || r.isFirst);
-                    }
-                  },
-                ),
-                const SizedBox(height: 10),
-                _SecondaryButton(
-                  label: _isHostMe && widget.circleId != null
-                      ? l10n.resultsRematch
-                      : l10n.resultsPlayAgain,
-                  onTap: _isHostMe && widget.circleId != null
-                      ? () {
-                          if (_startingRematch) return;
-                          _startRematch();
-                        }
-                      : (widget.onPlayAgain ??
-                          () {
-                            // default: just go back to lobby
-                            Navigator.pop(context);
-                          }),
-                ),
-                const SizedBox(height: 14),
+                if (widget.circleId != null) ...[
+                  NeonButton(
+                    label: "Back to ${l10n.circlesLobbyTitle}",
+                    onTap: _goBackToLobby,
+                  ),
+                  if (_isHostMe) ...[
+                    const SizedBox(height: 10),
+                    _SecondaryButton(
+                      label: l10n.resultsRematch,
+                      onTap: () {
+                        if (_startingRematch) return;
+                        _startRematch();
+                      },
+                    ),
+                  ],
+                  const SizedBox(height: 14),
+                ] else ...[
+                  NeonButton(
+                    label: l10n.resultsBackToCircles,
+                    onTap: widget.onPlayAgain ?? () => Navigator.pop(context),
+                  ),
+                  const SizedBox(height: 10),
+                  _SecondaryButton(
+                    label: l10n.resultsPlayAgain,
+                    onTap: widget.onPlayAgain ?? () => Navigator.pop(context),
+                  ),
+                  const SizedBox(height: 14),
+                ],
               ],
             ),
           ),

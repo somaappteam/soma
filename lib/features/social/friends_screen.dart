@@ -34,10 +34,36 @@ class _FriendsScreenState extends State<FriendsScreen> {
   }
 
   Future<void> _cancelOutgoing(String friendshipId) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Cancel request?'),
+        content: Text('You can send a new friend request later.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.decline)),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
     await socialRepository.cancelFriendRequest(friendshipId);
   }
 
   Future<void> _removeFriend(String friendUserId) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Remove friend?'),
+        content: Text('You will no longer appear in each other's friends list.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.leave)),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
     await socialRepository.removeFriend(friendUserId);
   }
 

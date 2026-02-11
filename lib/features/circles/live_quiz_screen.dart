@@ -550,21 +550,76 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
 
   void _openProfileSheet(String? userId) {
     if (userId == null || userId.isEmpty) return;
-    showModalBottomSheet(
+    showDialog<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       builder: (_) {
-        final height = MediaQuery.of(context).size.height * 0.92;
-        return ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          child: SizedBox(
-            height: height,
-            child: ProfileScreen(userId: userId),
+        final size = MediaQuery.of(context).size;
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: SizedBox(
+              width: size.width > 440 ? 420 : size.width * 0.92,
+              height: size.height * 0.74,
+              child: ProfileScreen(userId: userId),
+            ),
           ),
         );
       },
     );
+  }
+
+  Future<void> _confirmExitCircle() async {
+    final circleId = widget.circleId;
+    if (circleId == null) {
+      if (mounted) Navigator.pop(context);
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context);
+    final isHostUser = isHost;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        final scheme = Theme.of(ctx).colorScheme;
+        return AlertDialog(
+          backgroundColor: scheme.surface,
+          title: Text(
+            l10n.circlesLeavePromptTitle,
+            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
+          ),
+          content: Text(
+            isHostUser
+                ? l10n.circlesLeavePromptEndOnly
+                : (isSpectator
+                    ? '${l10n.circlesSpectator} • ${l10n.leave}'
+                    : '${l10n.circlesParticipant} • ${l10n.leave}'),
+            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82)),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(isHostUser ? l10n.circlesEndCircle : l10n.leave),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    timer?.cancel();
+    if (isHostUser) {
+      await circlesRepository.endCircle(circleId);
+    }
+    await circlesRepository.leaveCircle(circleId);
+    await circleVoiceService.disconnectIfCircle(circleId);
+    await agoraVoiceService.disconnectIfCircle(circleId);
+    if (!mounted) return;
+    Navigator.popUntil(context, (r) => r.isFirst);
   }
 
   void _openChatSheet() {
@@ -623,7 +678,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
       );
     }
     final q = questions[qIndex];
-    final progress = (qIndex + 1) / questions.length;
+    final totalQuestions = questions.length;
+    final progress = widget.timePerQ <= 0
+        ? 1.0
+        : (t / widget.timePerQ).clamp(0.0, 1.0);
     final hasTranslation = q.translation.trim().isNotEmpty;
     final showReadingLine = showReading && q.reading.trim().isNotEmpty && (!hasTranslation || revealed);
     final showTranslationLine = showTranslation && hasTranslation;
@@ -631,6 +689,12 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
       ..sort((a, b) => b.score.compareTo(a.score));
     final meKey = _currentUserKey;
     final isLocked = meKey != null && _answersByUser.containsKey(meKey);
+    final roleLabel = isHost
+        ? l10n.roleHost
+        : (isSpectator ? l10n.roleSpectator : l10n.circlesParticipant);
+    final roleIcon = isHost
+        ? Icons.admin_panel_settings_rounded
+        : (isSpectator ? Icons.visibility_rounded : Icons.person_rounded);
 
     return Scaffold(
       body: SafeArea(
@@ -649,6 +713,38 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                             const SizedBox(width: 8),
                             Text(
                               "0:${t.toString().padLeft(2, "0")}",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      _TinyGlass(
+                        child: Row(
+                          children: [
+                            const Icon(Icons.layers_rounded, color: Colors.white, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              "${qIndex + 1}/$totalQuestions",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      _TinyGlass(
+                        child: Row(
+                          children: [
+                            Icon(roleIcon, color: Colors.white, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              roleLabel,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w900,
@@ -701,7 +797,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                       ),
                       const SizedBox(width: 10),
                       _TinyGlass(
-                        onTap: () => Navigator.pop(context),
+                        onTap: _confirmExitCircle,
                         child: const Icon(Icons.close_rounded, color: Colors.white),
                       ),
                     ],
@@ -712,16 +808,16 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                   // Progress bar
                   _QuizProgressBar(progress: progress),
 
-                  if (isSpectator) ...[
-                    const SizedBox(height: 12),
-                      _RoleCallout(
-                        icon: Icons.visibility_rounded,
-                        title: l10n.liveQuizSpectatorModeTitle,
-                        subtitle: l10n.liveQuizSpectatorModeSubtitle,
-                      ),
-                  ] else ...[
-                    const SizedBox(height: 12),
-                  ],
+                  const SizedBox(height: 12),
+                  _RoleCallout(
+                    icon: roleIcon,
+                    title: roleLabel,
+                    subtitle: isHost
+                        ? '${l10n.resultsRematch} • ${l10n.leave}'
+                        : (isSpectator
+                            ? l10n.liveQuizSpectatorModeSubtitle
+                            : '${l10n.circlesParticipant} • ${l10n.leave}'),
+                  ),
 
                   // Question card
                   Glass(
@@ -731,7 +827,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          l10n.liveQuizQuestionCounter(qIndex + 1, questions.length),
+                          l10n.liveQuizQuestionCounter(qIndex + 1, totalQuestions),
                           style: TextStyle(
                             color: Colors.white.withValues(alpha: 0.70),
                             fontWeight: FontWeight.w800,

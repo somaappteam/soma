@@ -276,7 +276,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final metadata = metadataRaw is Map
         ? Map<String, dynamic>.from(metadataRaw)
         : <String, dynamic>{};
-    final type = _parseType(row['type']?.toString());
+    final rawType = row['type']?.toString();
     final time = _parseTime(row['created_at']);
     final isRead = row['is_read'] == true || row['is_read'] == 1;
 
@@ -293,11 +293,23 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     final friendshipIdRaw = metadata['friendship_id'] ?? row['friendship_id'];
 
+    final inferredType = socialAction != null
+        ? NotifType.social
+        : circleAction != null
+            ? NotifType.circle
+            : courseAction != null
+                ? NotifType.course
+                : _parseType(rawType);
+
     return AppNotification(
       id: row['id'].toString(),
-      type: type,
-      title: row['title'] ?? l10n.notificationTitleFallback,
-      body: row['body'] ?? '',
+      type: inferredType,
+      title: row['title'] ?? (socialAction == SocialAction.friendRequest
+          ? 'New friend request'
+          : l10n.notificationTitleFallback),
+      body: row['body'] ?? (socialAction == SocialAction.friendRequest
+          ? '${metadata['from_user_name']?.toString() ?? l10n.userFallbackName} sent you a friend request.'
+          : ''),
       time: time,
       isRead: isRead,
       socialAction: socialAction,
@@ -426,6 +438,17 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           );
         }
       }
+      return;
+    }
+
+    if (n.type == NotifType.circle && n.circleAction == CircleAction.invite) {
+      await notificationsRepository.deleteNotification(n.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.notificationsDeleted)),
+        );
+      }
+      return;
     }
   }
 }
@@ -649,6 +672,8 @@ class _ActionRow extends StatelessWidget {
       return Row(
         children: [
           _ChipButton(label: l10n.joinCircle, onTap: onPrimary),
+          const SizedBox(width: 10),
+          _ChipButton(label: l10n.decline, onTap: onSecondary ?? () {}),
         ],
       );
     }
