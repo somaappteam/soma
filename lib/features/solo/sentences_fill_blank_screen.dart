@@ -9,45 +9,16 @@ import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/glass.dart';
 
 class SentencesFillBlankScreen extends StatefulWidget {
-  const SentencesFillBlankScreen({super.key});
+  const SentencesFillBlankScreen({super.key, required this.questions});
+
+  final List<FillBlankQuestion> questions;
 
   @override
-  State<SentencesFillBlankScreen> createState() => _SentencesFillBlankScreenState();
+  State<SentencesFillBlankScreen> createState() =>
+      _SentencesFillBlankScreenState();
 }
 
 class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
- final List<FillBlankQuestion> _questions = const [
-  FillBlankQuestion(
-    prompt: "The store is closing ___ five minutes.",
-    translation: "商店五分钟后关门。",
-    reading: "Shāngdiàn wǔ fēnzhōng hòu guānmén.",
-    choices: ["in", "on", "at", "to"],
-    correctIndex: 0,
-  ),
-  FillBlankQuestion(
-    prompt: "She is good ___ math.",
-    translation: "彼女は数学が得意です。",
-    reading: "Kanojo wa suugaku ga tokui desu.",
-    choices: ["in", "at", "on", "to"],
-    correctIndex: 1,
-  ),
-  FillBlankQuestion(
-    prompt: "I’ve been learning Spanish ___ two months.",
-    translation: "أنا أتعلم الإسبانية منذ شهرين.",
-    reading: "Ana ata‘allam al-isbaniyya mundhu shahrayn.",
-    choices: ["since", "for", "during", "from"],
-    correctIndex: 1,
-  ),
-
-  // No reading (for languages that don't need it)
-  FillBlankQuestion(
-    prompt: "She is good ___ math.",
-    translation: "Ella es buena en matemáticas.",
-    choices: ["in", "at", "on", "to"],
-    correctIndex: 1,
-  ),
-];
-
 
   int _index = 0;
   int _score = 0;
@@ -62,7 +33,9 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
   @override
   void initState() {
     super.initState();
-    _startTimer();
+    if (widget.questions.isNotEmpty) {
+      _startTimer();
+    }
   }
 
   @override
@@ -88,7 +61,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
 
   void _lockAndReveal(int? choice) {
     if (_locked) return;
-    final q = _questions[_index];
+    final q = widget.questions[_index];
 
     setState(() {
       _locked = true;
@@ -107,8 +80,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
   }
 
   void _next() {
-    if (_index >= _questions.length - 1) {
-      // Done — for now just pop or show result later
+    if (_index >= widget.questions.length - 1) {
       Navigator.pop(context);
       return;
     }
@@ -153,7 +125,23 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final q = _questions[_index];
+    if (widget.questions.isEmpty) {
+      return Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Text(
+                l10n.loading,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    final q = widget.questions[_index];
     final progress = (_secondsLeft / _secondsPerQuestion).clamp(0.0, 1.0);
 
     return Scaffold(
@@ -220,7 +208,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                           ),
                           const Spacer(),
                           Text(
-                            "${_index + 1}/${_questions.length}",
+                            "${_index + 1}/${widget.questions.length}",
                             style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.65)),
                           ),
                         ],

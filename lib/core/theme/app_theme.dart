@@ -58,30 +58,30 @@ class AppTheme {
   static ThemeData light() {
     const scheme = ColorScheme.light(
       // Premium bright palette inspired by the provided references.
-      primary: Color(0xFF19C472), // Fresh green
-      secondary: Color(0xFFF9F319), // Cool yellow
-      tertiary: Color(0xFFFF8B2D), // Energy orange
-      surface: Color(0xFFFCFFFA),
-      surfaceContainerHighest: Color(0xFFF0FAF4),
-      background: Color(0xFFEFFBF3),
+      primary: Color(0xFF0DBB74), // Emerald accent
+      secondary: Color(0xFFFFE06C), // Soft champagne yellow
+      tertiary: Color(0xFFFF8A4C), // Warm coral accent
+      surface: Color(0xFFFFFFFF),
+      surfaceContainerHighest: Color(0xFFF5FBF7),
+      background: Color(0xFFF2FAF5),
       onPrimary: Colors.white,
-      onSecondary: Color(0xFF172012),
+      onSecondary: Color(0xFF1B2418),
       onTertiary: Colors.white,
-      onSurface: Color(0xFF0E1F1E),
-      onBackground: Color(0xFF0E1F1E),
+      onSurface: Color(0xFF10221D),
+      onBackground: Color(0xFF10221D),
     );
 
     const glass = GlassTheme(
-      fill: Color(0xCCFFFFFF),
-      stroke: Color(0xA8FFFFFF),
-      shadow: Color(0x1A0A3B24),
+      fill: Color(0xD9FFFFFF),
+      stroke: Color(0xBFF3FFF8),
+      shadow: Color(0x160E3E2A),
     );
     const background = AppBackgroundTheme(
       gradient: LinearGradient(
         colors: [
-          Color(0xFFEFFBF3),
-          Color(0xFFF8FFD7),
-          Color(0xFFFFF2E5),
+          Color(0xFFF2FAF5),
+          Color(0xFFF8FFE8),
+          Color(0xFFFFF5EC),
         ],
         stops: [0.08, 0.54, 1],
         begin: Alignment.topCenter,
@@ -148,7 +148,7 @@ class AppTheme {
     );
     final isLight = brightness == Brightness.light;
     final cardShadow = isLight
-        ? const Color(0xFF0A3B24).withValues(alpha: 0.12)
+        ? const Color(0xFF0A3B24).withValues(alpha: 0.10)
         : Colors.transparent;
 
     return base.copyWith(
@@ -159,6 +159,8 @@ class AppTheme {
       ),
       dialogTheme: DialogThemeData(
         backgroundColor: scheme.surface,
+        surfaceTintColor: scheme.primary.withValues(alpha: isLight ? 0.06 : 0),
+        shape: RoundedRectangleBorder(borderRadius: T.r28),
         titleTextStyle: TextStyle(
           color: scheme.onSurface,
           fontWeight: FontWeight.w800,
@@ -171,10 +173,15 @@ class AppTheme {
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: scheme.surface,
-        surfaceTintColor: Colors.transparent,
+        surfaceTintColor: scheme.primary.withValues(alpha: isLight ? 0.05 : 0),
+        elevation: isLight ? 8 : 0,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
       ),
       snackBarTheme: SnackBarThemeData(
         backgroundColor: isLight ? Colors.white : scheme.surface,
+        elevation: isLight ? 4 : 0,
         contentTextStyle: TextStyle(
           color: scheme.onSurface,
           fontWeight: FontWeight.w600,
@@ -183,12 +190,17 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: isLight ? scheme.surfaceContainerHighest : scheme.surface,
+        surfaceTintColor: scheme.primary.withValues(alpha: isLight ? 0.05 : 0),
         elevation: isLight ? 5 : 0,
         shadowColor: cardShadow,
+        margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: T.r28),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: isLight ? Colors.white.withValues(alpha: 0.72) : Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        scrolledUnderElevation: isLight ? 2 : 0,
+        shadowColor: cardShadow.withValues(alpha: 0.6),
         elevation: 0,
         iconTheme: IconThemeData(color: scheme.onBackground),
         titleTextStyle: TextStyle(
@@ -219,7 +231,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isLight ? scheme.surfaceContainerHighest : T.fieldFill,
+        fillColor: isLight ? Colors.white.withValues(alpha: 0.84) : T.fieldFill,
         border: OutlineInputBorder(borderRadius: T.r20, borderSide: BorderSide.none),
         enabledBorder: OutlineInputBorder(
           borderRadius: T.r20,
@@ -258,7 +270,7 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           foregroundColor: scheme.onPrimary,
           backgroundColor: scheme.primary,
-          elevation: isLight ? 1.5 : 0,
+          elevation: isLight ? 2.5 : 0,
           shadowColor: isLight
               ? scheme.primary.withValues(alpha: 0.22)
               : Colors.transparent,
@@ -270,6 +282,10 @@ class AppTheme {
         style: FilledButton.styleFrom(
           foregroundColor: scheme.onPrimary,
           backgroundColor: scheme.primary,
+          elevation: isLight ? 2 : 0,
+          shadowColor: isLight
+              ? scheme.primary.withValues(alpha: 0.20)
+              : Colors.transparent,
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
           shape: RoundedRectangleBorder(borderRadius: T.r20),
         ),
@@ -299,9 +315,12 @@ class AppTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: isLight
-            ? Colors.white.withValues(alpha: 0.9)
+            ? Colors.white.withValues(alpha: 0.92)
             : scheme.surface,
-        indicatorColor: scheme.primary.withValues(alpha: isLight ? 0.22 : 0.3),
+        shadowColor: isLight ? cardShadow : Colors.transparent,
+        elevation: isLight ? 10 : 0,
+        surfaceTintColor: scheme.primary.withValues(alpha: isLight ? 0.04 : 0),
+        indicatorColor: scheme.primary.withValues(alpha: isLight ? 0.20 : 0.3),
         iconTheme: WidgetStateProperty.resolveWith(
           (states) => IconThemeData(
             color: states.contains(WidgetState.selected)

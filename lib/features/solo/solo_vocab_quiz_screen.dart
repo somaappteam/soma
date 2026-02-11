@@ -38,22 +38,9 @@ class SoloVocabQuizScreen extends StatefulWidget {
 }
 
 class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
-  // DEMO: replace with your generator/data
   List<Map<String, dynamic>> questions = [];
-  final List<Map<String, dynamic>> _demoQuestions = [
-    {
-      "prompt": "llegar",
-      "reading": "",
-      "choices": ["arrive", "leave", "eat", "live"],
-      "correct": 0,
-    },
-    {
-      "prompt": "rápidamente",
-      "reading": "",
-      "choices": ["slowly", "quickly", "never", "yesterday"],
-      "correct": 1,
-    },
-  ];
+  bool _loading = true;
+  String? _loadError;
 
   int index = 0;
   int correctCount = 0;
@@ -77,6 +64,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
     _loadSettings();
     if (widget.reviewQuestions != null && widget.reviewQuestions!.isNotEmpty) {
       questions = widget.reviewQuestions!;
+      _loading = false;
       _prepareQuestion();
       _startTimer();
     } else {
@@ -99,24 +87,25 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
           widget.course.id, widget.totalQuestions);
       if (mounted) {
         setState(() {
-          questions = dbQuestions.isNotEmpty ? dbQuestions : _demoQuestions;
+          questions = dbQuestions;
+          _loading = false;
+          _loadError = dbQuestions.isEmpty
+              ? 'No vocabulary questions are available yet for this course.'
+              : null;
         });
-        _prepareQuestion();
-        _startTimer();
+        if (questions.isNotEmpty) {
+          _prepareQuestion();
+          _startTimer();
+        }
       }
     } catch (e, stack) {
       debugPrint("Error loading quiz: $e");
       if (mounted) {
-        showDialog(context: context, builder: (_) => AlertDialog(
-          title: const Text("Error Loading Quiz"),
-          content: SingleChildScrollView(child: Text("$e\n$stack")),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))],
-        ));
         setState(() {
-          questions = _demoQuestions;
+          _loading = false;
+          _loadError = 'Failed to load vocabulary questions. Please try again.';
         });
-        _prepareQuestion();
-        _startTimer();
+        debugPrint('$stack');
       }
     }
   }
@@ -289,6 +278,9 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
   }
 
   void _goToResults() {
+    final totalAnswered = questions.length < widget.totalQuestions
+        ? questions.length
+        : widget.totalQuestions;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -297,14 +289,13 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
           mode: SoloMode.vocabulary,
           level: widget.level,
           correct: correctCount,
-          total: widget.totalQuestions,
+          total: totalAnswered,
           points: correctCount * 15,
           mistakes: mistakes,
           onPlayAgain: () {
             Navigator.pop(context); // Go back to detail
           },
           onReviewMistakes: () {
-            // Demo: just pop for now or show mistakes
             Navigator.pop(context);
           },
         ),
@@ -314,9 +305,40 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (questions.isEmpty) {
+    if (_loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator(color: Color(0xFF33D6FF))),
+      );
+    }
+
+    if (_loadError != null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _loadError!,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: () {
+                    setState(() {
+                      _loading = true;
+                      _loadError = null;
+                    });
+                    _loadQuestions();
+                  },
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
     final scheme = Theme.of(context).colorScheme;
@@ -356,7 +378,8 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                   ),
                   const SizedBox(width: 10),
                   _Pill(
-                      text: "${index + 1}/${widget.totalQuestions}",
+                      text:
+                          "${index + 1}/${questions.length < widget.totalQuestions ? questions.length : widget.totalQuestions}",
                       icon: Icons.layers_rounded),
                 ],
               ),

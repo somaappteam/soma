@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import '../auth/welcome_screen.dart';
 import '../../core/theme/motion.dart';
 import '../../core/theme/tokens.dart';
-import '../../data/content_sync_service.dart';
 import '../../data/auth_repository.dart';
 import '../home/app_shell.dart';
 
@@ -37,34 +36,29 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.6, curve: MotionTokens.fadeCurve)),
     );
 
-    _controller.forward().then((_) async {
-      await Future.delayed(const Duration(milliseconds: 500));
+    _controller.forward();
+    _goNext();
+  }
 
-      try {
-        debugPrint("Starting Data Sync...");
-        await contentSyncService.syncEverything();
-        debugPrint("Data Sync Complete.");
-      } catch (e) {
-        debugPrint("Data Sync Warning: $e");
-      }
+  Future<void> _goNext() async {
+    await Future.delayed(const Duration(milliseconds: 220));
+    if (!mounted) return;
 
-      if (mounted) {
-        final session = authRepository.currentUser;
-        if (session != null) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const AppShell()),
-          );
-        } else {
-          Navigator.of(context).pushReplacement(
-            PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const WelcomeScreen(),
-              transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
-              transitionDuration: const Duration(milliseconds: 800),
-            ),
-          );
-        }
-      }
-    });
+    final session = authRepository.currentUser;
+    if (session != null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const AppShell()),
+      );
+      return;
+    }
+
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => const WelcomeScreen(),
+        transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+        transitionDuration: const Duration(milliseconds: 500),
+      ),
+    );
   }
 
   @override

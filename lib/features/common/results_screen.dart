@@ -170,9 +170,11 @@ class _ResultsScreenState extends State<ResultsScreen> {
         }
       }
 
-      if (quizQuestions.isNotEmpty) {
-        await circlesRepository.updateCircleQuestions(circleId, quizQuestions);
+      if (quizQuestions.isEmpty) {
+        throw Exception('No quiz questions available for rematch.');
       }
+
+      await circlesRepository.updateCircleQuestions(circleId, quizQuestions);
       await circlesRepository.updateCircleStatus(circleId, 'active');
       if (!mounted) return;
 
