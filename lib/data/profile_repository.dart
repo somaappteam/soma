@@ -66,6 +66,7 @@ class ProfileRepository {
       'username': profile.username,
       'bio': profile.bio,
       'location': profile.location,
+      'avatar_url': profile.avatarUrl,
       'daily_goal_minutes': profile.dailyGoalMinutes,
       'updated_at': DateTime.now().toIso8601String(),
     };

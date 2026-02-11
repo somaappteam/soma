@@ -17,6 +17,20 @@ class InboxScreen extends StatefulWidget {
 
 class _InboxScreenState extends State<InboxScreen> {
   String query = "";
+  late final Stream<List<Map<String, dynamic>>> _threadsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _threadsStream = _inboxThreadsStream();
+  }
+
+  Stream<List<Map<String, dynamic>>> _inboxThreadsStream() async* {
+    yield await chatRepository.getInboxThreads();
+    yield* Stream.periodic(const Duration(seconds: 1)).asyncMap(
+      (_) => chatRepository.getInboxThreads(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,8 +112,8 @@ class _InboxScreenState extends State<InboxScreen> {
                 const SizedBox(height: 14),
 
                 Expanded(
-                  child: FutureBuilder<List<Map<String, dynamic>>>(
-                    future: chatRepository.getInboxThreads(),
+                  child: StreamBuilder<List<Map<String, dynamic>>>(
+                    stream: _threadsStream,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(

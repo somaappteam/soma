@@ -65,7 +65,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 18),
 
               Glass(
                 radius: BorderRadius.circular(24),

@@ -353,12 +353,6 @@ class _GuestProfileView extends StatelessWidget {
               children: [
                 _TopBar(
                   onSettings: onSettings,
-                  onLeaderboard: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
-                    );
-                  },
                   title: l10n.profileTitle,
                 ),
                 const SizedBox(height: S.sm),
