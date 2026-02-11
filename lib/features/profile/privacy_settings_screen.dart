@@ -10,6 +10,7 @@ import '../../core/widgets/responsive.dart';
 import '../../data/auth_repository.dart';
 import '../../data/profile_repository.dart';
 import '../../data/stats_repository.dart';
+import '../../data/privacy_repository.dart';
 
 // Enum definitions (could be in a model file, but keeping here for simplicity as they were in privacy_store)
 enum ProfileVisibility { public, friends, private }
@@ -74,7 +75,6 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                         final allowRequests = data['allow_friend_requests'] ?? true;
                         final dmPermission = _parseDmPermission(data['dm_permission']);
                         final blockedIds = _parseBlockedUsers(data['blocked_user_ids']);
-                        // Blocked users would typically be a separate table query, skipping for now or assumed managed elsewhere
 
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(child: CircularProgressIndicator());
@@ -161,7 +161,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                               icon: Icons.block_rounded,
                               title: l10n.privacySectionBlockedUsers,
                               subtitle: blockedIds.isEmpty
-                                  ? "No blocked users"
+                                  ? AppLocalizations.of(context).privacyBlockedUsersComingSoon
                                   : "${blockedIds.length} blocked",
                               onTap: () {
                                 Navigator.push(
@@ -261,7 +261,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     showPremiumDialog(
       context: context,
       title: l10n.privacyDeleteConfirmTitle,
-      body: "${l10n.privacyDeleteConfirmBody}\n\nYour account will be scheduled for deletion in 30 days. You can sign back in before then to cancel.",
+      body: l10n.privacyDeleteConfirmBody,
       confirmText: l10n.delete,
       cancelText: l10n.cancel,
       destructive: true,
@@ -321,19 +321,12 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   Future<void> _deleteAccount(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     try {
-      final now = DateTime.now();
-      final scheduled = now.add(const Duration(days: 30));
-      await settingsRepository.updateSettings({
-        'account_delete_requested_at': now.toIso8601String(),
-        'account_delete_scheduled_for': scheduled.toIso8601String(),
-      });
+      await privacyRepository.requestAccountDeletion();
       await authRepository.signOutWithSessionEnd();
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Account scheduled for deletion on ${scheduled.toLocal().toString().split(' ').first}. You have 30 days to cancel by signing back in.",
-          ),
+        const SnackBar(
+          content: Text('Account deletion request submitted.'),
         ),
       );
       Navigator.of(context).popUntil((route) => route.isFirst);
@@ -407,7 +400,7 @@ class _BlockedUsersScreenState extends State<_BlockedUsersScreen> {
                           radius: BorderRadius.circular(24),
                           padding: const EdgeInsets.all(16),
                           child: Text(
-                            "No blocked users",
+                            l10n.privacyBlockedUsersComingSoon,
                             style: TextStyle(
                               color: scheme.onSurface.withValues(alpha: 0.75),
                               fontWeight: FontWeight.w700,

@@ -11,6 +11,7 @@ import '../../data/profile_repository.dart';
 import '../../data/profile_store.dart';
 import '../../data/social_repository.dart';
 import '../../data/stats_repository.dart';
+import '../../data/user_report_repository.dart';
 import '../../data/achievements_repository.dart';
 import '../../data/presence_repository.dart';
 import '../../models/user_profile.dart';
@@ -38,6 +39,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isRequestSending = false;
   bool _requestSent = false;
   bool _isBlocked = false;
+  bool _isReported = false;
+  bool _isReportSubmitting = false;
   String? _pendingFriendshipId;
   Future<UserStats>? _statsFuture;
   Future<List<Achievement>>? _achievementsFuture;
@@ -63,11 +66,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final p = await profileRepository.fetchProfile(userId: _viewedUserId);
     String? pendingId;
     var isBlocked = false;
+    var isReported = false;
     if (_isVisitorView && _viewerId != null && _viewedUserId != null) {
       pendingId = await socialRepository.getOutgoingPendingRequestId(_viewedUserId!);
       final settings = await settingsRepository.getSettings();
       final blockedIds = _parseBlockedIds(settings['blocked_user_ids']);
       isBlocked = blockedIds.contains(_viewedUserId);
+      isReported = await userReportRepository.hasReported(_viewedUserId!);
     }
     if (mounted) {
       setState(() {
@@ -75,6 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _pendingFriendshipId = pendingId;
         _requestSent = pendingId != null;
         _isBlocked = isBlocked;
+        _isReported = isReported;
         _isLoading = false;
       });
     }
@@ -230,6 +236,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _showSnack(shouldBlock ? 'User blocked.' : 'User unblocked.');
   }
 
+  Future<void> _toggleReported(UserProfile profile) async {
+    final otherId = profile.id ?? _viewedUserId;
+    if (otherId == null || otherId.isEmpty) {
+      _showSnack('Unable to submit report right now.');
+      return;
+    }
+
+    final shouldReport = !_isReported;
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(shouldReport ? 'Report user?' : 'Remove report?'),
+            content: Text(
+              shouldReport
+                  ? 'This report will be reviewed by our moderation team.'
+                  : 'This will remove your previous report for this user.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(AppLocalizations.of(context).cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(shouldReport ? 'Report' : 'Remove'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!confirmed) return;
+
+    setState(() => _isReportSubmitting = true);
+    try {
+      if (shouldReport) {
+        await userReportRepository.reportUser(otherId);
+      } else {
+        await userReportRepository.removeReport(otherId);
+      }
+      if (!mounted) return;
+      setState(() {
+        _isReported = shouldReport;
+        _isReportSubmitting = false;
+      });
+      _showSnack(shouldReport ? 'User reported.' : 'Report removed.');
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isReportSubmitting = false);
+      _showSnack('Unable to submit report right now.');
+    }
+  }
+
+
+  String _resolveFallbackUsername(AppLocalizations l10n) {
+    final current = authRepository.currentUser;
+    final metadataName = current?.userMetadata?['username']?.toString();
+    if (metadataName != null && metadataName.isNotEmpty) return metadataName;
+    final email = current?.email;
+    if (email != null && email.contains('@')) {
+      final prefix = email.split('@').first.trim();
+      if (prefix.isNotEmpty) return prefix;
+    }
+    return l10n.genericUser;
+  }
+
   void _showSnack(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
@@ -276,7 +348,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final profile = _profile ?? UserProfile(
       id: _viewedUserId,
       displayName: l10n.profileDefaultDisplayName,
-      username: "user_${DateTime.now().millisecondsSinceEpoch % 10000}",
+      username: _resolveFallbackUsername(l10n),
       bio: l10n.profileDefaultBio,
       location: l10n.profileDefaultLocation,
       dailyGoalMinutes: 15,
@@ -334,9 +406,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           isSending: _isRequestSending,
                           requestSent: _requestSent,
                           isBlocked: _isBlocked,
+                          isReported: _isReported,
+                          isReportSubmitting: _isReportSubmitting,
                           onMessage: () => _openMessage(profile),
-                          onAddFriend: () => _requestSent ? _cancelFriendRequest(profile) : _sendFriendRequest(profile),
+                          onAddFriend: () => _requestSent
+                              ? _cancelFriendRequest(profile)
+                              : _sendFriendRequest(profile),
                           onToggleBlocked: () => _toggleBlocked(profile),
+                          onToggleReported: () => _toggleReported(profile),
                         ),
                         const SizedBox(height: S.sm),
                         _VisitorStatsCard(profile: profile),
@@ -1120,17 +1197,23 @@ class _VisitorActionsCard extends StatelessWidget {
   final VoidCallback onMessage;
   final VoidCallback onAddFriend;
   final VoidCallback onToggleBlocked;
+  final VoidCallback onToggleReported;
   final bool isSending;
   final bool requestSent;
   final bool isBlocked;
+  final bool isReported;
+  final bool isReportSubmitting;
 
   const _VisitorActionsCard({
     required this.onMessage,
     required this.onAddFriend,
     required this.onToggleBlocked,
+    required this.onToggleReported,
     required this.isSending,
     required this.requestSent,
     required this.isBlocked,
+    required this.isReported,
+    required this.isReportSubmitting,
   });
 
   @override
@@ -1183,6 +1266,12 @@ class _VisitorActionsCard extends StatelessWidget {
             icon: isBlocked ? Icons.lock_open_rounded : Icons.block_rounded,
             label: isBlocked ? 'Unblock user' : 'Block user',
             onTap: onToggleBlocked,
+          ),
+          const SizedBox(height: S.xs),
+          _ActionButton(
+            icon: isReported ? Icons.flag_outlined : Icons.flag_rounded,
+            label: isReported ? 'Remove report' : 'Report user',
+            onTap: isReportSubmitting ? null : onToggleReported,
           ),
         ],
       ),

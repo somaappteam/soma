@@ -777,5 +777,28 @@
     "placeholders": {
       "id": {}
     }
-  }
+  },
+  "welcome": "Welcome, {name}!",
+  "authForgotPassword": "Forgot password?",
+  "authForgotPasswordTitle": "Reset password",
+  "authForgotPasswordBody": "Enter the email linked to your account. We'll send a secure reset link.",
+  "authSendResetLink": "Send reset link",
+  "authResetSentTitle": "Check your email",
+  "authResetSentBody": "We sent a password reset link. Follow the instructions to set a new password.",
+  "authResetFailedTitle": "Reset failed",
+  "circlesRoomLocked": "Room locked",
+  "circlesRoomUnlocked": "Room unlocked",
+  "circlesSettingsSaved": "Room settings saved",
+  "circlesUpdateFailed": "Couldn't update room: {error}",
+  "@circlesUpdateFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "circlesLiveChatTitle": "Live chat",
+  "circlesLiveChatPlaceholder": "Type a message",
+  "circlesLiveChatEmpty": "No messages yet. Start the chat!",
+  "circlesLiveChatUnavailable": "Live chat is available inside active circles.",
+  "circlesCreateHelpTitle": "Create a circle",
+  "circlesCreateHelpBody": "Choose your languages, mode, and difficulty, then set room limits. Spectators can watch, and live chat lets everyone talk during the match."
 }

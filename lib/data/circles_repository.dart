@@ -14,6 +14,31 @@ class CirclesRepository {
         'status', ['lobby', 'active']).order('created_at', ascending: false);
   }
 
+
+  /// Stream participant counts grouped by circle id for open circles.
+  Stream<Map<String, CircleParticipantCounts>> getOpenCircleParticipantCounts() {
+    return _supabase
+        .from('circle_participants')
+        .stream(primaryKey: ['id'])
+        .map((rows) {
+      final counts = <String, CircleParticipantCounts>{};
+      for (final row in rows) {
+        final circleId = row['circle_id']?.toString();
+        if (circleId == null || circleId.isEmpty) continue;
+        final role = row['role']?.toString() ?? 'player';
+        final current = counts[circleId] ?? const CircleParticipantCounts();
+        if (role == 'spectator') {
+          counts[circleId] = current.copyWith(spectators: current.spectators + 1);
+        } else if (role == 'pending') {
+          counts[circleId] = current.copyWith(pending: current.pending + 1);
+        } else {
+          counts[circleId] = current.copyWith(players: current.players + 1);
+        }
+      }
+      return counts;
+    });
+  }
+
   /// Create a new circle
   Future<String> createCircle({
     required String name,
@@ -426,3 +451,28 @@ class CircleJoinOutcome {
 }
 
 final circlesRepository = CirclesRepository();
+
+
+class CircleParticipantCounts {
+  final int players;
+  final int spectators;
+  final int pending;
+
+  const CircleParticipantCounts({
+    this.players = 0,
+    this.spectators = 0,
+    this.pending = 0,
+  });
+
+  CircleParticipantCounts copyWith({
+    int? players,
+    int? spectators,
+    int? pending,
+  }) {
+    return CircleParticipantCounts(
+      players: players ?? this.players,
+      spectators: spectators ?? this.spectators,
+      pending: pending ?? this.pending,
+    );
+  }
+}
