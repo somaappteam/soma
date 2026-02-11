@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "ఖాళీలను పూరించండి + అనువాదం + పఠనం",
   "soloModeReviewDescription": "నేర్చుకున్నవాటిని ప్రాక్టీస్ చేయండి: బలహీనమైన పదాలు, ఇటీవల చేసిన తప్పులు",
   "startReview": "సమీక్షను ప్రారంభించండి",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "{mode} సెటప్",
   "@soloSetupTitle": {
     "placeholders": {

@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "শূন্যস্থান পূরণ + অনুবাদ + পড়া",
   "soloModeReviewDescription": "আপনি যা শিখেছেন তা অনুশীলন করুন: দুর্বল শব্দ, সাম্প্রতিক ভুল এবং স্পেসড পুনরাবৃত্তি।",
   "startReview": "পর্যালোচনা শুরু করুন",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "{mode} সেটআপ",
   "@soloSetupTitle": {
     "placeholders": {

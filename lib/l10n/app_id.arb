@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "Isi kosong + terjemahan + bacaan",
   "soloModeReviewDescription": "Praktikkan apa yang telah dipelajari: kata-kata lemah, kesalahan terbaru, pengulangan berjarak.",
   "startReview": "Mulai Tinjauan",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "Pengaturan {mode}",
   "@soloSetupTitle": {
     "placeholders": {

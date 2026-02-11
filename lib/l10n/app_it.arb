@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "Riempimento spazi + traduzione + lettura",
   "soloModeReviewDescription": "Esercitati su ciò che hai appreso: parole deboli, errori recenti e ripetizione spaziata.",
   "startReview": "Inizia ripasso",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "Impostazione {mode}",
   "@soloSetupTitle": {
     "placeholders": {

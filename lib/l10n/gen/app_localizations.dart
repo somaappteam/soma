@@ -514,6 +514,42 @@ abstract class AppLocalizations {
   /// **'Start Review'**
   String get startReview;
 
+  /// No description provided for @soloReviewModeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review mode'**
+  String get soloReviewModeTitle;
+
+  /// No description provided for @soloReviewOptionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review options'**
+  String get soloReviewOptionsTitle;
+
+  /// No description provided for @soloReviewScopeAllLearned.
+  ///
+  /// In en, this message translates to:
+  /// **'All learned'**
+  String get soloReviewScopeAllLearned;
+
+  /// No description provided for @soloReviewScopeStruggling.
+  ///
+  /// In en, this message translates to:
+  /// **'Struggling items'**
+  String get soloReviewScopeStruggling;
+
+  /// No description provided for @soloReviewScopeStrugglingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Prioritize items you recently got wrong.'**
+  String get soloReviewScopeStrugglingDescription;
+
+  /// No description provided for @soloReviewScopeAllLearnedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Review all learned content for this course.'**
+  String get soloReviewScopeAllLearnedDescription;
+
   /// No description provided for @soloSetupTitle.
   ///
   /// In en, this message translates to:

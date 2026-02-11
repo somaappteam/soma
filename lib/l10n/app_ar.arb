@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "ملء الفراغات + الترجمة + القراءة",
   "soloModeReviewDescription": "تدرّب على ما تعلمته: الكلمات الضعيفة والأخطاء الأخيرة والتكرار المتباعد.",
   "startReview": "بدء المراجعة",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "إعداد {mode}",
   "@soloSetupTitle": {
     "placeholders": {

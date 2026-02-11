@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "रिक्त स्थान भरें + अनुवाद + पढ़ना",
   "soloModeReviewDescription": "जो आपने सीखा है उसका अभ्यास करें: कमजोर शब्द, हाल की गलतियां और स्पेस्ड रिपीटिशन।",
   "startReview": "समीक्षा शुरू करें",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "{mode} सेटअप",
   "@soloSetupTitle": {
     "placeholders": {

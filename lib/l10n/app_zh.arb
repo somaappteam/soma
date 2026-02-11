@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "填空 + 翻译 + 阅读",
   "soloModeReviewDescription": "练习所学内容：薄弱的单词、最近的错误、间隔重复。",
   "startReview": "开始复习",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "{mode}设置",
   "@soloSetupTitle": {
     "placeholders": {

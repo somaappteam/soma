@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "Fill in the blank + translation + reading",
   "soloModeReviewDescription": "Practice what you learned: weak words, recent mistakes, and spaced repetition.",
   "startReview": "Start Review",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "{mode} Setup",
   "@soloSetupTitle": {
     "placeholders": {

@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "ਖਾਲੀ ਥਾਂ ਭਰੋ + ਅਨੁਵਾਦ + ਪੜ੍ਹਨਾ",
   "soloModeReviewDescription": "ਜੋ ਸਿੱਖਿਆ ਹੈ ਉਸਦਾ ਅਭਿਆਸ ਕਰੋ: ਕਮਜ਼ੋਰ ਸ਼ਬਦ, ਤਾਜ਼ਾ ਗਲਤੀਆਂ ਅਤੇ ਦੁਹਰਾਓ",
   "startReview": "ਸਮੀਖਿਆ ਸ਼ੁਰੂ ਕਰੋ",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "{mode} ਸੈੱਟਅੱਪ",
   "@soloSetupTitle": {
     "placeholders": {

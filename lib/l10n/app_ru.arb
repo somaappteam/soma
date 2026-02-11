@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "Заполнение пропусков + перевод + чтение",
   "soloModeReviewDescription": "Практикуйте изученное: слабые слова, недавние ошибки и интервальное повторение.",
   "startReview": "Начать повторение",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "Настройка {mode}",
   "@soloSetupTitle": {
     "placeholders": {

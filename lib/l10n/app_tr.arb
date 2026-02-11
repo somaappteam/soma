@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "Boşluk doldurma + çeviri + okuma",
   "soloModeReviewDescription": "Öğrendiklerinizi pratik edin: unutulan kelimeler, son hatalar, aralıklı tekrar",
   "startReview": "Gözden Geçirmeyi Başlat",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "{mode} Kurulumu",
   "@soloSetupTitle": {
     "placeholders": {
