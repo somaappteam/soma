@@ -190,23 +190,6 @@ class _AppState extends State<App> {
     }
   }
 
-  double _uiScaleFor(MediaQueryData media) {
-    final shortest = media.size.shortestSide;
-    if (shortest >= 1200) return 0.86;
-    if (shortest >= 900) return 0.9;
-    if (shortest >= 700) return 0.94;
-    return (shortest / 390).clamp(0.9, 1.0);
-  }
-
-  EdgeInsets _scaleInsets(EdgeInsets insets, double scale) {
-    return EdgeInsets.fromLTRB(
-      insets.left / scale,
-      insets.top / scale,
-      insets.right / scale,
-      insets.bottom / scale,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -230,64 +213,68 @@ class _AppState extends State<App> {
           themeAnimationCurve: Curves.easeOutCubic,
           builder: (context, child) {
             if (child == null) return const SizedBox.shrink();
-            final background = Theme.of(context).extension<AppBackgroundTheme>()?.gradient;
+            final background =
+                Theme.of(context).extension<AppBackgroundTheme>()?.gradient;
             final media = MediaQuery.of(context);
-            final scale = _uiScaleFor(media);
-            Widget content;
-            if (scale == 1.0) {
-              content = DecoratedBox(
-                decoration: BoxDecoration(gradient: background),
-                child: child,
-              );
-            } else {
+            final clampedMedia = media.copyWith(
+              textScaler: media.textScaler.clamp(
+                minScaleFactor: 0.9,
+                maxScaleFactor: 1.15,
+              ),
+            );
 
-              final baseTextScale = media.textScaler.scale(1.0);
-              final scaledMedia = media.copyWith(
-                size: Size(media.size.width / scale, media.size.height / scale),
-                padding: _scaleInsets(media.padding, scale),
-                viewPadding: _scaleInsets(media.viewPadding, scale),
-                viewInsets: _scaleInsets(media.viewInsets, scale),
-                systemGestureInsets: _scaleInsets(media.systemGestureInsets, scale),
-                textScaler: TextScaler.linear(baseTextScale * scale),
-              );
+            final decoratedChild = MediaQuery(
+              data: clampedMedia,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  final maxContentWidth =
+                      width >= 1700 ? 1500.0 : (width >= 1400 ? 1320.0 : width);
+                  final sidePadding =
+                      width >= 1200 ? 20.0 : (width >= 900 ? 12.0 : 0.0);
 
-              content = DecoratedBox(
-                decoration: BoxDecoration(gradient: background),
-                child: MediaQuery(
-                  data: scaledMedia,
-                  child: Transform.scale(
-                    scale: scale,
+                  return Align(
                     alignment: Alignment.topCenter,
-                    child: SizedBox(
-                      width: media.size.width / scale,
-                      height: media.size.height / scale,
-                      child: child,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(maxWidth: maxContentWidth),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: sidePadding),
+                        child: child,
+                      ),
                     ),
-                  ),
-                ),
-              );
-            }
+                  );
+                },
+              ),
+            );
+
+            final content = DecoratedBox(
+              decoration: BoxDecoration(gradient: background),
+              child: decoratedChild,
+            );
 
             return AppLockGate(
               child: ValueListenableBuilder<SyncStatus>(
-              valueListenable: syncStatusNotifier,
-              builder: (context, status, _) {
-                return Stack(
-                  children: [
-                    content,
-                    if (status != SyncStatus.idle)
-                      SafeArea(
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            child: _SyncStatusBanner(status: status),
+                valueListenable: syncStatusNotifier,
+                builder: (context, status, _) {
+                  return Stack(
+                    children: [
+                      content,
+                      if (status != SyncStatus.idle)
+                        SafeArea(
+                          child: Align(
+                            alignment: Alignment.topCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 8,
+                              ),
+                              child: _SyncStatusBanner(status: status),
+                            ),
                           ),
                         ),
-                      ),
-                  ],
-                );
-              },
+                    ],
+                  );
+                },
               ),
             );
           },

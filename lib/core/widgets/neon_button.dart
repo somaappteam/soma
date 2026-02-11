@@ -76,22 +76,22 @@ class _NeonButtonState extends State<NeonButton>
             children: [
               // 1. Pulsing ambient glow (alive feel)
               Container(
-                height: 56,
+                height: 48,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  borderRadius: T.r28,
+                  borderRadius: T.r20,
                   boxShadow: [
                     BoxShadow(
                       color: ambientGlow.withValues(alpha: glowStrength),
-                      offset: const Offset(0, 8),
-                      blurRadius: 26,
-                      spreadRadius: -6,
+                      offset: const Offset(0, 6),
+                      blurRadius: 20,
+                      spreadRadius: -7,
                     ),
                     BoxShadow(
                       color: accentGlow.withValues(alpha: glowStrength * 0.6),
-                      offset: const Offset(0, 2),
-                      blurRadius: 18,
-                      spreadRadius: -8,
+                      offset: const Offset(0, 1),
+                      blurRadius: 14,
+                      spreadRadius: -9,
                     ),
                   ],
                 ),
@@ -99,10 +99,10 @@ class _NeonButtonState extends State<NeonButton>
 
               // 2. Main Button Pill (animated gradient shimmer)
               Container(
-                height: 56,
+                height: 48,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  borderRadius: T.r28,
+                  borderRadius: T.r20,
                   gradient: LinearGradient(
                     begin: Alignment(-1 + shimmerShift, -1),
                     end: Alignment(1, 1 + shimmerShift),
@@ -116,7 +116,7 @@ class _NeonButtonState extends State<NeonButton>
                       color: Colors.white.withValues(
                         alpha: enabled ? 1 : 0.7,
                       ),
-                      fontSize: 17,
+                      fontSize: 15.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
                     ),
@@ -127,8 +127,8 @@ class _NeonButtonState extends State<NeonButton>
               // 3. Subtle top specular highlight
               Positioned(
                 top: 1,
-                left: 24,
-                right: 24,
+                left: 20,
+                right: 20,
                 child: Container(
                   height: 1,
                   decoration: BoxDecoration(
@@ -145,7 +145,7 @@ class _NeonButtonState extends State<NeonButton>
                     opacity: enabled ? 0.22 : 0.1,
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        borderRadius: T.r28,
+                        borderRadius: T.r20,
                         gradient: LinearGradient(
                           begin: Alignment(-1.2 + shimmerShift, -0.6),
                           end: Alignment(1.2 + shimmerShift, 0.6),
