@@ -131,6 +131,17 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
         } else {
           debugPrint("CircleLobby: Status is active but questions are missing. Waiting for questions...");
         }
+        return;
+      }
+
+      if (newStatus == 'ended' || newStatus == 'terminated' || newStatus == 'closed') {
+        _hasNavigated = true;
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(content: Text('This circle has been terminated by the host.')),
+          );
+        Navigator.pop(context);
       }
     });
   }

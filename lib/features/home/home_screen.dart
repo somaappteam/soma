@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/services/haptics_service.dart';
@@ -79,27 +78,94 @@ class _HomeScreenState extends State<HomeScreen> {
     final scheme = Theme.of(context).colorScheme;
     final result = await showDialog<bool>(
       context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.55),
       builder: (ctx) {
-        return AlertDialog(
-          backgroundColor: scheme.surface,
-          title: Text(
-            l10n.removeCourseTitle,
-            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
-          ),
-          content: Text(
-            l10n.removeCourseBody(course.subtitle),
-            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.w600),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: Text(l10n.cancel, style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8))),
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Glass(
+            radius: BorderRadius.circular(24),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(
+                      colors: [
+                        scheme.tertiary.withValues(alpha: 0.92),
+                        scheme.error.withValues(alpha: 0.88),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: scheme.error.withValues(alpha: 0.28),
+                        blurRadius: 14,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: Icon(Icons.delete_forever_rounded, color: scheme.onError, size: 26),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  l10n.removeCourseTitle,
+                  style: TextStyle(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.removeCourseBody(course.subtitle),
+                  style: TextStyle(
+                    color: scheme.onSurface.withValues(alpha: 0.78),
+                    fontWeight: FontWeight.w600,
+                    height: 1.35,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: scheme.onSurface,
+                          side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.24)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: Text(l10n.cancel),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: scheme.error,
+                          foregroundColor: scheme.onError,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          l10n.remove,
+                          style: const TextStyle(fontWeight: FontWeight.w800),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: Text(l10n.remove, style: TextStyle(color: scheme.tertiary, fontWeight: FontWeight.w800)),
-            ),
-          ],
+          ),
         );
       },
     );
@@ -231,12 +297,10 @@ class _HomeScreenState extends State<HomeScreen> {
     _syncCoursesIfNeeded();
     return SafeArea(
         child: ResponsiveFrame(
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.sm),
-                child: Column(
-                  children: [
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.sm),
+            child: Column(
+              children: [
                 // Header row
                 Row(
                   children: [
@@ -289,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: S.lg),
 
                 // Welcome
-                _buildWelcomeRow(editing: false),
+                _buildWelcomeRow(editing: _isEditingCourses),
                 const SizedBox(height: S.sm),
 
 
@@ -303,49 +367,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                        
                       final courses = snapshot.data ?? [];
-                      return _buildCourseList(courses, editing: false);
+                      return _buildCourseList(courses, editing: _isEditingCourses);
                     },
                   ),
                 ),
-                  ],
-                ),
-              ),
-              if (_isEditingCourses) ...[
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                      child: Container(color: Colors.black.withValues(alpha: 0.35)),
-                    ),
-                  ),
-                ),
-                Positioned.fill(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.sm),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 62),
-                        _buildWelcomeRow(editing: true),
-                        const SizedBox(height: S.sm),
-                        Expanded(
-                          child: FutureBuilder<List<SoloCourse>>(
-                            future: _coursesFuture,
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const _CoursesSkeleton();
-                              }
-
-                              final courses = snapshot.data ?? [];
-                              return _buildCourseList(courses, editing: true);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
               ],
-            ],
+            ),
           ),
         ),
       );
@@ -700,11 +727,54 @@ class _AddCourseButton extends StatelessWidget {
         );
 
         if (created != null) {
+          final existingCourses = await coursesRepository.getUserCourses();
+          final duplicate = existingCourses.any((course) => _isSameCourse(course, created));
+          if (duplicate) {
+            if (!context.mounted) return;
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  content: Text(
+                    'You already have ${created.subtitle}. Duplicate course was not added.',
+                  ),
+                ),
+              );
+            return;
+          }
+
           await coursesRepository.addCustomCourse(created);
           onAdded(created);
         }
       },
     );
+  }
+
+  bool _isSameCourse(SoloCourse a, SoloCourse b) {
+    if (a.id == b.id) return true;
+    final aPair = _coursePairKey(a);
+    final bPair = _coursePairKey(b);
+    return aPair != null && aPair == bPair;
+  }
+
+  String? _coursePairKey(SoloCourse course) {
+    final idMatch = RegExp(r'^solo_([a-z]{2,})_([a-z]{2,})(?:_\d+)?$').firstMatch(
+      course.id.toLowerCase(),
+    );
+    if (idMatch != null) {
+      return '${idMatch.group(1)}->${idMatch.group(2)}';
+    }
+
+    final subtitleMatch = RegExp(r'^\s*(.*?)\s*→\s*(.*?)\s*$').firstMatch(course.subtitle);
+    if (subtitleMatch != null) {
+      final src = subtitleMatch.group(1)?.trim().toLowerCase();
+      final dst = subtitleMatch.group(2)?.trim().toLowerCase();
+      if ((src ?? '').isNotEmpty && (dst ?? '').isNotEmpty) {
+        return '$src->$dst';
+      }
+    }
+
+    return null;
   }
 }
 

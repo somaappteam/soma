@@ -36,7 +36,7 @@ class SoloCourseDetailScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 18),
 
               Expanded(
                 child: ListView(

@@ -360,7 +360,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                       icon: Icons.layers_rounded),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 18),
               Glass(
                 radius: BorderRadius.circular(22),
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
@@ -408,7 +408,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                 },
                 onSpeak: _speakPrompt,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
               Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),

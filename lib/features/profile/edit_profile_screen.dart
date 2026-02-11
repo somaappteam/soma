@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/theme/tokens.dart';
 import '../../data/profile_repository.dart';
@@ -16,6 +18,7 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _picker = ImagePicker();
 
   late UserProfile draft;
 
@@ -24,6 +27,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late final TextEditingController locationCtrl;
 
   int goalMinutes = 10;
+  bool _isSaving = false;
+  bool _isLoadingProfile = false;
+  bool _isUploadingAvatar = false;
+  String? _avatarUrl;
 
   @override
   void initState() {
@@ -38,6 +45,127 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     bioCtrl = TextEditingController(text: draft.bio);
     locationCtrl = TextEditingController(text: draft.location);
     goalMinutes = draft.dailyGoalMinutes;
+    _avatarUrl = draft.avatarUrl;
+
+    if (widget.initialProfile == null) {
+      _loadProfile();
+    }
+  }
+
+  Future<void> _loadProfile() async {
+    setState(() => _isLoadingProfile = true);
+    try {
+      final profile = await profileRepository.fetchProfile();
+      if (!mounted || profile == null) return;
+      setState(() {
+        draft = profile.copy();
+        usernameCtrl.text = draft.username;
+        bioCtrl.text = draft.bio;
+        locationCtrl.text = draft.location;
+        goalMinutes = draft.dailyGoalMinutes;
+        _avatarUrl = draft.avatarUrl;
+      });
+    } finally {
+      if (mounted) setState(() => _isLoadingProfile = false);
+    }
+  }
+
+  Future<void> _showPhotoOptions() async {
+    final l10n = AppLocalizations.of(context);
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.photo_library_rounded),
+                title: Text(l10n.editProfileChangePhoto),
+                subtitle: const Text('Upload from your gallery'),
+                onTap: () => Navigator.pop(ctx, 'gallery'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.link_rounded),
+                title: const Text('Use image URL'),
+                onTap: () => Navigator.pop(ctx, 'url'),
+              ),
+              if ((_avatarUrl ?? '').isNotEmpty)
+                ListTile(
+                  leading: const Icon(Icons.delete_outline_rounded),
+                  title: const Text('Remove photo'),
+                  onTap: () => Navigator.pop(ctx, 'remove'),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (choice == 'gallery') {
+      await _pickAndUploadAvatar();
+    } else if (choice == 'url') {
+      await _setAvatarByUrl();
+    } else if (choice == 'remove' && mounted) {
+      setState(() => _avatarUrl = null);
+    }
+  }
+
+  Future<void> _setAvatarByUrl() async {
+    final ctrl = TextEditingController(text: _avatarUrl ?? '');
+    final url = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text('Profile photo URL'),
+          content: TextField(
+            controller: ctrl,
+            decoration: const InputDecoration(hintText: 'https://example.com/photo.jpg'),
+            keyboardType: TextInputType.url,
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.pop(ctx, ctrl.text.trim()), child: const Text('Use')),
+          ],
+        );
+      },
+    );
+    if (!mounted || url == null || url.isEmpty) return;
+    setState(() => _avatarUrl = url);
+  }
+
+  Future<void> _pickAndUploadAvatar() async {
+    final l10n = AppLocalizations.of(context);
+    final uid = profileRepository.currentUserId;
+    if (uid == null) return;
+
+    try {
+      final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85, maxWidth: 1024);
+      if (picked == null || !mounted) return;
+
+      setState(() => _isUploadingAvatar = true);
+
+      final bytes = await picked.readAsBytes();
+      final path = '$uid/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final storage = Supabase.instance.client.storage.from('avatars');
+      await storage.uploadBinary(
+        path,
+        bytes,
+        fileOptions: const FileOptions(contentType: 'image/jpeg', upsert: true),
+      );
+
+      final publicUrl = storage.getPublicUrl(path);
+      if (!mounted) return;
+      setState(() => _avatarUrl = publicUrl);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.errorWithDetails(e.toString()))),
+      );
+    } finally {
+      if (mounted) setState(() => _isUploadingAvatar = false);
+    }
   }
 
   @override
@@ -49,15 +177,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _save() async {
+    if (_isSaving || _isUploadingAvatar) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final l10n = AppLocalizations.of(context);
+    setState(() => _isSaving = true);
 
     final next = UserProfile(
-      displayName: draft.displayName,
+      displayName: draft.displayName.isNotEmpty ? draft.displayName : usernameCtrl.text.trim(),
       username: usernameCtrl.text.trim(),
       bio: bioCtrl.text.trim(),
       location: locationCtrl.text.trim(),
       dailyGoalMinutes: goalMinutes,
+      avatarUrl: _avatarUrl,
     );
 
     try {
@@ -74,6 +205,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
            SnackBar(content: Text(l10n.errorWithDetails(e.toString()))),
         );
       }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -103,9 +236,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ),
                       ),
                       const Spacer(),
-                      _SmallIconButton(
-                        icon: Icons.check_rounded,
+                      TextButton(
                         onTap: _save,
+                        child: _isSaving
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : Text(
+                                l10n.save,
+                                style: const TextStyle(fontWeight: FontWeight.w800),
+                              ),
                       ),
                     ],
                   ),
@@ -113,7 +255,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   const SizedBox(height: 16),
 
                   Expanded(
-                    child: Form(
+                    child: _isLoadingProfile
+                        ? const Center(child: CircularProgressIndicator())
+                        : Form(
                       key: _formKey,
                       child: ListView(
                         physics: const BouncingScrollPhysics(),
@@ -124,7 +268,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
                             child: Row(
                               children: [
-                                _Avatar(),
+                                _Avatar(imageUrl: _avatarUrl),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
@@ -155,12 +299,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   ),
                                 ),
                                 _ChipButton(
-                                  label: l10n.editProfileChangePhoto,
-                                  onTap: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(l10n.editProfileAvatarUploadSoon)),
-                                    );
-                                  },
+                                  label: _isUploadingAvatar ? l10n.loading : l10n.editProfileChangePhoto,
+                                  onTap: _isUploadingAvatar ? () {} : _showPhotoOptions,
                                 )
                               ],
                             ),
@@ -259,34 +399,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               ],
                             ),
                           ),
-
-                          const SizedBox(height: 14),
-
-                          // Save button
-                          Glass(
-                            radius: BorderRadius.circular(26),
-                            padding: EdgeInsets.zero,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(26),
-                              onTap: _save,
-                              child: SizedBox(
-                                height: 56,
-                                width: double.infinity,
-                                child: Center(
-                                  child: Text(
-                                    l10n.save,
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w900),
-                                  ),
-                                ),
-                              ),
-                                ),
-                          ),
-
                           const SizedBox(height: 10),
                         ],
                       ),
@@ -335,6 +447,10 @@ class _SmallIconButton extends StatelessWidget {
 }
 
 class _Avatar extends StatelessWidget {
+  final String? imageUrl;
+
+  const _Avatar({this.imageUrl});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -357,15 +473,30 @@ class _Avatar extends StatelessWidget {
           ),
         ],
       ),
-      child: Center(
-        child: Text("🙂",
-            style: TextStyle(
-                fontSize: 22,
-                color: Theme.of(context)
-                    .colorScheme
-                    .onSurface
-                    .withValues(alpha: 0.95))),
-      ),
+      clipBehavior: Clip.antiAlias,
+      child: (imageUrl ?? '').isNotEmpty
+          ? Image.network(
+              imageUrl!,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Center(
+                child: Text(
+                  "🙂",
+                  style: TextStyle(
+                    fontSize: 22,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
+                  ),
+                ),
+              ),
+            )
+          : Center(
+              child: Text(
+                "🙂",
+                style: TextStyle(
+                  fontSize: 22,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
+                ),
+              ),
+            ),
     );
   }
 }
