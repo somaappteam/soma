@@ -43,6 +43,14 @@ class _NeonButtonState extends State<NeonButton>
   @override
   Widget build(BuildContext context) {
     final enabled = widget.onTap != null;
+    final scheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
+    final gradientStart = isLight ? scheme.primary : T.neonA;
+    final gradientEnd = isLight ? scheme.tertiary : T.neonC;
+    final ambientGlow = isLight ? scheme.primary : T.neonA;
+    final accentGlow = isLight ? scheme.secondary : T.neonB;
+
     return GestureDetector(
       onTap: widget.onTap == null
           ? null
@@ -56,10 +64,12 @@ class _NeonButtonState extends State<NeonButton>
         builder: (context, child) {
           final glowStrength = lerpDouble(0.12, 0.28, _pulse.value) ?? 0.2;
           final shimmerShift = lerpDouble(-0.2, 0.2, _pulse.value) ?? 0.0;
-          final baseA =
-              enabled ? T.neonA : T.neonA.withValues(alpha: 0.45);
-          final baseC =
-              enabled ? T.neonC : T.neonC.withValues(alpha: 0.45);
+          final baseA = enabled
+              ? gradientStart
+              : gradientStart.withValues(alpha: 0.45);
+          final baseC = enabled
+              ? gradientEnd
+              : gradientEnd.withValues(alpha: 0.45);
           return Stack(
             alignment: Alignment.center,
             clipBehavior: Clip.none,
@@ -72,13 +82,13 @@ class _NeonButtonState extends State<NeonButton>
                   borderRadius: T.r28,
                   boxShadow: [
                     BoxShadow(
-                      color: T.neonA.withValues(alpha: glowStrength),
+                      color: ambientGlow.withValues(alpha: glowStrength),
                       offset: const Offset(0, 8),
                       blurRadius: 26,
                       spreadRadius: -6,
                     ),
                     BoxShadow(
-                      color: T.neonB.withValues(alpha: glowStrength * 0.6),
+                      color: accentGlow.withValues(alpha: glowStrength * 0.6),
                       offset: const Offset(0, 2),
                       blurRadius: 18,
                       spreadRadius: -8,

@@ -8,15 +8,66 @@ import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/theme/tokens.dart';
 import '../../data/profile_store.dart';
+import '../../data/settings_repository.dart';
 import '../../core/widgets/responsive.dart';
 
-
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  Future<void> _changeLanguage(String language) async {
+    await settingsRepository.updateSetting('language_ui', language);
+  }
+
+  List<({String value, String label})> _languageOptions(AppLocalizations l10n) {
+    return [
+      (value: 'English', label: l10n.languageEnglish),
+      (value: 'Spanish', label: l10n.languageSpanish),
+      (value: 'French', label: l10n.languageFrench),
+      (value: 'German', label: l10n.languageGerman),
+      (value: 'Italian', label: l10n.languageItalian),
+      (value: 'Portuguese', label: l10n.languagePortuguese),
+      (value: 'Russian', label: l10n.languageRussian),
+      (value: 'Japanese', label: l10n.languageJapanese),
+      (value: 'Chinese', label: l10n.languageChinese),
+      (value: 'Arabic', label: l10n.languageArabic),
+      (value: 'Hindi', label: l10n.languageHindi),
+      (value: 'Indonesian', label: l10n.languageIndonesian),
+      (value: 'Bengali', label: l10n.languageBengali),
+      (value: 'Urdu', label: l10n.languageUrdu),
+      (value: 'Vietnamese', label: l10n.languageVietnamese),
+      (value: 'Turkish', label: l10n.languageTurkish),
+      (value: 'Korean', label: l10n.languageKorean),
+      (value: 'Thai', label: l10n.languageThai),
+      (value: 'Polish', label: l10n.languagePolish),
+      (value: 'Ukrainian', label: l10n.languageUkrainian),
+      (value: 'Dutch', label: l10n.languageDutch),
+      (value: 'Persian', label: l10n.languagePersian),
+      (value: 'Punjabi', label: l10n.languagePunjabi),
+      (value: 'Tamil', label: l10n.languageTamil),
+      (value: 'Telugu', label: l10n.languageTelugu),
+      (value: 'Swahili', label: l10n.languageSwahili),
+      (value: 'Malay', label: l10n.languageMalay),
+      (value: 'Romanian', label: l10n.languageRomanian),
+      (value: 'Greek', label: l10n.languageGreek),
+      (value: 'Hungarian', label: l10n.languageHungarian),
+      (value: 'Czech', label: l10n.languageCzech),
+      (value: 'Swedish', label: l10n.languageSwedish),
+      (value: 'Hebrew', label: l10n.languageHebrew),
+      (value: 'Norwegian', label: l10n.languageNorwegian),
+      (value: 'Danish', label: l10n.languageDanish),
+      (value: 'Finnish', label: l10n.languageFinnish),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final languageOptions = _languageOptions(l10n);
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -143,6 +194,68 @@ class WelcomeScreen extends StatelessWidget {
                     ],
                   ),
                 ),
+              ),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: StreamBuilder<Map<String, dynamic>>(
+                stream: settingsRepository.getSettingsStream(),
+                builder: (context, snapshot) {
+                  final current = snapshot.data?['language_ui']?.toString() ?? 'English';
+                  final currentLabel = languageOptions
+                          .firstWhere(
+                            (item) => item.value == current,
+                            orElse: () => languageOptions.first,
+                          )
+                          .label;
+
+                  return Glass(
+                    radius: BorderRadius.circular(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                    child: PopupMenuButton<String>(
+                      tooltip: l10n.settingsUiLanguage,
+                      onSelected: _changeLanguage,
+                      itemBuilder: (context) => [
+                        for (final option in languageOptions)
+                          PopupMenuItem<String>(
+                            value: option.value,
+                            child: Row(
+                              children: [
+                                Expanded(child: Text(option.label)),
+                                if (option.value == current)
+                                  Icon(
+                                    Icons.check_rounded,
+                                    size: 16,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                              ],
+                            ),
+                          ),
+                      ],
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.language_rounded, color: Colors.white, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              currentLabel,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.expand_more_rounded, color: Colors.white, size: 18),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],

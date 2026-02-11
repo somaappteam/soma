@@ -37,6 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
   bool _isRequestSending = false;
   bool _requestSent = false;
+  bool _isBlocked = false;
   String? _pendingFriendshipId;
   Future<UserStats>? _statsFuture;
   Future<List<Achievement>>? _achievementsFuture;
@@ -61,17 +62,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadProfile() async {
     final p = await profileRepository.fetchProfile(userId: _viewedUserId);
     String? pendingId;
+    var isBlocked = false;
     if (_isVisitorView && _viewerId != null && _viewedUserId != null) {
       pendingId = await socialRepository.getOutgoingPendingRequestId(_viewedUserId!);
+      final settings = await settingsRepository.getSettings();
+      final blockedIds = _parseBlockedIds(settings['blocked_user_ids']);
+      isBlocked = blockedIds.contains(_viewedUserId);
     }
     if (mounted) {
       setState(() {
         _profile = p;
         _pendingFriendshipId = pendingId;
         _requestSent = pendingId != null;
+        _isBlocked = isBlocked;
         _isLoading = false;
       });
     }
+  }
+
+  List<String> _parseBlockedIds(dynamic rawValue) {
+    if (rawValue is List) {
+      return rawValue.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
+    }
+    return const [];
   }
 
   void _openMessage(UserProfile profile) {
@@ -84,6 +97,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     if (meId == otherId) {
       _showSnack(l10n.profileThatsYourProfile);
+      return;
+    }
+    if (_isBlocked) {
+      _showSnack('Unblock this user to send a message.');
       return;
     }
 
@@ -110,6 +127,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     if (meId == otherId) {
       _showSnack(l10n.profileCantAddYourself);
+      return;
+    }
+    if (_isBlocked) {
+      _showSnack('Unblock this user to send a friend request.');
       return;
     }
 
@@ -156,6 +177,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() => _isRequestSending = false);
       _showSnack(AppLocalizations.of(context).profileRequestFailed);
     }
+  }
+
+  Future<void> _toggleBlocked(UserProfile profile) async {
+    final otherId = profile.id ?? _viewedUserId;
+    if (otherId == null || otherId.isEmpty) {
+      _showSnack('Unable to update block list right now.');
+      return;
+    }
+
+    final shouldBlock = !_isBlocked;
+    final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(shouldBlock ? 'Block user?' : 'Unblock user?'),
+            content: Text(
+              shouldBlock
+                  ? 'You will no longer be able to message or friend this user until you unblock them.'
+                  : 'You can message and friend this user again after unblocking.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(AppLocalizations.of(context).cancel),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(shouldBlock ? 'Block' : 'Unblock'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+
+    if (!confirmed) return;
+
+    final settings = await settingsRepository.getSettings();
+    final blockedIds = _parseBlockedIds(settings['blocked_user_ids']);
+    final nextIds = shouldBlock
+        ? <String>{...blockedIds, otherId}.toList()
+        : blockedIds.where((id) => id != otherId).toList();
+
+    await settingsRepository.updateSetting('blocked_user_ids', nextIds);
+    if (!mounted) return;
+    setState(() {
+      _isBlocked = shouldBlock;
+      if (shouldBlock) {
+        _requestSent = false;
+        _pendingFriendshipId = null;
+      }
+    });
+    _showSnack(shouldBlock ? 'User blocked.' : 'User unblocked.');
   }
 
   void _showSnack(String message) {
@@ -261,8 +333,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _VisitorActionsCard(
                           isSending: _isRequestSending,
                           requestSent: _requestSent,
+                          isBlocked: _isBlocked,
                           onMessage: () => _openMessage(profile),
                           onAddFriend: () => _requestSent ? _cancelFriendRequest(profile) : _sendFriendRequest(profile),
+                          onToggleBlocked: () => _toggleBlocked(profile),
                         ),
                         const SizedBox(height: S.sm),
                         _VisitorStatsCard(profile: profile),
@@ -1045,14 +1119,18 @@ class _AchievementsCard extends StatelessWidget {
 class _VisitorActionsCard extends StatelessWidget {
   final VoidCallback onMessage;
   final VoidCallback onAddFriend;
+  final VoidCallback onToggleBlocked;
   final bool isSending;
   final bool requestSent;
+  final bool isBlocked;
 
   const _VisitorActionsCard({
     required this.onMessage,
     required this.onAddFriend,
+    required this.onToggleBlocked,
     required this.isSending,
     required this.requestSent,
+    required this.isBlocked,
   });
 
   @override
@@ -1095,10 +1173,16 @@ class _VisitorActionsCard extends StatelessWidget {
                 child: _ActionButton(
                   icon: requestSent ? Icons.undo_rounded : Icons.person_add_alt_1_rounded,
                   label: friendLabel,
-                  onTap: isSending ? null : onAddFriend,
+                  onTap: isSending || isBlocked ? null : onAddFriend,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: S.xs),
+          _ActionButton(
+            icon: isBlocked ? Icons.lock_open_rounded : Icons.block_rounded,
+            label: isBlocked ? 'Unblock user' : 'Block user',
+            onTap: onToggleBlocked,
           ),
         ],
       ),
