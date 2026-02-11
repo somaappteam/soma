@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "Lückentext + Übersetzung + Lesung",
   "soloModeReviewDescription": "Üben Sie, was Sie gelernt haben: schwache Wörter, aktuelle Fehler und verteilte Wiederholung.",
   "startReview": "Wiederholung starten",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "{mode} Einrichtung",
   "@soloSetupTitle": {
     "placeholders": {

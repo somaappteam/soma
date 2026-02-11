@@ -220,6 +220,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isCompactWidth = MediaQuery.sizeOf(context).width < 380;
     _syncCoursesIfNeeded();
     final courseOptions = _buildCourseOptions();
     _CourseOption? selectedCourseOption;
@@ -267,27 +268,60 @@ class _CirclesScreenState extends State<CirclesScreen> {
               Glass(
                 radius: BorderRadius.circular(18),
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                child: Row(
-                  children: [
-                    _FilterChip(
-                      label: _courseLabel(courseOptions, l10n),
-                      icon: Icons.translate_rounded,
-                      onTap: () => _selectCourseFilter(courseOptions),
-                    ),
-                    const SizedBox(width: 10),
-                    _FilterChip(
-                      label: _modeLabel(l10n),
-                      icon: Icons.grid_view_rounded,
-                      onTap: _selectModeFilter,
-                    ),
-                    const SizedBox(width: 10),
-                    _FilterChip(
-                      label: _levelLabel(l10n),
-                      icon: Icons.leaderboard_rounded,
-                      onTap: _selectLevelFilter,
-                    ),
-                  ],
-                ),
+                child: isCompactWidth
+                    ? Column(
+                        children: [
+                          Row(
+                            children: [
+                              _FilterChip(
+                                label: _courseLabel(courseOptions, l10n),
+                                icon: Icons.translate_rounded,
+                                onTap: () => _selectCourseFilter(courseOptions),
+                                compact: true,
+                              ),
+                              const SizedBox(width: 10),
+                              _FilterChip(
+                                label: _modeLabel(l10n),
+                                icon: Icons.grid_view_rounded,
+                                onTap: _selectModeFilter,
+                                compact: true,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Row(
+                            children: [
+                              _FilterChip(
+                                label: _levelLabel(l10n),
+                                icon: Icons.leaderboard_rounded,
+                                onTap: _selectLevelFilter,
+                                compact: true,
+                              ),
+                            ],
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          _FilterChip(
+                            label: _courseLabel(courseOptions, l10n),
+                            icon: Icons.translate_rounded,
+                            onTap: () => _selectCourseFilter(courseOptions),
+                          ),
+                          const SizedBox(width: 10),
+                          _FilterChip(
+                            label: _modeLabel(l10n),
+                            icon: Icons.grid_view_rounded,
+                            onTap: _selectModeFilter,
+                          ),
+                          const SizedBox(width: 10),
+                          _FilterChip(
+                            label: _levelLabel(l10n),
+                            icon: Icons.leaderboard_rounded,
+                            onTap: _selectLevelFilter,
+                          ),
+                        ],
+                      ),
               ),
 
               const SizedBox(height: 14),
@@ -613,46 +647,51 @@ class _FilterChip extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
+  final bool compact;
 
-  const _FilterChip({required this.label, required this.icon, required this.onTap});
+  const _FilterChip({required this.label, required this.icon, required this.onTap, this.compact = false});
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: onTap,
-        child: Container(
-          height: 40,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(14),
-            color: Theme.of(context).brightness == Brightness.light
-                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
-                : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-            border: Border.all(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85)),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  label,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85),
-                    fontWeight: FontWeight.w800,
-                    fontSize: 12.5,
-                  ),
+    final content = InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        height: 40,
+        padding: EdgeInsets.symmetric(horizontal: compact ? 8 : 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: Theme.of(context).brightness == Brightness.light
+              ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+              : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: compact ? 16 : 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85)),
+            SizedBox(width: compact ? 6 : 8),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
+                  fontWeight: FontWeight.w800,
+                  fontSize: compact ? 12 : 12.5,
                 ),
               ),
+            ),
+            if (!compact)
               Icon(Icons.expand_more_rounded, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65)),
-            ],
-          ),
+          ],
         ),
       ),
+    );
+
+    return Expanded(
+      child: content,
     );
   }
 }

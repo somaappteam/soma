@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "穴埋め + 翻訳 + 読み",
   "soloModeReviewDescription": "学んだことを練習：苦手な単語、最近の間違い、間隔反復。",
   "startReview": "復習を開始",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "{mode}セットアップ",
   "@soloSetupTitle": {
     "placeholders": {

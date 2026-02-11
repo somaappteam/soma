@@ -81,7 +81,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                     const SizedBox(height: 10),
 
                     if (widget.mode == SoloMode.review) ...[
-                      Text('Review mode',
+                      Text(l10n.soloReviewModeTitle,
                           style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
                       const SizedBox(height: 10),
                       Row(
@@ -100,19 +100,19 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      Text('Review options',
+                      Text(l10n.soloReviewOptionsTitle,
                           style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
                       const SizedBox(height: 10),
                       Row(
                         children: [
                           _Chip(
-                            label: 'All learned',
+                            label: l10n.soloReviewScopeAllLearned,
                             selected: reviewScope == 'all',
                             onTap: () => setState(() => reviewScope = 'all'),
                           ),
                           const SizedBox(width: 10),
                           _Chip(
-                            label: 'Struggling items',
+                            label: l10n.soloReviewScopeStruggling,
                             selected: reviewScope == 'struggling',
                             onTap: () => setState(() => reviewScope = 'struggling'),
                           ),
@@ -121,8 +121,8 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                       const SizedBox(height: 10),
                       Text(
                         reviewScope == 'struggling'
-                            ? 'Prioritize items you recently got wrong.'
-                            : 'Review all learned content for this course.',
+                            ? l10n.soloReviewScopeStrugglingDescription
+                            : l10n.soloReviewScopeAllLearnedDescription,
                         style: TextStyle(
                           color: scheme.onSurface.withValues(alpha: 0.62),
                           fontWeight: FontWeight.w700,

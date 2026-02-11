@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "Điền vào chỗ trống + dịch + đọc",
   "soloModeReviewDescription": "Luyện tập những gì đã học: từ yếu, lỗi gần đây và ôn tập ngắt quãng",
   "startReview": "Bắt đầu ôn tập",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "Thiết lập {mode}",
   "@soloSetupTitle": {
     "placeholders": {

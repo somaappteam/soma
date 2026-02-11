@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "Uzupełnianie luk + tłumaczenia + czytanie",
   "soloModeReviewDescription": "Ćwicz to, czego się nauczyłeś: słabe słowa, ostatnie błędy, powtarzanie z przerwami.",
   "startReview": "Rozpocznij Powtórkę",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "Ustawienia {mode}",
   "@soloSetupTitle": {
     "placeholders": {

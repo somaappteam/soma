@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "เติมคำในช่องว่าง + แปล + การอ่าน",
   "soloModeReviewDescription": "ฝึกฝนสิ่งที่เรียนรู้: คำที่จำไม่ได้ ข้อผิดพลาดล่าสุด การทบทวนตามช่วงเวลา",
   "startReview": "เริ่มทบทวน",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "การตั้งค่า {mode}",
   "@soloSetupTitle": {
     "placeholders": {

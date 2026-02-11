@@ -195,6 +195,26 @@ class AppLocalizationsJa extends AppLocalizations {
   String get startReview => '復習を開始';
 
   @override
+  String get soloReviewModeTitle => 'Review mode';
+
+  @override
+  String get soloReviewOptionsTitle => 'Review options';
+
+  @override
+  String get soloReviewScopeAllLearned => 'All learned';
+
+  @override
+  String get soloReviewScopeStruggling => 'Struggling items';
+
+  @override
+  String get soloReviewScopeStrugglingDescription =>
+      'Prioritize items you recently got wrong.';
+
+  @override
+  String get soloReviewScopeAllLearnedDescription =>
+      'Review all learned content for this course.';
+
+  @override
   String soloSetupTitle(Object mode) {
     return '$modeセットアップ';
   }

@@ -65,6 +65,13 @@
   "soloModeSentencesSubtitle": "Remplir le blanc + traduction + lecture",
   "soloModeReviewDescription": "Pratiquez ce que vous avez appris : mots faibles, erreurs récentes et répétition espacée.",
   "startReview": "Démarrer la révision",
+
+  "soloReviewModeTitle": "Review mode",
+  "soloReviewOptionsTitle": "Review options",
+  "soloReviewScopeAllLearned": "All learned",
+  "soloReviewScopeStruggling": "Struggling items",
+  "soloReviewScopeStrugglingDescription": "Prioritize items you recently got wrong.",
+  "soloReviewScopeAllLearnedDescription": "Review all learned content for this course.",
   "soloSetupTitle": "Configuration {mode}",
   "@soloSetupTitle": {
     "placeholders": {
