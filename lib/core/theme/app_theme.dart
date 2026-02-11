@@ -111,10 +111,10 @@ class AppTheme {
       shadow: Color(0x7A000000),
     );
     const background = AppBackgroundTheme(
-      gradient: RadialGradient(
-        colors: [Color(0xFF120A3D), Color(0xFF0B0B2D), Color(0x00000000)],
-        radius: 1.25,
-        center: Alignment(0.0, -0.35),
+      gradient: LinearGradient(
+        colors: [Color(0xFF0B0B2D), Color(0xFF0B0B2D)],
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
       ),
     );
 
