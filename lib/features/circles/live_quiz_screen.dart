@@ -250,10 +250,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
   late int t;
   Timer? timer;
 
-  // Score demo
+  // Score state
   int myScore = 0;
 
-  // Leaderboard demo
+  // Leaderboard state
   List<_Leader> leaders = [];
 
 

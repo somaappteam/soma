@@ -34,11 +34,13 @@ class _CirclesScreenState extends State<CirclesScreen> {
   List<SoloCourse> _courses = [];
   int _coursesRevision = 0;
   late final Stream<List<Map<String, dynamic>>> _openCirclesStream;
+  late final Stream<Map<String, CircleParticipantCounts>> _participantCountsStream;
 
   @override
   void initState() {
     super.initState();
     _openCirclesStream = circlesRepository.getOpenCircles();
+    _participantCountsStream = circlesRepository.getOpenCircleParticipantCounts();
     _coursesRevision = coursesRepository.revision;
     _loadCourses();
     _cleanupGhostCircles();
@@ -302,70 +304,82 @@ class _CirclesScreenState extends State<CirclesScreen> {
                     }
                     
                     final rooms = snapshot.data!;
-                    final filtered = rooms.where((data) {
-                      if (!_matchesMode(data['mode']?.toString())) return false;
-                      if (!_matchesLevel(data['level']?.toString())) return false;
-                      if (selectedCourseOption != null && !_matchesCourse(data, selectedCourseOption)) return false;
-                      return true;
-                    }).toList();
 
-                    if (filtered.isEmpty) {
-                      return Center(
-                        child: Text(
-                          l10n.circlesNoActiveForFilters,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      );
-                    }
+                    return StreamBuilder<Map<String, CircleParticipantCounts>>(
+                      stream: _participantCountsStream,
+                      builder: (context, countsSnapshot) {
+                        final countsByCircle = countsSnapshot.data ?? const <String, CircleParticipantCounts>{};
+                        final filtered = rooms.where((data) {
+                          if (!_matchesMode(data['mode']?.toString())) return false;
+                          if (!_matchesLevel(data['level']?.toString())) return false;
+                          if (selectedCourseOption != null && !_matchesCourse(data, selectedCourseOption)) return false;
+                          return true;
+                        }).toList();
 
-                    return ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: filtered.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, i) {
-                        final data = filtered[i];
-                        final fromLabel = langLabel(data['from_lang']?.toString() ?? '?');
-                        final toLabel = langLabel(data['to_lang']?.toString() ?? '?');
-                        final room = CircleRoom(
-                          id: data['id'],
-                          title: data['name'] ?? l10n.circlesUnknownRoom,
-                          fromLang: fromLabel,
-                          toLang: toLabel,
-                          level: data['level'] ?? 'A',
-                          mode: data['mode'] ?? 'Vocabulary',
-                          players: 0,
-                          maxPlayers: data['max_players'] ?? 5,
-                          spectators: 0,
-                          questions: data['questions_count'] ?? 15,
-                          timePerQ: data['time_per_q'] ?? 10,
-                          isLive: true,
-                        );
+                        if (filtered.isEmpty) {
+                          return Center(
+                            child: Text(
+                              l10n.circlesNoActiveForFilters,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          );
+                        }
 
-                        return CircleCard(
-                          room: room,
-                          onJoin: () async {
-                            try {
-                              final status = data['status']?.toString() ?? 'lobby';
-                              final role = status == 'active' ? 'spectator' : 'player';
-                              await circlesRepository.joinCircle(room.id, role: role);
-                              if (!context.mounted) return;
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CircleLobbyScreen(circleId: room.id),
-                                ),
-                              );
-                            } catch (e) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(l10n.circlesJoinError(e.toString())), backgroundColor: Colors.redAccent),
-                                );
-                              }
-                            }
+                        return ListView.separated(
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: filtered.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 12),
+                          itemBuilder: (context, i) {
+                            final data = filtered[i];
+                            final circleId = data['id']?.toString() ?? '';
+                            final counts = countsByCircle[circleId] ?? const CircleParticipantCounts();
+                            final fromLabel = langLabel(data['from_lang']?.toString() ?? '?');
+                            final toLabel = langLabel(data['to_lang']?.toString() ?? '?');
+                            final room = CircleRoom(
+                              id: circleId,
+                              title: data['name'] ?? l10n.circlesUnknownRoom,
+                              fromLang: fromLabel,
+                              toLang: toLabel,
+                              level: data['level'] ?? 'A',
+                              mode: data['mode'] ?? 'Vocabulary',
+                              players: counts.players,
+                              maxPlayers: data['max_players'] ?? 5,
+                              spectators: counts.spectators,
+                              questions: data['questions_count'] ?? 15,
+                              timePerQ: data['time_per_q'] ?? 10,
+                              isLive: true,
+                            );
+
+                            return CircleCard(
+                              room: room,
+                              onJoin: () async {
+                                try {
+                                  final status = data['status']?.toString() ?? 'lobby';
+                                  final role = status == 'active' ? 'spectator' : 'player';
+                                  await circlesRepository.joinCircle(room.id, role: role);
+                                  if (!context.mounted) return;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => CircleLobbyScreen(circleId: room.id),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(l10n.circlesJoinError(e.toString())),
+                                        backgroundColor: Colors.redAccent,
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                            );
                           },
                         );
                       },
