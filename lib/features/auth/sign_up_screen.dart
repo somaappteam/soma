@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../home/app_shell.dart';
+import '../info/about_screen.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../data/auth_repository.dart';
@@ -84,6 +85,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  Future<void> _handleStarTap() async {
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AboutScreen(view: AboutView.version),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _username.dispose();
@@ -115,7 +126,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         const Spacer(),
                         _IconGlassButton(
                           icon: Icons.star_rounded,
-                          onTap: () {},
+                          onTap: _handleStarTap,
                         ),
                       ],
                     ),
