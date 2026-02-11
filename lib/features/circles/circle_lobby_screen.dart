@@ -241,7 +241,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                 ],
               ),
               const SizedBox(height: 12),
-              if (isHost) ...[
+              if (!isSpectator) ...[
                 _LobbyActionTile(
                   icon: Icons.person_add_alt_1_rounded,
                   title: l10n.circlesInvite,
@@ -679,17 +679,21 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
   void _openProfileSheet(String? userId) {
     if (userId == null || userId.isEmpty) return;
-    showModalBottomSheet(
+    showDialog<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.5),
       builder: (_) {
-        final height = MediaQuery.of(context).size.height * 0.92;
-        return ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          child: SizedBox(
-            height: height,
-            child: ProfileScreen(userId: userId),
+        final size = MediaQuery.of(context).size;
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: SizedBox(
+              width: size.width > 440 ? 420 : size.width * 0.92,
+              height: size.height * 0.74,
+              child: ProfileScreen(userId: userId),
+            ),
           ),
         );
       },
@@ -741,6 +745,41 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
         );
       },
     );
+  }
+
+  Future<void> _confirmMemberExit({required bool spectator}) async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        final scheme = Theme.of(ctx).colorScheme;
+        return AlertDialog(
+          backgroundColor: scheme.surface,
+          title: Text(
+            l10n.circlesLeavePromptTitle,
+            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
+          ),
+          content: Text(
+            spectator
+                ? '${l10n.circlesSpectator} • ${l10n.leave}'
+                : '${l10n.circlesParticipant} • ${l10n.leave}',
+            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82)),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+            TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.leave)),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return;
+
+    await circlesRepository.leaveCircle(widget.circleId);
+    await circleVoiceService.disconnectIfCircle(widget.circleId);
+    await agoraVoiceService.disconnectIfCircle(widget.circleId);
+    if (!mounted) return;
+    Navigator.pop(context);
   }
 
   Future<void> _requestJoin() async {
@@ -1214,7 +1253,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                 // Simplified quick actions
                                 Row(
                                   children: [
-                                    if (isHost) ...[
+                                    if (!isSpectator) ...[
                                       Expanded(
                                         child: _QuickAction(
                                           icon: Icons.person_add_alt_1_rounded,
@@ -1252,6 +1291,18 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                   _PlayerTip(),
                               ],
                             ),
+                          ),
+
+                          const SizedBox(height: 12),
+                          _StatusCallout(
+                            title: isHost
+                                ? l10n.roleHost
+                                : (isSpectator ? l10n.roleSpectator : l10n.circlesParticipant),
+                            body: isHost
+                                ? '${l10n.circlesStartGame} • ${l10n.circlesLeaveCircle}'
+                                : (isSpectator
+                                    ? '${l10n.circlesWatchLive} • ${l10n.leave}'
+                                    : '${l10n.ready} • ${l10n.leave}'),
                           ),
 
                           if (isSpectator &&
@@ -1501,16 +1552,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                 Expanded(
                                   child: _SecondaryButton(
                                     label: l10n.leave,
-                                    onTap: () async {
-                                      await circlesRepository
-                                          .leaveCircle(widget.circleId);
-                                      await circleVoiceService
-                                          .disconnectIfCircle(widget.circleId);
-                                      await agoraVoiceService
-                                          .disconnectIfCircle(widget.circleId);
-                                      if (!context.mounted) return;
-                                      Navigator.pop(context);
-                                    },
+                                    onTap: () => _confirmMemberExit(spectator: true),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
@@ -1548,16 +1590,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                 Expanded(
                                   child: _SecondaryButton(
                                     label: l10n.leave,
-                                    onTap: () async {
-                                      await circlesRepository
-                                          .leaveCircle(widget.circleId);
-                                      await circleVoiceService
-                                          .disconnectIfCircle(widget.circleId);
-                                      await agoraVoiceService
-                                          .disconnectIfCircle(widget.circleId);
-                                      if (!context.mounted) return;
-                                      Navigator.pop(context);
-                                    },
+                                    onTap: () => _confirmMemberExit(spectator: false),
                                   ),
                                 ),
                                 const SizedBox(width: 12),

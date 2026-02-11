@@ -22,6 +22,8 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
   String level = "A"; // A/B/C
   int questions = 10;
   int? timeLimit;
+  SoloMode reviewQuizMode = SoloMode.vocabulary;
+  String reviewScope = 'all'; // all | struggling
 
   @override
   void initState() {
@@ -41,6 +43,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
+    final effectiveMode = widget.mode == SoloMode.review ? reviewQuizMode : widget.mode;
     final modeLabel = widget.mode == SoloMode.vocabulary
         ? l10n.soloModeVocabulary
         : widget.mode == SoloMode.sentences
@@ -76,6 +79,58 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                     Text(widget.course.subtitle,
                         style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w800, fontSize: 12.5)),
                     const SizedBox(height: 10),
+
+                    if (widget.mode == SoloMode.review) ...[
+                      Text('Review mode',
+                          style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          _Chip(
+                            label: l10n.soloModeVocabulary,
+                            selected: reviewQuizMode == SoloMode.vocabulary,
+                            onTap: () => setState(() => reviewQuizMode = SoloMode.vocabulary),
+                          ),
+                          const SizedBox(width: 10),
+                          _Chip(
+                            label: l10n.soloModeSentences,
+                            selected: reviewQuizMode == SoloMode.sentences,
+                            onTap: () => setState(() => reviewQuizMode = SoloMode.sentences),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text('Review options',
+                          style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          _Chip(
+                            label: 'All learned',
+                            selected: reviewScope == 'all',
+                            onTap: () => setState(() => reviewScope = 'all'),
+                          ),
+                          const SizedBox(width: 10),
+                          _Chip(
+                            label: 'Struggling items',
+                            selected: reviewScope == 'struggling',
+                            onTap: () => setState(() => reviewScope = 'struggling'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        reviewScope == 'struggling'
+                            ? 'Prioritize items you recently got wrong.'
+                            : 'Review all learned content for this course.',
+                        style: TextStyle(
+                          color: scheme.onSurface.withValues(alpha: 0.62),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                    ],
 
                     Text(l10n.difficulty,
                         style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
@@ -132,7 +187,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
               NeonButton(
                 label: l10n.start,
                 onTap: () {
-                  if (widget.mode == SoloMode.sentences) {
+                  if (effectiveMode == SoloMode.sentences) {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(

@@ -28,6 +28,11 @@ class SocialRepository {
     final uid = currentUserId;
     if (uid == null) throw Exception("Not logged in");
 
+    final existingPendingId = await getOutgoingPendingRequestId(addresseeId);
+    if (existingPendingId != null) {
+      throw Exception("Friend request already pending");
+    }
+
     final inserted = await _supabase.from('friendships').insert({
       'requester_id': uid,
       'addressee_id': addresseeId,
@@ -139,6 +144,27 @@ class SocialRepository {
         .asyncMap((event) async => await getOutgoingRequests());
   }
 
+
+  Future<String?> getOutgoingPendingRequestId(String addresseeId) async {
+    final uid = currentUserId;
+    if (uid == null) return null;
+
+    final row = await _supabase
+        .from('friendships')
+        .select('id')
+        .eq('requester_id', uid)
+        .eq('addressee_id', addresseeId)
+        .eq('status', 'pending')
+        .maybeSingle();
+
+    return row?['id']?.toString();
+  }
+
+  Future<void> cancelFriendRequestToUser(String addresseeId) async {
+    final friendshipId = await getOutgoingPendingRequestId(addresseeId);
+    if (friendshipId == null) return;
+    await cancelFriendRequest(friendshipId);
+  }
 
   // Get Pending Requests (incoming)
   Future<List<Map<String, dynamic>>> getIncomingRequests() async {

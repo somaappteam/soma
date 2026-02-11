@@ -37,6 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
   bool _isRequestSending = false;
   bool _requestSent = false;
+  String? _pendingFriendshipId;
   Future<UserStats>? _statsFuture;
   Future<List<Achievement>>? _achievementsFuture;
 
@@ -59,9 +60,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadProfile() async {
     final p = await profileRepository.fetchProfile(userId: _viewedUserId);
+    String? pendingId;
+    if (_isVisitorView && _viewerId != null && _viewedUserId != null) {
+      pendingId = await socialRepository.getOutgoingPendingRequestId(_viewedUserId!);
+    }
     if (mounted) {
       setState(() {
         _profile = p;
+        _pendingFriendshipId = pendingId;
+        _requestSent = pendingId != null;
         _isLoading = false;
       });
     }
@@ -94,7 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _sendFriendRequest(UserProfile profile) async {
     final l10n = AppLocalizations.of(context);
-    if (_isRequestSending || _requestSent) return;
+    if (_isRequestSending) return;
     final meId = _viewerId;
     final otherId = profile.id ?? _viewedUserId;
     if (meId == null || otherId == null) {
@@ -110,15 +117,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await socialRepository.sendFriendRequest(otherId);
       if (!mounted) return;
+      final pendingId = await socialRepository.getOutgoingPendingRequestId(otherId);
+      if (!mounted) return;
       setState(() {
         _isRequestSending = false;
         _requestSent = true;
+        _pendingFriendshipId = pendingId;
       });
       _showSnack(l10n.profileRequestSent(profile.username));
     } catch (e) {
       if (!mounted) return;
       setState(() => _isRequestSending = false);
       _showSnack(l10n.profileRequestFailed);
+    }
+  }
+
+  Future<void> _cancelFriendRequest(UserProfile profile) async {
+    if (_isRequestSending) return;
+    final otherId = profile.id ?? _viewedUserId;
+    if (otherId == null) return;
+
+    setState(() => _isRequestSending = true);
+    try {
+      if (_pendingFriendshipId != null) {
+        await socialRepository.cancelFriendRequest(_pendingFriendshipId!);
+      } else {
+        await socialRepository.cancelFriendRequestToUser(otherId);
+      }
+      if (!mounted) return;
+      setState(() {
+        _isRequestSending = false;
+        _requestSent = false;
+        _pendingFriendshipId = null;
+      });
+      _showSnack('Friend request canceled.');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isRequestSending = false);
+      _showSnack(AppLocalizations.of(context).profileRequestFailed);
     }
   }
 
@@ -226,7 +262,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           isSending: _isRequestSending,
                           requestSent: _requestSent,
                           onMessage: () => _openMessage(profile),
-                          onAddFriend: () => _sendFriendRequest(profile),
+                          onAddFriend: () => _requestSent ? _cancelFriendRequest(profile) : _sendFriendRequest(profile),
                         ),
                         const SizedBox(height: S.sm),
                         _VisitorStatsCard(profile: profile),
@@ -1025,7 +1061,7 @@ class _VisitorActionsCard extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final friendLabel = requestSent
-        ? l10n.profileRequested
+        ? l10n.cancel
         : isSending
             ? l10n.profileSending
             : l10n.profileAddFriend;
@@ -1057,9 +1093,9 @@ class _VisitorActionsCard extends StatelessWidget {
               const SizedBox(width: S.xs),
               Expanded(
                 child: _ActionButton(
-                  icon: Icons.person_add_alt_1_rounded,
+                  icon: requestSent ? Icons.undo_rounded : Icons.person_add_alt_1_rounded,
                   label: friendLabel,
-                  onTap: requestSent || isSending ? null : onAddFriend,
+                  onTap: isSending ? null : onAddFriend,
                 ),
               ),
             ],

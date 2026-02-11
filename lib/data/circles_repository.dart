@@ -99,7 +99,11 @@ class CirclesRepository {
     }
   }
 
-  /// Join from invite (player if lobby, spectator if active)
+  /// Join from invite/link.
+  ///
+  /// - Invite/link users should auto-join as player when there is a free player slot.
+  /// - If player slots are full, they join as spectator.
+  /// - If already host/player, keep role as-is.
   Future<CircleJoinOutcome> joinCircleFromInvite(String circleId) async {
     final uid = currentUserId;
     if (uid == null) throw Exception("Not logged in");
@@ -129,7 +133,20 @@ class CirclesRepository {
       }
     }
 
-    final role = status == 'active' ? 'spectator' : 'player';
+    final maxPlayersRaw = circle['max_players'];
+    final maxPlayers = maxPlayersRaw is int
+        ? maxPlayersRaw
+        : int.tryParse(maxPlayersRaw?.toString() ?? '') ?? 5;
+
+    final players = await _supabase
+        .from('circle_participants')
+        .select('id')
+        .eq('circle_id', circleId)
+        .inFilter('role', ['host', 'player']);
+
+    final playerCount = (players as List).length;
+    final canJoinAsPlayer = playerCount < maxPlayers;
+    final role = canJoinAsPlayer ? 'player' : 'spectator';
 
     await _supabase.from('circle_participants').upsert({
       'circle_id': circleId,
