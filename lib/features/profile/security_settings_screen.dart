@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/widgets/glass.dart';
+import '../../core/widgets/selection_controls.dart';
 import '../../core/theme/tokens.dart';
 import '../../data/settings_repository.dart';
 import '../../data/auth_repository.dart';
@@ -476,11 +477,7 @@ class _SwitchTile extends StatelessWidget {
               ],
             ),
           ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: Theme.of(context).colorScheme.primary,
-          ),
+          AppNeonSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );
@@ -518,27 +515,13 @@ class _AutoLockRow extends StatelessWidget {
                 final selected = m == minutes;
                 return Padding(
                   padding: const EdgeInsets.only(left: 8),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(999),
+                  child: AppSelectablePill(
+                    label: l10n.minutesShort(m),
+                    selected: selected,
                     onTap: enabled ? () => onPick(m) : null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(999),
-                        color: selected
-                            ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)
-                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
-                        border: Border.all(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: selected ? 0.22 : 0.10)),
-                      ),
-                      child: Text(
-                        l10n.minutesShort(m),
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: selected ? 0.95 : 0.70),
-                            fontWeight: FontWeight.w900,
-                            fontSize: 12.5),
-                      ),
-                    ),
+                    fontSize: 12.5,
+                    height: 36,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                   ),
                 );
               }).toList(),

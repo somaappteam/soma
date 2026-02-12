@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/widgets/glass.dart';
+import '../../core/widgets/premium_dialog.dart';
 import '../../data/chat_repository.dart';
 import '../../data/settings_repository.dart';
 import 'dm_chat_screen.dart';
@@ -19,6 +20,7 @@ class _InboxScreenState extends State<InboxScreen> {
   String query = "";
   late final Stream<List<Map<String, dynamic>>> _threadsStream;
   final Set<String> _archivedThreadIds = <String>{};
+  final Set<String> _deletedThreadIds = <String>{};
   final Set<String> _pinnedThreadIds = <String>{};
   final Set<String> _mutedThreadIds = <String>{};
   bool _showArchivedOnly = false;
@@ -82,16 +84,19 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
   Future<void> _deleteThread(String otherId) async {
-    await chatRepository.deleteConversation(otherId);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Conversation deleted')),
-    );
     setState(() {
+      _deletedThreadIds.add(otherId);
       _archivedThreadIds.remove(otherId);
       _pinnedThreadIds.remove(otherId);
       _mutedThreadIds.remove(otherId);
     });
+
+    await chatRepository.deleteConversation(otherId);
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Conversation deleted')),
+    );
   }
 
   Future<void> _archiveThread(String otherId) async {
@@ -116,23 +121,36 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 
-  Future<bool?> _confirmDelete() {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete conversation?'),
-        content: const Text('This will remove all messages in this chat.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
-          ),
-        ],
+  Future<void> _unarchiveThread(String otherId) async {
+    setState(() {
+      _archivedThreadIds.remove(otherId);
+    });
+    await chatRepository.setConversationPreference(otherId, archived: false);
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Chat moved to inbox'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            if (!mounted) return;
+            setState(() => _archivedThreadIds.add(otherId));
+            chatRepository.setConversationPreference(otherId, archived: true);
+          },
+        ),
       ),
+    );
+  }
+
+  Future<bool?> _confirmDelete() {
+    return showPremiumDialog(
+      context: context,
+      title: 'Delete conversation?',
+      body: 'This will remove all messages in this chat.',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      destructive: true,
     );
   }
 
@@ -142,6 +160,7 @@ class _InboxScreenState extends State<InboxScreen> {
 
     final isPinned = _pinnedThreadIds.contains(otherId);
     final isMuted = _mutedThreadIds.contains(otherId);
+    final isArchived = _archivedThreadIds.contains(otherId);
     final unreadCount = (thread['unreadCount'] as int?) ?? 0;
 
     await showModalBottomSheet<void>(
@@ -196,11 +215,15 @@ class _InboxScreenState extends State<InboxScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.archive_outlined),
-                title: const Text('Archive chat'),
+                leading: Icon(isArchived ? Icons.unarchive_outlined : Icons.archive_outlined),
+                title: Text(isArchived ? 'Unarchive chat' : 'Archive chat'),
                 onTap: () {
                   Navigator.pop(context);
-                  _archiveThread(otherId);
+                  if (isArchived) {
+                    _unarchiveThread(otherId);
+                  } else {
+                    _archiveThread(otherId);
+                  }
                 },
               ),
               ListTile(
@@ -312,6 +335,8 @@ class _InboxScreenState extends State<InboxScreen> {
                       final otherId = t['otherId']?.toString();
                       if (otherId == null) return false;
 
+                      if (_deletedThreadIds.contains(otherId)) return false;
+
                       final isArchived = _archivedThreadIds.contains(otherId);
                       if (_showArchivedOnly && !isArchived) return false;
                       if (!_showArchivedOnly && isArchived) return false;
@@ -361,12 +386,14 @@ class _InboxScreenState extends State<InboxScreen> {
                           final isPinned = _pinnedThreadIds.contains(otherId);
                           final isMuted = _mutedThreadIds.contains(otherId);
 
+                          final isArchived = _archivedThreadIds.contains(otherId);
+
                           return Dismissible(
                             key: ValueKey('thread-$otherId'),
                             direction: DismissDirection.horizontal,
                             background: _SwipeActionBackground(
-                              icon: Icons.archive_outlined,
-                              label: 'Archive',
+                              icon: isArchived ? Icons.unarchive_outlined : Icons.archive_outlined,
+                              label: isArchived ? 'Unarchive' : 'Archive',
                               alignment: Alignment.centerLeft,
                               color: const Color(0xFF5D7CFF),
                             ),
@@ -378,7 +405,11 @@ class _InboxScreenState extends State<InboxScreen> {
                             ),
                             confirmDismiss: (direction) async {
                               if (direction == DismissDirection.startToEnd) {
-                                await _archiveThread(otherId);
+                                if (isArchived) {
+                                  await _unarchiveThread(otherId);
+                                } else {
+                                  await _archiveThread(otherId);
+                                }
                                 return true;
                               }
                               final shouldDelete = await _confirmDelete();

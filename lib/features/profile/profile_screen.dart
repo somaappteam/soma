@@ -3,6 +3,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/reward_sparkle.dart';
+import '../../core/widgets/premium_dialog.dart';
 import 'settings_screen.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/theme/motion.dart';
@@ -214,26 +215,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     final shouldBlock = !_isBlocked;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showPremiumDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text(shouldBlock ? 'Block user?' : 'Unblock user?'),
-            content: Text(
-              shouldBlock
-                  ? 'You will no longer be able to message or friend this user until you unblock them.'
-                  : 'You can message and friend this user again after unblocking.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(AppLocalizations.of(context).cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text(shouldBlock ? 'Block' : 'Unblock'),
-              ),
-            ],
-          ),
+          title: shouldBlock ? 'Block user?' : 'Unblock user?',
+          body: shouldBlock
+              ? 'You will no longer be able to message or friend this user until you unblock them.'
+              : 'You can message and friend this user again after unblocking.',
+          confirmText: shouldBlock ? 'Block' : 'Unblock',
+          cancelText: AppLocalizations.of(context).cancel,
+          destructive: shouldBlock,
         ) ??
         false;
 
@@ -265,26 +255,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     final shouldReport = !_isReported;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showPremiumDialog(
           context: context,
-          builder: (context) => AlertDialog(
-            title: Text(shouldReport ? 'Report user?' : 'Remove report?'),
-            content: Text(
-              shouldReport
-                  ? 'This report will be reviewed by our moderation team.'
-                  : 'This will remove your previous report for this user.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(AppLocalizations.of(context).cancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text(shouldReport ? 'Report' : 'Remove'),
-              ),
-            ],
-          ),
+          title: shouldReport ? 'Report user?' : 'Remove report?',
+          body: shouldReport
+              ? 'This report will be reviewed by our moderation team.'
+              : 'This will remove your previous report for this user.',
+          confirmText: shouldReport ? 'Report' : 'Remove',
+          cancelText: AppLocalizations.of(context).cancel,
+          destructive: shouldReport,
         ) ??
         false;
 

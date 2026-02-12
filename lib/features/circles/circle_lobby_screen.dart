@@ -5,6 +5,8 @@ import 'widgets/circle_chat_sheet.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
+import '../../core/widgets/premium_dialog.dart';
+import '../../core/widgets/selection_controls.dart';
 
 import '../../core/widgets/responsive.dart';
 import 'circle_countdown_screen.dart';
@@ -758,28 +760,15 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
   Future<void> _confirmMemberExit({required bool spectator}) async {
     final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showPremiumDialog(
       context: context,
-      builder: (ctx) {
-        final scheme = Theme.of(ctx).colorScheme;
-        return AlertDialog(
-          backgroundColor: scheme.surface,
-          title: Text(
-            l10n.circlesLeavePromptTitle,
-            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
-          ),
-          content: Text(
-            spectator
-                ? '${l10n.circlesSpectator} • ${l10n.leave}'
-                : '${l10n.circlesParticipant} • ${l10n.leave}',
-            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82)),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-            TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.leave)),
-          ],
-        );
-      },
+      title: l10n.circlesLeavePromptTitle,
+      body: spectator
+          ? '${l10n.circlesSpectator} • ${l10n.leave}'
+          : '${l10n.circlesParticipant} • ${l10n.leave}',
+      confirmText: l10n.leave,
+      cancelText: l10n.cancel,
+      destructive: true,
     );
 
     if (confirmed != true) return;
@@ -882,47 +871,27 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   Future<_HostExitAction?> _promptHostExit({required bool canTransfer}) async {
-    return showDialog<_HostExitAction>(
+    final l10n = AppLocalizations.of(context);
+    return showPremiumChoiceDialog<_HostExitAction>(
       context: context,
-      builder: (ctx) {
-        final l10n = AppLocalizations.of(ctx);
-        return AlertDialog(
-          backgroundColor: Theme.of(ctx).colorScheme.surface,
-          title: Text(
-            l10n.circlesLeavePromptTitle,
-            style: TextStyle(
-                color: Theme.of(ctx).colorScheme.onSurface, fontWeight: FontWeight.w900),
+      title: l10n.circlesLeavePromptTitle,
+      body: canTransfer
+          ? l10n.circlesLeavePromptTransfer
+          : l10n.circlesLeavePromptEndOnly,
+      actions: [
+        PremiumDialogAction<_HostExitAction>(label: l10n.cancel, value: null),
+        if (canTransfer)
+          PremiumDialogAction<_HostExitAction>(
+            label: l10n.circlesTransferHost,
+            value: _HostExitAction.transfer,
           ),
-          content: Text(
-            canTransfer
-                ? l10n.circlesLeavePromptTransfer
-                : l10n.circlesLeavePromptEndOnly,
-            style: TextStyle(
-                color: Theme.of(ctx).colorScheme.onSurface.withValues(alpha: 0.78),
-                fontWeight: FontWeight.w600),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(l10n.cancel,
-                  style: TextStyle(color: Theme.of(ctx).colorScheme.onSurface.withValues(alpha: 0.75))),
-            ),
-            if (canTransfer)
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, _HostExitAction.transfer),
-                child: Text(l10n.circlesTransferHost,
-                    style: const TextStyle(
-                        color: Color(0xFF2AFADF), fontWeight: FontWeight.w900)),
-              ),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, _HostExitAction.end),
-              child: Text(l10n.circlesEndCircle,
-                  style: const TextStyle(
-                      color: Color(0xFFFF4ECD), fontWeight: FontWeight.w900)),
-            ),
-          ],
-        );
-      },
+        PremiumDialogAction<_HostExitAction>(
+          label: l10n.circlesEndCircle,
+          value: _HostExitAction.end,
+          isPrimary: true,
+          destructive: true,
+        ),
+      ],
     );
   }
 
@@ -2183,36 +2152,12 @@ class _ModeChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected
-        ? const Color(0xFF2AFADF)
-        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65);
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
+    return AppSelectablePill(
+      label: label,
+      selected: selected,
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: selected
-              ? T.neonA.withValues(alpha: 0.2)
-              : Colors.transparent,
-          border: Border.all(
-            color: selected
-                ? T.neonA.withValues(alpha: 0.45)
-                : Colors.transparent,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.w800,
-              fontSize: 12,
-            ),
-          ),
-        ),
-      ),
+      fontSize: 12,
+      height: 52,
     );
   }
 }
@@ -2285,38 +2230,12 @@ class _LevelChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(14),
+    return AppSelectablePill(
+      label: label,
+      selected: selected,
       onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
-          color: selected
-              ? T.neonA.withValues(alpha: 0.2)
-              : Colors.transparent,
-          border: Border.all(
-            color: selected
-                ? T.neonA.withValues(alpha: 0.45)
-                : Colors.transparent,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: selected
-                  ? const Color(0xFF2AFADF)
-                  : Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.65),
-              fontWeight: FontWeight.w800,
-              fontSize: 11.5,
-            ),
-          ),
-        ),
-      ),
+      fontSize: 11.5,
+      height: 52,
     );
   }
 }
@@ -2556,14 +2475,7 @@ class _HostControlsRow extends StatelessWidget {
             children: [
               Icon(Icons.lock_rounded,
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75), size: 18),
-              Switch(
-                value: roomLocked,
-                onChanged: onToggleLock,
-                activeThumbColor: const Color(0xFF2AFADF),
-                activeTrackColor: T.neonA.withValues(alpha: 0.25),
-                inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
-                inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18),
-              ),
+              AppNeonSwitch(value: roomLocked, onChanged: onToggleLock),
             ],
           ),
         ],

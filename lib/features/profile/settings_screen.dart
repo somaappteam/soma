@@ -14,6 +14,7 @@ import '../../core/services/theme_mode_controller.dart';
 import '../../core/theme/spacing.dart';
 import '../../core/services/haptics_service.dart';
 import '../../core/widgets/premium_dialog.dart';
+import '../../core/widgets/selection_controls.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -957,7 +958,7 @@ class _ToggleRow extends StatelessWidget {
               ),
             ),
           ),
-          Switch(
+          AppNeonSwitch(
             value: value,
             onChanged: (next) {
               hapticsService.selectionClick();
