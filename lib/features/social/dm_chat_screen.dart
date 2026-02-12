@@ -1104,6 +1104,66 @@ class _ChatMessage {
   }
 }
 
+class _MessagePayload {
+  final String type;
+  final String? text;
+  final String? url;
+  final int? duration;
+
+  const _MessagePayload({required this.type, this.text, this.url, this.duration});
+
+  static _MessagePayload parse(String raw) {
+    try {
+      final map = jsonDecode(raw);
+      if (map is Map<String, dynamic>) {
+        return _MessagePayload(
+          type: map['type']?.toString() ?? 'text',
+          text: map['text']?.toString() ?? map['label']?.toString(),
+          url: map['url']?.toString(),
+          duration: map['duration'] is int ? map['duration'] as int : int.tryParse('${map['duration']}'),
+        );
+      }
+    } catch (_) {
+      // legacy plain text fallback
+    }
+    if (raw.startsWith('[img]')) {
+      return _MessagePayload(type: 'image', url: raw.substring(5).trim());
+    }
+    return _MessagePayload(type: 'text', text: raw);
+  }
+}
+
+class _ChatMessage {
+  final String id;
+  final bool isMine;
+  final String previewText;
+  final String rawContent;
+
+  const _ChatMessage({
+    required this.id,
+    required this.isMine,
+    required this.previewText,
+    required this.rawContent,
+  });
+
+  factory _ChatMessage.fromRow(Map<String, dynamic> row, {required bool isMe}) {
+    final raw = row['content']?.toString() ?? '';
+    final payload = _MessagePayload.parse(raw);
+    final preview = switch (payload.type) {
+      'image' => 'Photo',
+      'voice' => 'Voice message ${payload.text ?? ''}'.trim(),
+      _ => payload.text ?? raw,
+    };
+
+    return _ChatMessage(
+      id: row['id']?.toString() ?? '',
+      isMine: isMe,
+      previewText: preview,
+      rawContent: raw,
+    );
+  }
+}
+
 class _InputBar extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onSend;

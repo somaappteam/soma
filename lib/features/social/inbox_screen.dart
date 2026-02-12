@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../data/chat_repository.dart';
+import '../../data/settings_repository.dart';
 import 'dm_chat_screen.dart';
 import 'select_friend_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
@@ -25,6 +26,34 @@ class _InboxScreenState extends State<InboxScreen> {
   void initState() {
     super.initState();
     _threadsStream = _inboxThreadsStream();
+    _loadThreadPrefs();
+  }
+
+  Future<void> _loadThreadPrefs() async {
+    final settings = await settingsRepository.getSettings();
+    final raw = settings[_threadPrefsKey];
+    if (raw is! Map<String, dynamic>) return;
+
+    if (!mounted) return;
+    setState(() {
+      _archivedThreadIds
+        ..clear()
+        ..addAll((raw['archived'] as List?)?.map((e) => e.toString()) ?? const []);
+      _pinnedThreadIds
+        ..clear()
+        ..addAll((raw['pinned'] as List?)?.map((e) => e.toString()) ?? const []);
+      _mutedThreadIds
+        ..clear()
+        ..addAll((raw['muted'] as List?)?.map((e) => e.toString()) ?? const []);
+    });
+  }
+
+  Future<void> _saveThreadPrefs() async {
+    await settingsRepository.updateSetting(_threadPrefsKey, {
+      'archived': _archivedThreadIds.toList(),
+      'pinned': _pinnedThreadIds.toList(),
+      'muted': _mutedThreadIds.toList(),
+    });
   }
 
   Stream<List<Map<String, dynamic>>> _inboxThreadsStream() async* {
