@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
+import '../../core/widgets/selection_controls.dart';
 import '../../core/widgets/premium_dialog.dart';
 import 'circle_lobby_screen.dart';
 import '../../core/theme/tokens.dart';
@@ -563,39 +564,12 @@ class _SegButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gradient = T.neonGradient;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
+    return AppSelectablePill(
+      label: label,
+      selected: selected,
       onTap: onTap,
-      child: Container(
-        height: 44,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: selected ? gradient : null,
-          color: selected ? null : Colors.black.withValues(alpha: 0.12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: T.neonA.withValues(alpha: 0.12),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : null,
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w900,
-              fontSize: 13.5,
-            ),
-          ),
-        ),
-      ),
+      fontSize: 13.5,
+      height: 44,
     );
   }
 }
@@ -613,34 +587,13 @@ class _LevelChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
+    return AppSelectablePill(
+      label: label,
+      selected: selected,
       onTap: onTap,
-      child: Container(
-        height: 54,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: selected ? Colors.white.withValues(alpha: 0.10) : Colors.black.withValues(alpha: 0.12),
-          border: Border.all(
-            color: selected ? Colors.white.withValues(alpha: 0.30) : Colors.white.withValues(alpha: 0.12),
-          ),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              label,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.92),
-                fontWeight: FontWeight.w800,
-                fontSize: 13,
-              ),
-            ),
-          ],
-        ),
-      ),
+      fontSize: 13,
+      height: 54,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
     );
   }
 }
@@ -793,14 +746,7 @@ class _ToggleRow extends StatelessWidget {
               ],
             ),
           ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeThumbColor: const Color(0xFF2AFADF),
-            activeTrackColor: T.neonA.withValues(alpha: 0.35),
-            inactiveThumbColor: Colors.white.withValues(alpha: 0.70),
-            inactiveTrackColor: Colors.white.withValues(alpha: 0.18),
-          ),
+          AppNeonSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

@@ -3,6 +3,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
+import '../../core/widgets/selection_controls.dart';
 import '../../models/solo_course.dart';
 import '../../data/settings_repository.dart';
 import 'solo_course_detail_screen.dart';
@@ -238,30 +239,11 @@ class _Chip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     return Expanded(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
+      child: AppSelectablePill(
+        label: label,
+        selected: selected,
         onTap: onTap,
-        child: Container(
-          height: 44,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(999),
-            color: selected
-                ? scheme.primary.withValues(alpha: 0.15)
-                : scheme.onSurface.withValues(alpha: 0.1),
-            border: Border.all(
-              color: selected
-                  ? scheme.primary.withValues(alpha: 0.5)
-                  : scheme.onSurface.withValues(alpha: 0.15),
-            ),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            label,
-            style: TextStyle(color: selected ? scheme.primary : scheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14),
-          ),
-        ),
       ),
     );
   }

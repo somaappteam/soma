@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/premium_dialog.dart';
+import '../../core/widgets/selection_controls.dart';
 import '../../data/settings_repository.dart';
 import '../../core/widgets/responsive.dart';
 import '../../data/auth_repository.dart';
@@ -553,7 +554,7 @@ class _SwitchTile extends StatelessWidget {
               ],
             ),
           ),
-          Switch(value: value, onChanged: onChanged, activeThumbColor: const Color(0xFF2AFADF)),
+          AppNeonSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

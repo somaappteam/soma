@@ -7,6 +7,7 @@ import '../../core/theme/tokens.dart';
 import '../../data/profile_repository.dart';
 import '../../models/user_profile.dart';
 import '../../core/widgets/responsive.dart';
+import '../../core/widgets/selection_controls.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final UserProfile? initialProfile; // optional in case we create fresh
@@ -629,45 +630,13 @@ class _GoalChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return InkWell(
-      borderRadius: BorderRadius.circular(999),
-      onTap: onTap,
-      child: Container(
-        height: 44,
-        constraints: const BoxConstraints(minWidth: 72),
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(999),
-          color: selected
-              ? (Theme.of(context).brightness == Brightness.light
-                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15)
-                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14))
-              : (Theme.of(context).brightness == Brightness.light
-                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05)
-                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07)),
-          border: Border.all(
-              color: selected
-                  ? (Theme.of(context).brightness == Brightness.light
-                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
-                      : Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.22))
-                  : (Theme.of(context).brightness == Brightness.light
-                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)
-                      : Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withValues(alpha: 0.12))),
-        ),
-        child: Text(
-          l10n.minutesShort(min),
-          style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface,
-              fontWeight: FontWeight.w900,
-              fontSize: 13),
-        ),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minWidth: 72),
+      child: AppSelectablePill(
+        label: l10n.minutesShort(min),
+        selected: selected,
+        onTap: onTap,
+        fontSize: 13,
       ),
     );
   }
