@@ -68,6 +68,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final languageOptions = _languageOptions(l10n);
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -79,7 +82,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 22),
                   child: Column(
                     children: [
-                    const Spacer(flex: 20),
+                    const SizedBox(height: 80),
 
                     // Logo + tagline
                     Column(
@@ -91,7 +94,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             fontWeight: FontWeight.w800,
                             letterSpacing: 12.0,
                             fontSize: 54,
-                            color: Colors.white,
+                            color: isLight ? scheme.primary : Colors.white,
                             shadows: [
                               // Core bright glow (Cyan-ish)
                               Shadow(
@@ -116,14 +119,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           l10n.welcomeTagline,
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w500,
-                                color: Colors.white.withValues(alpha: 0.82),
+                                color: scheme.onSurface.withValues(alpha: 0.82),
                                 fontSize: 16,
                               ),
                         ),
                       ],
                     ),
 
-                    const Spacer(flex: 18),
+                    const SizedBox(height: 60),
 
                     // Buttons
                     Column(
@@ -159,8 +162,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 child: Center(
                                   child: Text(
                                     l10n.signIn,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: scheme.onSurface,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w800,
                                     ),
@@ -183,14 +186,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             l10n.skipForNow,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.white.withValues(alpha: 0.78),
+                                  color: scheme.onSurface.withValues(alpha: 0.6),
                                 ),
                           ),
                         ),
                       ],
                     ),
 
-                    const Spacer(flex: 16),
+                    const SizedBox(height: 60),
                     ],
                   ),
                 ),
@@ -209,6 +212,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             orElse: () => languageOptions.first,
                           )
                           .label;
+
 
                   return Glass(
                     radius: BorderRadius.circular(20),
@@ -238,18 +242,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.language_rounded, color: Colors.white, size: 18),
+                            Icon(Icons.language_rounded, color: scheme.onSurface, size: 18),
                             const SizedBox(width: 8),
                             Text(
                               currentLabel,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: scheme.onSurface,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 12,
                               ),
                             ),
                             const SizedBox(width: 4),
-                            const Icon(Icons.expand_more_rounded, color: Colors.white, size: 18),
+                            Icon(Icons.expand_more_rounded, color: scheme.onSurface, size: 18),
                           ],
                         ),
                       ),

@@ -106,6 +106,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get navProfile => '프로필';
 
   @override
+  String get myCourses => 'My Courses';
+
+  @override
   String get removeCourseTitle => '코스를 삭제하시겠습니까?';
 
   @override

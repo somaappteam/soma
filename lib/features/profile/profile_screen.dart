@@ -23,6 +23,7 @@ import '../leaderboard/leaderboard_screen.dart';
 import '../social/friends_screen.dart';
 import '../social/dm_chat_screen.dart';
 import '../../core/theme/spacing.dart';
+import '../../data/settings_repository.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? userId;
@@ -63,26 +64,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadProfile() async {
-    final p = await profileRepository.fetchProfile(userId: _viewedUserId);
-    String? pendingId;
-    var isBlocked = false;
-    var isReported = false;
-    if (_isVisitorView && _viewerId != null && _viewedUserId != null) {
-      pendingId = await socialRepository.getOutgoingPendingRequestId(_viewedUserId!);
-      final settings = await settingsRepository.getSettings();
-      final blockedIds = _parseBlockedIds(settings['blocked_user_ids']);
-      isBlocked = blockedIds.contains(_viewedUserId);
-      isReported = await userReportRepository.hasReported(_viewedUserId!);
-    }
-    if (mounted) {
-      setState(() {
-        _profile = p;
-        _pendingFriendshipId = pendingId;
-        _requestSent = pendingId != null;
-        _isBlocked = isBlocked;
-        _isReported = isReported;
-        _isLoading = false;
-      });
+    try {
+      final p = await profileRepository.fetchProfile(userId: _viewedUserId);
+      String? pendingId;
+      var isBlocked = false;
+      var isReported = false;
+      
+      if (_isVisitorView && _viewerId != null && _viewedUserId != null) {
+        try {
+          // Wrap auxiliary calls in their own try-catch to not block profile loading
+          pendingId = await socialRepository.getOutgoingPendingRequestId(_viewedUserId!);
+          
+          final settings = await settingsRepository.getSettings();
+          final blockedIds = _parseBlockedIds(settings['blocked_user_ids']);
+          isBlocked = blockedIds.contains(_viewedUserId);
+          
+          isReported = await userReportRepository.hasReported(_viewedUserId!);
+        } catch (e) {
+          debugPrint("Error loading visitor info: $e");
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          _profile = p;
+          _pendingFriendshipId = pendingId;
+          _requestSent = pendingId != null;
+          _isBlocked = isBlocked;
+          _isReported = isReported;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error loading profile: $e");
+      if (mounted) {
+         // Optionally show a snackbar or error state
+         _showSnack("An error occurred");
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -730,20 +751,43 @@ class _HeaderCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "@${profile.username}${profile.bio.isNotEmpty ? " • ${profile.bio}" : ""}",
-                      style: textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurface.withValues(alpha: 0.65),
-                        fontWeight: FontWeight.w600,
+                      "@${profile.username}",
+                      style: textTheme.titleLarge?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 20,
+                        letterSpacing: -0.5,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        // Timer Pill - Lowered and Smaller
+                        _Pill(
+                          text: l10n.profileGoalLabel(profile.dailyGoalMinutes),
+                          icon: Icons.timer_rounded,
+                          isSmall: true,
+                        ),
+                        if (profile.bio.isNotEmpty) ...[
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              profile.bio,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: scheme.onSurface.withValues(alpha: 0.5),
+                                fontWeight: FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ],
                 ),
-              ),
-              _Pill(
-                text: l10n.profileGoalLabel(profile.dailyGoalMinutes),
-                icon: Icons.timer_rounded,
               ),
             ],
           ),
@@ -1593,28 +1637,43 @@ class _BadgeTile extends StatelessWidget {
 class _Pill extends StatelessWidget {
   final String text;
   final IconData icon;
-  const _Pill({required this.text, required this.icon});
+  final bool isSmall;
+
+  const _Pill({
+    required this.text,
+    required this.icon,
+    this.isSmall = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.xs),
+      padding: EdgeInsets.symmetric(
+        horizontal: isSmall ? 8 : S.sm,
+        vertical: isSmall ? 4 : S.xs,
+      ),
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHighest.withValues(alpha: 0.7),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: scheme.onSurface.withValues(alpha: 0.9)),
-          const SizedBox(width: S.xs),
+          Icon(
+            icon,
+            size: isSmall ? 13 : 16,
+            color: scheme.onSurface.withValues(alpha: 0.9),
+          ),
+          const SizedBox(width: 4),
           Text(
             text,
             style: textTheme.bodySmall?.copyWith(
               color: scheme.onSurface,
               fontWeight: FontWeight.w800,
+              fontSize: isSmall ? 11 : 13,
             ),
           ),
         ],

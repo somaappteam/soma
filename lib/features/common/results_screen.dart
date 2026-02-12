@@ -299,14 +299,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final pct = (accuracy * 100).round();
-    final isHost = _isHostMe;
-    final isSpectator = widget.leaderboard.every((p) => !p.isMe);
-    final roleTitle = isHost
-        ? l10n.roleHost
-        : (isSpectator ? l10n.roleSpectator : l10n.circlesParticipant);
-    final roleOptions = isHost
-        ? 'Back to ${l10n.circlesLobbyTitle} • ${l10n.resultsRematch} • ${l10n.leave}'
-        : 'Back to ${l10n.circlesLobbyTitle} • ${l10n.leave}';
 
     return Scaffold(
       body: SafeArea(
@@ -349,46 +341,6 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     color: Colors.white.withValues(alpha: 0.70),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-                Glass(
-                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-                  radius: BorderRadius.circular(18),
-                  child: Row(
-                    children: [
-                      Icon(
-                        isHost
-                            ? Icons.admin_panel_settings_rounded
-                            : (isSpectator ? Icons.visibility_rounded : Icons.person_rounded),
-                        color: Colors.white,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              roleTitle,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              roleOptions,
-                              style: TextStyle(
-                                color: Colors.white.withValues(alpha: 0.72),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
                   ),
                 ),
 

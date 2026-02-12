@@ -106,6 +106,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get navProfile => 'சுயவிவரம்';
 
   @override
+  String get myCourses => 'My Courses';
+
+  @override
   String get removeCourseTitle => 'பாடத்திட்டத்தை நீக்கவா?';
 
   @override

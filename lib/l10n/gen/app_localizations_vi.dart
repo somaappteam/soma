@@ -106,6 +106,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get navProfile => 'Hồ sơ';
 
   @override
+  String get myCourses => 'My Courses';
+
+  @override
   String get removeCourseTitle => 'Xóa khóa học?';
 
   @override

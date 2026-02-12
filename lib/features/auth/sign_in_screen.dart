@@ -255,7 +255,7 @@ class _SignInScreenState extends State<SignInScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                    // top row
+                  // top row
                     Row(
                       children: [
                         _IconGlassButton(
@@ -270,7 +270,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ],
                     ),
 
-                    const Spacer(flex: 10),
+                    const SizedBox(height: 60),
 
                     // Title
                     Center(
@@ -278,7 +278,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         l10n.signIn,
                         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                               fontWeight: FontWeight.w900,
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                       ),
                     ),
@@ -339,15 +339,15 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                         child: Text.rich(
                           TextSpan(
-                            text: l10n.authNeedAccount,
+                            text: l10n.authHaveAccount,
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.72),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.72),
                                 ),
                             children: [
                               TextSpan(
                                 text: l10n.signUp,
                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Colors.white,
+                                      color: Theme.of(context).colorScheme.primary,
                                       fontWeight: FontWeight.w800,
                                     ),
                               ),
@@ -357,7 +357,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                     ),
 
-                    const Spacer(flex: 16),
+                    const SizedBox(height: 80),
                 ],
               ),
             ),
@@ -391,7 +391,7 @@ class _IconGlassButton extends StatelessWidget {
   child: Center(
     child: Icon(
       icon,
-      color: Colors.white,
+      color: Theme.of(context).colorScheme.onSurface,
     ),
   ),
 ),
@@ -420,35 +420,38 @@ class _GlassTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    
     return Container(
       height: 54,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: T.fieldFill,
+        color: isLight ? scheme.surfaceContainerHighest : T.fieldFill,
         border: Border.all(
-          color: Colors.white.withValues(alpha: 0.16),
+          color: scheme.onSurface.withValues(alpha: 0.16),
           width: 1,
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 14),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white.withValues(alpha: 0.85), size: 20),
+          Icon(icon, color: scheme.onSurface.withValues(alpha: 0.85), size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: controller,
               obscureText: obscure,
               keyboardType: keyboardType,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: scheme.onSurface,
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
               ),
               decoration: InputDecoration(
                 hintText: hint,
                 hintStyle: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.45),
+                  color: scheme.onSurface.withValues(alpha: 0.45),
                   fontWeight: FontWeight.w600,
                 ),
                 border: InputBorder.none,
@@ -460,7 +463,7 @@ class _GlassTextField extends StatelessWidget {
               onPressed: onToggleObscure,
               icon: Icon(
                 obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                color: Colors.white.withValues(alpha: 0.75),
+                color: scheme.onSurface.withValues(alpha: 0.75),
                 size: 20,
               ),
             ),

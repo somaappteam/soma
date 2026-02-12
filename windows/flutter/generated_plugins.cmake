@@ -5,9 +5,13 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   agora_rtc_engine
   app_links
+  file_selector_windows
   flutter_tts
   iris_method_channel
+  local_auth_windows
   permission_handler_windows
+  share_plus
+  sqlite3_flutter_libs
   url_launcher_windows
 )
 

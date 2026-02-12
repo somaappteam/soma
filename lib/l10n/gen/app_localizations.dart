@@ -346,6 +346,12 @@ abstract class AppLocalizations {
   /// **'Profile'**
   String get navProfile;
 
+  /// No description provided for @myCourses.
+  ///
+  /// In en, this message translates to:
+  /// **'My Courses'**
+  String get myCourses;
+
   /// No description provided for @removeCourseTitle.
   ///
   /// In en, this message translates to:

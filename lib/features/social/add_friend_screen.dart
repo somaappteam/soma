@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../data/social_repository.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
+import '../profile/profile_screen.dart';
 
 class AddFriendScreen extends StatefulWidget {
   const AddFriendScreen({super.key});
@@ -15,11 +17,44 @@ class AddFriendScreen extends StatefulWidget {
 class _AddFriendScreenState extends State<AddFriendScreen> {
   final controller = TextEditingController();
   bool loading = false;
+  
+  // Search state
+  Timer? _debounce;
+  List<Map<String, dynamic>> _searchResults = [];
+  bool _searching = false;
 
   @override
   void dispose() {
+    _debounce?.cancel();
     controller.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    
+    if (query.trim().isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _searching = false;
+      });
+      return;
+    }
+
+    setState(() => _searching = true);
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
+      try {
+        final results = await socialRepository.searchUsers(query);
+        if (!mounted) return;
+        setState(() {
+          _searchResults = results;
+          _searching = false;
+        });
+      } catch (e) {
+        debugPrint("Search error: $e");
+        if (mounted) setState(() => _searching = false);
+      }
+    });
   }
 
   Future<void> _send() async {
@@ -107,7 +142,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Glass(
+                  Glass(
                   radius: BorderRadius.circular(22),
                   padding: const EdgeInsets.all(14),
                   child: Column(
@@ -125,28 +160,76 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                         radius: BorderRadius.circular(18),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 10),
-                        child: TextField(
-                          controller: controller,
-                          style: TextStyle(
-                              color: scheme.onSurface, fontWeight: FontWeight.w800),
-                          cursorColor: scheme.primary,
-                          decoration: InputDecoration(
-                            hintText: l10n.addFriendUsernameHint,
-                            hintStyle: TextStyle(
-                                color: scheme.onSurface.withValues(alpha: 0.45)),
-                            border: InputBorder.none,
-                          ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: controller,
+                                onChanged: _onSearchChanged,
+                                style: TextStyle(
+                                    color: scheme.onSurface, fontWeight: FontWeight.w800),
+                                cursorColor: scheme.primary,
+                                decoration: InputDecoration(
+                                  hintText: l10n.addFriendUsernameHint,
+                                  hintStyle: TextStyle(
+                                      color: scheme.onSurface.withValues(alpha: 0.45)),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                ),
+                              ),
+                            ),
+                            if (_searching)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8),
+                                child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: scheme.primary,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 12),
-                      Text(
-                        l10n.addFriendTip,
-                        style: TextStyle(
-                          color: scheme.onSurface.withValues(alpha: 0.55),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12,
+                      
+                      // Search Results List
+                      if (_searchResults.isNotEmpty) ...[
+                        Container(
+                          constraints: const BoxConstraints(maxHeight: 200),
+                          child: ListView.separated(
+                            shrinkWrap: true,
+                            physics: const BouncingScrollPhysics(),
+                            itemCount: _searchResults.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 8),
+                            itemBuilder: (context, index) {
+                              final user = _searchResults[index];
+                              return _SearchResultRow(
+                                user: user,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ProfileScreen(userId: user['id']),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
                         ),
-                      ),
+                      ] else ...[
+                        Text(
+                          l10n.addFriendTip,
+                          style: TextStyle(
+                            color: scheme.onSurface.withValues(alpha: 0.55),
+                            fontWeight: FontWeight.w700,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -177,6 +260,69 @@ class _IconGlass extends StatelessWidget {
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
         child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92)),
+      ),
+    );
+  }
+}
+
+class _SearchResultRow extends StatelessWidget {
+  final Map<String, dynamic> user;
+  final VoidCallback onTap;
+
+  const _SearchResultRow({required this.user, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final username = user['username'] ?? "Unknown";
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: scheme.onSurface.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.1)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: scheme.primary.withValues(alpha: 0.2),
+              ),
+              child: Center(
+                child: Text(
+                  username.substring(0, 1).toUpperCase(),
+                  style: TextStyle(
+                    color: scheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    username,
+                    style: TextStyle(
+                      color: scheme.onSurface,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

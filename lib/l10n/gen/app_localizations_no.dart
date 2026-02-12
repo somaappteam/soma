@@ -106,6 +106,9 @@ class AppLocalizationsNo extends AppLocalizations {
   String get navProfile => 'Profile';
 
   @override
+  String get myCourses => 'My Courses';
+
+  @override
   String get removeCourseTitle => 'Remove course?';
 
   @override

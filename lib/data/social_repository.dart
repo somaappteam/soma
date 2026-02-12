@@ -16,7 +16,7 @@ class SocialRepository {
     // Simple ILIKE search on username
     final data = await _supabase
         .from('profiles')
-        .select('id, username, display_name, location')
+        .select('id, username, location')
         .ilike('username', '%$query%')
         .limit(20);
         

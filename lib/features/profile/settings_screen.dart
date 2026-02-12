@@ -550,7 +550,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ? languageUi
                           : languageItems.first.value;
 
-                      if (snapshot.connectionState == ConnectionState.waiting) {
+                      if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
                       }
 

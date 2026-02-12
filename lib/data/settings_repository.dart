@@ -52,8 +52,15 @@ class SettingsRepository {
       });
     }
 
-    _ensureUserSettingsStream(uid);
-    return _userSettingsController.stream;
+    return Stream<Map<String, dynamic>>.multi((controller) {
+      // Emit current cached settings immediately
+      controller.add(Map<String, dynamic>.from(_userSettings.isEmpty ? _guestSettings : _userSettings));
+      
+      final sub = _userSettingsController.stream.listen(controller.add);
+      _ensureUserSettingsStream(uid);
+      
+      controller.onCancel = sub.cancel;
+    });
   }
 
   void _ensureUserSettingsStream(String uid) {

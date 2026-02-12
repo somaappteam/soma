@@ -35,6 +35,7 @@
   "navHome": "Home",
   "navCircles": "Circles",
   "navProfile": "Profile",
+  "myCourses": "My Courses",
   "removeCourseTitle": "Remove course?",
   "removeCourseBody": "{course} will be removed from your home list.",
   "@removeCourseBody": {

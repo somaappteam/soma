@@ -106,6 +106,9 @@ class AppLocalizationsPa extends AppLocalizations {
   String get navProfile => 'ਪ੍ਰੋਫਾਈਲ';
 
   @override
+  String get myCourses => 'My Courses';
+
+  @override
   String get removeCourseTitle => 'ਕੋਰਸ ਹਟਾਉਣਾ ਹੈ?';
 
   @override

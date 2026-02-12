@@ -34,16 +34,16 @@ class _CirclesScreenState extends State<CirclesScreen> {
   List<SoloCourse> _courses = [];
   int _coursesRevision = 0;
   late final Stream<List<Map<String, dynamic>>> _openCirclesStream;
-  late final Stream<Map<String, CircleParticipantCounts>> _participantCountsStream;
+
 
   @override
   void initState() {
     super.initState();
     _openCirclesStream = circlesRepository.getOpenCircles();
-    _participantCountsStream = circlesRepository.getOpenCircleParticipantCounts();
+
     _coursesRevision = coursesRepository.revision;
     _loadCourses();
-    _cleanupGhostCircles();
+    // _cleanupGhostCircles(); // Disable heavy client-side cleanup
   }
 
   Future<void> _cleanupGhostCircles() async {
@@ -219,6 +219,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("CirclesScreen.build called");
     final l10n = AppLocalizations.of(context);
     final isCompactWidth = MediaQuery.sizeOf(context).width < 380;
     _syncCoursesIfNeeded();
@@ -339,83 +340,86 @@ class _CirclesScreenState extends State<CirclesScreen> {
                     
                     final rooms = snapshot.data!;
 
-                    return StreamBuilder<Map<String, CircleParticipantCounts>>(
-                      stream: _participantCountsStream,
-                      builder: (context, countsSnapshot) {
-                        final countsByCircle = countsSnapshot.data ?? const <String, CircleParticipantCounts>{};
-                        final filtered = rooms.where((data) {
-                          if (!_matchesMode(data['mode']?.toString())) return false;
-                          if (!_matchesLevel(data['level']?.toString())) return false;
-                          if (selectedCourseOption != null && !_matchesCourse(data, selectedCourseOption)) return false;
-                          return true;
-                        }).toList();
+                    final filtered = rooms.where((data) {
+                      if (!_matchesMode(data['mode']?.toString())) return false;
+                      if (!_matchesLevel(data['level']?.toString())) return false;
+                      if (selectedCourseOption != null && !_matchesCourse(data, selectedCourseOption)) return false;
+                      return true;
+                    }).toList();
 
-                        if (filtered.isEmpty) {
-                          return Center(
-                            child: Text(
-                              l10n.circlesNoActiveForFilters,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                    if (filtered.isEmpty) {
+                      return Center(
+                        child: Text(
+                          l10n.circlesNoActiveForFilters,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return ListView.separated(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: filtered.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, i) {
+                        try {
+                          final data = filtered[i];
+                          final circleId = data['id']?.toString() ?? '';
+                          // Use counts directly from circle data
+                          final playerCount = data['player_count'] as int? ?? 0;
+                          final spectatorCount = data['spectator_count'] as int? ?? 0;
+                          
+                          final fromLabel = langLabel(data['from_lang']?.toString() ?? '?');
+                          final toLabel = langLabel(data['to_lang']?.toString() ?? '?');
+                          
+                          final room = CircleRoom(
+                            id: circleId,
+                            title: data['name'] ?? l10n.circlesUnknownRoom,
+                            fromLang: fromLabel,
+                            toLang: toLabel,
+                            level: data['level'] ?? 'A',
+                            mode: data['mode'] ?? 'Vocabulary',
+                            players: playerCount,
+                            maxPlayers: data['max_players'] ?? 5,
+                            spectators: spectatorCount,
+                            questions: data['questions_count'] ?? 15,
+                            timePerQ: data['time_per_q'] ?? 10,
+                            isLive: true,
                           );
-                        }
 
-                        return ListView.separated(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: filtered.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
-                          itemBuilder: (context, i) {
-                            final data = filtered[i];
-                            final circleId = data['id']?.toString() ?? '';
-                            final counts = countsByCircle[circleId] ?? const CircleParticipantCounts();
-                            final fromLabel = langLabel(data['from_lang']?.toString() ?? '?');
-                            final toLabel = langLabel(data['to_lang']?.toString() ?? '?');
-                            final room = CircleRoom(
-                              id: circleId,
-                              title: data['name'] ?? l10n.circlesUnknownRoom,
-                              fromLang: fromLabel,
-                              toLang: toLabel,
-                              level: data['level'] ?? 'A',
-                              mode: data['mode'] ?? 'Vocabulary',
-                              players: counts.players,
-                              maxPlayers: data['max_players'] ?? 5,
-                              spectators: counts.spectators,
-                              questions: data['questions_count'] ?? 15,
-                              timePerQ: data['time_per_q'] ?? 10,
-                              isLive: true,
-                            );
-
-                            return CircleCard(
-                              room: room,
-                              onJoin: () async {
-                                try {
-                                  final status = data['status']?.toString() ?? 'lobby';
-                                  final role = status == 'active' ? 'spectator' : 'player';
-                                  await circlesRepository.joinCircle(room.id, role: role);
-                                  if (!context.mounted) return;
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => CircleLobbyScreen(circleId: room.id),
+                          return CircleCard(
+                            room: room,
+                            onJoin: () async {
+                              try {
+                                final status = data['status']?.toString() ?? 'lobby';
+                                final role = status == 'active' ? 'spectator' : 'player';
+                                await circlesRepository.joinCircle(room.id, role: role);
+                                if (!context.mounted) return;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CircleLobbyScreen(circleId: room.id),
+                                  ),
+                                );
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(l10n.circlesJoinError(e.toString())),
+                                      backgroundColor: Colors.redAccent,
                                     ),
                                   );
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(l10n.circlesJoinError(e.toString())),
-                                        backgroundColor: Colors.redAccent,
-                                      ),
-                                    );
-                                  }
                                 }
-                              },
-                            );
-                          },
-                        );
+                              }
+                            },
+                          );
+                        } catch (e, stack) {
+                          debugPrint("Error building circle card at index $i: $e\n$stack");
+                          return const SizedBox.shrink();
+                        }
                       },
                     );
                   }
@@ -523,9 +527,9 @@ class _FilterOption {
   });
 }
 
-class CircleCard extends StatelessWidget {
+class CircleCard extends StatefulWidget {
   final CircleRoom room;
-  final VoidCallback onJoin;
+  final Future<void> Function() onJoin;
 
   const CircleCard({
     super.key,
@@ -534,69 +538,90 @@ class CircleCard extends StatelessWidget {
   });
 
   @override
+  State<CircleCard> createState() => _CircleCardState();
+}
+
+class _CircleCardState extends State<CircleCard> {
+  bool _isJoining = false;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final modeLabel = room.mode.toLowerCase() == "vocabulary"
+    final modeLabel = widget.room.mode.toLowerCase() == "vocabulary"
         ? l10n.soloModeVocabulary
-        : room.mode.toLowerCase() == "sentences"
+        : widget.room.mode.toLowerCase() == "sentences"
             ? l10n.soloModeSentences
-            : room.mode;
-    final levelLabel = _levelLabelForValue(l10n, room.level);
+            : widget.room.mode;
+    final levelLabel = _levelLabelForValue(l10n, widget.room.level);
     return Glass(
-      radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 172),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      radius: BorderRadius.circular(16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           // Title row
           Row(
             children: [
-              _LiveDot(live: room.isLive),
-              const SizedBox(width: 10),
+              _LiveDot(live: widget.room.isLive),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  room.title,
+                  widget.room.title,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 17,
-                    fontWeight: FontWeight.w900,
+                    fontSize: 15.5,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70)),
+              Icon(Icons.chevron_right_rounded,
+                  size: 20,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.60)),
+            ],
+          ),
+
+          const SizedBox(height: 6),
+
+          // Language + mode line
+          Text(
+            l10n.circlesRoomLine(widget.room.fromLang, widget.room.toLang,
+                modeLabel, levelLabel),
+            style: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.70),
+              fontWeight: FontWeight.w600,
+              fontSize: 12.5,
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // Stats pills
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _Pill(
+                  icon: Icons.people_rounded,
+                  label: "${widget.room.players}/${widget.room.maxPlayers}"),
+              _Pill(
+                  icon: Icons.visibility_rounded,
+                  label: "${widget.room.spectators}"),
+              _Pill(
+                  icon: Icons.help_rounded,
+                  label: l10n.questionsShort(widget.room.questions)),
+              _Pill(
+                  icon: Icons.timer_rounded,
+                  label: l10n.secondsShort(widget.room.timePerQ)),
             ],
           ),
 
           const SizedBox(height: 12),
-
-          // Language + mode line
-          Text(
-            l10n.circlesRoomLine(room.fromLang, room.toLang, modeLabel, levelLabel),
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
-              fontWeight: FontWeight.w700,
-              fontSize: 13.5,
-            ),
-          ),
-
-          const SizedBox(height: 14),
-
-          // Stats pills
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: [
-              _Pill(icon: Icons.people_rounded, label: "${room.players}/${room.maxPlayers}"),
-              _Pill(icon: Icons.visibility_rounded, label: "${room.spectators}"),
-              _Pill(icon: Icons.help_rounded, label: l10n.questionsShort(room.questions)),
-              _Pill(icon: Icons.timer_rounded, label: l10n.secondsShort(room.timePerQ)),
-            ],
-          ),
-
-          const Spacer(),
-          const SizedBox(height: 14),
 
           // Actions
           Row(
@@ -604,14 +629,23 @@ class CircleCard extends StatelessWidget {
               Expanded(
                 child: _ActionButton(
                   label: l10n.join,
-                  onTap: onJoin,
+                  onTap: _isJoining
+                      ? () {}
+                      : () async {
+                          setState(() => _isJoining = true);
+                          try {
+                            await widget.onJoin();
+                          } finally {
+                            if (mounted) setState(() => _isJoining = false);
+                          }
+                        },
                   filled: true,
+                  isLoading: _isJoining,
                 ),
               ),
             ],
           ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -884,23 +918,23 @@ class _Pill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
         color: Colors.black.withValues(alpha: 0.16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: Colors.white.withValues(alpha: 0.9)),
-          const SizedBox(width: 6),
+          Icon(icon, size: 14, color: Colors.white.withValues(alpha: 0.8)),
+          const SizedBox(width: 5),
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.92),
-              fontWeight: FontWeight.w800,
-              fontSize: 13,
+              color: Colors.white.withValues(alpha: 0.90),
+              fontWeight: FontWeight.w700,
+              fontSize: 12,
             ),
           ),
         ],
@@ -913,46 +947,70 @@ class _ActionButton extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   final bool filled;
+  final bool isLoading;
 
   const _ActionButton({
     required this.label,
     required this.onTap,
     required this.filled,
+    this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bg = filled ? T.neonGradient : null;
+    final scheme = Theme.of(context).colorScheme;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+
+    final gradient = isLight
+        ? LinearGradient(
+            colors: [scheme.primary, scheme.tertiary],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          )
+        : T.neonGradient;
+
+    final bg = filled ? gradient : null;
+    final shadowColor =
+        isLight ? scheme.primary.withValues(alpha: 0.25) : T.neonA.withValues(alpha: 0.15);
 
     return InkWell(
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(14),
       onTap: onTap,
       child: Container(
-        height: 46,
+        height: 38,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(14),
           gradient: bg,
           color: filled ? null : Colors.black.withValues(alpha: 0.14),
           border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
           boxShadow: filled
               ? [
                   BoxShadow(
-                    color: T.neonA.withValues(alpha: 0.15),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    color: shadowColor,
+                    blurRadius: 6,
+                    offset: const Offset(0, 3),
                   ),
                 ]
               : null,
         ),
         child: Center(
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w900,
-              fontSize: 14.5,
-            ),
-          ),
+          child: isLoading
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13.5,
+                  ),
+                ),
         ),
       ),
     );

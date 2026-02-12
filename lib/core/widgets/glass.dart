@@ -24,9 +24,9 @@ class Glass extends StatelessWidget {
     final shadow = glass?.shadow ?? const Color(0x7A000000);
     final highlight = Color.lerp(fill, Colors.white, 0.18) ??
         Colors.white.withValues(alpha: 0.12);
-    final highlightOpacity = (fill.opacity + 0.08).clamp(0.0, 1.0);
-    final rimColor = Color.lerp(stroke, Colors.white, isLight ? 0.45 : 0.2) ??
-        stroke.withValues(alpha: isLight ? 0.5 : 0.3);
+    final highlightOpacity = (fill.a + 0.08).clamp(0.0, 1.0);
+    final rimColor = Color.lerp(stroke, Colors.white, isLight ? 0.3 : 0.2) ??
+        stroke.withValues(alpha: isLight ? 0.7 : 0.3);
 
     return ClipRRect(
       borderRadius: radius,
@@ -45,19 +45,32 @@ class Glass extends StatelessWidget {
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: radius,
-                border: Border.all(color: stroke, width: 1),
+                border: Border.all(
+                  color: stroke,
+                  width: isLight ? 2.2 : 1, // Significantly sharper border in light mode
+                ),
                 boxShadow: [
-                  BoxShadow(
-                    color: shadow,
-                    blurRadius: 28,
-                    offset: Offset(0, 16),
-                  ),
-                  if (isLight)
+                  if (isLight) ...[
+                    // "Grounded shadow" - sharper and deeper
                     BoxShadow(
-                      color: shadow.withValues(alpha: 0.08),
-                      blurRadius: 60,
-                      offset: Offset(0, 28),
+                      color: shadow.withValues(alpha: 0.25),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
                     ),
+                    // Stronger ambient depth
+                    BoxShadow(
+                      color: shadow.withValues(alpha: 0.12),
+                      blurRadius: 18,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 8),
+                    ),
+                  ] else ...[
+                    BoxShadow(
+                      color: shadow,
+                      blurRadius: 28,
+                      offset: const Offset(0, 16),
+                    ),
+                  ],
                 ],
               ),
               child: Padding(padding: padding, child: child),

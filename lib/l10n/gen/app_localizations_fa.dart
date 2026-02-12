@@ -106,6 +106,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get navProfile => 'پروفایل';
 
   @override
+  String get myCourses => 'My Courses';
+
+  @override
   String get removeCourseTitle => 'دوره حذف شود؟';
 
   @override

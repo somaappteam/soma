@@ -57,13 +57,13 @@ class AppBackgroundTheme extends ThemeExtension<AppBackgroundTheme> {
 class AppTheme {
   static ThemeData light() {
     const scheme = ColorScheme.light(
-      // Premium bright palette inspired by the provided references.
-      primary: Color(0xFF0DBB74), // Emerald accent
-      secondary: Color(0xFFFFE06C), // Soft champagne yellow
-      tertiary: Color(0xFFFF8A4C), // Warm coral accent
+      // More colorful light theme palette
+      primary: Color(0xFF0DBB74),
+      secondary: Color(0xFFFFE06C),
+      tertiary: Color(0xFFFF8A4C),
       surface: Color(0xFFFFFFFF),
       surfaceContainerHighest: Color(0xFFF5FBF7),
-      background: Color(0xFFF2FAF5),
+      background: Colors.transparent, // Allow global gradient to show through
       onPrimary: Colors.white,
       onSecondary: Color(0xFF1B2418),
       onTertiary: Colors.white,
@@ -72,18 +72,18 @@ class AppTheme {
     );
 
     const glass = GlassTheme(
-      fill: Color(0xD9FFFFFF),
-      stroke: Color(0xBFF3FFF8),
-      shadow: Color(0x160E3E2A),
+      fill: Color(0xE6FFFFFF), // ~90% opacity white
+      stroke: Color(0xFFFFFFFF), // Solid white stroke
+      shadow: Color(0x400E3E2A), // ~25% opacity shadow (darker green tint)
     );
     const background = AppBackgroundTheme(
       gradient: LinearGradient(
         colors: [
-          Color(0xFFF2FAF5),
-          Color(0xFFF8FFE8),
-          Color(0xFFFFF5EC),
+          Color(0xFFDFF7E5), // Rich Mint (Top)
+          Color(0xFFFFF5CC), // Warm Butter (Middle)
+          Color(0xFFFFEAD1), // Soft Apricot (Bottom)
         ],
-        stops: [0.08, 0.54, 1],
+        stops: [0.0, 0.5, 1.0],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),

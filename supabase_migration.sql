@@ -372,3 +372,32 @@ exception when others then null; end $$;
 do $$ begin
   alter publication supabase_realtime add table user_sessions;
 exception when others then null; end $$;
+ 
+ - -   1 6 .   U S E R   R E P O R T S  
+ c r e a t e   t a b l e   i f   n o t   e x i s t s   u s e r _ r e p o r t s   (  
+     i d   u u i d   d e f a u l t   g e n _ r a n d o m _ u u i d ( )   p r i m a r y   k e y ,  
+     r e p o r t e r _ i d   u u i d   r e f e r e n c e s   a u t h . u s e r s ( i d )   o n   d e l e t e   c a s c a d e   n o t   n u l l ,  
+     r e p o r t e d _ u s e r _ i d   u u i d   r e f e r e n c e s   a u t h . u s e r s ( i d )   o n   d e l e t e   c a s c a d e   n o t   n u l l ,  
+     r e a s o n   t e x t ,  
+     d e t a i l s   t e x t ,  
+     c r e a t e d _ a t   t i m e s t a m p   w i t h   t i m e   z o n e   d e f a u l t   t i m e z o n e ( ' u t c ' : : t e x t ,   n o w ( ) )   n o t   n u l l ,  
+     u n i q u e ( r e p o r t e r _ i d ,   r e p o r t e d _ u s e r _ i d )  
+ ) ;  
+ a l t e r   t a b l e   u s e r _ r e p o r t s   e n a b l e   r o w   l e v e l   s e c u r i t y ;  
+ c r e a t e   p o l i c y   " U s e r s   c a n   c r e a t e   r e p o r t s "   o n   u s e r _ r e p o r t s   f o r   i n s e r t   w i t h   c h e c k   ( a u t h . u i d ( )   =   r e p o r t e r _ i d ) ;  
+ c r e a t e   p o l i c y   " U s e r s   c a n   s e e   o w n   r e p o r t s "   o n   u s e r _ r e p o r t s   f o r   s e l e c t   u s i n g   ( a u t h . u i d ( )   =   r e p o r t e r _ i d ) ;  
+ c r e a t e   p o l i c y   " U s e r s   c a n   d e l e t e   o w n   r e p o r t s "   o n   u s e r _ r e p o r t s   f o r   d e l e t e   u s i n g   ( a u t h . u i d ( )   =   r e p o r t e r _ i d ) ;  
+  
+ - -   1 7 .   A C C O U N T   D E L E T I O N   R E Q U E S T S  
+ c r e a t e   t a b l e   i f   n o t   e x i s t s   a c c o u n t _ d e l e t i o n _ r e q u e s t s   (  
+     i d   u u i d   d e f a u l t   g e n _ r a n d o m _ u u i d ( )   p r i m a r y   k e y ,  
+     u s e r _ i d   u u i d   r e f e r e n c e s   a u t h . u s e r s ( i d )   o n   d e l e t e   c a s c a d e   n o t   n u l l ,  
+     s t a t u s   t e x t   d e f a u l t   ' p e n d i n g ' ,   - -   p e n d i n g ,   p r o c e s s e d  
+     r e q u e s t e d _ a t   t i m e s t a m p   w i t h   t i m e   z o n e   d e f a u l t   t i m e z o n e ( ' u t c ' : : t e x t ,   n o w ( ) )   n o t   n u l l ,  
+     p r o c e s s e d _ a t   t i m e s t a m p   w i t h   t i m e   z o n e ,  
+     u n i q u e ( u s e r _ i d )  
+ ) ;  
+ a l t e r   t a b l e   a c c o u n t _ d e l e t i o n _ r e q u e s t s   e n a b l e   r o w   l e v e l   s e c u r i t y ;  
+ c r e a t e   p o l i c y   " U s e r s   c a n   r e q u e s t   d e l e t i o n "   o n   a c c o u n t _ d e l e t i o n _ r e q u e s t s   f o r   i n s e r t   w i t h   c h e c k   ( a u t h . u i d ( )   =   u s e r _ i d ) ;  
+ c r e a t e   p o l i c y   " U s e r s   c a n   s e e   o w n   d e l e t i o n   r e q u e s t s "   o n   a c c o u n t _ d e l e t i o n _ r e q u e s t s   f o r   s e l e c t   u s i n g   ( a u t h . u i d ( )   =   u s e r _ i d ) ;  
+ 

@@ -237,7 +237,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ),
                       const Spacer(),
                       TextButton(
-                        onTap: _save,
+                        onPressed: _save,
                         child: _isSaving
                             ? const SizedBox(
                                 width: 18,

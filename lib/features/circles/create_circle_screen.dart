@@ -35,6 +35,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
   bool allowSpectators = true;
   bool enableVoice = true;
   bool enableChat = true;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -258,8 +259,8 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
 
                         // Create button
                         NeonButton(
-                          label: l10n.circlesCreateCircle,
-                          onTap: () async {
+                          label: _isLoading ? l10n.loading : l10n.circlesCreateCircle,
+                          onTap: _isLoading ? () {} : () async {
                             if (!canCreate) {
                               await showPremiumDialog(
                                 context: context,
@@ -269,6 +270,9 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                               );
                               return;
                             }
+                            
+                            setState(() => _isLoading = true);
+                            
                             try {
                               // Fetch questions from Supabase-backed CSV tables
                               String courseId = "$speakLang-$learnLang"; 
@@ -329,6 +333,8 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                   backgroundColor: Colors.redAccent,
                                 ),
                               );
+                            } finally {
+                              if (mounted) setState(() => _isLoading = false);
                             }
                           },
                         ),

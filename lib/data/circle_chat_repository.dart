@@ -24,7 +24,16 @@ class CircleChatRepository {
       'circle_id': circleId,
       'sender_id': uid,
       'content': content,
+      'read_by': [uid], // Sender has read it
     });
+  }
+
+  Future<void> markRead(String messageId) async {
+    try {
+      await _supabase.rpc('mark_chat_message_read', params: {'message_id': messageId});
+    } catch (e) {
+      // Ignore errors, it's just a read receipt
+    }
   }
 }
 

@@ -56,7 +56,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text('Remove friend?'),
-        content: Text('You will no longer appear in each other's friends list.'),
+        content: Text("You will no longer appear in each other's friends list."),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
           TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.leave)),

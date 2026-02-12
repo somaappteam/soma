@@ -615,6 +615,7 @@ class _SegmentedChoice extends StatelessWidget {
           Row(
             children: List.generate(options.length, (i) {
               final selected = i == selectedIndex;
+              final scheme = Theme.of(context).colorScheme;
               return Expanded(
                 child: InkWell(
                   borderRadius: BorderRadius.circular(999),
@@ -626,15 +627,18 @@ class _SegmentedChoice extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(999),
                       color: selected
-                          ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)
-                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+                          ? scheme.primary.withValues(alpha: 0.15)
+                          : scheme.onSurface.withValues(alpha: 0.1),
                       border: Border.all(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: selected ? 0.22 : 0.10)),
+                        color: selected
+                            ? scheme.primary.withValues(alpha: 0.5)
+                            : scheme.onSurface.withValues(alpha: 0.15),
+                      ),
                     ),
                     child: Text(
                       options[i].label,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: selected ? 0.95 : 0.75),
+                        color: selected ? scheme.primary : scheme.onSurface,
                         fontWeight: FontWeight.w900,
                         fontSize: 12.5,
                       ),

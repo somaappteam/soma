@@ -7,10 +7,30 @@ class LeaderboardRepository {
     final response = await _supabase
         .from('leaderboard')
         .select()
-        .order('xp', ascending: false) // 'xp' column confirmed from schema
+        .order('xp', ascending: false)
         .limit(limit);
     
     return List<Map<String, dynamic>>.from(response);
+  }
+
+  Future<List<Map<String, dynamic>>> searchUsers(String query) async {
+    final response = await _supabase
+        .from('leaderboard')
+        .select()
+        .ilike('username', '%$query%')
+        .order('xp', ascending: false)
+        .limit(20);
+        
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  Future<int> getUserRank(int xp) async {
+    final response = await _supabase
+        .from('leaderboard')
+        .count(CountOption.exact)
+        .gt('xp', xp);
+    
+    return response + 1;
   }
 }
 

@@ -182,21 +182,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       children: [
         Expanded(
-          child: AnimatedBuilder(
-            animation: profileStore,
-            builder: (_, __) {
-              final name = profileStore.profile.username.isNotEmpty
-                  ? profileStore.profile.username
-                  : l10n.guestUsername;
-              final greeting = _isFirstVisit ? l10n.welcome(name) : l10n.welcomeBack(name);
-              return Text(
-                greeting,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: scheme.onBackground,
-                      fontWeight: FontWeight.w800,
-                    ),
-              );
-            },
+          child: Text(
+            l10n.myCourses,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: scheme.onBackground,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 18,
+                ),
           ),
         ),
         InkWell(
@@ -304,12 +296,57 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Header row
                 Row(
                   children: [
-                    Text(
-                      l10n.appTitle,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1.4,
-                          ),
+                    // Profile Pic + Username
+                    AnimatedBuilder(
+                      animation: profileStore,
+                      builder: (context, _) {
+                        final p = profileStore.profile;
+                        final hasAvatar = p.avatarUrl != null && p.avatarUrl!.isNotEmpty;
+                        final username = p.username.isNotEmpty ? p.username : l10n.guestUsername;
+                        
+                        return Row(
+                          children: [
+                            Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                image: hasAvatar
+                                    ? DecorationImage(
+                                        image: NetworkImage(p.avatarUrl!),
+                                        fit: BoxFit.cover,
+                                      )
+                                    : null,
+                                border: Border.all(
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: !hasAvatar
+                                  ? Center(
+                                      child: Text(
+                                        username.isNotEmpty ? username[0].toUpperCase() : "?",
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onSurface,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              username,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 17,
+                                  ),
+                            ),
+                          ],
+                        );
+                      },
                     ),
                     const Spacer(),
                     if (isGuest)

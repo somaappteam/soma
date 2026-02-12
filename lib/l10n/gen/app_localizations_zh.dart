@@ -105,6 +105,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get navProfile => '个人资料';
 
   @override
+  String get myCourses => 'My Courses';
+
+  @override
   String get removeCourseTitle => '删除课程？';
 
   @override

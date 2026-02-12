@@ -106,6 +106,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get navProfile => 'Wasifu';
 
   @override
+  String get myCourses => 'My Courses';
+
+  @override
   String get removeCourseTitle => 'Ondoa kozi?';
 
   @override

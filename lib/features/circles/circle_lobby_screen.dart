@@ -38,6 +38,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   StreamSubscription<Map<String, dynamic>>? _circleSub;
   bool _editingLobbySettings = false;
   bool _savingLobbySettings = false;
+  bool _isExiting = false;
   String _editSpeakLang = '';
   String _editLearnLang = '';
   String _editMode = '';
@@ -179,25 +180,31 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     final action = await _promptHostExit(canTransfer: canTransfer);
     if (action == null) return;
 
-    if (action == _HostExitAction.transfer) {
-      final newHostId = await _pickNewHost(candidates);
-      if (newHostId == null) return;
-      try {
-        await circlesRepository.transferHost(
-            circleId: widget.circleId, newHostId: newHostId);
-        await circlesRepository.leaveCircle(widget.circleId);
-        await circleVoiceService.disconnectIfCircle(widget.circleId);
-        await agoraVoiceService.disconnectIfCircle(widget.circleId);
-        if (mounted) Navigator.pop(context);
-      } catch (e) {
-        if (mounted) {
-          _toast(context, l10n.circlesTransferHostFailed(e.toString()));
-        }
-      }
-      return;
-    }
-
+    setState(() => _isExiting = true);
     try {
+      if (action == _HostExitAction.transfer) {
+        final newHostId = await _pickNewHost(candidates);
+        if (newHostId == null) {
+           setState(() => _isExiting = false);
+           return;
+        }
+        try {
+          await circlesRepository.transferHost(
+              circleId: widget.circleId, newHostId: newHostId);
+          await circlesRepository.leaveCircle(widget.circleId);
+          await circleVoiceService.disconnectIfCircle(widget.circleId);
+          await agoraVoiceService.disconnectIfCircle(widget.circleId);
+          if (mounted) Navigator.pop(context);
+        } catch (e) {
+          if (mounted) {
+            _toast(context, l10n.circlesTransferHostFailed(e.toString()));
+            setState(() => _isExiting = false);
+          }
+        }
+        return;
+      }
+
+      // End circle
       await circlesRepository.endCircle(widget.circleId);
       await circlesRepository.leaveCircle(widget.circleId);
       await circleVoiceService.disconnectIfCircle(widget.circleId);
@@ -206,6 +213,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     } catch (e) {
       if (mounted) {
         _toast(context, l10n.circlesEndCircleFailed(e.toString()));
+        setState(() => _isExiting = false);
       }
     }
   }
@@ -775,11 +783,19 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
     if (confirmed != true) return;
 
-    await circlesRepository.leaveCircle(widget.circleId);
-    await circleVoiceService.disconnectIfCircle(widget.circleId);
-    await agoraVoiceService.disconnectIfCircle(widget.circleId);
-    if (!mounted) return;
-    Navigator.pop(context);
+    setState(() => _isExiting = true);
+    
+    try {
+      await circlesRepository.leaveCircle(widget.circleId);
+      await circleVoiceService.disconnectIfCircle(widget.circleId);
+      await agoraVoiceService.disconnectIfCircle(widget.circleId);
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (e) {
+       // If leave fails, we should probably still let them leave locally or show error?
+       // For now, just reset state if we stay
+       if (mounted) setState(() => _isExiting = false);
+    }
   }
 
   Future<void> _requestJoin() async {
@@ -996,12 +1012,35 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget content;
     if (circleData == null) {
-      return const Scaffold(
+      content = const Scaffold(
         body:
             Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF))),
       );
+    } else {
+       content = _buildLobbyContent(context);
     }
+
+    return Stack(
+      children: [
+        content,
+        if (_isExiting) ...[
+          const ModalBarrier(dismissible: false, color: Colors.black54),
+          const Center(
+            child: CircularProgressIndicator(color: Color(0xFF2AFADF)),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildLobbyContent(BuildContext context) {
+    /* 
+       Refactored build method content here for cleaner structure. 
+       Note: using local variables from build scope inside this method requires passing them 
+       or re-deriving them. Since this is a simple extraction, I'll copy the logic.
+    */
     final l10n = AppLocalizations.of(context);
 
     // Construct display players
@@ -1103,216 +1142,362 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                           // Settings summary card
                           Glass(
                             radius: BorderRadius.circular(26),
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _SectionTitle(l10n.circlesMatchSettings),
-                                const SizedBox(height: 12),
-
-                                Row(
+                            padding: const EdgeInsets.all(16),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final isNarrow = constraints.maxWidth < 400;
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Expanded(
-                                      child: _editingLobbySettings
-                                          ? _EditableSelectTile(
-                                              label: l10n.iSpeak,
-                                              value:
-                                                  _languageName(_editSpeakLang),
-                                              icon: Icons.record_voice_over_rounded,
-                                              onTap: () async {
-                                                final next =
-                                                    await _pickLanguage(
-                                                  title: l10n.chooseYourLanguage,
-                                                  currentCode: _editSpeakLang,
-                                                );
-                                                if (next != null) {
-                                                  setState(() => _editSpeakLang =
-                                                      next.code);
-                                                }
-                                              },
-                                            )
-                                          : _PillInfo(
-                                              icon: Icons.translate_rounded,
-                                              title:
-                                                  "${circleData!['from_lang']} → ${circleData!['to_lang']}",
-                                              subtitle: l10n.circlesLanguages,
-                                            ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: _editingLobbySettings
-                                          ? _EditableSelectTile(
-                                              label: l10n.iWantToLearn,
-                                              value:
-                                                  _languageName(_editLearnLang),
-                                              icon: Icons.translate_rounded,
-                                              onTap: () async {
-                                                final next =
-                                                    await _pickLanguage(
-                                                  title: l10n.chooseLearningLanguage,
-                                                  currentCode: _editLearnLang,
-                                                );
-                                                if (next != null) {
-                                                  setState(() => _editLearnLang =
-                                                      next.code);
-                                                }
-                                              },
-                                            )
-                                          : _PillInfo(
-                                              icon:
-                                                  Icons.local_fire_department_rounded,
-                                              title: modeLabel,
-                                              subtitle: l10n.circlesModeTitle,
-                                            ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
+                                    _SectionTitle(l10n.circlesMatchSettings),
+                                    const SizedBox(height: 12),
 
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: _editingLobbySettings
-                                          ? _ModeToggle(
-                                              leftLabel: l10n.soloModeVocabulary,
-                                              leftValue: "Vocabulary",
-                                              rightLabel: l10n.soloModeSentences,
-                                              rightValue: "Sentences",
-                                              value: _editMode,
-                                              onChanged: (value) =>
-                                                  setState(() => _editMode =
-                                                      value),
-                                            )
-                                          : _PillInfo(
-                                              icon: Icons.stacked_bar_chart_rounded,
-                                              title: l10n
-                                                  .circlesLevelWithValue(levelLabel),
-                                              subtitle: l10n.circlesDifficulty,
+                                    // --- Row 1 & 2 Logic ---
+                                    if (isNarrow) ...[
+                                      // Narrow Layout
+                                      if (_editingLobbySettings) ...[
+                                        // Edit Mode (Narrow)
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _EditableSelectTile(
+                                                label: l10n.iSpeak,
+                                                value: _languageName(_editSpeakLang),
+                                                icon: Icons.record_voice_over_rounded,
+                                                onTap: () async {
+                                                  final next = await _pickLanguage(
+                                                    title: l10n.chooseYourLanguage,
+                                                    currentCode: _editSpeakLang,
+                                                  );
+                                                  if (next != null) {
+                                                    setState(() => _editSpeakLang = next.code);
+                                                  }
+                                                },
+                                              ),
                                             ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: _editingLobbySettings
-                                          ? _LevelPicker(
-                                              level: _editLevel,
-                                              onChanged: (value) =>
-                                                  setState(() => _editLevel =
-                                                      value),
-                                            )
-                                          : _PillInfo(
-                                              icon: Icons.help_outline_rounded,
-                                              title: l10n.questionsShort(
-                                                  circleData!['questions_count'] ??
-                                                      0),
-                                              subtitle: l10n.circlesQuestions,
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: _EditableSelectTile(
+                                                label: l10n.iWantToLearn,
+                                                value: _languageName(_editLearnLang),
+                                                icon: Icons.translate_rounded,
+                                                onTap: () async {
+                                                  final next = await _pickLanguage(
+                                                    title: l10n.chooseLearningLanguage,
+                                                    currentCode: _editLearnLang,
+                                                  );
+                                                  if (next != null) {
+                                                    setState(() => _editLearnLang = next.code);
+                                                  }
+                                                },
+                                              ),
                                             ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: _editingLobbySettings
-                                          ? _HostSettingRow(
-                                              title: l10n.circlesQuestions,
-                                              value: "$_editQuestions",
-                                              onMinus: _editQuestions > 5
-                                                  ? () => setState(() =>
-                                                      _editQuestions -= 5)
-                                                  : null,
-                                              onPlus: _editQuestions < 50
-                                                  ? () => setState(() =>
-                                                      _editQuestions += 5)
-                                                  : null,
-                                            )
-                                          : _PillInfo(
-                                              icon: Icons.timer_rounded,
-                                              title: l10n.secondsShort(
-                                                  circleData!['time_per_q'] ?? 0),
-                                              subtitle: l10n.circlesPerQuestionShort,
-                                            ),
-                                    ),
-                                  ],
-                                ),
-
-                                if (_editingLobbySettings) ...[
-                                  const SizedBox(height: 10),
-                                  _HostSettingRow(
-                                    title: l10n.circlesTimePerQuestion,
-                                    value: l10n.secondsShort(_editTimePerQ),
-                                    onMinus: _editTimePerQ > 5
-                                        ? () => setState(() =>
-                                            _editTimePerQ -= 1)
-                                        : null,
-                                    onPlus: _editTimePerQ < 60
-                                        ? () => setState(() =>
-                                            _editTimePerQ += 1)
-                                        : null,
-                                  ),
-                                ],
-
-                                const SizedBox(height: 14),
-
-                                // Simplified quick actions
-                                Row(
-                                  children: [
-                                    if (!isSpectator) ...[
-                                      Expanded(
-                                        child: _QuickAction(
-                                          icon: Icons.person_add_alt_1_rounded,
-                                          label: l10n.circlesInvite,
-                                          onTap: _inviteByUsername,
+                                          ],
                                         ),
+                                        const SizedBox(height: 10),
+                                        _ModeToggle(
+                                          leftLabel: l10n.soloModeVocabulary,
+                                          leftValue: "Vocabulary",
+                                          rightLabel: l10n.soloModeSentences,
+                                          rightValue: "Sentences",
+                                          value: _editMode,
+                                          onChanged: (value) => setState(() => _editMode = value),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        _LevelPicker(
+                                          level: _editLevel,
+                                          onChanged: (value) => setState(() => _editLevel = value),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _HostSettingRow(
+                                                title: l10n.circlesQuestions,
+                                                value: "$_editQuestions",
+                                                onMinus: _editQuestions > 5
+                                                    ? () => setState(() => _editQuestions -= 5)
+                                                    : null,
+                                                onPlus: _editQuestions < 50
+                                                    ? () => setState(() => _editQuestions += 5)
+                                                    : null,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: _HostSettingRow(
+                                                title: l10n.circlesTimePerQuestion,
+                                                value: l10n.secondsShort(_editTimePerQ),
+                                                onMinus: _editTimePerQ > 5
+                                                    ? () => setState(() => _editTimePerQ -= 1)
+                                                    : null,
+                                                onPlus: _editTimePerQ < 60
+                                                    ? () => setState(() => _editTimePerQ += 1)
+                                                    : null,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ] else ...[
+                                        // View Mode (Narrow)
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _PillInfo(
+                                                icon: Icons.translate_rounded,
+                                                title:
+                                                    "${circleData!['from_lang']} → ${circleData!['to_lang']}",
+                                                subtitle: l10n.circlesLanguages,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _PillInfo(
+                                                icon: Icons.local_fire_department_rounded,
+                                                title: modeLabel,
+                                                subtitle: l10n.circlesModeTitle,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: _PillInfo(
+                                                icon: Icons.stacked_bar_chart_rounded,
+                                                title: l10n.circlesLevelWithValue(levelLabel),
+                                                subtitle: l10n.circlesDifficulty,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _PillInfo(
+                                                icon: Icons.help_outline_rounded,
+                                                title: l10n.questionsShort(
+                                                    circleData!['questions_count'] ?? 0),
+                                                subtitle: l10n.circlesQuestions,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: _PillInfo(
+                                                icon: Icons.timer_rounded,
+                                                title: l10n.secondsShort(
+                                                    circleData!['time_per_q'] ?? 0),
+                                                subtitle: l10n.circlesPerQuestionShort,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ] else ...[
+                                      // Wide Layout (Original Logic)
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: _editingLobbySettings
+                                                ? _EditableSelectTile(
+                                                    label: l10n.iSpeak,
+                                                    value: _languageName(_editSpeakLang),
+                                                    icon: Icons.record_voice_over_rounded,
+                                                    onTap: () async {
+                                                      final next = await _pickLanguage(
+                                                        title: l10n.chooseYourLanguage,
+                                                        currentCode: _editSpeakLang,
+                                                      );
+                                                      if (next != null) {
+                                                        setState(
+                                                            () => _editSpeakLang = next.code);
+                                                      }
+                                                    },
+                                                  )
+                                                : _PillInfo(
+                                                    icon: Icons.translate_rounded,
+                                                    title:
+                                                        "${circleData!['from_lang']} → ${circleData!['to_lang']}",
+                                                    subtitle: l10n.circlesLanguages,
+                                                  ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: _editingLobbySettings
+                                                ? _EditableSelectTile(
+                                                    label: l10n.iWantToLearn,
+                                                    value: _languageName(_editLearnLang),
+                                                    icon: Icons.translate_rounded,
+                                                    onTap: () async {
+                                                      final next = await _pickLanguage(
+                                                        title: l10n.chooseLearningLanguage,
+                                                        currentCode: _editLearnLang,
+                                                      );
+                                                      if (next != null) {
+                                                        setState(
+                                                            () => _editLearnLang = next.code);
+                                                      }
+                                                    },
+                                                  )
+                                                : _PillInfo(
+                                                    icon: Icons.local_fire_department_rounded,
+                                                    title: modeLabel,
+                                                    subtitle: l10n.circlesModeTitle,
+                                                  ),
+                                          ),
+                                        ],
                                       ),
-                                      const SizedBox(width: 10),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: _editingLobbySettings
+                                                ? _ModeToggle(
+                                                    leftLabel: l10n.soloModeVocabulary,
+                                                    leftValue: "Vocabulary",
+                                                    rightLabel: l10n.soloModeSentences,
+                                                    rightValue: "Sentences",
+                                                    value: _editMode,
+                                                    onChanged: (value) =>
+                                                        setState(() => _editMode = value),
+                                                  )
+                                                : _PillInfo(
+                                                    icon: Icons.stacked_bar_chart_rounded,
+                                                    title: l10n.circlesLevelWithValue(levelLabel),
+                                                    subtitle: l10n.circlesDifficulty,
+                                                  ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: _editingLobbySettings
+                                                ? _LevelPicker(
+                                                    level: _editLevel,
+                                                    onChanged: (value) =>
+                                                        setState(() => _editLevel = value),
+                                                  )
+                                                : _PillInfo(
+                                                    icon: Icons.help_outline_rounded,
+                                                    title: l10n.questionsShort(
+                                                        circleData!['questions_count'] ?? 0),
+                                                    subtitle: l10n.circlesQuestions,
+                                                  ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: _editingLobbySettings
+                                                ? _HostSettingRow(
+                                                    title: l10n.circlesQuestions,
+                                                    value: "$_editQuestions",
+                                                    onMinus: _editQuestions > 5
+                                                        ? () => setState(
+                                                            () => _editQuestions -= 5)
+                                                        : null,
+                                                    onPlus: _editQuestions < 50
+                                                        ? () => setState(
+                                                            () => _editQuestions += 5)
+                                                        : null,
+                                                  )
+                                                : _PillInfo(
+                                                    icon: Icons.timer_rounded,
+                                                    title: l10n.secondsShort(
+                                                        circleData!['time_per_q'] ?? 0),
+                                                    subtitle: l10n.circlesPerQuestionShort,
+                                                  ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (_editingLobbySettings) ...[
+                                        const SizedBox(height: 10),
+                                        _HostSettingRow(
+                                          title: l10n.circlesTimePerQuestion,
+                                          value: l10n.secondsShort(_editTimePerQ),
+                                          onMinus: _editTimePerQ > 5
+                                              ? () => setState(() => _editTimePerQ -= 1)
+                                              : null,
+                                          onPlus: _editTimePerQ < 60
+                                              ? () => setState(() => _editTimePerQ += 1)
+                                              : null,
+                                        ),
+                                      ],
                                     ],
-                                    Expanded(
-                                      child: _QuickAction(
-                                        icon: Icons.copy_rounded,
-                                        label: l10n.circlesCopyId,
-                                        onTap: () => _toast(
-                                            context, l10n.circlesCopiedId),
+
+                                    const SizedBox(height: 14),
+
+                                    // Simplified quick actions
+                                    if (!isNarrow) // On wide, show side-by-side
+                                      Row(
+                                        children: [
+                                          if (!isSpectator) ...[
+                                            Expanded(
+                                              child: _QuickAction(
+                                                icon: Icons.person_add_alt_1_rounded,
+                                                label: l10n.circlesInvite,
+                                                onTap: _inviteByUsername,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                          ],
+                                          Expanded(
+                                            child: _QuickAction(
+                                              icon: Icons.copy_rounded,
+                                              label: l10n.circlesCopyId,
+                                              onTap: () =>
+                                                  _toast(context, l10n.circlesCopiedId),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    else // On narrow, maybe stack or use smaller buttons?
+                                      // Actually, keep them side-by-side unless very small.
+                                      // 400px is enough for 2 buttons.
+                                      Row(
+                                        children: [
+                                          if (!isSpectator) ...[
+                                            Expanded(
+                                              child: _QuickAction(
+                                                icon: Icons.person_add_alt_1_rounded,
+                                                label: l10n.circlesInvite,
+                                                onTap: _inviteByUsername,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                          ],
+                                          Expanded(
+                                            child: _QuickAction(
+                                              icon: Icons.copy_rounded,
+                                              label: l10n.circlesCopyId,
+                                              onTap: () =>
+                                                  _toast(context, l10n.circlesCopiedId),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
+
+                                    const SizedBox(height: 12),
+
+                                    if (isHost)
+                                      _HostControlsRow(
+                                        roomLocked: circleData?['is_locked'] ?? false,
+                                        isEditing: _editingLobbySettings,
+                                        isSaving: _savingLobbySettings,
+                                        onToggleLock: _toggleRoomLock,
+                                        onEdit: _toggleLobbySettingsEdit,
+                                        onCancel: _cancelLobbySettingsEdit,
+                                      )
+                                    else if (isSpectator)
+                                      _SpectatorTip()
+                                    else
+                                      _PlayerTip(),
                                   ],
-                                ),
-
-                                const SizedBox(height: 12),
-
-                                if (isHost)
-                                  _HostControlsRow(
-                                    roomLocked: circleData?['is_locked'] ?? false,
-                                    isEditing: _editingLobbySettings,
-                                    isSaving: _savingLobbySettings,
-                                    onToggleLock: _toggleRoomLock,
-                                    onEdit: _toggleLobbySettingsEdit,
-                                    onCancel: _cancelLobbySettingsEdit,
-                                  )
-                                else if (isSpectator)
-                                  _SpectatorTip()
-                                else
-                                  _PlayerTip(),
-                              ],
+                                );
+                              },
                             ),
                           ),
 
                           const SizedBox(height: 12),
-                          _StatusCallout(
-                            title: isHost
-                                ? l10n.roleHost
-                                : (isSpectator ? l10n.roleSpectator : l10n.circlesParticipant),
-                            body: isHost
-                                ? '${l10n.circlesStartGame} • ${l10n.circlesLeaveCircle}'
-                                : (isSpectator
-                                    ? '${l10n.circlesWatchLive} • ${l10n.leave}'
-                                    : '${l10n.ready} • ${l10n.leave}'),
-                          ),
 
-                          if (isSpectator &&
-                              circleData?['status'] == 'active') ...[
-                            const SizedBox(height: 12),
-                            _StatusCallout(
-                              title: l10n.circlesMatchInProgress,
-                              body: l10n.circlesSpectatorQueuedBody,
-                            ),
-                          ],
 
                           const SizedBox(height: 14),
 
@@ -2423,60 +2608,7 @@ class _SpectatorTip extends StatelessWidget {
   }
 }
 
-class _StatusCallout extends StatelessWidget {
-  final String title;
-  final String body;
 
-  const _StatusCallout({required this.title, required this.body});
-
-  @override
-  Widget build(BuildContext context) {
-    return Glass(
-      radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
-              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
-            ),
-            child: Icon(Icons.hourglass_top_rounded,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 20),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 13.5,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  body,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.68),
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _PlayerRow extends StatelessWidget {
   final PlayerSlot player;
