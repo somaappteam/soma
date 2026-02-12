@@ -1198,34 +1198,26 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                           onChanged: (value) => setState(() => _editLevel = value),
                                         ),
                                         const SizedBox(height: 10),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: _HostSettingRow(
-                                                title: l10n.circlesQuestions,
-                                                value: "$_editQuestions",
-                                                onMinus: _editQuestions > 5
-                                                    ? () => setState(() => _editQuestions -= 5)
-                                                    : null,
-                                                onPlus: _editQuestions < 50
-                                                    ? () => setState(() => _editQuestions += 5)
-                                                    : null,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Expanded(
-                                              child: _HostSettingRow(
-                                                title: l10n.circlesTimePerQuestion,
-                                                value: l10n.secondsShort(_editTimePerQ),
-                                                onMinus: _editTimePerQ > 5
-                                                    ? () => setState(() => _editTimePerQ -= 1)
-                                                    : null,
-                                                onPlus: _editTimePerQ < 60
-                                                    ? () => setState(() => _editTimePerQ += 1)
-                                                    : null,
-                                              ),
-                                            ),
-                                          ],
+                                        _HostSettingRow(
+                                          title: l10n.circlesQuestions,
+                                          value: "$_editQuestions",
+                                          onMinus: _editQuestions > 5
+                                              ? () => setState(() => _editQuestions -= 5)
+                                              : null,
+                                          onPlus: _editQuestions < 50
+                                              ? () => setState(() => _editQuestions += 5)
+                                              : null,
+                                        ),
+                                        const SizedBox(height: 10),
+                                        _HostSettingRow(
+                                          title: l10n.circlesTimePerQuestion,
+                                          value: l10n.secondsShort(_editTimePerQ),
+                                          onMinus: _editTimePerQ > 5
+                                              ? () => setState(() => _editTimePerQ -= 1)
+                                              : null,
+                                          onPlus: _editTimePerQ < 60
+                                              ? () => setState(() => _editTimePerQ += 1)
+                                              : null,
                                         ),
                                       ] else ...[
                                         // View Mode (Narrow)
