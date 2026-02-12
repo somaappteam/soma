@@ -47,9 +47,9 @@ class LiveQuizScreen extends StatefulWidget {
 }
 
 class _LiveQuizScreenState extends State<LiveQuizScreen> {
-  static const double _leaderChipWidth = 92;
-  static const double _leaderChipHeight = 96;
-  static const double _leaderChipSpacing = 8;
+  static const double _leaderChipWidth = 76;
+  static const double _leaderChipHeight = 80;
+  static const double _leaderChipSpacing = 6;
 
   late List<_Question> questions;
   StreamSubscription<Map<String, VoicePresence>>? _voiceSub;
@@ -794,12 +794,12 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
 
                   // Progress bar
                   _QuizProgressBar(progress: progress),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
 
 
                   // Leaderboard strip (left->right ranking)
@@ -872,7 +872,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
                   _TtsControls(
                     rates: const [0.75, 1.0, 1.25],
                     selectedRate: _speechRate,
@@ -883,12 +883,12 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                     onSpeak: () => _onSpeakTap(q),
                     disabled: _isSentenceQuestion(q) && !revealed,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
 
                   // Answers
                   Expanded(
                     child: ListView.separated(
-                      physics: const BouncingScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: _choices.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (_, i) {
@@ -986,7 +986,7 @@ class _LiveLeaderboardStrip extends StatelessWidget {
 
     return Glass(
       radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+      padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SizedBox(
@@ -1039,7 +1039,7 @@ class _LiveLeaderChip extends StatelessWidget {
       child: PressableScale(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: borderColor),
@@ -1056,9 +1056,9 @@ class _LiveLeaderChip extends StatelessWidget {
                 muted: leader.isMuted,
                 speaking: leader.isSpeaking,
                 avatarUrl: leader.avatarUrl,
-                size: 44,
+                size: 34,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 3),
               Text(
                 leader.name,
                 maxLines: 1,
@@ -1066,7 +1066,7 @@ class _LiveLeaderChip extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
-                  fontSize: 11.5,
+                  fontSize: 10,
                 ),
               ),
               const SizedBox(height: 1),
@@ -1075,7 +1075,7 @@ class _LiveLeaderChip extends StatelessWidget {
                 style: TextStyle(
                   color: scoreColor,
                   fontWeight: FontWeight.w900,
-                  fontSize: 17,
+                  fontSize: 14,
                 ),
               ),
             ],

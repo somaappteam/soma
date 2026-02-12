@@ -70,6 +70,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     final languageOptions = _languageOptions(l10n);
     final isLight = Theme.of(context).brightness == Brightness.light;
     final scheme = Theme.of(context).colorScheme;
+    final screenHeight = MediaQuery.sizeOf(context).height;
+    final logoTopPadding = (screenHeight * 0.14).clamp(64.0, 120.0);
+    final actionsBottomPadding = (screenHeight * 0.08).clamp(28.0, 64.0);
 
     return Scaffold(
       body: SafeArea(
@@ -77,125 +80,126 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           children: [
             ResponsiveFrame(
               maxWidth: 430,
-              child: ResponsiveScroll(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 22),
-                  child: Column(
-                    children: [
-                    const SizedBox(height: 80),
-
-                    // Logo + tagline
-                    Column(
-                      children: [
-                        Text(
-                          "SOMA",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.orbitron(
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 12.0,
-                            fontSize: 54,
-                            color: isLight ? scheme.primary : Colors.white,
-                            shadows: [
-                              // Core bright glow (Cyan-ish)
-                              Shadow(
-                                color: const Color(0xFF00FFFF).withValues(alpha: 0.6),
-                                blurRadius: 20,
-                              ),
-                              // Mid layer (Purple-ish)
-                              Shadow(
-                                color: const Color(0xFF9D00FF).withValues(alpha: 0.5),
-                                blurRadius: 40,
-                              ),
-                              // Ambient wide glow
-                              Shadow(
-                                color: const Color(0xFF6A00FF).withValues(alpha: 0.3),
-                                blurRadius: 80,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          l10n.welcomeTagline,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: scheme.onSurface.withValues(alpha: 0.82),
-                                fontSize: 16,
-                              ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 60),
-
-                    // Buttons
-                    Column(
-                      children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: NeonButton(
-                            label: l10n.signUp,
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const SignUpScreen(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 22),
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child: Padding(
+                        padding: EdgeInsets.only(top: logoTopPadding),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "SOMA",
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.orbitron(
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 12.0,
+                                fontSize: 54,
+                                color: isLight ? scheme.primary : Colors.white,
+                                shadows: [
+                                  Shadow(
+                                    color: const Color(0xFF00FFFF).withValues(alpha: 0.6),
+                                    blurRadius: 20,
+                                  ),
+                                  Shadow(
+                                    color: const Color(0xFF9D00FF).withValues(alpha: 0.5),
+                                    blurRadius: 40,
+                                  ),
+                                  Shadow(
+                                    color: const Color(0xFF6A00FF).withValues(alpha: 0.3),
+                                    blurRadius: 80,
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
+                            const SizedBox(height: 10),
+                            Text(
+                              l10n.welcomeTagline,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: scheme.onSurface.withValues(alpha: 0.82),
+                                    fontSize: 16,
+                                  ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 14),
-                        SizedBox(
-                          width: double.infinity,
-                          child: Glass(
-                            radius: T.r28,
-                            padding: EdgeInsets.zero,
-                            child: InkWell(
-                              borderRadius: T.r28,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignInScreen(),
-                                ),
-                              ),
-                              child: SizedBox(
-                                height: 56,
-                                child: Center(
-                                  child: Text(
-                                    l10n.signIn,
-                                    style: TextStyle(
-                                      color: scheme.onSurface,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: actionsBottomPadding),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                              SizedBox(
+                                width: double.infinity,
+                                child: NeonButton(
+                                  label: l10n.signUp,
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const SignUpScreen(),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                          GestureDetector(
-                          onTap: () {
-                            profileStore.loginAsGuest();
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (_) => const AppShell()),
-                            );
-                          },
-                          child: Text(
-                            l10n.skipForNow,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  color: scheme.onSurface.withValues(alpha: 0.6),
+                              const SizedBox(height: 14),
+                              SizedBox(
+                                width: double.infinity,
+                                child: Glass(
+                                  radius: T.r28,
+                                  padding: EdgeInsets.zero,
+                                  child: InkWell(
+                                    borderRadius: T.r28,
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const SignInScreen(),
+                                      ),
+                                    ),
+                                    child: SizedBox(
+                                      height: 56,
+                                      child: Center(
+                                        child: Text(
+                                          l10n.signIn,
+                                          style: TextStyle(
+                                            color: scheme.onSurface,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                          ),
+                              ),
+                              const SizedBox(height: 18),
+                              GestureDetector(
+                                onTap: () {
+                                  profileStore.loginAsGuest();
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => const AppShell()),
+                                  );
+                                },
+                                child: Text(
+                                  l10n.skipForNow,
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: scheme.onSurface.withValues(alpha: 0.6),
+                                      ),
+                                ),
+                              ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-
-                    const SizedBox(height: 60),
-                    ],
-                  ),
+                  ],
                 ),
               ),
             ),
