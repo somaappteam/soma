@@ -15,6 +15,7 @@ class InboxScreen extends StatefulWidget {
 }
 
 class _InboxScreenState extends State<InboxScreen> {
+  static const String _threadPrefsKey = 'chat_thread_prefs';
   String query = "";
   late final Stream<List<Map<String, dynamic>>> _threadsStream;
   final Set<String> _archivedThreadIds = <String>{};

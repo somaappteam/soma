@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'widgets/circle_chat_sheet.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
@@ -798,6 +799,24 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     }
   }
 
+  void _openChatSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        final height = MediaQuery.of(context).size.height * 0.75;
+        return SizedBox(
+          height: height,
+          child: CircleChatSheet(
+            circleId: widget.circleId,
+            meId: circlesRepository.currentUserId,
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _requestJoin() async {
     final l10n = AppLocalizations.of(context);
     if (isPendingJoin) return;
@@ -1133,6 +1152,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                       onShare: () {
                         _openLobbyActionsSheet();
                       },
+                      onChat: _openChatSheet,
                     ),
                     const SizedBox(height: 14),
                     Expanded(
@@ -1867,12 +1887,14 @@ class _TopBar extends StatelessWidget {
   final String subtitle;
   final VoidCallback onBack;
   final VoidCallback onShare;
+  final VoidCallback onChat;
 
   const _TopBar({
     required this.title,
     required this.subtitle,
     required this.onBack,
     required this.onShare,
+    required this.onChat,
   });
 
   @override
@@ -1905,6 +1927,8 @@ class _TopBar extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(width: 10),
+        _IconGlassButton(icon: Icons.chat_bubble_rounded, onTap: onChat),
         const SizedBox(width: 10),
         _IconGlassButton(icon: Icons.ios_share_rounded, onTap: onShare),
       ],

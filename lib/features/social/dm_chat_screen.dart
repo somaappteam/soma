@@ -61,6 +61,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
   String _planTier = 'starter';
   bool _showSearch = false;
   String _searchQuery = '';
+  // NEW: Track block status
+  StreamSubscription? _settingsSub;
+  bool _isOtherBlocked = false;   
 
   int get _maxImageBytes => _planTier == 'pro' ? _proMaxImageBytes : _starterMaxImageBytes;
   int get _maxFileBytes => _planTier == 'pro' ? _proMaxFileBytes : _starterMaxFileBytes;
@@ -77,8 +80,17 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _loadOtherProfile();
     _loadCostTier();
     _markConversationAsRead();
-    // Auto-scroll on new messages can be handled in builder or listener,
-    // but simplified approach: just builder.
+    
+    // NEW: Listen to settings for block updates
+    _settingsSub = settingsRepository.getSettingsStream().listen((settings) {
+      if (!mounted) return;
+      final blocked = (settings['blocked_user_ids'] as List?)
+          ?.map((e) => e.toString())
+          .contains(widget.otherId) ?? false;
+      if (blocked != _isOtherBlocked) {
+        setState(() => _isOtherBlocked = blocked);
+      }
+    });
   }
 
   @override
@@ -88,6 +100,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
     _voiceRecordTimer?.cancel();
     _callTimer?.cancel();
+    _settingsSub?.cancel(); // NEW
     _controller.dispose();
     _scroll.dispose();
     super.dispose();
@@ -300,7 +313,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       }
 
       final path = 'chat_media/$uid/${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final storage = Supabase.instance.client.storage.from('avatars');
+      final storage = Supabase.instance.client.storage.from('chat_assets');
       await storage.uploadBinary(
         path,
         bytes,
@@ -359,7 +372,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       final sanitizedName = (file.name.isEmpty ? 'document.$extension' : file.name)
           .replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '_');
       final objectPath = 'chat_docs/$uid/${DateTime.now().millisecondsSinceEpoch}_$sanitizedName';
-      final storage = Supabase.instance.client.storage.from('avatars');
+      final storage = Supabase.instance.client.storage.from('chat_assets');
       await storage.uploadBinary(
         objectPath,
         bytes,
@@ -665,6 +678,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                                     time: _fmtTime(created),
                                     isMe: isMe,
                                     isRead: m['is_read'] == true || m['is_read'] == 1,
+                                    replyTo: parsed.payload.replyTo,
                                     onLongPress: () => _showMessageActions(parsed),
                                     onTapFile: _openFileUrl,
                                   ),
@@ -704,21 +718,59 @@ class _DmChatScreenState extends State<DmChatScreen> {
                     ),
                   ),
                 ),
-              _InputBar(
-                controller: _controller,
-                onSend: _send,
-                onVoiceMessage: () {
-                  _handleVoiceMessageTap();
-                },
-                onSendImage: _pickAndSendImage,
-                onSendFile: _pickAndSendDocument,
-                isRecordingVoiceMessage: _isRecordingVoiceMessage,
-                recordingSeconds: _voiceRecordElapsedSeconds,
-              ),
+              if (_isOtherBlocked)
+                _BlockedOverlay(
+                  onUnblock: _unblockUser,
+                )
+              else
+                _InputBar(
+                  controller: _controller,
+                  onSend: _send,
+                  onVoiceMessage: () {
+                    _handleVoiceMessageTap();
+                  },
+                  onSendImage: _pickAndSendImage,
+                  onSendFile: _pickAndSendDocument,
+                  isRecordingVoiceMessage: _isRecordingVoiceMessage,
+                  recordingSeconds: _voiceRecordElapsedSeconds,
+                ),
             ],
           ),
       ),
     );
+  }
+
+  Future<void> _unblockUser() async {
+    final l10n = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Unblock user?'),
+        content: const Text('You will be able to message this user again.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Unblock'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+
+    final settings = await settingsRepository.getSettings();
+    final blockedIds = (settings['blocked_user_ids'] as List?)
+            ?.map((e) => e.toString())
+            .toList() ??
+        [];
+    blockedIds.remove(widget.otherId);
+    
+    await settingsRepository.updateSetting('blocked_user_ids', blockedIds);
+    // Stream listener in initState will update state
   }
 
   String _fmtTime(DateTime dt) {
@@ -862,6 +914,7 @@ class _Bubble extends StatelessWidget {
   final String time;
   final bool isMe;
   final bool isRead;
+  final String? replyTo;
   final VoidCallback? onLongPress;
   final ValueChanged<String>? onTapFile;
 
@@ -871,6 +924,7 @@ class _Bubble extends StatelessWidget {
     required this.time,
     required this.isMe,
     required this.isRead,
+    this.replyTo,
     this.onLongPress,
     this.onTapFile,
   });
@@ -892,9 +946,28 @@ class _Bubble extends StatelessWidget {
     final isVoice = parsed.type == 'voice';
     final isFile = parsed.type == 'file';
 
+
     return Column(
       crossAxisAlignment: align,
       children: [
+        if (replyTo != null)
+          Padding(
+            padding: EdgeInsets.only(
+              bottom: 4,
+              right: isMe ? 4 : 0,
+              left: isMe ? 0 : 4,
+            ),
+            child: Text(
+              'Replying to: $replyTo',
+              style: TextStyle(
+                color: scheme.onSurface.withValues(alpha: 0.6),
+                fontSize: 11,
+                fontStyle: FontStyle.italic,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
         GestureDetector(
           onLongPress: onLongPress,
           onTap: isFile && parsed.url != null ? () => onTapFile?.call(parsed.url!) : null,
@@ -1034,6 +1107,7 @@ class _MessagePayload {
   final int? duration;
   final String? fileName;
   final int? sizeBytes;
+  final String? replyTo;
 
   const _MessagePayload({
     required this.type,
@@ -1043,6 +1117,7 @@ class _MessagePayload {
     this.duration,
     this.fileName,
     this.sizeBytes,
+    this.replyTo,
   });
 
   static _MessagePayload parse(String raw) {
@@ -1056,7 +1131,9 @@ class _MessagePayload {
           thumb: map['thumb']?.toString(),
           duration: map['duration'] is int ? map['duration'] as int : int.tryParse('${map['duration']}'),
           fileName: map['name']?.toString(),
+
           sizeBytes: map['size'] is int ? map['size'] as int : int.tryParse('${map['size']}'),
+          replyTo: map['reply_to']?.toString(),
         );
       }
     } catch (_) {
@@ -1104,65 +1181,6 @@ class _ChatMessage {
   }
 }
 
-class _MessagePayload {
-  final String type;
-  final String? text;
-  final String? url;
-  final int? duration;
-
-  const _MessagePayload({required this.type, this.text, this.url, this.duration});
-
-  static _MessagePayload parse(String raw) {
-    try {
-      final map = jsonDecode(raw);
-      if (map is Map<String, dynamic>) {
-        return _MessagePayload(
-          type: map['type']?.toString() ?? 'text',
-          text: map['text']?.toString() ?? map['label']?.toString(),
-          url: map['url']?.toString(),
-          duration: map['duration'] is int ? map['duration'] as int : int.tryParse('${map['duration']}'),
-        );
-      }
-    } catch (_) {
-      // legacy plain text fallback
-    }
-    if (raw.startsWith('[img]')) {
-      return _MessagePayload(type: 'image', url: raw.substring(5).trim());
-    }
-    return _MessagePayload(type: 'text', text: raw);
-  }
-}
-
-class _ChatMessage {
-  final String id;
-  final bool isMine;
-  final String previewText;
-  final String rawContent;
-
-  const _ChatMessage({
-    required this.id,
-    required this.isMine,
-    required this.previewText,
-    required this.rawContent,
-  });
-
-  factory _ChatMessage.fromRow(Map<String, dynamic> row, {required bool isMe}) {
-    final raw = row['content']?.toString() ?? '';
-    final payload = _MessagePayload.parse(raw);
-    final preview = switch (payload.type) {
-      'image' => 'Photo',
-      'voice' => 'Voice message ${payload.text ?? ''}'.trim(),
-      _ => payload.text ?? raw,
-    };
-
-    return _ChatMessage(
-      id: row['id']?.toString() ?? '',
-      isMine: isMe,
-      previewText: preview,
-      rawContent: raw,
-    );
-  }
-}
 
 class _InputBar extends StatelessWidget {
   final TextEditingController controller;
@@ -1309,6 +1327,44 @@ class _InputBar extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BlockedOverlay extends StatelessWidget {
+  final VoidCallback onUnblock;
+  
+  const _BlockedOverlay({required this.onUnblock});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+      color: scheme.surface,
+      child: Column(
+        children: [
+          Text(
+            "You have blocked this user",
+             style: TextStyle(
+              color: scheme.onSurface.withValues(alpha: 0.7),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: onUnblock,
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: scheme.error),
+                foregroundColor: scheme.error,
+              ),
+              child: const Text("Unblock"),
             ),
           ),
         ],

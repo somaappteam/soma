@@ -8,6 +8,7 @@ import 'features/auth/splash_screen.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'dart:ffi';
 import 'dart:io';
 import 'data/content_sync_service.dart';
 import 'data/settings_repository.dart';
@@ -25,6 +26,10 @@ final syncMessageNotifier = ValueNotifier<String?>(null);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (!kIsWeb && Platform.isWindows) {
+    _fixSqliteDll();
+  }
 
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     sqfliteFfiInit();
@@ -45,6 +50,7 @@ Future<void> main() async {
   await themeModeController.load();
   await hapticsService.init();
   await sfxService.init();
+  await settingsRepository.init();
   
   _runContentSync();
   runApp(const App());
@@ -332,5 +338,19 @@ class _SyncStatusBanner extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+void _fixSqliteDll() {
+  try {
+    final scriptDir = File(Platform.resolvedExecutable).parent.path;
+    final src = File('$scriptDir\\sqlite3.dll');
+    final dest = File('$scriptDir\\sqlite3.x64.windows.dll');
+    if (src.existsSync() && !dest.existsSync()) {
+      src.copySync(dest.path);
+      debugPrint('SQLite DLL fixed: copied to ${dest.path}');
+    }
+  } catch (e) {
+    debugPrint('SQLite DLL fix failed: $e');
   }
 }

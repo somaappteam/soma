@@ -72,7 +72,7 @@ serve(async (req) => {
   );
 
   return Response.json(
-    { token, uid, expiresIn, channel },
+    { token, uid, expiresIn, channel, appId: Deno.env.get("AGORA_APP_ID")! },
     { headers: corsHeaders },
   );
 });

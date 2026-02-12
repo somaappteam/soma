@@ -36,9 +36,25 @@ class AgoraVoiceService {
         : ClientRoleType.clientRoleAudience;
 
     if (_engine == null) {
+      String appId = AgoraConfig.appId;
+      if (appId.isEmpty) {
+        // Fallback or error, but preferably we use the one from credentials if available
+        if (credentials.appId != null && credentials.appId!.isNotEmpty) {
+           appId = credentials.appId!;
+        }
+      } else if (credentials.appId != null && credentials.appId!.isNotEmpty) {
+        // Prefer the one from server to ensure it matches the token
+        appId = credentials.appId!;
+      }
+      
+      if (appId.isEmpty) {
+         debugPrint('AgoraVoiceService: No App ID found');
+         return;
+      }
+
       _engine = createAgoraRtcEngine();
-      await _engine!.initialize(const RtcEngineContext(
-        appId: AgoraConfig.appId,
+      await _engine!.initialize(RtcEngineContext(
+        appId: appId,
       ));
       await _engine!.enableAudio();
       await _engine!.setChannelProfile(ChannelProfileType.channelProfileLiveBroadcasting);
@@ -152,15 +168,15 @@ class AgoraVoiceService {
         final map = Map<String, dynamic>.from(data);
         final token = map['token']?.toString() ?? '';
         final uid = _parseUid(map['uid']);
-        return _AgoraJoinCredentials(token: token, uid: uid);
+        final appId = map['appId']?.toString();
+        return _AgoraJoinCredentials(token: token, uid: uid, appId: appId);
       }
     } catch (_) {}
-    return const _AgoraJoinCredentials(token: '', uid: null);
+    return const _AgoraJoinCredentials(token: '', uid: null, appId: null);
   }
 
-  Future<void> disconnectIfCircle(String? circleId) async {
-    if (_engine == null || _circleId == null || circleId == null) return;
-    if (_circleId != circleId) return;
+  Future<void> disconnect() async {
+    if (_engine == null) return;
     if (_disconnecting) return;
 
     try {
@@ -177,6 +193,12 @@ class AgoraVoiceService {
       _lastSpeaking = false;
       _disconnecting = false;
     }
+  }
+
+  Future<void> disconnectIfCircle(String? circleId) async {
+    if (_engine == null || _circleId == null || circleId == null) return;
+    if (_circleId != circleId) return;
+    await disconnect();
   }
 
   Future<bool> _ensurePermissions() async {
@@ -196,8 +218,9 @@ class AgoraVoiceService {
 class _AgoraJoinCredentials {
   final String token;
   final int? uid;
+  final String? appId;
 
-  const _AgoraJoinCredentials({required this.token, required this.uid});
+  const _AgoraJoinCredentials({required this.token, required this.uid, this.appId});
 }
 
 final agoraVoiceService = AgoraVoiceService.instance;

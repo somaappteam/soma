@@ -26,6 +26,15 @@ class QuizRepository {
     }
 
     try {
+      // Prioritize Supabase for real-time/group quizzes if available
+      if (_client.auth.currentUser != null) {
+        final supabaseQs = await getVocabQuestionsFromSupabase(courseId, limit);
+        if (supabaseQs.isNotEmpty) {
+          await _cache.save(cacheKey, supabaseQs);
+          return supabaseQs;
+        }
+      }
+
       final dbHelper = DatabaseHelper.instance;
       final sourceRows = await dbHelper.getVocabularyByLang(langs.source);
       final targetRows = await dbHelper.getVocabularyByLang(langs.target);
@@ -33,8 +42,7 @@ class QuizRepository {
       final sourceList = _rowsToMapList(sourceRows);
       final targetList = _rowsToMapList(targetRows);
       if (sourceList.isEmpty || targetList.isEmpty) {
-        debugPrint("Local vocabulary empty, trying Supabase...");
-        return getVocabQuestionsFromSupabase(courseId, limit);
+        return [];
       }
 
       final targetByConcept = <int, Map<String, dynamic>>{};
@@ -128,6 +136,15 @@ class QuizRepository {
     if (cached.isNotEmpty) return cached;
 
     try {
+      // Prioritize Supabase
+      if (_client.auth.currentUser != null) {
+        final supabaseQs = await getSentenceQuestionsFromSupabase(courseId, limit);
+        if (supabaseQs.isNotEmpty) {
+          await _cache.save(cacheKey, supabaseQs);
+          return supabaseQs;
+        }
+      }
+
       final dbHelper = DatabaseHelper.instance;
       final sourceRows = await dbHelper.getSentencesByLang(langs.source);
       final targetRows = await dbHelper.getSentencesByLang(langs.target);
@@ -135,8 +152,7 @@ class QuizRepository {
       final sourceList = _rowsToMapList(sourceRows);
       final targetList = _rowsToMapList(targetRows);
       if (sourceList.isEmpty || targetList.isEmpty) {
-         debugPrint("Local sentences empty, trying Supabase...");
-         return getSentenceQuestionsFromSupabase(courseId, limit);
+         return [];
       }
 
       final targetByConcept = <int, Map<String, dynamic>>{};

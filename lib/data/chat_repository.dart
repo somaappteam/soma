@@ -14,6 +14,16 @@ class ChatRepository {
   Future<void> sendMessage(String receiverId, String content) async {
     final uid = currentUserId;
     if (uid == null) throw Exception("Not logged in");
+    
+    // NEW: Check for blocks
+    final settings = await _supabase.from('profiles').select('settings').eq('id', uid).single();
+    final blockedIds = (settings['settings']?['blocked_user_ids'] as List?)
+        ?.map((e) => e.toString())
+        .toList() ?? [];
+    if (blockedIds.contains(receiverId)) {
+      throw Exception("You have blocked this user.");
+    }
+
     if (content.length > _maxContentChars) {
       throw Exception('Message payload exceeds 4000 characters');
     }

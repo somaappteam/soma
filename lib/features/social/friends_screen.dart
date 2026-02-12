@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/widgets/glass.dart';
 import '../../models/friend.dart';
 import '../../data/social_repository.dart';
+import '../../data/auth_repository.dart';
 import 'add_friend_screen.dart';
 import 'dm_chat_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
@@ -274,8 +275,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                                 context,
                                                 MaterialPageRoute(
                                                   builder: (_) => DmChatScreen(
-                                                    meId: socialRepository
-                                                            .currentUserId ??
+                                            meId: socialRepository.currentUserId ?? 
+                                                        authRepository.currentUser?.id ??
                                                         "me",
                                                     otherId: f.id,
                                                     otherName: f.username,
