@@ -2,6 +2,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'presence_repository.dart';
 
 class ChatRepository {
+  static const int _maxContentChars = 4000;
+
   final _supabase = Supabase.instance.client;
 
   String? get currentUserId => _supabase.auth.currentUser?.id;
@@ -10,6 +12,9 @@ class ChatRepository {
   Future<void> sendMessage(String receiverId, String content) async {
     final uid = currentUserId;
     if (uid == null) throw Exception("Not logged in");
+    if (content.length > _maxContentChars) {
+      throw Exception('Message payload exceeds 4000 characters');
+    }
 
     await _supabase.from('messages').insert({
       'sender_id': uid,
@@ -49,6 +54,50 @@ class ChatRepository {
         .eq('sender_id', otherUserId)
         .eq('receiver_id', uid)
         .eq('is_read', false);
+  }
+
+  Future<void> markConversationAsUnread(String otherUserId) async {
+    final uid = currentUserId;
+    if (uid == null) return;
+
+    await _supabase
+        .from('messages')
+        .update({'is_read': false})
+        .eq('sender_id', otherUserId)
+        .eq('receiver_id', uid)
+        .eq('is_read', true);
+  }
+
+  Future<void> deleteConversation(String otherUserId) async {
+    final uid = currentUserId;
+    if (uid == null) return;
+
+    await _supabase
+        .from('messages')
+        .delete()
+        .or('and(sender_id.eq.$uid,receiver_id.eq.$otherUserId),and(sender_id.eq.$otherUserId,receiver_id.eq.$uid)');
+  }
+
+  Future<void> deleteMessageById(String messageId) async {
+    final uid = currentUserId;
+    if (uid == null) return;
+
+    await _supabase
+        .from('messages')
+        .delete()
+        .eq('id', messageId)
+        .eq('sender_id', uid);
+  }
+
+  Future<void> editMessageById(String messageId, String content) async {
+    final uid = currentUserId;
+    if (uid == null) return;
+
+    await _supabase
+        .from('messages')
+        .update({'content': content})
+        .eq('id', messageId)
+        .eq('sender_id', uid);
   }
 
   /// Get Inbox (list of conversations)
