@@ -48,9 +48,10 @@ class LiveQuizScreen extends StatefulWidget {
 }
 
 class _LiveQuizScreenState extends State<LiveQuizScreen> {
-  static const double _leaderChipWidth = 76;
-  static const double _leaderChipHeight = 80;
-  static const double _leaderChipSpacing = 6;
+  static const double _leaderChipWidth = 62;
+  static const double _leaderChipHeight = 66;
+  static const double _leaderChipSpacing = 4;
+  static const double _questionCardHeight = 168;
 
   late List<_Question> questions;
   StreamSubscription<Map<String, VoicePresence>>? _voiceSub;
@@ -811,62 +812,74 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                   ),
 
                   // Question card
-                  Glass(
-                    radius: BorderRadius.circular(26),
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.liveQuizQuestionCounter(qIndex + 1, totalQuestions),
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.70),
-                            fontWeight: FontWeight.w800,
-                            fontSize: 12,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        if (_isSentenceQuestion(q))
+                  SizedBox(
+                    height: _questionCardHeight,
+                    child: Glass(
+                      radius: BorderRadius.circular(26),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
                           Text(
-                            q.prompt,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 18,
-                              height: 1.2,
-                            ),
-                          )
-                        else
-                          _VocabPromptLine(
-                            prompt: q.prompt,
-                            article: q.article,
-                            word: q.word,
-                            gender: q.gender,
-                          ),
-                        if (showReadingLine) ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            q.reading,
+                            l10n.liveQuizQuestionCounter(qIndex + 1, totalQuestions),
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.55),
-                              fontWeight: FontWeight.w600,
-                              fontSize: 13,
+                              color: Colors.white.withValues(alpha: 0.70),
+                              fontWeight: FontWeight.w800,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (_isSentenceQuestion(q))
+                                    Text(
+                                      q.prompt,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 18,
+                                        height: 1.2,
+                                      ),
+                                    )
+                                  else
+                                    _VocabPromptLine(
+                                      prompt: q.prompt,
+                                      article: q.article,
+                                      word: q.word,
+                                      gender: q.gender,
+                                    ),
+                                  if (showReadingLine) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      q.reading,
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.55),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                  if (showTranslationLine) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      q.translation,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.white.withValues(alpha: 0.75),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13.5,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
                             ),
                           ),
                         ],
-                        if (showTranslationLine) ...[
-                          const SizedBox(height: 8),
-                          Text(
-                            q.translation,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.75),
-                              fontWeight: FontWeight.w700,
-                              fontSize: 13.5,
-                            ),
-                          ),
-                        ],
-                      ],
+                      ),
                     ),
                   ),
 
@@ -984,7 +997,7 @@ class _LiveLeaderboardStrip extends StatelessWidget {
 
     return Glass(
       radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
+      padding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: SizedBox(
@@ -1037,7 +1050,7 @@ class _LiveLeaderChip extends StatelessWidget {
       child: PressableScale(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: borderColor),
@@ -1054,9 +1067,9 @@ class _LiveLeaderChip extends StatelessWidget {
                 muted: leader.isMuted,
                 speaking: leader.isSpeaking,
                 avatarUrl: leader.avatarUrl,
-                size: 34,
+                size: 26,
               ),
-              const SizedBox(height: 3),
+              const SizedBox(height: 2),
               Text(
                 leader.name,
                 maxLines: 1,
@@ -1064,7 +1077,7 @@ class _LiveLeaderChip extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w800,
-                  fontSize: 10,
+                  fontSize: 9,
                 ),
               ),
               const SizedBox(height: 1),
@@ -1073,7 +1086,7 @@ class _LiveLeaderChip extends StatelessWidget {
                 style: TextStyle(
                   color: scoreColor,
                   fontWeight: FontWeight.w900,
-                  fontSize: 14,
+                  fontSize: 12,
                 ),
               ),
             ],
