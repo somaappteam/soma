@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/motion.dart';
 
 import '../../core/widgets/glass.dart';
@@ -12,6 +14,9 @@ import '../../data/agora_voice_service.dart';
 import '../../data/chat_repository.dart';
 import '../../data/presence_repository.dart';
 import '../../data/profile_repository.dart';
+import '../../data/settings_repository.dart';
+import '../../models/user_profile.dart';
+import '../profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 class DmChatScreen extends StatefulWidget {
@@ -31,8 +36,12 @@ class DmChatScreen extends StatefulWidget {
 }
 
 class _DmChatScreenState extends State<DmChatScreen> {
-  static const int _maxImageBytes = 2 * 1024 * 1024; // 2 MB
-  static const int _maxTextChars = 1200;
+  static const int _starterMaxImageBytes = 2 * 1024 * 1024; // 2 MB
+  static const int _proMaxImageBytes = 6 * 1024 * 1024; // 6 MB
+  static const int _starterMaxFileBytes = 3 * 1024 * 1024; // 3 MB
+  static const int _proMaxFileBytes = 12 * 1024 * 1024; // 12 MB
+  static const int _starterMaxTextChars = 1200;
+  static const int _proMaxTextChars = 3000;
 
   final _controller = TextEditingController();
   final _scroll = ScrollController();
@@ -48,6 +57,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
   Timer? _callTimer;
   int _callElapsedSeconds = 0;
   String? _replyPreview;
+  UserProfile? _otherProfile;
+  String _planTier = 'starter';
+  bool _showSearch = false;
+  String _searchQuery = '';
+
+  int get _maxImageBytes => _planTier == 'pro' ? _proMaxImageBytes : _starterMaxImageBytes;
+  int get _maxFileBytes => _planTier == 'pro' ? _proMaxFileBytes : _starterMaxFileBytes;
+  int get _maxTextChars => _planTier == 'pro' ? _proMaxTextChars : _starterMaxTextChars;
 
   String get _myUserId => chatRepository.currentUserId ?? widget.meId;
 
@@ -57,6 +74,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _messagesStream = chatRepository.getMessagesStream(widget.otherId);
     _onlineStream = presenceRepository.streamOnlineStatus(widget.otherId);
     _loadOnlineVisibility();
+    _loadOtherProfile();
+    _loadCostTier();
     _markConversationAsRead();
     // Auto-scroll on new messages can be handled in builder or listener,
     // but simplified approach: just builder.
@@ -91,8 +110,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     if (text.length > _maxTextChars) {
+      final allowed = _maxTextChars;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Message too long. Keep it under 1200 characters.')),
+        SnackBar(content: Text('Message too long. Keep it under $allowed characters.')),
       );
       return;
     }
@@ -128,6 +148,27 @@ class _DmChatScreenState extends State<DmChatScreen> {
       setState(() => _showOnlineIndicator = data.showOnlineStatus);
     } catch (_) {
       // ignore
+    }
+  }
+
+  Future<void> _loadOtherProfile() async {
+    try {
+      final profile = await profileRepository.fetchProfile(userId: widget.otherId);
+      if (!mounted || profile == null) return;
+      setState(() => _otherProfile = profile);
+    } catch (_) {
+      // ignore
+    }
+  }
+
+  Future<void> _loadCostTier() async {
+    try {
+      final settings = await settingsRepository.getSettings();
+      final tier = settings['chat_plan_tier']?.toString().toLowerCase();
+      if (!mounted) return;
+      setState(() => _planTier = tier == 'pro' ? 'pro' : 'starter');
+    } catch (_) {
+      // keep starter fallback
     }
   }
 
@@ -243,7 +284,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       final picked = await _imagePicker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 85,
-        maxWidth: 1440,
+        maxWidth: _planTier == 'pro' ? 1920 : 1280,
       );
       if (picked == null || !mounted) return;
 
@@ -251,8 +292,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
       if (bytes.length > _maxImageBytes) {
         if (!mounted) return;
         final mb = (bytes.length / (1024 * 1024)).toStringAsFixed(1);
+        final allowedMb = (_maxImageBytes / (1024 * 1024)).toStringAsFixed(0);
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Image is ${mb}MB. Max allowed is 2MB.')),
+          SnackBar(content: Text('Image is ${mb}MB. Max allowed is ${allowedMb}MB.')),
         );
         return;
       }
@@ -267,7 +309,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       final publicUrl = storage.getPublicUrl(path);
       await chatRepository.sendMessage(
         widget.otherId,
-        jsonEncode({'type': 'image', 'url': publicUrl}),
+        jsonEncode({'type': 'image', 'url': publicUrl, 'thumb': publicUrl}),
       );
 
       if (!mounted) return;
@@ -280,6 +322,166 @@ class _DmChatScreenState extends State<DmChatScreen> {
         const SnackBar(content: Text('Could not send picture')),
       );
     }
+  }
+
+
+
+  Future<void> _pickAndSendDocument() async {
+    final uid = _myUserId;
+    try {
+      final pick = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        withData: true,
+        type: FileType.custom,
+        allowedExtensions: const ['pdf', 'doc', 'docx', 'txt'],
+      );
+      if (pick == null || pick.files.isEmpty || !mounted) return;
+
+      final file = pick.files.single;
+      final bytes = file.bytes;
+      if (bytes == null || bytes.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not read selected document.')),
+        );
+        return;
+      }
+
+      if (bytes.length > _maxFileBytes) {
+        final mb = (bytes.length / (1024 * 1024)).toStringAsFixed(1);
+        final allowedMb = (_maxFileBytes / (1024 * 1024)).toStringAsFixed(0);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Document is ${mb}MB. Max allowed is ${allowedMb}MB.')),
+        );
+        return;
+      }
+
+      final extension = (file.extension ?? 'file').toLowerCase();
+      final sanitizedName = (file.name.isEmpty ? 'document.$extension' : file.name)
+          .replaceAll(RegExp(r'[^a-zA-Z0-9._-]'), '_');
+      final objectPath = 'chat_docs/$uid/${DateTime.now().millisecondsSinceEpoch}_$sanitizedName';
+      final storage = Supabase.instance.client.storage.from('avatars');
+      await storage.uploadBinary(
+        objectPath,
+        bytes,
+        fileOptions: FileOptions(
+          contentType: _docContentType(extension),
+          upsert: true,
+        ),
+      );
+      final publicUrl = storage.getPublicUrl(objectPath);
+      await chatRepository.sendMessage(
+        widget.otherId,
+        jsonEncode({
+          'type': 'file',
+          'url': publicUrl,
+          'name': file.name,
+          'size': bytes.length,
+        }),
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Document sent')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not send document')),
+      );
+    }
+  }
+
+  String _docContentType(String extension) {
+    return switch (extension) {
+      'pdf' => 'application/pdf',
+      'doc' => 'application/msword',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'txt' => 'text/plain',
+      _ => 'application/octet-stream',
+    };
+  }
+
+  Future<void> _openFileUrl(String url) async {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return;
+    final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!launched && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open file')),
+      );
+    }
+  }
+
+  Future<void> _editTextMessage(_ChatMessage msg) async {
+    final initial = msg.payload.text ?? '';
+    final editor = TextEditingController(text: initial);
+    final updated = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit message'),
+        content: TextField(
+          controller: editor,
+          maxLines: 4,
+          autofocus: true,
+          decoration: const InputDecoration(hintText: 'Update your message'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, editor.text.trim()),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted || updated == null) return;
+    if (updated.isEmpty || updated == initial.trim()) return;
+    if (updated.length > _maxTextChars) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Message too long. Keep it under $_maxTextChars characters.')),
+      );
+      return;
+    }
+
+    await chatRepository.editMessageById(
+      msg.id,
+      jsonEncode({'type': 'text', 'text': updated}),
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Message updated')),
+    );
+  }
+
+  Future<void> _confirmAndDeleteMessage(String messageId) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Unsend message?'),
+        content: const Text('This removes the message from the chat.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Unsend'),
+          ),
+        ],
+      ),
+    );
+    if (shouldDelete != true) return;
+
+    await chatRepository.deleteMessageById(messageId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Message removed')),
+    );
   }
 
   Future<void> _showMessageActions(_ChatMessage msg) async {
@@ -297,13 +499,22 @@ class _DmChatScreenState extends State<DmChatScreen> {
                 setState(() => _replyPreview = msg.previewText);
               },
             ),
+            if (msg.isMine && msg.payload.type == 'text')
+              ListTile(
+                leading: const Icon(Icons.edit_rounded),
+                title: const Text('Edit'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _editTextMessage(msg);
+                },
+              ),
             if (msg.isMine)
               ListTile(
                 leading: const Icon(Icons.delete_outline_rounded),
                 title: const Text('Unsend'),
                 onTap: () async {
                   Navigator.pop(context);
-                  await chatRepository.deleteMessageById(msg.id);
+                  await _confirmAndDeleteMessage(msg.id);
                 },
               )
             else
@@ -334,24 +545,66 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       stream: _onlineStream,
                       builder: (context, snapshot) {
                         return _TopBar(
-                          title: widget.otherName,
+                          title: _otherProfile?.displayName.isNotEmpty == true
+                              ? _otherProfile!.displayName
+                              : widget.otherName,
+                          username: _otherProfile?.username,
+                          avatarUrl: _otherProfile?.avatarUrl,
                           showOnlineIndicator: snapshot.data == true,
                           onBack: () => Navigator.pop(context),
+                          onProfileTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ProfileScreen(userId: widget.otherId),
+                              ),
+                            );
+                          },
                           onCall: _toggleVoiceCall,
+                          onToggleSearch: () => setState(() => _showSearch = !_showSearch),
                           isInCall: _inVoiceCall,
                           callDuration: _callElapsedSeconds,
                         );
                       },
                     )
                   : _TopBar(
-                      title: widget.otherName,
+                      title: _otherProfile?.displayName.isNotEmpty == true
+                          ? _otherProfile!.displayName
+                          : widget.otherName,
+                      username: _otherProfile?.username,
+                      avatarUrl: _otherProfile?.avatarUrl,
                       showOnlineIndicator: false,
                       onBack: () => Navigator.pop(context),
+                      onProfileTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ProfileScreen(userId: widget.otherId),
+                          ),
+                        );
+                      },
                       onCall: _toggleVoiceCall,
+                      onToggleSearch: () => setState(() => _showSearch = !_showSearch),
                       isInCall: _inVoiceCall,
                       callDuration: _callElapsedSeconds,
                     ),
               const SizedBox(height: 8),
+              if (_showSearch)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                  child: Glass(
+                    radius: BorderRadius.circular(12),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    child: TextField(
+                      onChanged: (v) => setState(() => _searchQuery = v.trim().toLowerCase()),
+                      decoration: const InputDecoration(
+                        isDense: true,
+                        border: InputBorder.none,
+                        hintText: 'Search in conversation',
+                      ),
+                    ),
+                  ),
+                ),
               Expanded(
                 child: StreamBuilder<List<Map<String, dynamic>>>(
                     stream: _messagesStream,
@@ -368,13 +621,20 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       }
 
                       final msgs = snapshot.data!;
-                      final hasUnread = msgs.any((m) => m['receiver_id'] == _myUserId && (m['is_read'] != true && m['is_read'] != 1));
+                      final visibleMsgs = _searchQuery.isEmpty
+                          ? msgs
+                          : msgs
+                              .where((m) => (m['content']?.toString().toLowerCase() ?? '').contains(_searchQuery))
+                              .toList();
+                      final hasUnread = visibleMsgs.any((m) => m['receiver_id'] == _myUserId && (m['is_read'] != true && m['is_read'] != 1));
                       if (hasUnread) {
                         _markConversationAsRead();
                       }
-                      if (msgs.isEmpty) {
+                      if (visibleMsgs.isEmpty) {
                         return Center(
-                            child: Text("Say hi to ${widget.otherName}! 👋",
+                            child: Text(_searchQuery.isEmpty
+                                ? "Say hi to ${widget.otherName}! 👋"
+                                : 'No messages match your search',
                                 style: TextStyle(
                                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))));
                       }
@@ -382,9 +642,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       return ListView.builder(
                         controller: _scroll,
                         padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-                        itemCount: msgs.length,
+                        itemCount: visibleMsgs.length,
                         itemBuilder: (context, i) {
-                          final m = msgs[i];
+                          final m = visibleMsgs[i];
                           final senderId = m['sender_id'];
                           final isMe = senderId == _myUserId;
                           final parsed = _ChatMessage.fromRow(m, isMe: isMe);
@@ -392,38 +652,21 @@ class _DmChatScreenState extends State<DmChatScreen> {
                           final created =
                               DateTime.parse(m['created_at']).toLocal();
 
-                          // Time logic can look at previous message
-                          bool showTime = i == 0;
-                          if (i > 0) {
-                            final prev =
-                                DateTime.parse(msgs[i - 1]['created_at'])
-                                    .toLocal();
-                            if (created.difference(prev).inMinutes.abs() > 10) {
-                              showTime = true;
-                            }
-                          }
-
                           return StaggeredIn(
                             index: i,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                if (showTime) ...[
-                                  const SizedBox(height: 6),
-                                  Align(
-                                    alignment: Alignment.center,
-                                    child: _TimeChip(time: _fmtTime(created)),
-                                  ),
-                                  const SizedBox(height: 8),
-                                ],
                                 Align(
                                   alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
                                   child: _Bubble(
                                     text: parsed.previewText,
                                     rawContent: parsed.rawContent,
+                                    time: _fmtTime(created),
                                     isMe: isMe,
                                     isRead: m['is_read'] == true || m['is_read'] == 1,
                                     onLongPress: () => _showMessageActions(parsed),
+                                    onTapFile: _openFileUrl,
                                   ),
                                 ),
                                 const SizedBox(height: 10),
@@ -468,6 +711,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                   _handleVoiceMessageTap();
                 },
                 onSendImage: _pickAndSendImage,
+                onSendFile: _pickAndSendDocument,
                 isRecordingVoiceMessage: _isRecordingVoiceMessage,
                 recordingSeconds: _voiceRecordElapsedSeconds,
               ),
@@ -488,17 +732,25 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
 class _TopBar extends StatelessWidget {
   final String title;
+  final String? username;
+  final String? avatarUrl;
   final bool showOnlineIndicator;
   final VoidCallback onBack;
+  final VoidCallback onProfileTap;
   final VoidCallback onCall;
+  final VoidCallback onToggleSearch;
   final bool isInCall;
   final int callDuration;
 
   const _TopBar({
     required this.title,
+    required this.username,
+    required this.avatarUrl,
     required this.showOnlineIndicator,
     required this.onBack,
+    required this.onProfileTap,
     required this.onCall,
+    required this.onToggleSearch,
     required this.isInCall,
     required this.callDuration,
   });
@@ -512,28 +764,63 @@ class _TopBar extends StatelessWidget {
           _IconGlass(icon: Icons.arrow_back_ios_new_rounded, onTap: onBack),
           const SizedBox(width: 10),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                if (isInCall)
-                  Text(
-                    'In call ${_fmtCallDuration(callDuration)}',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: onProfileTap,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                      foregroundColor: Theme.of(context).colorScheme.onSurface,
+                      backgroundImage:
+                          (avatarUrl != null && avatarUrl!.trim().isNotEmpty)
+                              ? NetworkImage(avatarUrl!)
+                              : null,
+                      child: (avatarUrl == null || avatarUrl!.trim().isEmpty)
+                          ? const Icon(Icons.person_rounded, size: 16)
+                          : null,
                     ),
-                  ),
-              ],
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          Text(
+                            isInCall
+                                ? 'In call ${_fmtCallDuration(callDuration)}'
+                                : showOnlineIndicator
+                                    ? '● Active now'
+                                    : '@${(username == null || username!.isEmpty) ? title : username}',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: isInCall
+                                  ? Theme.of(context).colorScheme.primary
+                                  : showOnlineIndicator
+                                      ? const Color(0xFF58F7B6)
+                                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.68),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           if (showOnlineIndicator)
@@ -551,6 +838,8 @@ class _TopBar extends StatelessWidget {
               ),
             ),
           const SizedBox(width: 10),
+          _IconGlass(icon: Icons.search_rounded, onTap: onToggleSearch),
+          const SizedBox(width: 8),
           _IconGlass(
             icon: isInCall ? Icons.call_end_rounded : Icons.call_rounded,
             onTap: onCall,
@@ -567,40 +856,23 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-class _TimeChip extends StatelessWidget {
-  final String time;
-  const _TimeChip({required this.time});
-
-  @override
-  Widget build(BuildContext context) {
-    return Glass(
-      radius: BorderRadius.circular(999),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: Text(
-        time,
-        style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
-        ),
-      ),
-    );
-  }
-}
-
 class _Bubble extends StatelessWidget {
   final String text;
   final String rawContent;
+  final String time;
   final bool isMe;
   final bool isRead;
   final VoidCallback? onLongPress;
+  final ValueChanged<String>? onTapFile;
 
   const _Bubble({
     required this.text,
     required this.rawContent,
+    required this.time,
     required this.isMe,
     required this.isRead,
     this.onLongPress,
+    this.onTapFile,
   });
 
   @override
@@ -618,12 +890,14 @@ class _Bubble extends StatelessWidget {
     final isImage = parsed.type == 'image';
     final imageUrl = parsed.url;
     final isVoice = parsed.type == 'voice';
+    final isFile = parsed.type == 'file';
 
     return Column(
       crossAxisAlignment: align,
       children: [
         GestureDetector(
           onLongPress: onLongPress,
+          onTap: isFile && parsed.url != null ? () => onTapFile?.call(parsed.url!) : null,
           child: Container(
           constraints: const BoxConstraints(maxWidth: 320),
           padding: EdgeInsets.symmetric(
@@ -674,20 +948,65 @@ class _Bubble extends StatelessWidget {
                         ),
                       ],
                     )
-              : Text(
-                  text,
-                  style: TextStyle(
-                    color: scheme.onSurface.withValues(alpha: 0.92),
-                    fontWeight: FontWeight.w700,
-                    height: 1.25,
-                    fontSize: 14.5,
-                  ),
-                ),
+                  : isFile
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.description_rounded, color: scheme.primary),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    parsed.fileName ?? 'Document',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: scheme.onSurface.withValues(alpha: 0.92),
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                  if (parsed.sizeBytes != null)
+                                    Text(
+                                      _formatBytes(parsed.sizeBytes!),
+                                      style: TextStyle(
+                                        color: scheme.onSurface.withValues(alpha: 0.66),
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
+                      : Text(
+                          text,
+                          style: TextStyle(
+                            color: scheme.onSurface.withValues(alpha: 0.92),
+                            fontWeight: FontWeight.w700,
+                            height: 1.25,
+                            fontSize: 14.5,
+                          ),
+                        ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 4, right: isMe ? 4 : 0, left: isMe ? 0 : 4),
+          child: Text(
+            time,
+            style: TextStyle(
+              color: scheme.onSurface.withValues(alpha: 0.55),
+              fontSize: 10.5,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
         if (isMe)
           Padding(
-            padding: const EdgeInsets.only(top: 4, right: 4),
+            padding: const EdgeInsets.only(top: 2, right: 4),
             child: Icon(
               isRead ? Icons.done_all_rounded : Icons.done_rounded,
               size: 14,
@@ -695,6 +1014,92 @@ class _Bubble extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+
+
+  String _formatBytes(int bytes) {
+    if (bytes < 1024) return '$bytes B';
+    final kb = bytes / 1024;
+    if (kb < 1024) return '${kb.toStringAsFixed(1)} KB';
+    return '${(kb / 1024).toStringAsFixed(1)} MB';
+  }
+}
+
+class _MessagePayload {
+  final String type;
+  final String? text;
+  final String? url;
+  final String? thumb;
+  final int? duration;
+  final String? fileName;
+  final int? sizeBytes;
+
+  const _MessagePayload({
+    required this.type,
+    this.text,
+    this.url,
+    this.thumb,
+    this.duration,
+    this.fileName,
+    this.sizeBytes,
+  });
+
+  static _MessagePayload parse(String raw) {
+    try {
+      final map = jsonDecode(raw);
+      if (map is Map<String, dynamic>) {
+        return _MessagePayload(
+          type: map['type']?.toString() ?? 'text',
+          text: map['text']?.toString() ?? map['label']?.toString(),
+          url: map['url']?.toString(),
+          thumb: map['thumb']?.toString(),
+          duration: map['duration'] is int ? map['duration'] as int : int.tryParse('${map['duration']}'),
+          fileName: map['name']?.toString(),
+          sizeBytes: map['size'] is int ? map['size'] as int : int.tryParse('${map['size']}'),
+        );
+      }
+    } catch (_) {
+      // legacy plain text fallback
+    }
+    if (raw.startsWith('[img]')) {
+      return _MessagePayload(type: 'image', url: raw.substring(5).trim());
+    }
+    return _MessagePayload(type: 'text', text: raw);
+  }
+}
+
+class _ChatMessage {
+  final String id;
+  final bool isMine;
+  final String previewText;
+  final String rawContent;
+  final _MessagePayload payload;
+
+  const _ChatMessage({
+    required this.id,
+    required this.isMine,
+    required this.previewText,
+    required this.rawContent,
+    required this.payload,
+  });
+
+  factory _ChatMessage.fromRow(Map<String, dynamic> row, {required bool isMe}) {
+    final raw = row['content']?.toString() ?? '';
+    final payload = _MessagePayload.parse(raw);
+    final preview = switch (payload.type) {
+      'image' => 'Photo',
+      'voice' => 'Voice message ${payload.text ?? ''}'.trim(),
+      'file' => payload.fileName?.isNotEmpty == true ? 'Document: ${payload.fileName}' : 'Document',
+      _ => payload.text ?? raw,
+    };
+
+    return _ChatMessage(
+      id: row['id']?.toString() ?? '',
+      isMine: isMe,
+      previewText: preview,
+      rawContent: raw,
+      payload: payload,
     );
   }
 }
@@ -764,6 +1169,7 @@ class _InputBar extends StatelessWidget {
   final VoidCallback onSend;
   final VoidCallback onVoiceMessage;
   final VoidCallback onSendImage;
+  final VoidCallback onSendFile;
   final bool isRecordingVoiceMessage;
   final int recordingSeconds;
 
@@ -772,6 +1178,7 @@ class _InputBar extends StatelessWidget {
     required this.onSend,
     required this.onVoiceMessage,
     required this.onSendImage,
+    required this.onSendFile,
     required this.isRecordingVoiceMessage,
     required this.recordingSeconds,
   });
@@ -844,6 +1251,21 @@ class _InputBar extends StatelessWidget {
                       border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
                     ),
                     child: Icon(Icons.image_rounded, color: scheme.onSurface.withValues(alpha: 0.92)),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  onTap: onSendFile,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: scheme.onSurface.withValues(alpha: 0.10),
+                      border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
+                    ),
+                    child: Icon(Icons.attach_file_rounded, color: scheme.onSurface.withValues(alpha: 0.92)),
                   ),
                 ),
                 const SizedBox(width: 8),

@@ -22,8 +22,6 @@ class _InboxScreenState extends State<InboxScreen> {
   final Set<String> _mutedThreadIds = <String>{};
   bool _showArchivedOnly = false;
 
-  static const String _threadPrefsKey = 'chat_thread_prefs';
-
   @override
   void initState() {
     super.initState();
@@ -65,6 +63,23 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 
+  void _syncServerPrefs(List<Map<String, dynamic>> threads) {
+    for (final t in threads) {
+      final otherId = t['otherId']?.toString();
+      if (otherId == null || otherId.isEmpty) continue;
+
+      if (t['isPinned'] == true) {
+        _pinnedThreadIds.add(otherId);
+      }
+      if (t['isMuted'] == true) {
+        _mutedThreadIds.add(otherId);
+      }
+      if (t['isArchived'] == true) {
+        _archivedThreadIds.add(otherId);
+      }
+    }
+  }
+
   Future<void> _deleteThread(String otherId) async {
     await chatRepository.deleteConversation(otherId);
     if (!mounted) return;
@@ -76,14 +91,13 @@ class _InboxScreenState extends State<InboxScreen> {
       _pinnedThreadIds.remove(otherId);
       _mutedThreadIds.remove(otherId);
     });
-    _saveThreadPrefs();
   }
 
   Future<void> _archiveThread(String otherId) async {
     setState(() {
       _archivedThreadIds.add(otherId);
     });
-    _saveThreadPrefs();
+    await chatRepository.setConversationPreference(otherId, archived: true);
 
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -94,6 +108,7 @@ class _InboxScreenState extends State<InboxScreen> {
           onPressed: () {
             if (!mounted) return;
             setState(() => _archivedThreadIds.remove(otherId));
+            chatRepository.setConversationPreference(otherId, archived: false);
           },
         ),
       ),
@@ -148,7 +163,7 @@ class _InboxScreenState extends State<InboxScreen> {
                       _pinnedThreadIds.add(otherId);
                     }
                   });
-                  _saveThreadPrefs();
+                  chatRepository.setConversationPreference(otherId, pinned: !isPinned);
                 },
               ),
               ListTile(
@@ -163,7 +178,7 @@ class _InboxScreenState extends State<InboxScreen> {
                       _mutedThreadIds.add(otherId);
                     }
                   });
-                  _saveThreadPrefs();
+                  chatRepository.setConversationPreference(otherId, muted: !isMuted);
                 },
               ),
               ListTile(
@@ -291,6 +306,7 @@ class _InboxScreenState extends State<InboxScreen> {
                     }
 
                     final all = snapshot.data ?? [];
+                    _syncServerPrefs(all);
                     final visibleThreads = all.where((t) {
                       final otherId = t['otherId']?.toString();
                       if (otherId == null) return false;
@@ -544,6 +560,10 @@ class _ThreadRow extends StatelessWidget {
                       ),
                       if (pinned)
                         Icon(Icons.push_pin_rounded, size: 14, color: scheme.primary.withValues(alpha: 0.9)),
+                      if (showOnlineIndicator) ...[
+                        const SizedBox(width: 6),
+                        const _ActiveNowPill(),
+                      ],
                       if (muted) ...[
                         const SizedBox(width: 6),
                         Icon(Icons.notifications_off_rounded,
@@ -620,7 +640,20 @@ class _Avatar extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: scheme.onSurface.withValues(alpha: 0.10),
-        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
+        border: Border.all(
+          color: showOnlineIndicator
+              ? const Color(0xFF58F7B6).withValues(alpha: 0.65)
+              : scheme.onSurface.withValues(alpha: 0.16),
+        ),
+        boxShadow: showOnlineIndicator
+            ? [
+                BoxShadow(
+                  color: const Color(0xFF58F7B6).withValues(alpha: 0.35),
+                  blurRadius: 12,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
       ),
       child: Stack(
         children: [
@@ -644,6 +677,37 @@ class _Avatar extends StatelessWidget {
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActiveNowPill extends StatelessWidget {
+  const _ActiveNowPill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: const Color(0xFF58F7B6).withValues(alpha: 0.15),
+        border: Border.all(color: const Color(0xFF58F7B6).withValues(alpha: 0.45)),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.circle, size: 7, color: Color(0xFF58F7B6)),
+          SizedBox(width: 4),
+          Text(
+            'Active',
+            style: TextStyle(
+              color: Color(0xFF58F7B6),
+              fontSize: 9.5,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
         ],
       ),
     );

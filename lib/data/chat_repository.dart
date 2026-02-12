@@ -3,8 +3,10 @@ import 'presence_repository.dart';
 
 class ChatRepository {
   static const int _maxContentChars = 4000;
+  static const int _maxMessagesPerMinute = 20;
 
   final _supabase = Supabase.instance.client;
+  final List<DateTime> _sendTimestamps = [];
 
   String? get currentUserId => _supabase.auth.currentUser?.id;
 
@@ -15,6 +17,13 @@ class ChatRepository {
     if (content.length > _maxContentChars) {
       throw Exception('Message payload exceeds 4000 characters');
     }
+
+    final now = DateTime.now();
+    _sendTimestamps.removeWhere((t) => now.difference(t).inSeconds >= 60);
+    if (_sendTimestamps.length >= _maxMessagesPerMinute) {
+      throw Exception('Rate limit reached. Please wait before sending more messages.');
+    }
+    _sendTimestamps.add(now);
 
     await _supabase.from('messages').insert({
       'sender_id': uid,
@@ -100,6 +109,30 @@ class ChatRepository {
         .eq('sender_id', uid);
   }
 
+  Future<void> setConversationPreference(
+    String otherUserId, {
+    bool? pinned,
+    bool? muted,
+    bool? archived,
+  }) async {
+    final uid = currentUserId;
+    if (uid == null) return;
+
+    final update = <String, dynamic>{
+      if (pinned != null) 'is_pinned': pinned,
+      if (muted != null) 'is_muted': muted,
+      if (archived != null) 'is_archived': archived,
+      'updated_at': DateTime.now().toIso8601String(),
+    };
+    if (update.isEmpty) return;
+
+    await _supabase.from('conversations').upsert({
+      'user_id': uid,
+      'other_user_id': otherUserId,
+      ...update,
+    });
+  }
+
   /// Get Inbox (list of conversations)
   /// Note: Supabase doesn't support grouping in Stream easily, and we don't have a 'conversations' table.
   /// For MVP, we will fetch recent messages and process distinct users locally, OR use Friends list.
@@ -113,6 +146,15 @@ class ChatRepository {
   Future<List<Map<String, dynamic>>> getInboxThreads() async {
     final uid = currentUserId;
     if (uid == null) return [];
+
+    final prefRows = await _supabase
+        .from('conversations')
+        .select('other_user_id,is_pinned,is_muted,is_archived,unread_count,last_message,last_message_at')
+        .eq('user_id', uid);
+    final prefsByOther = <String, Map<String, dynamic>>{
+      for (final r in prefRows)
+        r['other_user_id'].toString(): Map<String, dynamic>.from(r),
+    };
 
     // Fetch last 100 messages involving me
     final response = await _supabase
@@ -134,12 +176,16 @@ class ChatRepository {
       final isRead = msg['is_read'] == true || msg['is_read'] == 1;
 
       if (!threads.containsKey(otherId)) {
+        final pref = prefsByOther[otherId] ?? const <String, dynamic>{};
         final parsed = DateTime.tryParse(msg['created_at']?.toString() ?? '');
         threads[otherId] = {
           'otherId': otherId,
-          'lastMsg': msg['content']?.toString() ?? '',
-          'time': parsed ?? DateTime.now(),
+          'lastMsg': pref['last_message']?.toString() ?? msg['content']?.toString() ?? '',
+          'time': DateTime.tryParse(pref['last_message_at']?.toString() ?? '') ?? parsed ?? DateTime.now(),
           'unreadCount': 0,
+          'isPinned': pref['is_pinned'] == true,
+          'isMuted': pref['is_muted'] == true,
+          'isArchived': pref['is_archived'] == true,
         };
       }
 
@@ -150,7 +196,9 @@ class ChatRepository {
     }
 
     for (final entry in threads.entries) {
-      entry.value['unreadCount'] = unreadByOther[entry.key] ?? 0;
+      final pref = prefsByOther[entry.key] ?? const <String, dynamic>{};
+      entry.value['unreadCount'] =
+          (pref['unread_count'] is int ? pref['unread_count'] as int : null) ?? (unreadByOther[entry.key] ?? 0);
     }
 
     // We need profiles for names
