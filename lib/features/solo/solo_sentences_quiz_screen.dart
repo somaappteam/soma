@@ -448,63 +448,66 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                 ],
               ),
               const SizedBox(height: 18),
-              Glass(
-                radius: BorderRadius.circular(22),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: SizedBox(
-                        height: 10,
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          backgroundColor: scheme.onSurface.withValues(alpha: 0.10),
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Color.lerp(const Color(0xFF33D6FF),
-                                const Color(0xFFFF4BD8), 1.0 - progress)!,
-                          ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: SizedBox(
+                  height: 10,
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: scheme.onSurface.withValues(alpha: 0.10),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Color.lerp(const Color(0xFF33D6FF),
+                          const Color(0xFFFF4BD8), 1.0 - progress)!,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 200),
+                child: Glass(
+                  radius: BorderRadius.circular(22),
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                  child: Column(
+                    children: [
+                      Text(
+                        _prompt.isNotEmpty
+                            ? _prompt
+                            : (q["prompt"]?.toString() ?? ''),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: scheme.onSurface,
+                            fontSize: 22,
+                            height: 1.25,
+                            fontWeight: FontWeight.w900),
+                      ),
+                      if (revealed &&
+                          showReading &&
+                          (q["reading"] as String?)?.trim().isNotEmpty ==
+                              true) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          q["reading"] as String,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: scheme.onSurface.withValues(alpha: 0.55),
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      _prompt.isNotEmpty
-                          ? _prompt
-                          : (q["prompt"]?.toString() ?? ''),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: scheme.onSurface,
-                          fontSize: 22,
-                          height: 1.25,
-                          fontWeight: FontWeight.w900),
-                    ),
-                    if (revealed &&
-                        showReading &&
-                        (q["reading"] as String?)?.trim().isNotEmpty ==
-                            true) ...[
-                      const SizedBox(height: 8),
-                      Text(
-                        q["reading"] as String,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: scheme.onSurface.withValues(alpha: 0.55),
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w600),
-                      ),
+                      ],
+                      if (showTranslation) ...[
+                        const SizedBox(height: 10),
+                        Text(
+                          q["translation"],
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: scheme.onSurface.withValues(alpha: 0.80),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700),
+                        ),
+                      ],
                     ],
-                    if (showTranslation) ...[
-                      const SizedBox(height: 10),
-                      Text(
-                        q["translation"],
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: scheme.onSurface.withValues(alpha: 0.80),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
               ),
               const SizedBox(height: 14),
@@ -518,7 +521,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                 onSpeak: _onSpeakTap,
                 disabled: !revealed,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 48),
               Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
@@ -682,14 +685,14 @@ class _TtsControls extends StatelessWidget {
     return Opacity(
       opacity: opacity,
       child: Glass(
-        radius: BorderRadius.circular(18),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        radius: BorderRadius.circular(16),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         child: Row(
           children: [
             ...rates.map((rate) {
               final selected = rate == selectedRate;
               return Padding(
-                padding: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.only(right: 6),
                 child: _SpeedChip(
                   label: "${rate.toStringAsFixed(rate == 1.0 ? 0 : 2)}x",
                   selected: selected,
@@ -699,12 +702,15 @@ class _TtsControls extends StatelessWidget {
             }),
             const Spacer(),
             InkWell(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               onTap: disabled ? null : onSpeak,
               child: Padding(
-                padding: const EdgeInsets.all(6),
-                child: Icon(Icons.volume_up_rounded,
-                    color: scheme.onSurface.withValues(alpha: 0.9)),
+                padding: const EdgeInsets.all(4),
+                child: Icon(
+                  Icons.volume_up_rounded,
+                  color: scheme.onSurface.withValues(alpha: 0.9),
+                  size: 18,
+                ),
               ),
             ),
           ],
@@ -732,8 +738,8 @@ class _SpeedChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
       child: Container(
-        height: 30,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        height: 24,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
           color: selected
@@ -748,7 +754,7 @@ class _SpeedChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-              color: scheme.onSurface, fontWeight: FontWeight.w800, fontSize: 12),
+              color: scheme.onSurface, fontWeight: FontWeight.w800, fontSize: 11),
         ),
       ),
     );

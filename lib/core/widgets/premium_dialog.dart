@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import '../theme/tokens.dart';
 import 'glass.dart';
 
-class PremiumDialogAction<T> {
+class PremiumDialogAction<ValueType> {
   final String label;
-  final T? value;
+  final ValueType? value;
   final bool isPrimary;
   final bool destructive;
 
@@ -31,6 +31,7 @@ Future<bool?> showPremiumDialog({
     barrierColor: Colors.black.withValues(alpha: 0.55),
     builder: (_) => Dialog(
       backgroundColor: Colors.transparent,
+      elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
       child: Glass(
         radius: BorderRadius.circular(24),
@@ -99,18 +100,19 @@ Future<bool?> showPremiumDialog({
   );
 }
 
-Future<T?> showPremiumChoiceDialog<T>({
+Future<ResultType?> showPremiumChoiceDialog<ResultType>({
   required BuildContext context,
   required String title,
   required String body,
-  required List<PremiumDialogAction<T>> actions,
+  required List<PremiumDialogAction<ResultType>> actions,
 }) {
   final scheme = Theme.of(context).colorScheme;
-  return showDialog<T>(
+  return showDialog<ResultType>(
     context: context,
     barrierColor: Colors.black.withValues(alpha: 0.60),
     builder: (ctx) => Dialog(
       backgroundColor: Colors.transparent,
+      elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
       child: Glass(
         radius: BorderRadius.circular(28),
@@ -144,7 +146,7 @@ Future<T?> showPremiumChoiceDialog<T>({
               alignment: WrapAlignment.end,
               children: actions.map((action) {
                 final foreground = action.destructive
-                    ? scheme.error
+                    ? (action.isPrimary ? scheme.onError : scheme.error)
                     : action.isPrimary
                         ? scheme.onPrimary
                         : scheme.onSurface.withValues(alpha: 0.86);

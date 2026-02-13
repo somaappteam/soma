@@ -7,6 +7,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/theme/motion.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/widgets/glass.dart';
+import '../../core/widgets/premium_dialog.dart';
 import '../../core/widgets/neon_button.dart';
 
 import '../../core/widgets/responsive.dart';
@@ -48,10 +49,10 @@ class LiveQuizScreen extends StatefulWidget {
 }
 
 class _LiveQuizScreenState extends State<LiveQuizScreen> {
-  static const double _leaderChipWidth = 62;
-  static const double _leaderChipHeight = 66;
-  static const double _leaderChipSpacing = 4;
-  static const double _questionCardHeight = 168;
+  static const double _leaderChipWidth = 48;
+  static const double _leaderChipHeight = 58;
+  static const double _leaderChipSpacing = 8;
+
 
   late List<_Question> questions;
   StreamSubscription<Map<String, VoicePresence>>? _voiceSub;
@@ -584,33 +585,17 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
 
     final l10n = AppLocalizations.of(context);
     final isHostUser = isHost;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showPremiumDialog(
       context: context,
-      builder: (ctx) {
-        final scheme = Theme.of(ctx).colorScheme;
-        return AlertDialog(
-          backgroundColor: scheme.surface,
-          title: Text(
-            l10n.circlesLeavePromptTitle,
-            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
-          ),
-          content: Text(
-            isHostUser
-                ? l10n.circlesLeavePromptEndOnly
-                : (isSpectator
-                    ? '${l10n.circlesSpectator} • ${l10n.leave}'
-                    : '${l10n.circlesParticipant} • ${l10n.leave}'),
-            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82)),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: Text(isHostUser ? l10n.circlesEndCircle : l10n.leave),
-            ),
-          ],
-        );
-      },
+      title: l10n.circlesLeavePromptTitle,
+      body: isHostUser
+          ? l10n.circlesLeavePromptEndOnly
+          : (isSpectator
+              ? '${l10n.circlesSpectator} • ${l10n.leave}'
+              : '${l10n.circlesParticipant} • ${l10n.leave}'),
+      cancelText: l10n.cancel,
+      confirmText: isHostUser ? l10n.circlesEndCircle : l10n.leave,
+      destructive: true,
     );
 
     if (confirmed != true) return;
@@ -653,6 +638,8 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+
     if (questions.isEmpty) {
       return Scaffold(
         body: SafeArea(
@@ -667,7 +654,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                     _waitingForHostText,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
+                      color: scheme.onSurface,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
@@ -686,8 +673,11 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     final hasTranslation = q.translation.trim().isNotEmpty;
     final showReadingLine = showReading && q.reading.trim().isNotEmpty && (!hasTranslation || revealed);
     final showTranslationLine = showTranslation && hasTranslation;
+    
+    // Sort leaders for leaderboard
     final sortedLeaders = List<_Leader>.from(leaders)
       ..sort((a, b) => b.score.compareTo(a.score));
+      
     _Leader? meLeader;
     for (final leader in sortedLeaders) {
       if (leader.isMe) {
@@ -695,114 +685,82 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
         break;
       }
     }
+    
     final meKey = _currentUserKey;
     final isLocked = meKey != null && _answersByUser.containsKey(meKey);
     final roleLabel = isHost
         ? l10n.roleHost
         : (isSpectator ? l10n.roleSpectator : l10n.circlesParticipant);
-    final roleIcon = isHost
-        ? Icons.admin_panel_settings_rounded
-        : (isSpectator ? Icons.visibility_rounded : Icons.person_rounded);
 
     return Scaffold(
       body: SafeArea(
-            child: ResponsiveFrame(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-                child: Column(
+        child: ResponsiveFrame(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+            child: Column(
+              children: [
+                // Top Bar
+                Row(
                   children: [
-                  // Top bar (timer + role/score + exit)
-                  Row(
-                    children: [
-                      _TinyGlass(
-                        child: Row(
-                          children: [
-                            const Icon(Icons.timer_rounded, color: Colors.white, size: 18),
-                            const SizedBox(width: 8),
-                            Text(
-                              "0:${t.toString().padLeft(2, "0")}",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ],
-                        ),
+                    _IconGlass(
+                      icon: Icons.close_rounded,
+                      onTap: _confirmExitCircle,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                           Text(
+                            roleLabel,
+                            style: TextStyle(
+                                color: scheme.onSurface.withValues(alpha: 0.7),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          Text(
+                            "Q${qIndex + 1} • 0:${t.toString().padLeft(2, "0")}",
+                            style: TextStyle(
+                                color: scheme.onSurface,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900),
+                          ),
+                        ],
+                       )
+                    ),
+                     _Pill(
+                        text: "$myScore",
+                        icon: Icons.bolt_rounded,
+                        color: const Color(0xFFF9F319),
+                     ),
+                  ],
+                ),
+                
+                const SizedBox(height: 12),
+                
+                 // Timer Bar
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(999),
+                  child: SizedBox(
+                    height: 6,
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: scheme.onSurface.withValues(alpha: 0.10),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color.lerp(const Color(0xFF33D6FF),
+                            const Color(0xFFFF4BD8), 1.0 - progress)!,
                       ),
-                      const SizedBox(width: 10),
-                      _TinyGlass(
-                        child: Row(
-                          children: [
-                            const Icon(Icons.layers_rounded, color: Colors.white, size: 18),
-                            const SizedBox(width: 8),
-                            Text(
-                              "${qIndex + 1}/$totalQuestions",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      _TinyGlass(
-                        child: Row(
-                          children: [
-                            Icon(roleIcon, color: Colors.white, size: 18),
-                            const SizedBox(width: 8),
-                            Text(
-                              roleLabel,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _TinyGlass(
-                          child: canPlay
-                                  ? Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(Icons.bolt_rounded, color: Colors.white, size: 18),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      "$myScore",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                               : _RolePill(
-                                   icon: isHost ? Icons.admin_panel_settings_rounded : Icons.visibility_rounded,
-                                   label: isHost ? l10n.roleHost : l10n.roleSpectator,
-                                 ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      _TinyGlass(
-                        onTap: _confirmExitCircle,
-                        child: const Icon(Icons.close_rounded, color: Colors.white),
-                      ),
-                    ],
+                    ),
                   ),
+                ),
 
-                  const SizedBox(height: 8),
+                const SizedBox(height: 12),
 
-                  // Progress bar
-                  _QuizProgressBar(progress: progress),
-
-                  const SizedBox(height: 8),
-
-
-                  // Leaderboard strip (left->right ranking)
-                  _LiveLeaderboardStrip(
+                // Leaderboard
+                Glass(
+                  radius: BorderRadius.circular(18),
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                  child: _LiveLeaderboardStrip(
                     leaders: sortedLeaders,
                     onAvatarTap: (leader) {
                       if (leader.userId != null) {
@@ -810,81 +768,68 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                       }
                     },
                   ),
+                ),
+                  
+                const SizedBox(height: 12),
 
-                  // Question card
-                  SizedBox(
-                    height: _questionCardHeight,
-                    child: Glass(
-                      radius: BorderRadius.circular(26),
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.liveQuizQuestionCounter(qIndex + 1, totalQuestions),
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.70),
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12,
+                // Question Card (Flexible)
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 200),
+                  child: Glass(
+                    radius: BorderRadius.circular(22),
+                    padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
+                    child: Column(
+                      children: [
+                        if (_isSentenceQuestion(q))
+                            Text(
+                              q.prompt,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: scheme.onSurface,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 20,
+                                height: 1.25,
+                              ),
+                            )
+                          else
+                            _VocabPromptLine(
+                              prompt: q.prompt,
+                              article: q.article,
+                              word: q.word,
+                              gender: q.gender,
                             ),
-                          ),
-                          const SizedBox(height: 10),
-                          Expanded(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (_isSentenceQuestion(q))
-                                    Text(
-                                      q.prompt,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 18,
-                                        height: 1.2,
-                                      ),
-                                    )
-                                  else
-                                    _VocabPromptLine(
-                                      prompt: q.prompt,
-                                      article: q.article,
-                                      word: q.word,
-                                      gender: q.gender,
-                                    ),
-                                  if (showReadingLine) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      q.reading,
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.55),
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ],
-                                  if (showTranslationLine) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      q.translation,
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.75),
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 13.5,
-                                      ),
-                                    ),
-                                  ],
-                                ],
+                          if (showReadingLine) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              q.reading,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: scheme.onSurface.withValues(alpha: 0.55),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                          if (showTranslationLine) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              q.translation,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: scheme.onSurface.withValues(alpha: 0.80),
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                      ],
                     ),
                   ),
+                ),
 
-                  const SizedBox(height: 8),
-                  _TtsControls(
+                const SizedBox(height: 12),
+
+                _TtsControls(
                     rates: const [0.75, 1.0, 1.25],
                     selectedRate: _speechRate,
                     onRateSelected: (rate) {
@@ -894,41 +839,96 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                     onSpeak: () => _onSpeakTap(q),
                     disabled: _isSentenceQuestion(q) && !revealed,
                   ),
-                  const SizedBox(height: 8),
 
-                  // Answers
+                const SizedBox(height: 16),
+                
+                 // Answers
                   Expanded(
                     child: ListView.separated(
-                      physics: const NeverScrollableScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       itemCount: _choices.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (_, i) {
                         final isSelected = selectedIndex == i;
                         final isCorrect = _correctIndex == i;
                         final showCorrect = revealed;
+                        
+                        // Neon styling from Solo layout
+                        Color bg = scheme.onSurface.withValues(alpha: 0.06);
+                        Color border = scheme.onSurface.withValues(alpha: 0.14);
+
+                        if (showCorrect) {
+                           if (isCorrect) {
+                            bg = const Color(0xFF2AFADF).withValues(alpha: 0.14);
+                            border = const Color(0xFF2AFADF).withValues(alpha: 0.85);
+                          } else if (isSelected) {
+                            bg = const Color(0xFFFF4FD8).withValues(alpha: 0.12);
+                            border = const Color(0xFFFF4FD8).withValues(alpha: 0.85);
+                          }
+                        } else {
+                           if (isSelected) {
+                            bg = scheme.onSurface.withValues(alpha: 0.12);
+                            border = scheme.onSurface.withValues(alpha: 0.28);
+                          }
+                        }
 
                         return StaggeredIn(
                           index: i,
-                          child: _AnswerTile(
-                            text: _choices[i],
-                            isSelected: isSelected,
-                            disabled: !canPlay || isLocked,
-                            state: !showCorrect
-                                ? _AnswerState.normal
-                                : (isCorrect
-                                    ? _AnswerState.correct
-                                    : (isSelected ? _AnswerState.wrong : _AnswerState.normal)),
-                            onTap: canPlay ? () => _select(i) : null,
+                          child: PressableScale(
+                            onTap: (canPlay && !isLocked && !revealed) ? () => _select(i) : null,
+                            child: AnimatedScale(
+                              scale: showCorrect && isCorrect ? 1.02 : 1,
+                              duration: MotionTokens.short,
+                              curve: MotionTokens.standardCurve,
+                              child: AnimatedContainer(
+                                duration: MotionTokens.short,
+                                curve: MotionTokens.standardCurve,
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  color: bg,
+                                  border: Border.all(color: border),
+                                  boxShadow: showCorrect && isCorrect
+                                      ? [
+                                          BoxShadow(
+                                            color: const Color(0xFF2AFADF).withValues(alpha: 0.35),
+                                            blurRadius: 16,
+                                            spreadRadius: 1,
+                                          ),
+                                        ]
+                                      : [],
+                                ),
+                                child: Row(
+                                  children: [
+                                     Expanded(
+                                      child: Text(
+                                        _choices[i],
+                                        style: TextStyle(
+                                            color: scheme.onSurface.withValues(alpha: 0.92),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w800),
+                                      ),
+                                    ),
+                                    if (showCorrect && isCorrect) ...[
+                                      const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
+                                      const SizedBox(width: 6),
+                                      const RewardSparkle(show: true),
+                                    ] else if (showCorrect && isSelected && !isCorrect)
+                                      const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8))
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
                         );
                       },
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // CTA
-                  if (isSpectator) ...[
+                // CTA (Spectator Join / Bottom Bar)
+                if (isSpectator) ...[
                     NeonButton(
                       label: _joinRequested ? l10n.liveQuizRequestSent : l10n.liveQuizRequestToJoin,
                       onTap: canRequestJoin ? _requestJoin : null,
@@ -937,23 +937,24 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                     _SpectatorFooter(),
                   ],
 
-                  const SizedBox(height: 12),
-                  Glass(
-                    radius: BorderRadius.circular(18),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                    child: _BottomActionBar(
-                      isMuted: meLeader?.isMuted ?? false,
-                      isSpeaking: meLeader?.isSpeaking ?? false,
-                      readingEnabled: showReading,
-                      onToggleMute: canPlay ? () => _toggleMuteFor(meLeader?.name ?? '') : null,
-                      onOpenChat: _openChatSheet,
-                      onToggleReading: () => setState(() => showReading = !showReading),
-                    ),
-                  ),
-                  ],
-                ),
-              ),
+                  if (!isSpectator) ...[
+                       Glass(
+                        radius: BorderRadius.circular(18),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        child: _BottomActionBar(
+                          isMuted: meLeader?.isMuted ?? false,
+                          isSpeaking: meLeader?.isSpeaking ?? false,
+                          readingEnabled: showReading,
+                          onToggleMute: canPlay ? () => _toggleMuteFor(meLeader?.name ?? '') : null,
+                          onOpenChat: _openChatSheet,
+                          onToggleReading: () => setState(() => showReading = !showReading),
+                        ),
+                      ),
+                  ]
+              ],
             ),
+          ),
+        ),
       ),
     );
   }
@@ -992,28 +993,30 @@ class _LiveLeaderboardStrip extends StatelessWidget {
     }
 
     final totalWidth =
-        (leaders.length * (_LiveQuizScreenState._leaderChipWidth + _LiveQuizScreenState._leaderChipSpacing)) -
-            _LiveQuizScreenState._leaderChipSpacing;
+        (leaders.length * (_LiveQuizScreenState._leaderChipWidth + _LiveQuizScreenState._leaderChipSpacing)) + 16;
 
-    return Glass(
-      radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(6, 4, 6, 4),
+    return SizedBox(
+      height: _LiveQuizScreenState._leaderChipHeight,
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
         child: SizedBox(
-          width: totalWidth,
-          height: _LiveQuizScreenState._leaderChipHeight,
+          width: max(MediaQuery.of(context).size.width, totalWidth),
           child: Stack(
+            clipBehavior: Clip.none,
             children: leaders.asMap().entries.map((entry) {
               final index = entry.key;
               final leader = entry.value;
+              // Center the strip if items are few
+              final startOffset = max(0.0, (MediaQuery.of(context).size.width - totalWidth) / 2) + 16;
+
               return AnimatedPositioned(
                 key: ValueKey('strip-${leader.userId ?? leader.name}'),
                 duration: MotionTokens.medium,
                 curve: MotionTokens.movementCurve,
-                left: index * (_LiveQuizScreenState._leaderChipWidth + _LiveQuizScreenState._leaderChipSpacing),
+                left: startOffset + (index * (_LiveQuizScreenState._leaderChipWidth + _LiveQuizScreenState._leaderChipSpacing)),
                 top: 0,
-                child: _LiveLeaderChip(
+                child: _CompactLeaderChip(
                   rank: index + 1,
                   leader: leader,
                   onTap: onAvatarTap == null ? null : () => onAvatarTap!(leader),
@@ -1027,70 +1030,102 @@ class _LiveLeaderboardStrip extends StatelessWidget {
   }
 }
 
-class _LiveLeaderChip extends StatelessWidget {
+class _CompactLeaderChip extends StatelessWidget {
   final int rank;
   final _Leader leader;
   final VoidCallback? onTap;
 
-  const _LiveLeaderChip({required this.rank, required this.leader, this.onTap});
+  const _CompactLeaderChip({required this.rank, required this.leader, this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    final scoreColor = rank == 1
-        ? const Color(0xFFF9F319)
-        : rank <= 3
-            ? const Color(0xFFB8FF62)
-            : Colors.white.withValues(alpha: 0.9);
     final borderColor = leader.isMe
-        ? Colors.white.withValues(alpha: 0.4)
-        : Colors.white.withValues(alpha: 0.16);
+        ? const Color(0xFF33D6FF)
+        : Colors.white.withValues(alpha: 0.2);
+    
+    Color? statusColor;
+    IconData? statusIcon;
+    
+    if (leader.lastAnswer == LeaderboardAnswer.correct) {
+      statusColor = const Color(0xFF2AFADF);
+      statusIcon = Icons.check;
+    } else if (leader.lastAnswer == LeaderboardAnswer.wrong) {
+      statusColor = const Color(0xFFFF4FD8);
+      statusIcon = Icons.close;
+    }
 
     return SizedBox(
       width: _LiveQuizScreenState._leaderChipWidth,
       child: PressableScale(
         onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: borderColor),
-            color: leader.isMe
-                ? Colors.white.withValues(alpha: 0.10)
-                : Colors.white.withValues(alpha: 0.05),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _AvatarBubble(
-                name: leader.name,
-                heroTag: leader.userId == null ? null : "profile-avatar-${leader.userId}",
-                muted: leader.isMuted,
-                speaking: leader.isSpeaking,
-                avatarUrl: leader.avatarUrl,
-                size: 26,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 36,
+              height: 36,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: borderColor, width: 1.5),
+                      boxShadow: leader.isMe ? [
+                        BoxShadow(
+                          color: const Color(0xFF33D6FF).withValues(alpha: 0.3),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        )
+                      ] : null,
+                    ),
+                    child: _AvatarBubble(
+                      name: leader.name,
+                      heroTag: leader.userId == null ? null : "profile-avatar-${leader.userId}",
+                      muted: leader.isMuted,
+                      speaking: leader.isSpeaking,
+                      avatarUrl: leader.avatarUrl,
+                      size: 32,
+                    ),
+                  ),
+                  if (statusColor != null)
+                    Positioned(
+                      right: -2,
+                      bottom: -2,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.black, width: 1.5),
+                        ),
+                        child: Icon(statusIcon, size: 10, color: Colors.black),
+                      ),
+                    ),
+                ],
               ),
-              const SizedBox(height: 2),
-              Text(
-                leader.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 9,
-                ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              leader.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: leader.isMe ? const Color(0xFF33D6FF) : Colors.white.withValues(alpha: 0.9),
+                fontWeight: leader.isMe ? FontWeight.w800 : FontWeight.w600,
+                fontSize: 9,
               ),
-              const SizedBox(height: 1),
-              Text(
+            ),
+             Text(
                 '${leader.score}',
-                style: TextStyle(
-                  color: scoreColor,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 12,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 8,
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -1366,93 +1401,7 @@ class _QuizProgressBar extends StatelessWidget {
 
 enum _AnswerState { normal, correct, wrong }
 
-class _AnswerTile extends StatelessWidget {
-  final String text;
-  final bool isSelected;
-  final bool disabled;
-  final _AnswerState state;
-  final VoidCallback? onTap;
 
-  const _AnswerTile({
-    required this.text,
-    required this.isSelected,
-    this.disabled = false,
-    required this.state,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final baseBorder = Colors.white.withValues(alpha: 0.14);
-
-    Color bg = Colors.black.withValues(alpha: 0.14);
-    Color border = baseBorder;
-
-    if (isSelected) {
-      border = Colors.white.withValues(alpha: 0.30);
-      bg = Colors.black.withValues(alpha: 0.18);
-    }
-    if (state == _AnswerState.correct) {
-      border = const Color(0xFF2AFADF).withValues(alpha: 0.85);
-      bg = const Color(0xFF2AFADF).withValues(alpha: 0.14);
-    } else if (state == _AnswerState.wrong) {
-      border = const Color(0xFFFF4FD8).withValues(alpha: 0.85);
-      bg = const Color(0xFFFF4FD8).withValues(alpha: 0.12);
-    }
-
-    final textColor = disabled ? Colors.white.withValues(alpha: 0.65) : Colors.white;
-    return PressableScale(
-      onTap: onTap,
-      child: AnimatedScale(
-        scale: state == _AnswerState.correct ? 1.02 : 1,
-        duration: MotionTokens.short,
-        curve: MotionTokens.standardCurve,
-        child: AnimatedContainer(
-          duration: MotionTokens.short,
-          curve: MotionTokens.standardCurve,
-          height: 62,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: bg,
-            border: Border.all(color: border),
-            boxShadow: state == _AnswerState.correct
-                ? [
-                    BoxShadow(
-                      color: const Color(0xFF2AFADF).withValues(alpha: 0.20),
-                      blurRadius: 12,
-                      spreadRadius: 0,
-                    ),
-                  ]
-                : [],
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  text,
-                  style: TextStyle(
-                    color: textColor,
-                    fontWeight: FontWeight.w900,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-              if (state == _AnswerState.correct) ...[
-                const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
-                const SizedBox(width: 6),
-                const RewardSparkle(show: true),
-              ] else if (state == _AnswerState.wrong)
-                const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8))
-              else
-                Icon(Icons.circle_outlined, color: Colors.white.withValues(alpha: 0.22)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 class _Question {
   final String prompt;
@@ -1503,14 +1452,14 @@ class _TtsControls extends StatelessWidget {
     return Opacity(
       opacity: opacity,
       child: Glass(
-        radius: BorderRadius.circular(18),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        radius: BorderRadius.circular(16),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         child: Row(
           children: [
             ...rates.map((rate) {
               final selected = rate == selectedRate;
               return Padding(
-                padding: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.only(right: 6),
                 child: _SpeedChip(
                   label: "${rate.toStringAsFixed(rate == 1.0 ? 0 : 2)}x",
                   selected: selected,
@@ -1520,11 +1469,15 @@ class _TtsControls extends StatelessWidget {
             }),
             const Spacer(),
             InkWell(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
               onTap: disabled ? null : onSpeak,
               child: Padding(
-                padding: const EdgeInsets.all(6),
-                child: Icon(Icons.volume_up_rounded, color: Colors.white.withValues(alpha: 0.9)),
+                padding: const EdgeInsets.all(4),
+                child: Icon(
+                  Icons.volume_up_rounded, 
+                  color: Colors.white.withValues(alpha: 0.9),
+                  size: 18,
+                ),
               ),
             ),
           ],
@@ -1551,8 +1504,8 @@ class _SpeedChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
       child: Container(
-        height: 30,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        height: 24,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
           color: selected ? Colors.white.withValues(alpha: 0.16) : Colors.white.withValues(alpha: 0.08),
@@ -1561,7 +1514,7 @@ class _SpeedChip extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           label,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 12),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 11),
         ),
       ),
     );
@@ -1728,6 +1681,66 @@ class _Leader {
       lastAnswer: lastAnswer ?? this.lastAnswer,
       userId: userId ?? this.userId,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+    );
+  }
+}
+
+class _Pill extends StatelessWidget {
+  final String text;
+  final IconData icon;
+  final Color? color;
+
+  const _Pill({
+    required this.text,
+    required this.icon,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color ?? Colors.white.withValues(alpha: 0.9)),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: TextStyle(
+              color: color ?? Colors.white,
+              fontWeight: FontWeight.w800,
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _IconGlass extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const _IconGlass({required this.icon, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Glass(
+        radius: BorderRadius.circular(16),
+        padding: const EdgeInsets.all(10),
+        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),
+      ),
     );
   }
 }

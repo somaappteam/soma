@@ -1,0 +1,27 @@
+--- COMPREHENSIVE SCHEMA AUDIT ---
+
+[Circles]
+Existing columns: [id, host_id, name, from_lang, to_lang, mode, level, max_players, questions_count, time_per_q, allow_spectators, status, created_at, questions]
+✅ from_lang present
+✅ to_lang present
+✅ mode present
+✅ level present
+✅ questions_count present
+❌ is_locked MISSING
+
+[Circle Participants]
+✅ role present
+✅ is_ready present
+✅ score present
+✅ joined_at present
+
+[chat_messages]
+✅ Table exists
+
+[live_quiz_questions]
+✅ Table exists
+
+[live_quiz_answers]
+✅ Table exists
+
+--- END AUDIT ---

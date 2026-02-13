@@ -628,18 +628,18 @@ class _SegmentedChoice extends StatelessWidget {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(999),
                       color: selected
-                          ? scheme.primary.withValues(alpha: 0.15)
+                          ? const Color(0xFF3A3568)
                           : scheme.onSurface.withValues(alpha: 0.1),
                       border: Border.all(
                         color: selected
-                            ? scheme.primary.withValues(alpha: 0.5)
+                            ? const Color(0xFF6B5CFF)
                             : scheme.onSurface.withValues(alpha: 0.15),
                       ),
                     ),
                     child: Text(
                       options[i].label,
                       style: TextStyle(
-                        color: selected ? scheme.primary : scheme.onSurface,
+                        color: selected ? const Color(0xFF36F4E8) : scheme.onSurface,
                         fontWeight: FontWeight.w900,
                         fontSize: 12.5,
                       ),

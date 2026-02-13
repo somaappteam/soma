@@ -1,0 +1,470 @@
+﻿Resolving dependencies...
+Downloading packages...
+  app_links 6.4.1 (7.0.0 available)
+  characters 1.4.0 (1.4.1 available)
+  csv 6.0.0 (7.1.0 available)
+  ffi 2.1.5 (2.2.0 available)
+  flutter_markdown 0.7.7+1 (discontinued replaced by flutter_markdown_plus)
+  local_auth 2.3.0 (3.0.0 available)
+  local_auth_android 1.0.56 (2.0.4 available)
+  local_auth_darwin 1.6.1 (2.0.2 available)
+  local_auth_windows 1.0.11 (2.0.1 available)
+  matcher 0.12.17 (0.12.18 available)
+  material_color_utilities 0.11.1 (0.13.0 available)
+  meta 1.17.0 (1.18.1 available)
+  share_plus 10.1.4 (12.0.1 available)
+  share_plus_platform_interface 5.0.2 (6.1.0 available)
+  sqlite3 3.1.4 (3.1.5 available)
+  test_api 0.7.7 (0.7.9 available)
+  url_launcher_ios 6.3.6 (6.4.0 available)
+Got dependencies!
+1 package is discontinued.
+16 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Analyzing soma app...                                           
+
+warning - This default clause is covered by the previous cases - lib\core\services\theme_mode_controller.dart:53:7 - unreachable_switch_default
+   info - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:66:7 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:71:7 - deprecated_member_use
+   info - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:97:34 - deprecated_member_use
+   info - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:108:7 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:112:7 - deprecated_member_use
+   info - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:133:34 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:205:48 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:207:25 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:353:27 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\core\theme\app_theme.dart:354:30 - deprecated_member_use
+   info - The type parameter name 'T' matches a visible type name - lib\core\theme\app_theme.dart:365:27 - avoid_types_as_parameter_names
+   info - Unnecessary braces in a string interpolation - lib\features\circles\circle_lobby_screen.dart:340:25 - unnecessary_brace_in_string_interps
+   info - Unnecessary braces in a string interpolation - lib\features\circles\circle_lobby_screen.dart:340:43 - unnecessary_brace_in_string_interps
+warning - The declaration '_cleanupGhostCircles' isn't referenced - lib\features\circles\circles_screen.dart:49:16 - unused_element
+warning - Unused import: 'dart:math' - lib\features\circles\live_quiz_screen.dart:2:8 - unused_import
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\features\home\home_screen.dart:195:37 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\features\home\home_screen.dart:213:58 - deprecated_member_use
+warning - The value of the local variable 'scheme' isn't used - lib\features\home\home_screen.dart:720:11 - unused_local_variable
+warning - The declaration '_showInfo' isn't referenced - lib\features\profile\privacy_settings_screen.dart:251:8 - unused_element
+   info - Don't use 'BuildContext's across async gaps - lib\features\profile\privacy_settings_screen.dart:270:22 - use_build_context_synchronously
+   info - 'background' is deprecated and shouldn't be used. Use surface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\features\profile\profile_screen.dart:341:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\sentences_fill_blank_screen.dart:104:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\sentences_fill_blank_screen.dart:108:29 - deprecated_member_use
+   info - Unnecessary braces in a string interpolation - lib\features\solo\solo_result_screen.dart:82:45 - unnecessary_brace_in_string_interps
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:5:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:27:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:28:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:32:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:35:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:40:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:41:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:42:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:43:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:44:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:47:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:50:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:51:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:52:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:53:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\add_questions_column.dart:54:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_migration_20260301.dart:8:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_migration_20260301.dart:12:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_migration_20260301.dart:15:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_migration_20260301.dart:28:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_migration_20260301.dart:33:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_migration_20260301.dart:35:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:5:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:19:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:26:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:29:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:37:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:39:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:43:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:44:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:49:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:51:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:52:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\apply_questions_migration.dart:53:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_comprehensive.dart:13:5 - avoid_print
+warning - Unnecessary cast - scripts\audit_schema_comprehensive.dart:24:21 - unnecessary_cast
+   info - Statements in an if should be enclosed in a block - scripts\audit_schema_comprehensive.dart:28:33 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - scripts\audit_schema_comprehensive.dart:29:14 - curly_braces_in_flow_control_structures
+warning - Unnecessary cast - scripts\audit_schema_comprehensive.dart:51:35 - unnecessary_cast
+   info - Statements in an if should be enclosed in a block - scripts\audit_schema_comprehensive.dart:55:33 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - scripts\audit_schema_comprehensive.dart:56:14 - curly_braces_in_flow_control_structures
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:13:3 - avoid_print
+warning - Unnecessary cast - scripts\audit_schema_rest.dart:17:21 - unnecessary_cast
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:18:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:22:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:24:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:27:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:28:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:31:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:33:10 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:37:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:41:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:44:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:46:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:50:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:53:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:55:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\audit_schema_rest.dart:58:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\capture_error.dart:10:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\capture_error.dart:12:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\capture_error.dart:14:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:14:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:23:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:27:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:28:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:29:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:30:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:31:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:32:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:36:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:37:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:40:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:42:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_circle_questions.dart:46:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_columns.dart:12:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_columns.dart:17:5 - avoid_print
+warning - Unnecessary cast - scripts\check_columns_onebyone.dart:21:37 - unnecessary_cast
+   info - Don't invoke 'print' in production code - scripts\check_columns_onebyone.dart:31:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_courses.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_courses.dart:14:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_courses.dart:16:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_courses.dart:19:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:14:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:19:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:23:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_data_integrity.dart:25:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:18:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:30:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:38:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:40:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_local_db.dart:45:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:11:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:32:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:50:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:51:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:53:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:56:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:57:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:59:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:62:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:66:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:67:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:72:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:74:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:80:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:82:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:85:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_migration_status.dart:86:3 - avoid_print
+warning - Unused import: 'dart:io' - scripts\check_realtime.dart:3:8 - unused_import
+   info - Don't invoke 'print' in production code - scripts\check_realtime.dart:11:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_realtime.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_realtime.dart:18:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_realtime.dart:22:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_realtime.dart:24:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:24:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:26:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:29:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:32:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_schema_questions.dart:34:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_supabase_vocabulary.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_supabase_vocabulary.dart:15:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_supabase_vocabulary.dart:18:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_supabase_vocabulary.dart:22:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\check_supabase_vocabulary.dart:25:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:39:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:42:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:44:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:51:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:53:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\cleanup_ghosts.dart:57:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:23:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:32:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:34:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:37:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\close_all_circles.dart:40:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\count_supabase_rows.dart:12:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\count_supabase_rows.dart:16:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\count_supabase_rows.dart:18:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:8:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:12:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:15:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:29:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:35:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\db_migration_direct.dart:37:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:5:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:11:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:21:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:25:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:26:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:27:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:30:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:33:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:35:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:37:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:39:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:42:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_circle_data.dart:46:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:20:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:25:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:26:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:27:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:31:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:33:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:35:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:38:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:39:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_latest_circle.dart:43:5 - avoid_print
+warning - Unused import: 'dart:io' - scripts\debug_settings.dart:3:8 - unused_import
+   info - Don't invoke 'print' in production code - scripts\debug_settings.dart:11:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_settings.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_settings.dart:18:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_settings.dart:24:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\debug_settings.dart:26:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\deep_audit_supabase.dart:13:5 - avoid_print
+warning - Unnecessary cast - scripts\deep_audit_supabase.dart:49:23 - unnecessary_cast
+   info - Statements in an if should be enclosed in a block - scripts\deep_audit_supabase.dart:51:35 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - scripts\deep_audit_supabase.dart:52:16 - curly_braces_in_flow_control_structures
+warning - Unused import: 'dart:io' - scripts\enable_realtime.dart:3:8 - unused_import
+   info - Don't invoke 'print' in production code - scripts\enable_realtime.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\enable_realtime.dart:24:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\enable_realtime.dart:26:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\enable_realtime.dart:28:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\enable_realtime.dart:37:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\enable_realtime.dart:39:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\enable_realtime.dart:45:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:7:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:13:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:17:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:20:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:32:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:34:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\exec_sql_direct.dart:36:5 - avoid_print
+warning - Unused import: 'dart:io' - scripts\final_wiring_check.dart:3:8 - unused_import
+   info - Don't invoke 'print' in production code - scripts\final_wiring_check.dart:11:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\final_wiring_check.dart:26:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\final_wiring_check.dart:28:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\fix_imports.dart:32:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\fix_imports.dart:37:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:18:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:22:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:25:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:74:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:81:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:85:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:88:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:137:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:144:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\import_data.dart:152:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:14:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:16:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:19:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:22:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:26:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:28:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:31:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:34:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:38:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_columns.dart:41:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_full_schema.dart:16:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_full_schema.dart:42:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_full_schema.dart:49:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_schema.dart:22:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_schema.dart:25:13 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_schema.dart:27:13 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_schema.dart:31:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\inspect_schema.dart:34:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_alignment_via_rpc.dart:13:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_alignment_via_rpc.dart:18:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_alignment_via_rpc.dart:25:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_alignment_via_rpc.dart:27:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_alignment_via_rpc.dart:28:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_alignment_via_rpc.dart:31:8 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_alignment_via_rpc.dart:33:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:18:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:19:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:26:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:30:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:33:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:85:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:92:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:96:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:99:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:150:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:157:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:167:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:169:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:181:11 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:182:11 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\migrate_assets.dart:186:5 - avoid_print
+warning - Unused import: 'dart:io' - scripts\probe_db_conn.dart:3:8 - unused_import
+   info - Don't invoke 'print' in production code - scripts\probe_db_conn.dart:30:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\probe_db_conn.dart:42:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\probe_db_conn.dart:46:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\probe_rls_anon.dart:10:3 - avoid_print
+warning - The value of the local variable 'res' isn't used - scripts\probe_rls_anon.dart:16:13 - unused_local_variable
+   info - Don't invoke 'print' in production code - scripts\probe_rls_anon.dart:17:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\probe_rls_anon.dart:19:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\probe_rls_anon.dart:29:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\probe_rls_anon.dart:31:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\probe_rls_anon.dart:34:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\safe_audit.dart:18:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\safe_audit.dart:24:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\safe_audit.dart:26:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\safe_audit.dart:30:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_course_id_parsing.dart:19:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_course_id_parsing.dart:22:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_course_id_parsing.dart:24:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_db_conn.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_db_conn.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_db_conn.dart:18:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_db_conn.dart:21:5 - avoid_print
+warning - Unused import: 'dart:io' - scripts\test_direct_conn.dart:3:8 - unused_import
+   info - Don't invoke 'print' in production code - scripts\test_direct_conn.dart:14:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_direct_conn.dart:17:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_direct_conn.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_insert.dart:16:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_insert.dart:18:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_insert_minimal.dart:14:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_insert_minimal.dart:16:5 - avoid_print
+warning - Unused import: 'dart:io' - scripts\test_ip_conn.dart:3:8 - unused_import
+   info - Don't invoke 'print' in production code - scripts\test_ip_conn.dart:16:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_ip_conn.dart:19:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_ip_conn.dart:22:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:27:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:29:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:33:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:37:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\test_vocabulary_insert.dart:40:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:12:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:17:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:73:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:78:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:80:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upgrade_local_db.dart:85:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:21:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:23:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:30:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:34:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:37:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:42:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:46:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:49:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:52:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:75:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:81:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:85:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:88:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:93:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:97:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:100:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:103:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\upload_csv_to_supabase.dart:125:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_migration.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_migration.dart:14:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_migration_simple.dart:16:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_migration_simple.dart:17:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:6:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:11:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:20:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:27:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:34:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:42:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:43:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:47:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:50:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:51:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:52:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:53:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:54:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:55:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:56:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_questions_column.dart:57:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:9:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:13:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:16:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:18:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:21:8 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:24:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:29:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:32:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:34:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:36:8 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_rls.dart:39:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:10:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:19:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:23:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:26:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:29:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:31:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:37:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:44:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:66:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:73:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:82:8 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_schema.dart:85:8 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:13:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:24:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:39:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:41:9 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:44:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:48:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:51:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:54:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:56:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:59:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:62:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:66:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:68:5 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:71:3 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:90:7 - avoid_print
+   info - Don't invoke 'print' in production code - scripts\verify_sync.dart:92:7 - avoid_print
+   info - Don't invoke 'print' in production code - temp_migration\main.dart:11:7 - avoid_print
+   info - Don't invoke 'print' in production code - temp_migration\main.dart:15:5 - avoid_print
+   info - Don't invoke 'print' in production code - temp_migration\main.dart:18:5 - avoid_print
+   info - Don't invoke 'print' in production code - temp_migration\main.dart:31:7 - avoid_print
+   info - Don't invoke 'print' in production code - temp_migration\main.dart:33:7 - avoid_print
+   info - Don't invoke 'print' in production code - temp_migration\main.dart:35:7 - avoid_print
+   info - Don't invoke 'print' in production code - temp_migration\main.dart:42:5 - avoid_print
+
+flutter : 423 
+issues found. (ran 
+in 6.4s)
+At line:1 char:1
++ flutter analyze > 
+analyze_output.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo  
+            : NotS  
+  pecified: (423    
+ issues found. (    
+ran in 6.4s):St    
+ring) [], Remot    
+eException
+    + FullyQualifie 
+   dErrorId : Nati  
+  veCommandError
+ 

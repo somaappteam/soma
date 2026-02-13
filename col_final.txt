@@ -1,0 +1,19 @@
+--- COLUMN AUDIT ---
+
+[TABLE: profiles]
+Columns: id, username, display_name, full_name, avatar_url, website, bio, location, total_xp, settings, updated_at, daily_goal_minutes
+
+[TABLE: friendships]
+Table empty or no accessible record.
+
+[TABLE: messages]
+Table empty or no accessible record.
+
+[TABLE: circles]
+Columns: id, host_id, name, from_lang, to_lang, mode, level, max_players, questions_count, time_per_q, allow_spectators, status, created_at, questions, is_locked
+
+[TABLE: user_sessions]
+Columns: id, user_id, device_id, device_name, platform, last_seen, is_current, created_at
+
+[TABLE: leaderboard]
+Columns: id, username, display_name, avatar_url, xp

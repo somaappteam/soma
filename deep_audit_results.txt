@@ -1,0 +1,160 @@
+--- COMPREHENSIVE DEEP-DIVE AUDIT ---
+
+[Table: profiles]
+✅ Table exists and has data.
+  ✅ Column "id" present
+  ✅ Column "username" present
+  ✅ Column "display_name" present
+  ✅ Column "daily_goal_minutes" present
+  ✅ Column "total_xp" present
+  ✅ Column "avatar_url" present
+  ✅ Column "settings" present
+
+[Table: friendships]
+ℹ️ Table exists but is empty. Probing columns individually...
+  ✅ Column "id" present
+  ❌ Column "user_id" MISSING or error: PostgrestException(message: column friendships.user_id does not exist, code: 42703, details: Bad Request, hint: null)
+  ❌ Column "friend_id" MISSING or error: PostgrestException(message: column friendships.friend_id does not exist, code: 42703, details: Bad Request, hint: null)
+  ✅ Column "status" present
+  ✅ Column "addressee_id" present
+
+[Table: messages]
+ℹ️ Table exists but is empty. Probing columns individually...
+  ✅ Column "id" present
+  ✅ Column "sender_id" present
+  ✅ Column "receiver_id" present
+  ✅ Column "content" present
+  ✅ Column "is_read" present
+
+[Table: circles]
+✅ Table exists and has data.
+  ✅ Column "id" present
+  ✅ Column "name" present
+  ✅ Column "host_id" present
+  ✅ Column "is_locked" present
+  ✅ Column "status" present
+  ✅ Column "questions" present
+
+[Table: circle_participants]
+✅ Table exists and has data.
+  ✅ Column "id" present
+  ✅ Column "circle_id" present
+  ✅ Column "user_id" present
+  ✅ Column "joined_at" present
+
+[Table: vocabulary]
+✅ Table exists and has data.
+  ✅ Column "id" present
+  ✅ Column "concept_id" present
+  ✅ Column "lang" present
+  ✅ Column "word" present
+  ❌ Column "definition" MISSING
+  ❌ Column "translation" MISSING
+  ❌ Column "examples" MISSING
+  ❌ Column "audio_url" MISSING
+
+[Table: sentences]
+✅ Table exists and has data.
+  ✅ Column "id" present
+  ✅ Column "concept_id" present
+  ✅ Column "lang_code" present
+  ❌ Column "text" MISSING
+  ❌ Column "translation" MISSING
+  ❌ Column "audio_url" MISSING
+
+[Table: user_courses]
+ℹ️ Table exists but is empty. Probing columns individually...
+  ✅ Column "user_id" present
+  ✅ Column "course_id" present
+  ❌ Column "progress" MISSING or error: PostgrestException(message: column user_courses.progress does not exist, code: 42703, details: Bad Request, hint: Perhaps you meant to reference the column "user_courses.progress_xp".)
+  ❌ Column "status" MISSING or error: PostgrestException(message: column user_courses.status does not exist, code: 42703, details: Bad Request, hint: null)
+  ✅ Column "last_accessed" present
+
+[Table: courses]
+✅ Table exists and has data.
+  ✅ Column "id" present
+  ✅ Column "title" present
+  ❌ Column "description" MISSING
+  ❌ Column "language" MISSING
+  ❌ Column "cover_url" MISSING
+
+[Table: user_learned_items]
+ℹ️ Table exists but is empty. Probing columns individually...
+  ✅ Column "user_id" present
+  ✅ Column "concept_id" present
+  ❌ Column "mastery_level" MISSING or error: PostgrestException(message: column user_learned_items.mastery_level does not exist, code: 42703, details: Bad Request, hint: null)
+  ❌ Column "last_reviewed" MISSING or error: PostgrestException(message: column user_learned_items.last_reviewed does not exist, code: 42703, details: Bad Request, hint: null)
+  ❌ Column "next_review" MISSING or error: PostgrestException(message: column user_learned_items.next_review does not exist, code: 42703, details: Bad Request, hint: null)
+
+[Table: chat_messages]
+ℹ️ Table exists but is empty. Probing columns individually...
+  ✅ Column "id" present
+  ✅ Column "circle_id" present
+  ❌ Column "user_id" MISSING or error: PostgrestException(message: column chat_messages.user_id does not exist, code: 42703, details: Bad Request, hint: null)
+  ✅ Column "content" present
+  ✅ Column "created_at" present
+
+[Table: user_stats]
+✅ Table exists and has data.
+  ✅ Column "user_id" present
+  ❌ Column "quizzes_taken" MISSING
+  ❌ Column "correct_answers" MISSING
+  ❌ Column "sentences_read" MISSING
+  ✅ Column "circles_joined" present
+
+[Table: achievements]
+✅ Table exists and has data.
+  ✅ Column "id" present
+  ✅ Column "title" present
+  ✅ Column "description" present
+  ❌ Column "icon_url" MISSING
+  ❌ Column "xp_reward" MISSING
+
+[Table: user_achievements]
+ℹ️ Table exists but is empty. Probing columns individually...
+  ✅ Column "user_id" present
+  ✅ Column "achievement_id" present
+  ❌ Column "earned_at" MISSING or error: PostgrestException(message: column user_achievements.earned_at does not exist, code: 42703, details: Bad Request, hint: null)
+
+[Table: notifications]
+ℹ️ Table exists but is empty. Probing columns individually...
+  ✅ Column "id" present
+  ✅ Column "user_id" present
+  ✅ Column "type" present
+  ✅ Column "title" present
+  ❌ Column "message" MISSING or error: PostgrestException(message: column notifications.message does not exist, code: 42703, details: Bad Request, hint: null)
+  ❌ Column "data" MISSING or error: PostgrestException(message: column notifications.data does not exist, code: 42703, details: Bad Request, hint: null)
+  ✅ Column "is_read" present
+  ✅ Column "created_at" present
+
+[Table: user_sessions]
+✅ Table exists and has data.
+  ✅ Column "id" present
+  ✅ Column "user_id" present
+  ✅ Column "device_id" present
+  ✅ Column "device_name" present
+  ✅ Column "platform" present
+  ✅ Column "last_seen" present
+  ✅ Column "is_current" present
+
+[Table: leaderboard]
+✅ Table exists and has data.
+  ✅ Column "id" present
+  ❌ Column "user_id" MISSING
+  ✅ Column "xp" present
+  ❌ Column "rank" MISSING
+
+[Table: concepts]
+ℹ️ Table exists but is empty. Probing columns individually...
+  ✅ Column "id" present
+  ❌ Column "category" MISSING or error: PostgrestException(message: column concepts.category does not exist, code: 42703, details: Bad Request, hint: null)
+  ❌ Column "tags" MISSING or error: PostgrestException(message: column concepts.tags does not exist, code: 42703, details: Bad Request, hint: null)
+
+--- SEED DATA CHECK ---
+Achievements in DB: 6
+Vocabulary samples: 10
+
+--- RLS PROBE (Preliminary) ---
+Note: Service Role Key used here. RLS verification requires testing with Anon Key.
+
+--- END DEEP AUDIT ---

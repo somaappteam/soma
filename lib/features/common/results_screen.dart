@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 import '../../core/widgets/glass.dart';
+import '../../core/widgets/premium_dialog.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/staggered_in.dart';
 import '../../core/theme/tokens.dart';
@@ -247,33 +248,17 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final l10n = AppLocalizations.of(context);
     final isHost = _isHostMe;
     final isSpectator = widget.leaderboard.every((p) => !p.isMe);
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showPremiumDialog(
       context: context,
-      builder: (ctx) {
-        final scheme = Theme.of(ctx).colorScheme;
-        return AlertDialog(
-          backgroundColor: scheme.surface,
-          title: Text(
-            l10n.circlesLeavePromptTitle,
-            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
-          ),
-          content: Text(
-            isHost
-                ? l10n.circlesLeavePromptEndOnly
-                : (isSpectator
-                    ? '${l10n.circlesSpectator} • ${l10n.leave}'
-                    : '${l10n.circlesParticipant} • ${l10n.leave}'),
-            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82)),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: Text(isHost ? l10n.circlesEndCircle : l10n.leave),
-            ),
-          ],
-        );
-      },
+      title: l10n.circlesLeavePromptTitle,
+      body: isHost
+          ? l10n.circlesLeavePromptEndOnly
+          : (isSpectator
+              ? '${l10n.circlesSpectator} • ${l10n.leave}'
+              : '${l10n.circlesParticipant} • ${l10n.leave}'),
+      cancelText: l10n.cancel,
+      confirmText: isHost ? l10n.circlesEndCircle : l10n.leave,
+      destructive: true,
     );
 
     if (confirmed != true) return;

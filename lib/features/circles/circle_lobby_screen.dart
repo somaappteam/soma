@@ -715,44 +715,90 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     final controller = TextEditingController();
     return showDialog<String>(
       context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.55),
       builder: (ctx) {
         final l10n = AppLocalizations.of(ctx);
-        return AlertDialog(
-          backgroundColor: Theme.of(ctx).colorScheme.surface,
-          title: Text(
-            l10n.circlesInviteByUsername,
-            style: TextStyle(
-                color: Theme.of(ctx).colorScheme.onSurface, fontWeight: FontWeight.w900),
-          ),
-          content: TextField(
-            controller: controller,
-            style: TextStyle(
-                color: Theme.of(ctx).colorScheme.onSurface, fontWeight: FontWeight.w700),
-            cursorColor: Theme.of(ctx).colorScheme.primary,
-            decoration: InputDecoration(
-              hintText: l10n.authUsername,
-              hintStyle: TextStyle(color: Theme.of(ctx).colorScheme.onSurface.withValues(alpha: 0.5)),
+        final scheme = Theme.of(ctx).colorScheme;
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Glass(
+            radius: BorderRadius.circular(24),
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.circlesInviteByUsername,
+                  style: TextStyle(
+                    color: scheme.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: controller,
+                  style: TextStyle(
+                      color: scheme.onSurface, fontWeight: FontWeight.w700),
+                  cursorColor: scheme.primary,
+                  decoration: InputDecoration(
+                    hintText: l10n.authUsername,
+                    hintStyle: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.5)),
+                    filled: true,
+                    fillColor: scheme.surface.withValues(alpha: 0.3),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: scheme.onSurface,
+                          side: BorderSide(
+                              color: scheme.onSurface.withValues(alpha: 0.25)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: Text(l10n.cancel),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final text = controller.text.trim();
+                          Navigator.pop(ctx,
+                              text.startsWith('@') ? text.substring(1) : text);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: scheme.primary,
+                          foregroundColor: scheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                          shadowColor: T.neonA.withValues(alpha: 0.35),
+                          elevation: 6,
+                        ),
+                        child: Text(l10n.send),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(l10n.cancel,
-                  style: TextStyle(color: Theme.of(ctx).colorScheme.onSurface.withValues(alpha: 0.75))),
-            ),
-            TextButton(
-              onPressed: () {
-                final text = controller.text.trim();
-                Navigator.pop(
-                    ctx, text.startsWith('@') ? text.substring(1) : text);
-              },
-              child: Text(
-                l10n.send,
-                style: const TextStyle(
-                    color: Color(0xFF2AFADF), fontWeight: FontWeight.w900),
-              ),
-            ),
-          ],
         );
       },
     );

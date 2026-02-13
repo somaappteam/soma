@@ -384,26 +384,26 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                 ],
               ),
               const SizedBox(height: 18),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: SizedBox(
+                  height: 10,
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: scheme.onSurface.withValues(alpha: 0.10),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      Color.lerp(const Color(0xFF33D6FF),
+                          const Color(0xFFFF4BD8), 1.0 - progress)!,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
               Glass(
                 radius: BorderRadius.circular(22),
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
                 child: Column(
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(999),
-                      child: SizedBox(
-                        height: 10,
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          backgroundColor: scheme.onSurface.withValues(alpha: 0.10),
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Color.lerp(const Color(0xFF33D6FF),
-                                const Color(0xFFFF4BD8), 1.0 - progress)!,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
                     _VocabPromptRow(question: q),
                     if (showReading &&
                         (q["reading"] as String?)?.trim().isNotEmpty ==
@@ -431,7 +431,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                 },
                 onSpeak: _speakPrompt,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 48),
               Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),

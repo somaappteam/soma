@@ -306,9 +306,9 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final color = selected ? scheme.primary : scheme.onSurface.withValues(alpha: 0.65);
-    final bg = selected ? scheme.primary.withValues(alpha: 0.12) : Colors.transparent;
-    final border = selected ? scheme.primary.withValues(alpha: 0.22) : Colors.transparent;
+    final color = selected ? const Color(0xFF36F4E8) : scheme.onSurface.withValues(alpha: 0.65);
+    final bg = selected ? const Color(0xFF3A3568) : Colors.transparent;
+    final border = selected ? const Color(0xFF6B5CFF) : Colors.transparent;
 
     return PressableScale(
       onTap: onTap,
@@ -410,9 +410,9 @@ class _RailItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final color = selected ? scheme.primary : scheme.onSurface.withValues(alpha: 0.65);
-    final bg = selected ? scheme.primary.withValues(alpha: 0.12) : Colors.transparent;
-    final border = selected ? scheme.primary.withValues(alpha: 0.22) : Colors.transparent;
+    final color = selected ? const Color(0xFF36F4E8) : scheme.onSurface.withValues(alpha: 0.65);
+    final bg = selected ? const Color(0xFF3A3568) : Colors.transparent;
+    final border = selected ? const Color(0xFF6B5CFF) : Colors.transparent;
 
     return PressableScale(
       onTap: onTap,
