@@ -122,6 +122,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return const _NotificationsSkeleton();
                               }
+                              if (snapshot.hasError) {
+                                return _NotificationsEmptyState(
+                                  title: l10n.notificationsEmpty,
+                                  subtitle: _tabDescription(context, activeTab),
+                                );
+                              }
 
                               final items = (snapshot.data ?? []).map(_mapNotification).toList();
                               final filtered = items.where((n) {
@@ -140,7 +146,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               }).toList();
 
                               if (filtered.isEmpty) {
-                                return _NotificationsEmptyState(message: l10n.notificationsEmpty);
+                                return _NotificationsEmptyState(
+                                  title: l10n.notificationsEmpty,
+                                  subtitle: _tabDescription(context, activeTab),
+                                );
                               }
 
                               return ListView.separated(
@@ -203,6 +212,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
+  String _tabDescription(BuildContext context, NotificationsTab tab) {
+    final l10n = AppLocalizations.of(context);
+    switch (tab) {
+      case NotificationsTab.courses:
+        return l10n.notificationsTabCourses;
+      case NotificationsTab.social:
+        return l10n.notificationsTabSocial;
+      case NotificationsTab.circles:
+        return l10n.notificationsTabCircles;
+      case NotificationsTab.system:
+        return l10n.notificationsTabSystem;
+      case NotificationsTab.all:
+        return l10n.notificationsTabAll;
+    }
+  }
+
   Widget _buildGuestNotifications(BuildContext context, NotificationsTab activeTab) {
     final l10n = AppLocalizations.of(context);
     return AnimatedBuilder(
@@ -223,7 +248,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         }).toList();
 
         if (filtered.isEmpty) {
-          return _NotificationsEmptyState(message: l10n.notificationsEmpty);
+          return _NotificationsEmptyState(
+            title: l10n.notificationsEmpty,
+            subtitle: _tabDescription(context, activeTab),
+          );
         }
 
         return ListView.separated(
@@ -351,6 +379,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     await notificationsRepository.markAsRead(n.id);
     if (n.type == NotifType.social && n.socialAction == SocialAction.friendRequest) {
       try {
+        if (n.friendshipId == null && n.fromUserId == null) {
+          throw StateError('Missing request identity for friend request action.');
+        }
         if (n.friendshipId != null) {
           await socialRepository.acceptFriendRequest(n.friendshipId!);
         } else if (n.fromUserId != null) {
@@ -420,6 +451,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final l10n = AppLocalizations.of(context);
     if (n.type == NotifType.social && n.socialAction == SocialAction.friendRequest) {
       try {
+        if (n.friendshipId == null && n.fromUserId == null) {
+          throw StateError('Missing request identity for friend request action.');
+        }
         if (n.friendshipId != null) {
           await socialRepository.declineFriendRequest(n.friendshipId!);
         } else if (n.fromUserId != null) {
@@ -746,8 +780,9 @@ class _IconBubble extends StatelessWidget {
 }
 
 class _NotificationsEmptyState extends StatelessWidget {
-  final String message;
-  const _NotificationsEmptyState({required this.message});
+  final String title;
+  final String subtitle;
+  const _NotificationsEmptyState({required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -756,6 +791,8 @@ class _NotificationsEmptyState extends StatelessWidget {
     return Glass(
       radius: BorderRadius.circular(24),
       padding: const EdgeInsets.all(S.lg),
+      child: SizedBox(
+        width: double.infinity,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -763,7 +800,7 @@ class _NotificationsEmptyState extends StatelessWidget {
           Icon(Icons.notifications_none_rounded, color: scheme.primary, size: 28),
           const SizedBox(height: S.sm),
           Text(
-            message,
+            title,
             style: textTheme.titleMedium?.copyWith(
               color: scheme.onSurface.withValues(alpha: 0.9),
               fontWeight: FontWeight.w800,
@@ -771,13 +808,14 @@ class _NotificationsEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: S.xs),
           Text(
-            AppLocalizations.of(context).notificationsTabAll,
+            subtitle,
             style: textTheme.bodySmall?.copyWith(
               color: scheme.onSurface.withValues(alpha: 0.6),
               fontWeight: FontWeight.w600,
             ),
           ),
         ],
+      ),
       ),
     );
   }
