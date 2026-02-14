@@ -1,5 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'experiment_repository.dart';
+
 class NotificationsRepository {
   final _supabase = Supabase.instance.client;
 
@@ -68,15 +70,25 @@ class NotificationsRepository {
     required String fromUserName,
     String? friendshipId,
   }) async {
+    final variant = await experimentRepository.variant(
+      'notif_copy_friend_request',
+      buckets: const ['A', 'B'],
+    );
+    final title = variant == 'B' ? 'Someone wants to connect' : 'New friend request';
+    final body = variant == 'B'
+        ? '$fromUserName sent you a connection invite.'
+        : '$fromUserName wants to add you as a friend.';
+
     await _supabase.from('notifications').insert({
       'user_id': toUserId,
       'type': 'social',
-      'title': 'New friend request',
-      'body': '$fromUserName wants to add you as a friend.',
+      'title': title,
+      'body': body,
       'is_read': false,
       'metadata': {
         'action': 'friend_request',
         'social_action': 'friend_request',
+        'copy_variant': variant,
         'from_user_id': fromUserId,
         'from_user_name': fromUserName,
         if (friendshipId != null) 'friendship_id': friendshipId,
