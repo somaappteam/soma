@@ -11,10 +11,13 @@ import 'security_settings_screen.dart';
 import '../../data/profile_store.dart';
 import '../auth/welcome_screen.dart';
 import '../../core/services/theme_mode_controller.dart';
+import '../../core/i18n/ui_language.dart';
 import '../../core/theme/spacing.dart';
 import '../../core/services/haptics_service.dart';
 import '../../core/widgets/premium_dialog.dart';
 import '../../core/widgets/selection_controls.dart';
+import '../../core/widgets/soma_plus_plan_cards.dart';
+import '../../data/soma_plus_repository.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -32,10 +35,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _guestHaptics = true;
   bool _guestNotifications = true;
   String _guestThemeMode = "System";
-  String _guestLanguageUi = "English";
+  String _guestLanguageUi = "en";
   int _guestTimerSeconds = 15;
   String _guestDifficulty = "Adaptive";
   String _guestDailyReminder = "20:00";
+  SomaSubscriptionTier _guestTier = SomaSubscriptionTier.free;
 
   @override
   void initState() {
@@ -69,10 +73,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _guestHaptics = settings['haptics_enabled'] ?? _guestHaptics;
       _guestNotifications = settings['push_notifications'] ?? _guestNotifications;
       _guestThemeMode = settings['theme_mode'] ?? _guestThemeMode;
-      _guestLanguageUi = settings['language_ui'] ?? _guestLanguageUi;
+      _guestLanguageUi = normalizeUiLanguageCode(settings['language_ui']?.toString());
       _guestTimerSeconds = (settings['default_timer_s'] as num?)?.toInt() ?? _guestTimerSeconds;
       _guestDifficulty = settings['match_difficulty']?.toString() ?? _guestDifficulty;
       _guestDailyReminder = settings['daily_reminder']?.toString() ?? _guestDailyReminder;
+      _guestTier = SomaPlusRepository.parseTier(settings['plus_plan']?.toString());
     });
   }
 
@@ -204,6 +209,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+
+  Future<void> _selectTier(SomaSubscriptionTier tier) async {
+    if (tier == SomaSubscriptionTier.free) {
+      await settingsRepository.updateSettings({
+        'plus_plan': SomaPlusRepository.serializeTier(tier),
+        'plus_enabled': false,
+      });
+      return;
+    }
+    await settingsRepository.updateSettings({
+      'plus_plan': SomaPlusRepository.serializeTier(tier),
+      'plus_enabled': true,
+    });
+  }
+
   String _formatTime(String value) {
     final parts = value.split(':');
     if (parts.length != 2) return value;
@@ -222,52 +242,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _DropdownItem('Light', l10n.themeLight),
     ];
     final languageItems = <_DropdownItem>[
-      _DropdownItem('English', l10n.languageEnglish),
-      _DropdownItem('Spanish', l10n.languageSpanish),
-      _DropdownItem('French', l10n.languageFrench),
-      _DropdownItem('German', l10n.languageGerman),
-      _DropdownItem('Italian', l10n.languageItalian),
-      _DropdownItem('Portuguese', l10n.languagePortuguese),
-      _DropdownItem('Russian', l10n.languageRussian),
-      _DropdownItem('Japanese', l10n.languageJapanese),
-      _DropdownItem('Chinese', l10n.languageChinese),
-      _DropdownItem('Arabic', l10n.languageArabic),
-      _DropdownItem('Hindi', l10n.languageHindi),
-      _DropdownItem('Indonesian', l10n.languageIndonesian),
-      _DropdownItem('Bengali', l10n.languageBengali),
-      _DropdownItem('Urdu', l10n.languageUrdu),
-      _DropdownItem('Vietnamese', l10n.languageVietnamese),
-      _DropdownItem('Turkish', l10n.languageTurkish),
-      _DropdownItem('Korean', l10n.languageKorean),
-      _DropdownItem('Thai', l10n.languageThai),
-      _DropdownItem('Polish', l10n.languagePolish),
-      _DropdownItem('Ukrainian', l10n.languageUkrainian),
-      _DropdownItem('Dutch', l10n.languageDutch),
-      _DropdownItem('Persian', l10n.languagePersian),
-      _DropdownItem('Punjabi', l10n.languagePunjabi),
-      _DropdownItem('Tamil', l10n.languageTamil),
-      _DropdownItem('Telugu', l10n.languageTelugu),
-      _DropdownItem('Swahili', l10n.languageSwahili),
-      _DropdownItem('Malay', l10n.languageMalay),
-      _DropdownItem('Romanian', l10n.languageRomanian),
-      _DropdownItem('Greek', l10n.languageGreek),
-      _DropdownItem('Hungarian', l10n.languageHungarian),
-      _DropdownItem('Czech', l10n.languageCzech),
-      _DropdownItem('Swedish', l10n.languageSwedish),
-      _DropdownItem('Hebrew', l10n.languageHebrew),
-      _DropdownItem('Norwegian', l10n.languageNorwegian),
-      _DropdownItem('Danish', l10n.languageDanish),
-      _DropdownItem('Finnish', l10n.languageFinnish),
+      for (final language in kSupportedUiLanguages)
+        _DropdownItem(language.code, language.labelBuilder(l10n)),
     ];
     final guestThemeValue = themeItems.any((item) => item.value == _guestThemeMode)
         ? _guestThemeMode
         : themeItems.first.value;
-    final guestLanguageValue = languageItems.any((item) => item.value == _guestLanguageUi)
-        ? _guestLanguageUi
+    final normalizedGuestLanguage = normalizeUiLanguageCode(_guestLanguageUi);
+    final guestLanguageValue = languageItems.any((item) => item.value == normalizedGuestLanguage)
+        ? normalizedGuestLanguage
         : languageItems.first.value;
     return ListView(
       physics: const BouncingScrollPhysics(),
       children: [
+        const _SectionTitle('Soma Plus'),
+        const SizedBox(height: S.xs),
+        SomaPlusPlanCards(
+          currentTier: _guestTier,
+          onSelect: (tier) async {
+            setState(() => _guestTier = tier);
+            await _selectTier(tier);
+          },
+        ),
+        const SizedBox(height: S.md),
         _SectionTitle(l10n.settingsSectionGameplay),
         const SizedBox(height: S.xs),
         Glass(
@@ -475,42 +472,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _DropdownItem('Light', l10n.themeLight),
     ];
     final languageItems = <_DropdownItem>[
-      _DropdownItem('English', l10n.languageEnglish),
-      _DropdownItem('Spanish', l10n.languageSpanish),
-      _DropdownItem('French', l10n.languageFrench),
-      _DropdownItem('German', l10n.languageGerman),
-      _DropdownItem('Italian', l10n.languageItalian),
-      _DropdownItem('Portuguese', l10n.languagePortuguese),
-      _DropdownItem('Russian', l10n.languageRussian),
-      _DropdownItem('Japanese', l10n.languageJapanese),
-      _DropdownItem('Chinese', l10n.languageChinese),
-      _DropdownItem('Arabic', l10n.languageArabic),
-      _DropdownItem('Hindi', l10n.languageHindi),
-      _DropdownItem('Indonesian', l10n.languageIndonesian),
-      _DropdownItem('Bengali', l10n.languageBengali),
-      _DropdownItem('Urdu', l10n.languageUrdu),
-      _DropdownItem('Vietnamese', l10n.languageVietnamese),
-      _DropdownItem('Turkish', l10n.languageTurkish),
-      _DropdownItem('Korean', l10n.languageKorean),
-      _DropdownItem('Thai', l10n.languageThai),
-      _DropdownItem('Polish', l10n.languagePolish),
-      _DropdownItem('Ukrainian', l10n.languageUkrainian),
-      _DropdownItem('Dutch', l10n.languageDutch),
-      _DropdownItem('Persian', l10n.languagePersian),
-      _DropdownItem('Punjabi', l10n.languagePunjabi),
-      _DropdownItem('Tamil', l10n.languageTamil),
-      _DropdownItem('Telugu', l10n.languageTelugu),
-      _DropdownItem('Swahili', l10n.languageSwahili),
-      _DropdownItem('Malay', l10n.languageMalay),
-      _DropdownItem('Romanian', l10n.languageRomanian),
-      _DropdownItem('Greek', l10n.languageGreek),
-      _DropdownItem('Hungarian', l10n.languageHungarian),
-      _DropdownItem('Czech', l10n.languageCzech),
-      _DropdownItem('Swedish', l10n.languageSwedish),
-      _DropdownItem('Hebrew', l10n.languageHebrew),
-      _DropdownItem('Norwegian', l10n.languageNorwegian),
-      _DropdownItem('Danish', l10n.languageDanish),
-      _DropdownItem('Finnish', l10n.languageFinnish),
+      for (final language in kSupportedUiLanguages)
+        _DropdownItem(language.code, language.labelBuilder(l10n)),
     ];
     return Scaffold(
       body: SafeArea(
@@ -543,7 +506,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       final dailyReminder = data['daily_reminder']?.toString() ?? "20:00";
                        
                       final themeMode = data['theme_mode'] ?? "System";
-                      final languageUi = data['language_ui'] ?? "English";
+                      final languageUi = normalizeUiLanguageCode(data['language_ui']?.toString());
+                      final subscriptionTier = SomaPlusRepository.parseTier(data['plus_plan']?.toString());
                       final themeModeValue = themeItems.any((item) => item.value == themeMode)
                           ? themeMode
                           : themeItems.first.value;
@@ -558,6 +522,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       return ListView(
                         physics: const BouncingScrollPhysics(),
                         children: [
+                          const _SectionTitle('Soma Plus'),
+                          const SizedBox(height: S.xs),
+                          SomaPlusPlanCards(
+                            currentTier: subscriptionTier,
+                            onSelect: _selectTier,
+                          ),
+                          const SizedBox(height: S.md),
                           _SectionTitle(l10n.settingsSectionAccount),
                           const SizedBox(height: S.xs),
                           Glass(

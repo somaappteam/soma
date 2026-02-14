@@ -21,6 +21,8 @@ import '../../data/profile_store.dart';
 import '../../data/rtc_voice_service.dart';
 import '../../data/quiz_repository.dart';
 import '../../data/languages.dart';
+import '../../data/settings_repository.dart';
+import '../../data/soma_plus_repository.dart';
 import '../profile/profile_screen.dart';
 
 class CircleLobbyScreen extends StatefulWidget {
@@ -48,6 +50,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   String _editLevel = '';
   int _editQuestions = 0;
   int _editTimePerQ = 0;
+  SomaSubscriptionTier _tier = SomaSubscriptionTier.free;
 
   String? get _myRole {
     final uid = circlesRepository.currentUserId;
@@ -79,6 +82,15 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     _listenParticipants();
     _connectVoice();
     _listenCircleStatus();
+    _loadTier();
+  }
+
+  Future<void> _loadTier() async {
+    final settings = await settingsRepository.getSettings();
+    if (!mounted) return;
+    setState(() {
+      _tier = SomaPlusRepository.parseTier(settings['plus_plan']?.toString());
+    });
   }
 
   @override
@@ -618,6 +630,16 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
   Future<void> _inviteByUsername() async {
     final l10n = AppLocalizations.of(context);
+    if (_tier == SomaSubscriptionTier.free) {
+      await showPremiumDialog(
+        context: context,
+        title: 'Plus feature',
+        body: 'Inviting friends is available on Plus and Pro plans.',
+        confirmText: l10n.ok,
+      );
+      return;
+    }
+
     final username = await _promptInviteUsername();
     if (username == null || username.isEmpty) return;
 

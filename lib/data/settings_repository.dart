@@ -4,6 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 
+import '../core/i18n/ui_language.dart';
+import 'soma_plus_repository.dart';
+
 class SettingsRepository {
   final _supabase = Supabase.instance.client;
   SharedPreferences? _prefs;
@@ -18,7 +21,11 @@ class SettingsRepository {
     'match_difficulty': 'Adaptive',
     'daily_reminder': '20:00',
     'theme_mode': 'System',
-    'language_ui': 'English',
+    'language_ui': 'en',
+    'plus_enabled': false,
+    'plus_plan': 'free',
+    'plus_trial_started_at': null,
+    'plus_expires_at': null,
   };
   final StreamController<Map<String, dynamic>> _settingsController =
       StreamController<Map<String, dynamic>>.broadcast();
@@ -45,7 +52,7 @@ class SettingsRepository {
           .select('settings')
           .eq('id', uid)
           .single();
-      _effectiveSettings = Map<String, dynamic>.from(resp['settings'] ?? {});
+      _effectiveSettings = _withDefaults(resp['settings'] as Map<String, dynamic>?);
     } catch (e) {
       debugPrint("Error fetching settings: $e");
       // Fallback to guest settings structure but empty? or keep previous?
@@ -93,8 +100,7 @@ class SettingsRepository {
         .listen((event) {
       if (event.isEmpty) return;
       final row = event.first;
-      final serverSettings = (row['settings'] as Map<String, dynamic>?) ?? {};
-      _effectiveSettings = Map<String, dynamic>.from(serverSettings);
+      _effectiveSettings = _withDefaults(row['settings'] as Map<String, dynamic>?);
       _settingsController.add(_effectiveSettings);
     });
   }
@@ -102,8 +108,7 @@ class SettingsRepository {
   Future<void> _bootstrapUserSettings(String uid) async {
     try {
       final resp = await _supabase.from('profiles').select('settings').eq('id', uid).single();
-      final settings = Map<String, dynamic>.from(resp['settings'] ?? {});
-      _effectiveSettings = settings;
+      _effectiveSettings = _withDefaults(resp['settings'] as Map<String, dynamic>?);
       _settingsController.add(_effectiveSettings);
     } catch (e) {
       debugPrint("Error bootstrapping settings: $e");
@@ -118,24 +123,16 @@ class SettingsRepository {
     // The previous logic only persisted to prefs if guest.
     
     if (uid == null) {
-      _guestSettings[key] = value;
+      _guestSettings[key] = _normalizeSettingValue(key, value);
       _effectiveSettings = Map<String, dynamic>.from(_guestSettings);
       _settingsController.add(_effectiveSettings);
       
-      if (value is bool) {
-        _prefs?.setBool(key, value);
-      } else if (value is String) {
-        _prefs?.setString(key, value);
-      } else if (value is int) {
-        _prefs?.setInt(key, value);
-      } else if (value is double) {
-        _prefs?.setDouble(key, value);
-      }
+      _persistGuestValue(key, _guestSettings[key]);
       return;
     }
 
     // User is logged in
-    _effectiveSettings[key] = value;
+    _effectiveSettings[key] = _normalizeSettingValue(key, value);
     _settingsController.add(Map<String, dynamic>.from(_effectiveSettings));
 
     try {
@@ -145,8 +142,8 @@ class SettingsRepository {
           .eq('id', uid)
           .single();
       
-      final currentSettings = Map<String, dynamic>.from(resp['settings'] ?? {});
-      currentSettings[key] = value;
+      final currentSettings = _withDefaults(resp['settings'] as Map<String, dynamic>?);
+      currentSettings[key] = _normalizeSettingValue(key, value);
 
       await _supabase
           .from('profiles')
@@ -161,24 +158,79 @@ class SettingsRepository {
   Future<void> updateSettings(Map<String, dynamic> newValues) async {
     final uid = currentUserId;
     if (uid == null) {
-      _guestSettings.addAll(newValues);
+      for (final entry in newValues.entries) {
+        _guestSettings[entry.key] = _normalizeSettingValue(entry.key, entry.value);
+      }
       _effectiveSettings = Map<String, dynamic>.from(_guestSettings);
       _settingsController.add(_effectiveSettings);
+      for (final entry in newValues.entries) {
+        _persistGuestValue(entry.key, _guestSettings[entry.key]);
+      }
       return;
     }
 
-    _effectiveSettings.addAll(newValues);
+    for (final entry in newValues.entries) {
+      _effectiveSettings[entry.key] = _normalizeSettingValue(entry.key, entry.value);
+    }
     _settingsController.add(_effectiveSettings);
     
     try {
       final resp = await _supabase.from('profiles').select('settings').eq('id', uid).single();
-      final currentSettings = Map<String, dynamic>.from(resp['settings'] ?? {});
-      currentSettings.addAll(newValues);
+      final currentSettings = _withDefaults(resp['settings'] as Map<String, dynamic>?);
+      for (final entry in newValues.entries) {
+        currentSettings[entry.key] = _normalizeSettingValue(entry.key, entry.value);
+      }
 
       await _supabase.from('profiles').update({'settings': currentSettings}).eq('id', uid);
     } catch (e) {
       debugPrint("Error updating settings: $e");
     }
+  }
+
+
+  Map<String, dynamic> _withDefaults(Map<String, dynamic>? remote) {
+    final merged = Map<String, dynamic>.from(_guestSettings);
+    if (remote != null) {
+      merged.addAll(remote);
+    }
+    merged['language_ui'] = normalizeUiLanguageCode(merged['language_ui']?.toString());
+    merged['plus_plan'] = SomaPlusRepository.serializeTier(SomaPlusRepository.parseTier(merged['plus_plan']?.toString()));
+    merged['plus_enabled'] = merged['plus_enabled'] == true;
+    return merged;
+  }
+
+  dynamic _normalizeSettingValue(String key, dynamic value) {
+    if (key == 'language_ui') {
+      return normalizeUiLanguageCode(value?.toString());
+    }
+    if (key == 'plus_plan') {
+      return SomaPlusRepository.serializeTier(SomaPlusRepository.parseTier(value?.toString()));
+    }
+    return value;
+  }
+
+  void _persistGuestValue(String key, dynamic value) {
+    if (value is bool) {
+      _prefs?.setBool(key, value);
+    } else if (value is String) {
+      _prefs?.setString(key, value);
+    } else if (value is int) {
+      _prefs?.setInt(key, value);
+    } else if (value is double) {
+      _prefs?.setDouble(key, value);
+    }
+  }
+
+
+  Future<void> _hydrateFromCurrentSessionIfNeeded() async {
+    final uid = currentUserId;
+    if (uid == null) {
+      _effectiveSettings = Map<String, dynamic>.from(_guestSettings);
+      _settingsController.add(_effectiveSettings);
+      return;
+    }
+    await _bootstrapUserSettings(uid);
+    _listenToUserSettings(uid);
   }
 
   SettingsRepository();
@@ -193,6 +245,7 @@ class SettingsRepository {
       debugPrint("Error initializing settings repository: $e");
     }
     _initAuthListener();
+    await _hydrateFromCurrentSessionIfNeeded();
   }
 
   Future<void> _loadGuestPersistence() async {
@@ -208,6 +261,7 @@ class SettingsRepository {
           changed = true;
         }
       }
+      _guestSettings['language_ui'] = normalizeUiLanguageCode(_guestSettings['language_ui']?.toString());
       // If we loaded something, update the effective settings if we are currently a guest
       if (changed && currentUserId == null) {
          _effectiveSettings = Map<String, dynamic>.from(_guestSettings);

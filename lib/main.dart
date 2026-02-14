@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -8,10 +10,12 @@ import 'features/auth/splash_screen.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'dart:ffi';
 import 'dart:io';
+import 'core/config/app_config.dart';
+import 'core/i18n/ui_language.dart';
 import 'data/content_sync_service.dart';
 import 'data/settings_repository.dart';
+import 'data/soma_plus_repository.dart';
 import 'core/services/session_tracker.dart';
 import 'core/services/theme_mode_controller.dart';
 import 'core/services/haptics_service.dart';
@@ -36,9 +40,10 @@ Future<void> main() async {
     databaseFactory = databaseFactoryFfi;
   }
 
+  AppConfig.validate();
   await Supabase.initialize(
-    url: 'https://bnbjteedohflgkarfaxk.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYmp0ZWVkb2hmbGdrYXJmYXhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3MDAyNjQsImV4cCI6MjA4NTI3NjI2NH0.m8ua_6P0AtykUgLbLuxeE3o3i4Dwfw_xPsvODORlKtM',
+    url: AppConfig.supabaseUrl,
+    anonKey: AppConfig.supabaseAnonKey,
   );
 
   try {
@@ -51,6 +56,7 @@ Future<void> main() async {
   await hapticsService.init();
   await sfxService.init();
   await settingsRepository.init();
+  await somaPlusRepository.init();
   
   _runContentSync();
   runApp(const App());
@@ -60,14 +66,21 @@ Future<void> _runContentSync() async {
   await Future.delayed(const Duration(seconds: 1));
   syncStatusNotifier.value = SyncStatus.syncing;
   syncMessageNotifier.value = null;
-  try {
-    await contentSyncService.syncEverything();
-    syncStatusNotifier.value = SyncStatus.idle;
-  } catch (e) {
-    debugPrint("Sync failed: $e");
-    syncStatusNotifier.value = SyncStatus.error;
-    syncMessageNotifier.value = "Sync failed. Check your connection.";
+
+  var result = await contentSyncService.syncEverything();
+  if (!result.success) {
+    await Future.delayed(const Duration(milliseconds: 800));
+    result = await contentSyncService.syncEverything();
   }
+
+  if (result.success) {
+    syncStatusNotifier.value = SyncStatus.idle;
+    return;
+  }
+
+  syncStatusNotifier.value = SyncStatus.error;
+  syncMessageNotifier.value =
+      'Sync completed with issues: ${result.failedSteps.join(', ')}';
 }
 
 class App extends StatefulWidget {
@@ -78,46 +91,11 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  final List<Locale> _supportedLocales = const [
-    Locale('en'),
-    Locale('es'),
-    Locale('fr'),
-    Locale('de'),
-    Locale('it'),
-    Locale('pt'),
-    Locale('ru'),
-    Locale('ja'),
-    Locale('zh'),
-    Locale('ar'),
-    Locale('hi'),
-    Locale('id'),
-    Locale('bn'),
-    Locale('ur'),
-    Locale('vi'),
-    Locale('tr'),
-    Locale('ko'),
-    Locale('th'),
-    Locale('pl'),
-    Locale('uk'),
-    Locale('nl'),
-    Locale('fa'),
-    Locale('pa'),
-    Locale('ta'),
-    Locale('te'),
-    Locale('sw'),
-    Locale('ms'),
-    Locale('ro'),
-    Locale('el'),
-    Locale('hu'),
-    Locale('cs'),
-    Locale('sv'),
-    Locale('he'),
-    Locale('no'),
-    Locale('da'),
-    Locale('fi'),
-  ];
+  final List<Locale> _supportedLocales =
+      kSupportedUiLanguages.map((item) => Locale(item.code)).toList();
 
   Locale? _currentLocale;
+  StreamSubscription<Map<String, dynamic>>? _settingsSubscription;
 
   @override
   void initState() {
@@ -131,7 +109,7 @@ class _AppState extends State<App> {
       final settings = await settingsRepository.getSettings();
       final languageUi = settings['language_ui'] as String?;
       if (languageUi != null && mounted) {
-        final locale = _languageToLocale(languageUi);
+        final locale = uiLanguageToLocale(languageUi);
         setState(() => _currentLocale = locale);
       }
     } catch (e) {
@@ -140,11 +118,12 @@ class _AppState extends State<App> {
   }
 
   void _listenToSettingsChanges() {
-    settingsRepository.getSettingsStream().listen((settings) {
+    _settingsSubscription?.cancel();
+    _settingsSubscription = settingsRepository.getSettingsStream().listen((settings) {
       final languageUi = settings['language_ui'] as String?;
       final themeMode = settings['theme_mode'] as String?;
       if (languageUi != null && mounted) {
-        final locale = _languageToLocale(languageUi);
+        final locale = uiLanguageToLocale(languageUi);
         if (_currentLocale != locale) {
           setState(() => _currentLocale = locale);
         }
@@ -155,45 +134,10 @@ class _AppState extends State<App> {
     });
   }
 
-  Locale _languageToLocale(String language) {
-    switch (language) {
-      case 'Spanish': return const Locale('es');
-      case 'French': return const Locale('fr');
-      case 'German': return const Locale('de');
-      case 'Italian': return const Locale('it');
-      case 'Portuguese': return const Locale('pt');
-      case 'Russian': return const Locale('ru');
-      case 'Japanese': return const Locale('ja');
-      case 'Chinese': return const Locale('zh');
-      case 'Arabic': return const Locale('ar');
-      case 'Hindi': return const Locale('hi');
-      case 'Indonesian': return const Locale('id');
-      case 'Bengali': return const Locale('bn');
-      case 'Urdu': return const Locale('ur');
-      case 'Vietnamese': return const Locale('vi');
-      case 'Turkish': return const Locale('tr');
-      case 'Korean': return const Locale('ko');
-      case 'Thai': return const Locale('th');
-      case 'Polish': return const Locale('pl');
-      case 'Ukrainian': return const Locale('uk');
-      case 'Dutch': return const Locale('nl');
-      case 'Persian': return const Locale('fa');
-      case 'Punjabi': return const Locale('pa');
-      case 'Tamil': return const Locale('ta');
-      case 'Telugu': return const Locale('te');
-      case 'Swahili': return const Locale('sw');
-      case 'Malay': return const Locale('ms');
-      case 'Romanian': return const Locale('ro');
-      case 'Greek': return const Locale('el');
-      case 'Hungarian': return const Locale('hu');
-      case 'Czech': return const Locale('cs');
-      case 'Swedish': return const Locale('sv');
-      case 'Hebrew': return const Locale('he');
-      case 'Norwegian': return const Locale('no');
-      case 'Danish': return const Locale('da');
-      case 'Finnish': return const Locale('fi');
-      default: return const Locale('en');
-    }
+  @override
+  void dispose() {
+    _settingsSubscription?.cancel();
+    super.dispose();
   }
 
   @override

@@ -15,6 +15,7 @@ import '../../data/chat_repository.dart';
 import '../../data/presence_repository.dart';
 import '../../data/profile_repository.dart';
 import '../../data/settings_repository.dart';
+import '../../data/soma_plus_repository.dart';
 import '../../data/user_report_repository.dart';
 import '../../models/user_profile.dart';
 import '../profile/profile_screen.dart';
@@ -39,12 +40,21 @@ class DmChatScreen extends StatefulWidget {
 }
 
 class _DmChatScreenState extends State<DmChatScreen> {
-  static const int _starterMaxImageBytes = 2 * 1024 * 1024; // 2 MB
-  static const int _proMaxImageBytes = 6 * 1024 * 1024; // 6 MB
-  static const int _starterMaxFileBytes = 3 * 1024 * 1024; // 3 MB
-  static const int _proMaxFileBytes = 12 * 1024 * 1024; // 12 MB
-  static const int _starterMaxTextChars = 1200;
+  static const int _freeMaxImageBytes = 2 * 1024 * 1024; // 2 MB
+  static const int _plusMaxImageBytes = 6 * 1024 * 1024; // 6 MB
+  static const int _proMaxImageBytes = 10 * 1024 * 1024; // 10 MB
+  static const int _freeMaxFileBytes = 3 * 1024 * 1024; // 3 MB
+  static const int _plusMaxFileBytes = 12 * 1024 * 1024; // 12 MB
+  static const int _proMaxFileBytes = 24 * 1024 * 1024; // 24 MB
+  static const int _freeMaxTextChars = 1200;
+  static const int _plusMaxTextChars = 2200;
   static const int _proMaxTextChars = 3000;
+  static const int _freeMaxVoiceMessageSeconds = 30;
+  static const int _paidMaxVoiceMessageSeconds = 60;
+  static const int _freeDailyVoiceMessages = 5;
+  static const int _freeDailyImages = 5;
+  static const int _freeDailyFiles = 5;
+  static const int _freeDailyVoiceCalls = 3;
 
   final _controller = TextEditingController();
   final _scroll = ScrollController();
@@ -64,7 +74,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
   StreamSubscription<bool>? _rtcConnectionSub;
   String? _replyPreview;
   UserProfile? _otherProfile;
-  String _planTier = 'starter';
+  SomaSubscriptionTier _planTier = SomaSubscriptionTier.free;
   bool _showSearch = false;
   String _searchQuery = '';
   String _draftText = '';
@@ -79,9 +89,46 @@ class _DmChatScreenState extends State<DmChatScreen> {
   Timer? _typingDebounce;
   bool _typingStateSent = false;
 
-  int get _maxImageBytes => _planTier == 'pro' ? _proMaxImageBytes : _starterMaxImageBytes;
-  int get _maxFileBytes => _planTier == 'pro' ? _proMaxFileBytes : _starterMaxFileBytes;
-  int get _maxTextChars => _planTier == 'pro' ? _proMaxTextChars : _starterMaxTextChars;
+  int get _maxImageBytes {
+    switch (_planTier) {
+      case SomaSubscriptionTier.pro:
+        return _proMaxImageBytes;
+      case SomaSubscriptionTier.plus:
+        return _plusMaxImageBytes;
+      case SomaSubscriptionTier.free:
+      default:
+        return _freeMaxImageBytes;
+    }
+  }
+
+  int get _maxFileBytes {
+    switch (_planTier) {
+      case SomaSubscriptionTier.pro:
+        return _proMaxFileBytes;
+      case SomaSubscriptionTier.plus:
+        return _plusMaxFileBytes;
+      case SomaSubscriptionTier.free:
+      default:
+        return _freeMaxFileBytes;
+    }
+  }
+
+  int get _maxTextChars {
+    switch (_planTier) {
+      case SomaSubscriptionTier.pro:
+        return _proMaxTextChars;
+      case SomaSubscriptionTier.plus:
+        return _plusMaxTextChars;
+      case SomaSubscriptionTier.free:
+      default:
+        return _freeMaxTextChars;
+    }
+  }
+
+  int get _maxVoiceMessageSeconds =>
+      _planTier == SomaSubscriptionTier.free
+          ? _freeMaxVoiceMessageSeconds
+          : _paidMaxVoiceMessageSeconds;
 
   String get _myUserId => chatRepository.currentUserId ?? widget.meId;
 
@@ -246,12 +293,57 @@ class _DmChatScreenState extends State<DmChatScreen> {
   Future<void> _loadCostTier() async {
     try {
       final settings = await settingsRepository.getSettings();
-      final tier = settings['chat_plan_tier']?.toString().toLowerCase();
+      final tier = SomaPlusRepository.parseTier(settings['plus_plan']?.toString());
       if (!mounted) return;
-      setState(() => _planTier = tier == 'pro' ? 'pro' : 'starter');
+      setState(() => _planTier = tier);
     } catch (_) {
-      // keep starter fallback
+      // keep free fallback
     }
+  }
+
+  Future<Map<String, dynamic>> _dailyQuotaState() async {
+    final settings = await settingsRepository.getSettings();
+    final today = DateTime.now().toIso8601String().split('T').first;
+    final storedDate = settings['dm_quota_date']?.toString();
+    if (storedDate == today) return settings;
+
+    final reset = <String, dynamic>{
+      'dm_quota_date': today,
+      'dm_quota_voice_count': 0,
+      'dm_quota_image_count': 0,
+      'dm_quota_file_count': 0,
+      'dm_quota_call_count': 0,
+    };
+    await settingsRepository.updateSettings(reset);
+    return {...settings, ...reset};
+  }
+
+  int _intValue(dynamic value) => (value as num?)?.toInt() ?? 0;
+
+  Future<bool> _canUseFreeQuota({
+    required String key,
+    required int limit,
+    required String limitMessage,
+  }) async {
+    if (_planTier != SomaSubscriptionTier.free) return true;
+    final state = await _dailyQuotaState();
+    final count = _intValue(state[key]);
+    if (count >= limit) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(limitMessage)),
+        );
+      }
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _incrementFreeQuota(String key) async {
+    if (_planTier != SomaSubscriptionTier.free) return;
+    final state = await _dailyQuotaState();
+    final count = _intValue(state[key]);
+    await settingsRepository.updateSetting(key, count + 1);
   }
 
   String _dmVoiceChannelId() {
@@ -442,11 +534,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
   }
 
-  Future<void> _startVoiceCall({required bool sendInvite, bool incoming = false}) async {
+  Future<bool> _startVoiceCall({required bool sendInvite, bool incoming = false}) async {
     final l10n = AppLocalizations.of(context);
     try {
       await rtcVoiceService.connect(circleId: _dmVoiceChannelId(), asSpeaker: true, prioritySpeaker: true);
-      if (!mounted) return;
+      if (!mounted) return false;
 
       setState(() {
         _callState = incoming ? DmCallState.connecting : DmCallState.ringingOutgoing;
@@ -464,12 +556,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
           content: Text(incoming ? 'Accepting voice call…' : 'Calling…'),
         ),
       );
+      return true;
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted) return false;
       setState(() => _callState = DmCallState.idle);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.chatCallLater)),
       );
+      return false;
     }
   }
 
@@ -495,17 +589,37 @@ class _DmChatScreenState extends State<DmChatScreen> {
       return;
     }
 
-    await _startVoiceCall(sendInvite: true);
+    final canCall = await _canUseFreeQuota(
+      key: 'dm_quota_call_count',
+      limit: _freeDailyVoiceCalls,
+      limitMessage:
+          'Free plan allows $_freeDailyVoiceCalls voice calls per day in DM. Upgrade to Plus for unlimited calls.',
+    );
+    if (!canCall) return;
+
+    final started = await _startVoiceCall(sendInvite: true);
+    if (started) {
+      await _incrementFreeQuota('dm_quota_call_count');
+    }
   }
 
   Future<void> _sendVoiceMessage(int durationSeconds) async {
-    final clampedDuration = durationSeconds.clamp(1, 60);
+    final canSend = await _canUseFreeQuota(
+      key: 'dm_quota_voice_count',
+      limit: _freeDailyVoiceMessages,
+      limitMessage:
+          'Free plan allows $_freeDailyVoiceMessages voice messages per day. Upgrade to Plus for unlimited voice messages.',
+    );
+    if (!canSend) return;
+
+    final clampedDuration = durationSeconds.clamp(1, _maxVoiceMessageSeconds);
     final mm = (clampedDuration ~/ 60).toString().padLeft(2, '0');
     final ss = (clampedDuration % 60).toString().padLeft(2, '0');
     await chatRepository.sendMessage(
       widget.otherId,
       jsonEncode({'type': 'voice', 'duration': clampedDuration, 'label': '$mm:$ss'}),
     );
+    await _incrementFreeQuota('dm_quota_voice_count');
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Voice message sent')),
@@ -525,7 +639,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
         return;
       }
       final nextValue = _voiceRecordElapsedSeconds + 1;
-      if (nextValue >= 60) {
+      if (nextValue >= _maxVoiceMessageSeconds) {
         timer.cancel();
         await _stopVoiceRecording(send: true, hitLimit: true);
         return;
@@ -550,7 +664,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
     if (hitLimit && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Voice messages are limited to 1 minute.')),
+        SnackBar(
+          content: Text(
+            'Voice messages are limited to ${_maxVoiceMessageSeconds}s on your current plan.',
+          ),
+        ),
       );
     }
   }
@@ -569,9 +687,17 @@ class _DmChatScreenState extends State<DmChatScreen> {
       final picked = await _imagePicker.pickImage(
         source: ImageSource.gallery,
         imageQuality: 85,
-        maxWidth: _planTier == 'pro' ? 1920 : 1280,
+        maxWidth: _planTier == SomaSubscriptionTier.pro ? 1920 : 1280,
       );
       if (picked == null || !mounted) return;
+
+      final canSendImage = await _canUseFreeQuota(
+        key: 'dm_quota_image_count',
+        limit: _freeDailyImages,
+        limitMessage:
+            'Free plan allows $_freeDailyImages photos per day. Upgrade to Plus for unlimited photos.',
+      );
+      if (!canSendImage) return;
 
       final bytes = await picked.readAsBytes();
       if (bytes.length > _maxImageBytes) {
@@ -596,6 +722,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
         widget.otherId,
         jsonEncode({'type': 'image', 'url': publicUrl, 'thumb': publicUrl}),
       );
+      await _incrementFreeQuota('dm_quota_image_count');
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -621,6 +748,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
         allowedExtensions: const ['pdf', 'doc', 'docx', 'txt'],
       );
       if (pick == null || pick.files.isEmpty || !mounted) return;
+
+      final canSendFile = await _canUseFreeQuota(
+        key: 'dm_quota_file_count',
+        limit: _freeDailyFiles,
+        limitMessage:
+            'Free plan allows $_freeDailyFiles document sends per day. Upgrade to Plus for unlimited files.',
+      );
+      if (!canSendFile) return;
 
       final file = pick.files.single;
       final bytes = file.bytes;
@@ -663,6 +798,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
           'size': bytes.length,
         }),
       );
+      await _incrementFreeQuota('dm_quota_file_count');
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
