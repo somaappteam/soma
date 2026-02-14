@@ -11,6 +11,8 @@ import '../../core/widgets/responsive.dart';
 
 import '../../data/languages.dart';
 import '../../data/quiz_repository.dart';
+import '../../data/settings_repository.dart';
+import '../../data/soma_plus_repository.dart';
 
 class CreateCircleScreen extends StatefulWidget {
   const CreateCircleScreen({super.key});
@@ -36,7 +38,23 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
   bool allowSpectators = true;
   bool enableVoice = true;
   bool enableChat = true;
+  bool isPrivateCircle = false;
   bool _isLoading = false;
+  SomaSubscriptionTier _tier = SomaSubscriptionTier.free;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTier();
+  }
+
+  Future<void> _loadTier() async {
+    final settings = await settingsRepository.getSettings();
+    if (!mounted) return;
+    setState(() {
+      _tier = SomaPlusRepository.parseTier(settings['plus_plan']?.toString());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -280,6 +298,25 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 value: enableChat,
                                 onChanged: (v) => setState(() => enableChat = v),
                               ),
+                              const SizedBox(height: 10),
+
+                              _ToggleRow(
+                                title: 'Private Circle (Plus/Pro)',
+                                subtitle: 'Only invited users can join this circle',
+                                value: isPrivateCircle,
+                                onChanged: (v) async {
+                                  if (v && _tier == SomaSubscriptionTier.free) {
+                                    await showPremiumDialog(
+                                      context: context,
+                                      title: 'Plus feature',
+                                      body: 'Private circles are available on Plus and Pro plans.',
+                                      confirmText: l10n.ok,
+                                    );
+                                    return;
+                                  }
+                                  setState(() => isPrivateCircle = v);
+                                },
+                              ),
                             ],
                           ),
                         ),
@@ -295,6 +332,16 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 context: context,
                                 title: l10n.circlesCircleName,
                                 body: l10n.circlesEnterName,
+                                confirmText: l10n.ok,
+                              );
+                              return;
+                            }
+
+                            if (isPrivateCircle && _tier == SomaSubscriptionTier.free) {
+                              await showPremiumDialog(
+                                context: context,
+                                title: 'Plus feature',
+                                body: 'Upgrade to Plus or Pro to create private circles.',
                                 confirmText: l10n.ok,
                               );
                               return;
@@ -334,6 +381,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 questionsCount: questions, 
                                 timePerQ: timePerQ,
                                 allowSpectators: allowSpectators,
+                                isLocked: isPrivateCircle,
                                 questions: quizQuestions,
                               );
 

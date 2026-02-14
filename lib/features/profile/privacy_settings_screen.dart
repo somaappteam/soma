@@ -323,7 +323,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     final l10n = AppLocalizations.of(context);
     try {
       await privacyRepository.requestAccountDeletion();
-      await authRepository.signOutWithSessionEnd();
+      await authRepository.signOut();
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(

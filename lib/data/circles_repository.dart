@@ -28,6 +28,7 @@ class CirclesRepository {
     required int questionsCount,
     required int timePerQ,
     required bool allowSpectators,
+    bool isLocked = false,
     List<Map<String, dynamic>>? questions,
   }) async {
     final uid = currentUserId;
@@ -54,7 +55,7 @@ class CirclesRepository {
           'questions_count': questions?.length ?? 0,
           'time_per_q': timePerQ,
           'allow_spectators': allowSpectators,
-          'is_locked': false,
+          'is_locked': isLocked,
           'status': 'lobby',
           'questions': questions ?? [],
         })
@@ -429,6 +430,5 @@ class CircleJoinOutcome {
 }
 
 final circlesRepository = CirclesRepository();
-
 
 

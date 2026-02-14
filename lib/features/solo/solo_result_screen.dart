@@ -5,6 +5,8 @@ import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../models/solo_course.dart';
 import '../../data/quiz_repository.dart';
+import '../../data/settings_repository.dart';
+import '../../data/soma_plus_repository.dart';
 import 'solo_course_detail_screen.dart';
 import 'solo_vocab_quiz_screen.dart';
 import 'solo_sentences_quiz_screen.dart';
@@ -41,11 +43,13 @@ class SoloResultScreen extends StatefulWidget {
 }
 
 class _SoloResultScreenState extends State<SoloResultScreen> {
+  bool _hasShownFreePlanAd = false;
 
   @override
   void initState() {
     super.initState();
     _saveProgress();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeShowFreePlanAd());
   }
 
   Future<void> _saveProgress() async {
@@ -55,6 +59,36 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
       xpEarned: widget.points,
       correctCount: widget.correct,
       totalCount: widget.total,
+    );
+  }
+
+  Future<void> _maybeShowFreePlanAd() async {
+    if (!mounted || _hasShownFreePlanAd) return;
+    final settings = await settingsRepository.getSettings();
+    if (!mounted) return;
+    final tier = SomaPlusRepository.parseTier(settings['plus_plan']?.toString());
+    if (tier != SomaSubscriptionTier.free) return;
+
+    _hasShownFreePlanAd = true;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        final scheme = Theme.of(ctx).colorScheme;
+        return AlertDialog(
+          title: const Text('Sponsored Break'),
+          content: const Text(
+            'Ads are shown after each solo quiz session on the Free plan. '
+            'Upgrade to Plus for an ad-free experience.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('Continue', style: TextStyle(color: scheme.primary)),
+            ),
+          ],
+        );
+      },
     );
   }
 
