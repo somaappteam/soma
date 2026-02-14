@@ -10,7 +10,7 @@ import '../../core/theme/motion.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/staggered_in.dart';
-import '../../data/agora_voice_service.dart';
+import '../../data/rtc_voice_service.dart';
 import '../../data/chat_repository.dart';
 import '../../data/presence_repository.dart';
 import '../../data/profile_repository.dart';
@@ -18,6 +18,8 @@ import '../../data/settings_repository.dart';
 import '../../models/user_profile.dart';
 import '../profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
+
+enum DmCallState { idle, ringingOutgoing, ringingIncoming, connecting, connected }
 
 class DmChatScreen extends StatefulWidget {
   const DmChatScreen({
@@ -50,12 +52,15 @@ class _DmChatScreenState extends State<DmChatScreen> {
   late Stream<bool> _onlineStream;
   bool _showOnlineIndicator = true;
   bool _readSyncInFlight = false;
-  bool _inVoiceCall = false;
+  DmCallState _callState = DmCallState.idle;
   bool _isRecordingVoiceMessage = false;
   int _voiceRecordElapsedSeconds = 0;
   Timer? _voiceRecordTimer;
   Timer? _callTimer;
+  Timer? _callSetupTimeoutTimer;
   int _callElapsedSeconds = 0;
+  RealtimeChannel? _dmCallChannel;
+  StreamSubscription<bool>? _rtcConnectionSub;
   String? _replyPreview;
   UserProfile? _otherProfile;
   String _planTier = 'starter';
@@ -80,6 +85,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _loadOtherProfile();
     _loadCostTier();
     _markConversationAsRead();
+    _initDmCallSignaling();
+    _rtcConnectionSub = rtcVoiceService.connectionStream.listen(_onRtcConnectionState);
     
     // NEW: Listen to settings for block updates
     _settingsSub = settingsRepository.getSettingsStream().listen((settings) {
@@ -95,11 +102,18 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   @override
   void dispose() {
-    if (_inVoiceCall) {
-      agoraVoiceService.disconnect();
+    if (_isCallActive) {
+      rtcVoiceService.disconnect();
+    }
+    final callChannel = _dmCallChannel;
+    if (callChannel != null) {
+      Supabase.instance.client.removeChannel(callChannel);
+      _dmCallChannel = null;
     }
     _voiceRecordTimer?.cancel();
     _callTimer?.cancel();
+    _callSetupTimeoutTimer?.cancel();
+    _rtcConnectionSub?.cancel();
     _settingsSub?.cancel(); // NEW
     _controller.dispose();
     _scroll.dispose();
@@ -190,40 +204,243 @@ class _DmChatScreenState extends State<DmChatScreen> {
     return 'dm_${ids[0]}_${ids[1]}';
   }
 
-  Future<void> _toggleVoiceCall() async {
-    final l10n = AppLocalizations.of(context);
-    if (_inVoiceCall) {
-      await agoraVoiceService.disconnect();
+  bool get _isCallActive => _callState != DmCallState.idle;
+
+  String _formatCallDuration(int seconds) {
+    final mm = (seconds ~/ 60).toString().padLeft(2, '0');
+    final ss = (seconds % 60).toString().padLeft(2, '0');
+    return '$mm:$ss';
+  }
+
+  String get _callSubtitle {
+    return switch (_callState) {
+      DmCallState.idle => '',
+      DmCallState.ringingOutgoing => 'Calling…',
+      DmCallState.ringingIncoming => 'Incoming call…',
+      DmCallState.connecting => 'Connecting…',
+      DmCallState.connected => 'In call ${_formatCallDuration(_callElapsedSeconds)}',
+    };
+  }
+
+  void _initDmCallSignaling() {
+    final channelId = _dmVoiceChannelId();
+    final channel = Supabase.instance.client.channel(
+      'dm_call:$channelId',
+      opts: const RealtimeChannelConfig(enabled: true),
+    );
+
+    channel
+        .onBroadcast(event: 'voice_call', callback: (payload) {
+          _handleDmCallSignal(payload);
+        })
+        .subscribe();
+
+    _dmCallChannel = channel;
+  }
+
+  Future<void> _handleDmCallSignal(dynamic payload) async {
+    final map = payload is Map ? Map<String, dynamic>.from(payload) : null;
+    if (map == null) return;
+
+    final data = map['payload'] is Map
+        ? Map<String, dynamic>.from(map['payload'] as Map)
+        : map;
+
+    final from = data['from']?.toString();
+    if (from == null || from == _myUserId) return;
+    final type = data['type']?.toString();
+
+    if (type == 'call_invite') {
+      if (_isCallActive) return;
       if (!mounted) return;
-      _callTimer?.cancel();
-      setState(() => _inVoiceCall = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Voice call ended')),
-      );
+      setState(() => _callState = DmCallState.ringingIncoming);
+      final accepted = await _showIncomingCallDialog();
+      if (!mounted || _callState != DmCallState.ringingIncoming) return;
+
+      if (accepted) {
+        await _emitDmCallSignal('call_accept');
+        await _startVoiceCall(sendInvite: false, incoming: true);
+      } else {
+        setState(() => _callState = DmCallState.idle);
+        await _emitDmCallSignal('call_decline');
+      }
       return;
     }
 
-    try {
-      await agoraVoiceService.connect(circleId: _dmVoiceChannelId(), asSpeaker: true);
+    if (type == 'call_accept') {
+      if (_callState == DmCallState.ringingOutgoing) {
+        setState(() => _callState = DmCallState.connecting);
+        _startCallSetupTimeout();
+      }
+      return;
+    }
+
+    if (type == 'call_connected') {
+      _markCallConnected();
+      return;
+    }
+
+    if (type == 'call_decline') {
+      if (!_isCallActive) return;
+      await _endVoiceCall(showRemoteEnded: true, message: 'Voice call declined');
+      return;
+    }
+
+    if (type == 'call_end') {
+      if (!_isCallActive) return;
+      await _endVoiceCall(showRemoteEnded: true);
+    }
+  }
+
+  Future<bool> _showIncomingCallDialog() async {
+    final response = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Incoming voice call'),
+        content: Text('${widget.otherName} is calling you.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Decline'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Accept'),
+          ),
+        ],
+      ),
+    );
+
+    return response == true;
+  }
+
+  void _onRtcConnectionState(bool connected) {
+    if (!mounted) return;
+    if (!connected) return;
+    if (!_isCallActive) return;
+
+    _markCallConnected();
+    _emitDmCallSignal('call_connected');
+  }
+
+  void _markCallConnected() {
+    if (!mounted) return;
+    if (_callState == DmCallState.connected) return;
+
+    _callSetupTimeoutTimer?.cancel();
+    _callTimer?.cancel();
+    setState(() {
+      _callState = DmCallState.connected;
+      _callElapsedSeconds = 0;
+    });
+    _callTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted || _callState != DmCallState.connected) return;
+      setState(() => _callElapsedSeconds += 1);
+    });
+  }
+
+  void _startCallSetupTimeout() {
+    _callSetupTimeoutTimer?.cancel();
+    _callSetupTimeoutTimer = Timer(const Duration(seconds: 20), () async {
       if (!mounted) return;
-      _callTimer?.cancel();
+      if (_callState == DmCallState.connected || _callState == DmCallState.idle) return;
+
+      final retryWithRelay = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Call connection issue'),
+          content: const Text('Unable to connect quickly. Retry using relay (TURN)?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Retry with relay'),
+            ),
+          ],
+        ),
+      );
+
+      if (retryWithRelay == true) {
+        await rtcVoiceService.forceTurnRelay();
+        _startCallSetupTimeout();
+      } else {
+        await _emitDmCallSignal('call_end');
+        await _endVoiceCall(showRemoteEnded: false, message: 'Voice call failed to connect');
+      }
+    });
+  }
+
+  Future<void> _emitDmCallSignal(String type) async {
+    final channel = _dmCallChannel;
+    if (channel == null) return;
+
+    await channel.sendBroadcastMessage(
+      event: 'voice_call',
+      payload: {
+        'type': type,
+        'from': _myUserId,
+      },
+    );
+  }
+
+  Future<void> _startVoiceCall({required bool sendInvite, bool incoming = false}) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      await rtcVoiceService.connect(circleId: _dmVoiceChannelId(), asSpeaker: true, prioritySpeaker: true);
+      if (!mounted) return;
+
       setState(() {
-        _inVoiceCall = true;
+        _callState = incoming ? DmCallState.connecting : DmCallState.ringingOutgoing;
         _callElapsedSeconds = 0;
       });
-      _callTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (!mounted || !_inVoiceCall) return;
-        setState(() => _callElapsedSeconds += 1);
-      });
+
+      if (sendInvite) {
+        await _emitDmCallSignal('call_invite');
+      }
+
+      _startCallSetupTimeout();
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Connecting voice call...')),
+        SnackBar(
+          content: Text(incoming ? 'Accepting voice call…' : 'Calling…'),
+        ),
       );
     } catch (_) {
       if (!mounted) return;
+      setState(() => _callState = DmCallState.idle);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.chatCallLater)),
       );
     }
+  }
+
+  Future<void> _endVoiceCall({required bool showRemoteEnded, String? message}) async {
+    await rtcVoiceService.disconnect();
+    if (!mounted) return;
+    _callTimer?.cancel();
+    _callSetupTimeoutTimer?.cancel();
+    setState(() => _callState = DmCallState.idle);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message ?? (showRemoteEnded ? 'Voice call ended by peer' : 'Voice call ended'),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _toggleVoiceCall() async {
+    if (_isCallActive) {
+      await _emitDmCallSignal('call_end');
+      await _endVoiceCall(showRemoteEnded: false);
+      return;
+    }
+
+    await _startVoiceCall(sendInvite: true);
   }
 
   Future<void> _sendVoiceMessage(int durationSeconds) async {
@@ -575,7 +792,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
                           },
                           onCall: _toggleVoiceCall,
                           onToggleSearch: () => setState(() => _showSearch = !_showSearch),
-                          isInCall: _inVoiceCall,
+                          isInCall: _isCallActive,
+                          callStatusText: _callSubtitle,
                           callDuration: _callElapsedSeconds,
                         );
                       },
@@ -598,7 +816,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       },
                       onCall: _toggleVoiceCall,
                       onToggleSearch: () => setState(() => _showSearch = !_showSearch),
-                      isInCall: _inVoiceCall,
+                      isInCall: _isCallActive,
+                      callStatusText: _callSubtitle,
                       callDuration: _callElapsedSeconds,
                     ),
               const SizedBox(height: 8),
@@ -792,6 +1011,7 @@ class _TopBar extends StatelessWidget {
   final VoidCallback onCall;
   final VoidCallback onToggleSearch;
   final bool isInCall;
+  final String callStatusText;
   final int callDuration;
 
   const _TopBar({
@@ -804,6 +1024,7 @@ class _TopBar extends StatelessWidget {
     required this.onCall,
     required this.onToggleSearch,
     required this.isInCall,
+    required this.callStatusText,
     required this.callDuration,
   });
 
@@ -852,7 +1073,7 @@ class _TopBar extends StatelessWidget {
                           ),
                           Text(
                             isInCall
-                                ? 'In call ${_fmtCallDuration(callDuration)}'
+                                ? callStatusText
                                 : showOnlineIndicator
                                     ? '● Active now'
                                     : '@${(username == null || username!.isEmpty) ? title : username}',
