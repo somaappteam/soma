@@ -132,6 +132,36 @@ class _InboxScreenState extends State<InboxScreen> {
     await chatRepository.setConversationPreference(otherId, archived: false);
   }
 
+  Future<void> _togglePinnedThread(String otherId, {required bool next}) async {
+    setState(() {
+      if (next) {
+        _pinnedThreadIds.add(otherId);
+      } else {
+        _pinnedThreadIds.remove(otherId);
+      }
+    });
+    await chatRepository.setConversationPreference(otherId, pinned: next);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(next ? 'Chat pinned' : 'Chat unpinned')),
+    );
+  }
+
+  Future<void> _toggleMutedThread(String otherId, {required bool next}) async {
+    setState(() {
+      if (next) {
+        _mutedThreadIds.add(otherId);
+      } else {
+        _mutedThreadIds.remove(otherId);
+      }
+    });
+    await chatRepository.setConversationPreference(otherId, muted: next);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(next ? 'Chat muted' : 'Chat unmuted')),
+    );
+  }
+
   Future<bool?> _confirmDelete() {
     return showPremiumDialog(
       context: context,
@@ -294,8 +324,39 @@ class _InboxScreenState extends State<InboxScreen> {
 
                     if (visibleThreads.isEmpty) {
                       return Center(
-                        child: Text(
-                          query.isNotEmpty ? l10n.noMatchForQuery(query) : '${l10n.inboxEmptyState}\n$_onboardingPrompt',
+                        child: Glass(
+                          radius: BorderRadius.circular(20),
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.mark_chat_read_rounded,
+                                color: scheme.primary,
+                                size: 28,
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                query.isNotEmpty ? l10n.noMatchForQuery(query) : l10n.inboxEmptyState,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: scheme.onSurface,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              if (query.isEmpty) ...[
+                                const SizedBox(height: 6),
+                                Text(
+                                  _onboardingPrompt,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: scheme.onSurface.withValues(alpha: 0.65),
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       );
                     }
@@ -311,46 +372,69 @@ class _InboxScreenState extends State<InboxScreen> {
                         final unreadCount = t['unreadCount'] ?? 0;
                         final selected = _selectedThreadIds.contains(otherId);
 
-                        return _ThreadRow(
-                          otherId: otherId,
-                          name: t['otherName'] ?? l10n.unknown,
-                          lastText: t['lastMsg'] ?? '',
-                          time: _fmtTime(t['time'] as DateTime),
-                          unreadCount: unreadCount,
-                          showOnlineIndicator: t['isOnline'] == true,
-                          pinned: isPinned,
-                          muted: isMuted,
-                          selected: selected,
-                          selectionMode: _selectionMode,
-                          onTap: () async {
-                            if (_selectionMode) {
-                              setState(() {
-                                if (selected) {
-                                  _selectedThreadIds.remove(otherId);
-                                } else {
-                                  _selectedThreadIds.add(otherId);
-                                }
-                              });
-                              return;
+                        return Dismissible(
+                          key: ValueKey('thread-$otherId'),
+                          direction: _selectionMode ? DismissDirection.none : DismissDirection.horizontal,
+                          confirmDismiss: (direction) async {
+                            if (direction == DismissDirection.startToEnd) {
+                              await _togglePinnedThread(otherId, next: !isPinned);
+                            } else {
+                              await _toggleMutedThread(otherId, next: !isMuted);
                             }
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => DmChatScreen(
-                                  meId: chatRepository.currentUserId ?? "me",
-                                  otherId: t['otherId'],
-                                  otherName: t['otherName'] ?? l10n.genericUser,
+                            return false;
+                          },
+                          background: _SwipeActionBackground(
+                            alignment: Alignment.centerLeft,
+                            icon: isPinned ? Icons.push_pin_outlined : Icons.push_pin_rounded,
+                            label: isPinned ? 'Unpin' : 'Pin',
+                          ),
+                          secondaryBackground: _SwipeActionBackground(
+                            alignment: Alignment.centerRight,
+                            icon: isMuted ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
+                            label: isMuted ? 'Unmute' : 'Mute',
+                          ),
+                          child: _ThreadRow(
+                            otherId: otherId,
+                            name: t['otherName'] ?? l10n.unknown,
+                            lastText: t['lastMsg'] ?? '',
+                            time: _fmtTime(context, t['time'] as DateTime),
+                            unreadCount: unreadCount,
+                            showOnlineIndicator: t['isOnline'] == true,
+                            avatarUrl: t['avatar_url']?.toString(),
+                            pinned: isPinned,
+                            muted: isMuted,
+                            selected: selected,
+                            selectionMode: _selectionMode,
+                            onTap: () async {
+                              if (_selectionMode) {
+                                setState(() {
+                                  if (selected) {
+                                    _selectedThreadIds.remove(otherId);
+                                  } else {
+                                    _selectedThreadIds.add(otherId);
+                                  }
+                                });
+                                return;
+                              }
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => DmChatScreen(
+                                    meId: chatRepository.currentUserId ?? "me",
+                                    otherId: t['otherId'],
+                                    otherName: t['otherName'] ?? l10n.genericUser,
+                                  ),
                                 ),
-                              ),
-                            );
-                            if (mounted) setState(() {});
-                          },
-                          onLongPress: () async {
-                            final shouldDelete = await _confirmDelete();
-                            if (shouldDelete == true) {
-                              await _deleteThread(otherId);
-                            }
-                          },
+                              );
+                              if (mounted) setState(() {});
+                            },
+                            onLongPress: () async {
+                              final shouldDelete = await _confirmDelete();
+                              if (shouldDelete == true) {
+                                await _deleteThread(otherId);
+                              }
+                            },
+                          ),
                         );
                       },
                     );
@@ -364,10 +448,55 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 
-  String _fmtTime(DateTime dt) {
-    final hh = dt.hour.toString().padLeft(2, '0');
-    final mm = dt.minute.toString().padLeft(2, '0');
-    return "$hh:$mm";
+  String _fmtTime(BuildContext context, DateTime dt) {
+    final l10n = AppLocalizations.of(context);
+    final now = DateTime.now();
+    final diff = now.difference(dt);
+    if (diff.inMinutes < 1) return l10n.timeShortMinutes(1);
+    if (diff.inMinutes < 60) return l10n.timeShortMinutes(diff.inMinutes);
+    if (diff.inHours < 24) return l10n.timeShortHours(diff.inHours);
+    return l10n.timeShortDays(diff.inDays);
+  }
+}
+
+class _SwipeActionBackground extends StatelessWidget {
+  final Alignment alignment;
+  final IconData icon;
+  final String label;
+
+  const _SwipeActionBackground({
+    required this.alignment,
+    required this.icon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        color: scheme.primary.withValues(alpha: 0.14),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.25)),
+      ),
+      alignment: alignment,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: scheme.primary),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+              color: scheme.primary,
+              fontWeight: FontWeight.w900,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -398,6 +527,7 @@ class _ThreadRow extends StatelessWidget {
   final String time;
   final int unreadCount;
   final bool showOnlineIndicator;
+  final String? avatarUrl;
   final bool pinned;
   final bool muted;
   final bool selectionMode;
@@ -412,6 +542,7 @@ class _ThreadRow extends StatelessWidget {
     required this.time,
     required this.unreadCount,
     required this.showOnlineIndicator,
+    required this.avatarUrl,
     required this.pinned,
     required this.muted,
     required this.selectionMode,
@@ -448,7 +579,11 @@ class _ThreadRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            _Avatar(showOnlineIndicator: showOnlineIndicator),
+            _Avatar(
+              showOnlineIndicator: showOnlineIndicator,
+              avatarUrl: avatarUrl,
+              name: name,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -491,15 +626,23 @@ class _ThreadRow extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    lastText,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: TextStyle(
-                      color: scheme.onSurface.withValues(alpha: 0.65),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12.5,
-                    ),
+                  StreamBuilder<bool>(
+                    stream: chatRepository.typingStream(otherId),
+                    builder: (context, snapshot) {
+                      final isTyping = snapshot.data == true;
+                      return Text(
+                        isTyping ? 'Typing…' : lastText,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: isTyping
+                              ? Colors.orange
+                              : scheme.onSurface.withValues(alpha: 0.65),
+                          fontWeight: FontWeight.w700,
+                          fontSize: 12.5,
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -548,8 +691,14 @@ class _ThreadRow extends StatelessWidget {
 
 class _Avatar extends StatelessWidget {
   final bool showOnlineIndicator;
+  final String? avatarUrl;
+  final String name;
 
-  const _Avatar({required this.showOnlineIndicator});
+  const _Avatar({
+    required this.showOnlineIndicator,
+    required this.avatarUrl,
+    required this.name,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -566,10 +715,49 @@ class _Avatar extends StatelessWidget {
               : scheme.onSurface.withValues(alpha: 0.16),
         ),
       ),
-      child: Center(
-        child: Text(
-          "🙂",
-          style: TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
+      child: ClipOval(
+        child: _buildAvatarContent(context),
+      ),
+    );
+  }
+
+  Widget _buildAvatarContent(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final url = avatarUrl?.trim() ?? '';
+    if (url.isNotEmpty) {
+      return Image.network(
+        url,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => _AvatarFallback(name: name),
+      );
+    }
+    return _AvatarFallback(name: name);
+  }
+}
+
+class _AvatarFallback extends StatelessWidget {
+  final String name;
+  const _AvatarFallback({required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final clean = name.trim();
+    final parts = clean.split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList();
+    final first = parts.isNotEmpty ? parts.first[0] : '?';
+    final second = parts.length > 1 ? parts[1][0] : '';
+    final initials = (first + second).toUpperCase();
+
+    return Container(
+      color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+      alignment: Alignment.center,
+      child: Text(
+        initials,
+        style: TextStyle(
+          color: scheme.onSurface.withValues(alpha: 0.92),
+          fontSize: 12.5,
+          fontWeight: FontWeight.w900,
+          letterSpacing: 0.3,
         ),
       ),
     );

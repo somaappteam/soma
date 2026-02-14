@@ -54,6 +54,7 @@ class AppNotification {
 class NotificationsStore extends ChangeNotifier {
   List<AppNotification> _items = [];
   bool _initialized = false;
+  VoidCallback? _disposeListener;
 
   List<AppNotification> get items => List.unmodifiable(_items);
   int get unreadCount => _items.where((n) => !n.isRead).length;
@@ -66,9 +67,12 @@ class NotificationsStore extends ChangeNotifier {
     if (_initialized) return;
     _initialized = true;
 
-    notificationsRepository.getNotificationsStream().listen((rows) {
+    final sub = notificationsRepository.getNotificationsStream().listen((rows) {
       _items = rows.map((row) {
-        final metadata = row['metadata'] as Map<String, dynamic>? ?? {};
+        final metadataRaw = row['metadata'];
+        final metadata = metadataRaw is Map
+            ? Map<String, dynamic>.from(metadataRaw)
+            : <String, dynamic>{};
         
         final courseAction = metadata['course_action'] == 'daily_goal'
             ? CourseAction.dailyGoal
@@ -79,8 +83,8 @@ class NotificationsStore extends ChangeNotifier {
           type: _parseType(row['type']),
           title: row['title'] ?? '',
           body: row['body'] ?? '',
-          time: DateTime.parse(row['created_at']),
-          isRead: row['is_read'] ?? false,
+          time: _parseTime(row['created_at']),
+          isRead: row['is_read'] == true || row['is_read'] == 1,
           
           socialAction: metadata['social_action'] == 'friend_request' ? SocialAction.friendRequest : null,
           fromUserId: metadata['from_user_id'],
@@ -97,6 +101,19 @@ class NotificationsStore extends ChangeNotifier {
       }).toList();
       notifyListeners();
     });
+
+    _disposeListener = () {
+      sub.cancel();
+      _disposeListener = null;
+    };
+  }
+
+  DateTime _parseTime(dynamic raw) {
+    if (raw is DateTime) return raw;
+    if (raw is String) {
+      return DateTime.tryParse(raw) ?? DateTime.now();
+    }
+    return DateTime.now();
   }
 
   NotifType _parseType(String? type) {
@@ -131,6 +148,12 @@ class NotificationsStore extends ChangeNotifier {
 
   void joinCircle(String notifId) {
     markRead(notifId);
+  }
+
+  @override
+  void dispose() {
+    _disposeListener?.call();
+    super.dispose();
   }
 }
 
