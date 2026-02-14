@@ -22,7 +22,7 @@ import '../../data/circle_voice_service.dart';
 import '../../data/settings_repository.dart';
 import '../../data/profile_repository.dart';
 import '../../data/profile_store.dart';
-import '../../data/agora_voice_service.dart';
+import '../../data/rtc_voice_service.dart';
 import '../../core/services/tts_service.dart';
 import '../profile/profile_screen.dart';
 
@@ -216,7 +216,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
 
     try {
       await circleVoiceService.connect(circleId: circleId, name: name);
-      await agoraVoiceService.connect(circleId: circleId, asSpeaker: !isSpectator);
+      await rtcVoiceService.connect(circleId: circleId, asSpeaker: !isSpectator, prioritySpeaker: isHost);
     } catch (e) {
       debugPrint('Error connecting to voice services: $e');
       // Continue without voice if it fails
@@ -315,7 +315,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
   }
 
   void _toggleMuteFor(String name) {
-    agoraVoiceService.toggleMuted();
+    rtcVoiceService.toggleMuted();
   }
 
   void _revealAnswer({bool timedOut = false}) async {
@@ -606,7 +606,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     }
     await circlesRepository.leaveCircle(circleId);
     await circleVoiceService.disconnectIfCircle(circleId);
-    await agoraVoiceService.disconnectIfCircle(circleId);
+    await rtcVoiceService.disconnectIfCircle(circleId);
     if (!mounted) return;
     Navigator.popUntil(context, (r) => r.isFirst);
   }

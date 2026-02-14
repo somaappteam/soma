@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../data/circle_voice_service.dart';
 import '../../data/profile_store.dart';
-import '../../data/agora_voice_service.dart';
+import '../../data/rtc_voice_service.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/responsive.dart';
 
@@ -102,7 +102,7 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
                           return _MicToggleButton(
                             muted: me?.muted ?? false,
                             speaking: me?.speaking ?? false,
-                            onTap: agoraVoiceService.toggleMuted,
+                            onTap: rtcVoiceService.toggleMuted,
                           );
                         },
                       ),
@@ -136,7 +136,7 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
         : (profile.username.isNotEmpty ? profile.username : l10n.userFallbackName);
 
     await circleVoiceService.connect(circleId: circleId, name: name);
-    await agoraVoiceService.connect(circleId: circleId, asSpeaker: true);
+    await rtcVoiceService.connect(circleId: circleId, asSpeaker: true, prioritySpeaker: true);
   }
 }
 
