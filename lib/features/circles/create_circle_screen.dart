@@ -199,6 +199,34 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                               _SectionTitle(l10n.circlesRoomSetup),
                               const SizedBox(height: 10),
 
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  _PresetChip(
+                                    label: 'Beginner Fast 10Q',
+                                    onTap: () => setState(() {
+                                      level = 'A';
+                                      mode = 'Vocabulary';
+                                      questions = 10;
+                                      timePerQ = 8;
+                                      maxPlayers = 5;
+                                    }),
+                                  ),
+                                  _PresetChip(
+                                    label: 'Exam Prep 20Q',
+                                    onTap: () => setState(() {
+                                      level = 'B';
+                                      mode = 'Sentences';
+                                      questions = 20;
+                                      timePerQ = 15;
+                                      maxPlayers = 5;
+                                    }),
+                                  ),
+                                ],
+                              ),
+
                               _StepperRow(
                                 title: l10n.circlesPlayers,
                                 subtitle: l10n.circlesPlayersRange,
@@ -905,4 +933,31 @@ Future<LangOption?> _pickFrom(
       );
     },
   );
+}
+
+
+class _PresetChip extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  const _PresetChip({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(999),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(999),
+          color: Colors.white.withValues(alpha: 0.08),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
 }

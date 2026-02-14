@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/premium_dialog.dart';
 import '../../data/chat_repository.dart';
-import '../../data/settings_repository.dart';
+import '../../data/experiment_repository.dart';
 import 'dm_chat_screen.dart';
 import 'select_friend_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
+
+enum _InboxFilter { all, unread, mentions }
 
 class InboxScreen extends StatefulWidget {
   const InboxScreen({super.key});
@@ -16,52 +18,39 @@ class InboxScreen extends StatefulWidget {
 }
 
 class _InboxScreenState extends State<InboxScreen> {
-  static const String _threadPrefsKey = 'chat_thread_prefs';
   String query = "";
   late final Stream<List<Map<String, dynamic>>> _threadsStream;
   final Set<String> _archivedThreadIds = <String>{};
   final Set<String> _deletedThreadIds = <String>{};
   final Set<String> _pinnedThreadIds = <String>{};
   final Set<String> _mutedThreadIds = <String>{};
+  final Set<String> _selectedThreadIds = <String>{};
   bool _showArchivedOnly = false;
+  bool _selectionMode = false;
+  _InboxFilter _filter = _InboxFilter.all;
+  String _onboardingPrompt = 'Start with a quick hello to a friend.';
 
   @override
   void initState() {
     super.initState();
     _threadsStream = _inboxThreadsStream();
-    _loadThreadPrefs();
+    _loadExperimentPrompt();
   }
 
-  Future<void> _loadThreadPrefs() async {
-    final settings = await settingsRepository.getSettings();
-    final raw = settings[_threadPrefsKey];
-    if (raw is! Map<String, dynamic>) return;
 
+  Future<void> _loadExperimentPrompt() async {
+    final v = await experimentRepository.variant('inbox_onboarding_prompt', buckets: const ['A', 'B']);
     if (!mounted) return;
     setState(() {
-      _archivedThreadIds
-        ..clear()
-        ..addAll((raw['archived'] as List?)?.map((e) => e.toString()) ?? const []);
-      _pinnedThreadIds
-        ..clear()
-        ..addAll((raw['pinned'] as List?)?.map((e) => e.toString()) ?? const []);
-      _mutedThreadIds
-        ..clear()
-        ..addAll((raw['muted'] as List?)?.map((e) => e.toString()) ?? const []);
-    });
-  }
-
-  Future<void> _saveThreadPrefs() async {
-    await settingsRepository.updateSetting(_threadPrefsKey, {
-      'archived': _archivedThreadIds.toList(),
-      'pinned': _pinnedThreadIds.toList(),
-      'muted': _mutedThreadIds.toList(),
+      _onboardingPrompt = v == 'B'
+          ? 'Tip: pin your most important chats.'
+          : 'Start with a quick hello to a friend.';
     });
   }
 
   Stream<List<Map<String, dynamic>>> _inboxThreadsStream() async* {
     yield await chatRepository.getInboxThreads();
-    yield* Stream.periodic(const Duration(seconds: 1)).asyncMap(
+    yield* chatRepository.inboxRefreshStream().asyncMap(
       (_) => chatRepository.getInboxThreads(),
     );
   }
@@ -71,16 +60,31 @@ class _InboxScreenState extends State<InboxScreen> {
       final otherId = t['otherId']?.toString();
       if (otherId == null || otherId.isEmpty) continue;
 
-      if (t['isPinned'] == true) {
-        _pinnedThreadIds.add(otherId);
-      }
-      if (t['isMuted'] == true) {
-        _mutedThreadIds.add(otherId);
-      }
-      if (t['isArchived'] == true) {
-        _archivedThreadIds.add(otherId);
-      }
+      if (t['isPinned'] == true) _pinnedThreadIds.add(otherId);
+      if (t['isMuted'] == true) _mutedThreadIds.add(otherId);
+      if (t['isArchived'] == true) _archivedThreadIds.add(otherId);
     }
+  }
+
+  Future<void> _bulkMarkRead() async {
+    final ids = _selectedThreadIds.toList();
+    await chatRepository.markAllConversationsAsRead(ids);
+    if (!mounted) return;
+    setState(() {
+      _selectionMode = false;
+      _selectedThreadIds.clear();
+    });
+  }
+
+  Future<void> _bulkArchive() async {
+    final ids = _selectedThreadIds.toList();
+    await chatRepository.archiveConversations(ids);
+    if (!mounted) return;
+    setState(() {
+      _archivedThreadIds.addAll(ids);
+      _selectionMode = false;
+      _selectedThreadIds.clear();
+    });
   }
 
   Future<void> _deleteThread(String otherId) async {
@@ -126,21 +130,6 @@ class _InboxScreenState extends State<InboxScreen> {
       _archivedThreadIds.remove(otherId);
     });
     await chatRepository.setConversationPreference(otherId, archived: false);
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Chat moved to inbox'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            if (!mounted) return;
-            setState(() => _archivedThreadIds.add(otherId));
-            chatRepository.setConversationPreference(otherId, archived: true);
-          },
-        ),
-      ),
-    );
   }
 
   Future<bool?> _confirmDelete() {
@@ -151,96 +140,6 @@ class _InboxScreenState extends State<InboxScreen> {
       confirmText: 'Delete',
       cancelText: 'Cancel',
       destructive: true,
-    );
-  }
-
-  Future<void> _showThreadOptions(Map<String, dynamic> thread) async {
-    final otherId = thread['otherId']?.toString();
-    if (otherId == null) return;
-
-    final isPinned = _pinnedThreadIds.contains(otherId);
-    final isMuted = _mutedThreadIds.contains(otherId);
-    final isArchived = _archivedThreadIds.contains(otherId);
-    final unreadCount = (thread['unreadCount'] as int?) ?? 0;
-
-    await showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: Icon(isPinned ? Icons.push_pin : Icons.push_pin_outlined),
-                title: Text(isPinned ? 'Unpin chat' : 'Pin chat'),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    if (isPinned) {
-                      _pinnedThreadIds.remove(otherId);
-                    } else {
-                      _pinnedThreadIds.add(otherId);
-                    }
-                  });
-                  chatRepository.setConversationPreference(otherId, pinned: !isPinned);
-                },
-              ),
-              ListTile(
-                leading: Icon(isMuted ? Icons.notifications_active_outlined : Icons.notifications_off_outlined),
-                title: Text(isMuted ? 'Unmute notifications' : 'Mute notifications'),
-                onTap: () {
-                  Navigator.pop(context);
-                  setState(() {
-                    if (isMuted) {
-                      _mutedThreadIds.remove(otherId);
-                    } else {
-                      _mutedThreadIds.add(otherId);
-                    }
-                  });
-                  chatRepository.setConversationPreference(otherId, muted: !isMuted);
-                },
-              ),
-              ListTile(
-                leading: Icon(unreadCount > 0 ? Icons.mark_chat_read_outlined : Icons.mark_chat_unread_outlined),
-                title: Text(unreadCount > 0 ? 'Mark as read' : 'Mark as unread'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  if (unreadCount > 0) {
-                    await chatRepository.markConversationAsRead(otherId);
-                  } else {
-                    await chatRepository.markConversationAsUnread(otherId);
-                  }
-                  if (mounted) setState(() {});
-                },
-              ),
-              ListTile(
-                leading: Icon(isArchived ? Icons.unarchive_outlined : Icons.archive_outlined),
-                title: Text(isArchived ? 'Unarchive chat' : 'Archive chat'),
-                onTap: () {
-                  Navigator.pop(context);
-                  if (isArchived) {
-                    _unarchiveThread(otherId);
-                  } else {
-                    _archiveThread(otherId);
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline_rounded),
-                title: const Text('Delete conversation'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final shouldDelete = await _confirmDelete();
-                  if (shouldDelete == true) {
-                    await _deleteThread(otherId);
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
@@ -270,9 +169,23 @@ class _InboxScreenState extends State<InboxScreen> {
                     ),
                   ),
                   const Spacer(),
+                  if (_selectionMode) ...[
+                    _IconGlass(icon: Icons.mark_chat_read_rounded, onTap: _bulkMarkRead),
+                    const SizedBox(width: 8),
+                    _IconGlass(icon: Icons.archive_rounded, onTap: _bulkArchive),
+                    const SizedBox(width: 8),
+                  ],
                   _IconGlass(
                     icon: _showArchivedOnly ? Icons.archive : Icons.archive_outlined,
                     onTap: () => setState(() => _showArchivedOnly = !_showArchivedOnly),
+                  ),
+                  const SizedBox(width: 8),
+                  _IconGlass(
+                    icon: _selectionMode ? Icons.close_rounded : Icons.checklist_rounded,
+                    onTap: () => setState(() {
+                      _selectionMode = !_selectionMode;
+                      if (!_selectionMode) _selectedThreadIds.clear();
+                    }),
                   ),
                   const SizedBox(width: 8),
                   _IconGlass(
@@ -287,9 +200,29 @@ class _InboxScreenState extends State<InboxScreen> {
                   ),
                 ],
               ),
-
-              const SizedBox(height: 14),
-
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  ChoiceChip(
+                    label: const Text('All'),
+                    selected: _filter == _InboxFilter.all,
+                    onSelected: (_) => setState(() => _filter = _InboxFilter.all),
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('Unread'),
+                    selected: _filter == _InboxFilter.unread,
+                    onSelected: (_) => setState(() => _filter = _InboxFilter.unread),
+                  ),
+                  const SizedBox(width: 8),
+                  ChoiceChip(
+                    label: const Text('Mentions'),
+                    selected: _filter == _InboxFilter.mentions,
+                    onSelected: (_) => setState(() => _filter = _InboxFilter.mentions),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
               Glass(
                 radius: BorderRadius.circular(20),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -318,32 +251,33 @@ class _InboxScreenState extends State<InboxScreen> {
                   ],
                 ),
               ),
-
-              const SizedBox(height: 14),
-
+              const SizedBox(height: 12),
               Expanded(
                 child: StreamBuilder<List<Map<String, dynamic>>>(
                   stream: _threadsStream,
                   builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF)));
+                    if (!snapshot.hasData) {
+                      return const Center(child: CircularProgressIndicator());
                     }
+                    final threads = snapshot.data!;
+                    _syncServerPrefs(threads);
 
-                    final all = snapshot.data ?? [];
-                    _syncServerPrefs(all);
-                    final visibleThreads = all.where((t) {
+                    var visibleThreads = threads.where((t) {
                       final otherId = t['otherId']?.toString();
-                      if (otherId == null) return false;
-
-                      if (_deletedThreadIds.contains(otherId)) return false;
+                      if (otherId == null || _deletedThreadIds.contains(otherId)) return false;
 
                       final isArchived = _archivedThreadIds.contains(otherId);
-                      if (_showArchivedOnly && !isArchived) return false;
-                      if (!_showArchivedOnly && isArchived) return false;
+                      if (_showArchivedOnly != isArchived) return false;
 
-                      if (query.trim().isEmpty) return true;
-                      final name = (t['otherName'] as String?) ?? '';
-                      return name.toLowerCase().contains(query.toLowerCase());
+                      final hay = '${t['otherName'] ?? ''} ${t['lastMsg'] ?? ''}'.toLowerCase();
+                      if (query.isNotEmpty && !hay.contains(query.toLowerCase())) return false;
+
+                      final unreadCount = (t['unreadCount'] as int?) ?? 0;
+                      if (_filter == _InboxFilter.unread && unreadCount <= 0) return false;
+                      if (_filter == _InboxFilter.mentions && !(t['lastMsg']?.toString().contains('@') ?? false)) {
+                        return false;
+                      }
+                      return true;
                     }).toList();
 
                     visibleThreads.sort((a, b) {
@@ -359,92 +293,66 @@ class _InboxScreenState extends State<InboxScreen> {
                     });
 
                     if (visibleThreads.isEmpty) {
-                      return Glass(
-                        radius: BorderRadius.circular(22),
-                        padding: const EdgeInsets.all(16),
+                      return Center(
                         child: Text(
-                          query.isEmpty
-                              ? (_showArchivedOnly ? 'No archived chats yet.' : l10n.inboxEmptyState)
-                              : l10n.noMatchForQuery(query),
-                          style: TextStyle(
-                            color: scheme.onSurface.withValues(alpha: 0.75),
-                            fontWeight: FontWeight.w700,
-                          ),
+                          query.isNotEmpty ? l10n.noMatchForQuery(query) : '${l10n.inboxEmptyState}\n$_onboardingPrompt',
                         ),
                       );
                     }
 
-                    return Glass(
-                      radius: BorderRadius.circular(22),
-                      padding: const EdgeInsets.all(12),
-                      child: ListView.separated(
-                        itemCount: visibleThreads.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          final t = visibleThreads[index];
-                          final otherId = t['otherId']?.toString() ?? '';
-                          final isPinned = _pinnedThreadIds.contains(otherId);
-                          final isMuted = _mutedThreadIds.contains(otherId);
+                    return ListView.separated(
+                      itemCount: visibleThreads.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        final t = visibleThreads[index];
+                        final otherId = t['otherId']?.toString() ?? '';
+                        final isPinned = _pinnedThreadIds.contains(otherId);
+                        final isMuted = _mutedThreadIds.contains(otherId);
+                        final unreadCount = t['unreadCount'] ?? 0;
+                        final selected = _selectedThreadIds.contains(otherId);
 
-                          final isArchived = _archivedThreadIds.contains(otherId);
-
-                          return Dismissible(
-                            key: ValueKey('thread-$otherId'),
-                            direction: DismissDirection.horizontal,
-                            background: _SwipeActionBackground(
-                              icon: isArchived ? Icons.unarchive_outlined : Icons.archive_outlined,
-                              label: isArchived ? 'Unarchive' : 'Archive',
-                              alignment: Alignment.centerLeft,
-                              color: const Color(0xFF5D7CFF),
-                            ),
-                            secondaryBackground: _SwipeActionBackground(
-                              icon: Icons.delete_outline_rounded,
-                              label: 'Delete',
-                              alignment: Alignment.centerRight,
-                              color: const Color(0xFFEF5350),
-                            ),
-                            confirmDismiss: (direction) async {
-                              if (direction == DismissDirection.startToEnd) {
-                                if (isArchived) {
-                                  await _unarchiveThread(otherId);
+                        return _ThreadRow(
+                          otherId: otherId,
+                          name: t['otherName'] ?? l10n.unknown,
+                          lastText: t['lastMsg'] ?? '',
+                          time: _fmtTime(t['time'] as DateTime),
+                          unreadCount: unreadCount,
+                          showOnlineIndicator: t['isOnline'] == true,
+                          pinned: isPinned,
+                          muted: isMuted,
+                          selected: selected,
+                          selectionMode: _selectionMode,
+                          onTap: () async {
+                            if (_selectionMode) {
+                              setState(() {
+                                if (selected) {
+                                  _selectedThreadIds.remove(otherId);
                                 } else {
-                                  await _archiveThread(otherId);
+                                  _selectedThreadIds.add(otherId);
                                 }
-                                return true;
-                              }
-                              final shouldDelete = await _confirmDelete();
-                              if (shouldDelete == true) {
-                                await _deleteThread(otherId);
-                                return true;
-                              }
-                              return false;
-                            },
-                            child: _ThreadRow(
-                              name: t['otherName'] ?? l10n.unknown,
-                              lastText: t['lastMsg'] ?? '',
-                              time: _fmtTime(t['time'] as DateTime),
-                              unreadCount: t['unreadCount'] ?? 0,
-                              showOnlineIndicator: t['isOnline'] == true,
-                              pinned: isPinned,
-                              muted: isMuted,
-                              onLongPress: () => _showThreadOptions(t),
-                              onTap: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => DmChatScreen(
-                                      meId: chatRepository.currentUserId ?? "me",
-                                      otherId: t['otherId'],
-                                      otherName: t['otherName'] ?? l10n.genericUser,
-                                    ),
-                                  ),
-                                );
-                                if (mounted) setState(() {});
-                              },
-                            ),
-                          );
-                        },
-                      ),
+                              });
+                              return;
+                            }
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => DmChatScreen(
+                                  meId: chatRepository.currentUserId ?? "me",
+                                  otherId: t['otherId'],
+                                  otherName: t['otherName'] ?? l10n.genericUser,
+                                ),
+                              ),
+                            );
+                            if (mounted) setState(() {});
+                          },
+                          onLongPress: () async {
+                            final shouldDelete = await _confirmDelete();
+                            if (shouldDelete == true) {
+                              await _deleteThread(otherId);
+                            }
+                          },
+                        );
+                      },
                     );
                   },
                 ),
@@ -483,52 +391,8 @@ class _IconGlass extends StatelessWidget {
   }
 }
 
-class _SwipeActionBackground extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Alignment alignment;
-  final Color color;
-
-  const _SwipeActionBackground({
-    required this.icon,
-    required this.label,
-    required this.alignment,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      alignment: alignment,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        color: color.withValues(alpha: 0.22),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (alignment == Alignment.centerRight)
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-            ),
-          const SizedBox(width: 8),
-          Icon(icon, color: Colors.white),
-          if (alignment == Alignment.centerLeft) ...[
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
 class _ThreadRow extends StatelessWidget {
+  final String otherId;
   final String name;
   final String lastText;
   final String time;
@@ -536,10 +400,13 @@ class _ThreadRow extends StatelessWidget {
   final bool showOnlineIndicator;
   final bool pinned;
   final bool muted;
+  final bool selectionMode;
+  final bool selected;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
   const _ThreadRow({
+    required this.otherId,
     required this.name,
     required this.lastText,
     required this.time,
@@ -547,6 +414,8 @@ class _ThreadRow extends StatelessWidget {
     required this.showOnlineIndicator,
     required this.pinned,
     required this.muted,
+    required this.selectionMode,
+    required this.selected,
     required this.onTap,
     required this.onLongPress,
   });
@@ -564,9 +433,17 @@ class _ThreadRow extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: highlight ? scheme.onSurface.withValues(alpha: 0.10) : scheme.onSurface.withValues(alpha: 0.06),
+          color: selected
+              ? scheme.primary.withValues(alpha: 0.12)
+              : (highlight
+                  ? scheme.onSurface.withValues(alpha: 0.10)
+                  : scheme.onSurface.withValues(alpha: 0.06)),
           border: Border.all(
-            color: highlight ? scheme.onSurface.withValues(alpha: 0.24) : scheme.onSurface.withValues(alpha: 0.14),
+            color: selected
+                ? scheme.primary
+                : (highlight
+                    ? scheme.onSurface.withValues(alpha: 0.24)
+                    : scheme.onSurface.withValues(alpha: 0.14)),
           ),
         ),
         child: Row(
@@ -596,6 +473,16 @@ class _ThreadRow extends StatelessWidget {
                         const SizedBox(width: 6),
                         const _ActiveNowPill(),
                       ],
+                      StreamBuilder<bool>(
+                        stream: chatRepository.typingStream(otherId),
+                        builder: (context, snapshot) {
+                          if (snapshot.data != true) return const SizedBox.shrink();
+                          return const Padding(
+                            padding: EdgeInsets.only(left: 6),
+                            child: _TypingPill(),
+                          );
+                        },
+                      ),
                       if (muted) ...[
                         const SizedBox(width: 6),
                         Icon(Icons.notifications_off_rounded,
@@ -648,7 +535,8 @@ class _ThreadRow extends StatelessWidget {
                     ),
                   )
                 else
-                  Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.45)),
+                  Icon(selectionMode ? Icons.check_circle_outline : Icons.chevron_right_rounded,
+                      color: scheme.onSurface.withValues(alpha: 0.45)),
               ],
             ),
           ],
@@ -677,39 +565,12 @@ class _Avatar extends StatelessWidget {
               ? const Color(0xFF58F7B6).withValues(alpha: 0.65)
               : scheme.onSurface.withValues(alpha: 0.16),
         ),
-        boxShadow: showOnlineIndicator
-            ? [
-                BoxShadow(
-                  color: const Color(0xFF58F7B6).withValues(alpha: 0.35),
-                  blurRadius: 12,
-                  spreadRadius: 1,
-                ),
-              ]
-            : null,
       ),
-      child: Stack(
-        children: [
-          Center(
-            child: Text(
-              "🙂",
-              style: TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
-            ),
-          ),
-          if (showOnlineIndicator)
-            Positioned(
-              bottom: 2,
-              right: 2,
-              child: Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF58F7B6),
-                  border: Border.all(color: scheme.surface.withValues(alpha: 0.7), width: 2),
-                ),
-              ),
-            ),
-        ],
+      child: Center(
+        child: Text(
+          "🙂",
+          style: TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
+        ),
       ),
     );
   }
@@ -727,20 +588,33 @@ class _ActiveNowPill extends StatelessWidget {
         color: const Color(0xFF58F7B6).withValues(alpha: 0.15),
         border: Border.all(color: const Color(0xFF58F7B6).withValues(alpha: 0.45)),
       ),
-      child: const Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.circle, size: 7, color: Color(0xFF58F7B6)),
-          SizedBox(width: 4),
-          Text(
-            'Active',
-            style: TextStyle(
-              color: Color(0xFF58F7B6),
-              fontSize: 9.5,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
+      child: const Text(
+        'Active',
+        style: TextStyle(
+          color: Color(0xFF58F7B6),
+          fontSize: 9.5,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+class _TypingPill extends StatelessWidget {
+  const _TypingPill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: Colors.orange.withValues(alpha: 0.15),
+        border: Border.all(color: Colors.orange.withValues(alpha: 0.45)),
+      ),
+      child: const Text(
+        'Typing…',
+        style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.orange),
       ),
     );
   }

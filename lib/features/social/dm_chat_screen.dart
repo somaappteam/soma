@@ -15,6 +15,7 @@ import '../../data/chat_repository.dart';
 import '../../data/presence_repository.dart';
 import '../../data/profile_repository.dart';
 import '../../data/settings_repository.dart';
+import '../../data/user_report_repository.dart';
 import '../../models/user_profile.dart';
 import '../profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
@@ -66,9 +67,17 @@ class _DmChatScreenState extends State<DmChatScreen> {
   String _planTier = 'starter';
   bool _showSearch = false;
   String _searchQuery = '';
+  String _draftText = '';
   // NEW: Track block status
   StreamSubscription? _settingsSub;
-  bool _isOtherBlocked = false;   
+  bool _isOtherBlocked = false;
+  bool _canChat = true;
+  String? _dmGateReason;
+  String? _sentRequestStatus;
+  String? _incomingRequestStatus;
+  late Stream<bool> _typingStream;
+  Timer? _typingDebounce;
+  bool _typingStateSent = false;
 
   int get _maxImageBytes => _planTier == 'pro' ? _proMaxImageBytes : _starterMaxImageBytes;
   int get _maxFileBytes => _planTier == 'pro' ? _proMaxFileBytes : _starterMaxFileBytes;
@@ -85,8 +94,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _loadOtherProfile();
     _loadCostTier();
     _markConversationAsRead();
-    _initDmCallSignaling();
-    _rtcConnectionSub = rtcVoiceService.connectionStream.listen(_onRtcConnectionState);
+    _typingStream = chatRepository.typingStream(widget.otherId);
+    _loadDmGate();
+    _loadDraft();
     
     // NEW: Listen to settings for block updates
     _settingsSub = settingsRepository.getSettingsStream().listen((settings) {
@@ -115,6 +125,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _callSetupTimeoutTimer?.cancel();
     _rtcConnectionSub?.cancel();
     _settingsSub?.cancel(); // NEW
+    _typingDebounce?.cancel();
+    _setTypingState(false, immediate: true);
+    _saveDraft(_controller.text);
     _controller.dispose();
     _scroll.dispose();
     super.dispose();
@@ -134,6 +147,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
   }
 
   void _send() {
+    if (!_canChat) return;
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     if (text.length > _maxTextChars) {
@@ -150,7 +164,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
       if (_replyPreview != null) 'reply_to': _replyPreview,
     };
     chatRepository.sendMessage(widget.otherId, jsonEncode(payload));
+    _setTypingState(false, immediate: true);
     _controller.clear();
+    _saveDraft('');
     setState(() => _replyPreview = null);
 
     // Optional: Optimistic UI or wait for stream update
@@ -166,6 +182,45 @@ class _DmChatScreenState extends State<DmChatScreen> {
         );
       }
     });
+  }
+
+
+  void _onTypingChanged(bool hasText) {
+    _typingDebounce?.cancel();
+    _typingDebounce = Timer(const Duration(milliseconds: 450), () {
+      _setTypingState(hasText);
+    });
+  }
+
+  void _setTypingState(bool value, {bool immediate = false}) {
+    if (!immediate && _typingStateSent == value) return;
+    _typingStateSent = value;
+    chatRepository.setTypingState(otherUserId: widget.otherId, isTyping: value);
+  }
+
+
+  Future<void> _loadDraft() async {
+    final settings = await settingsRepository.getSettings();
+    final drafts = (settings['chat_drafts'] as Map<String, dynamic>?) ?? {};
+    final key = widget.otherId;
+    final draft = drafts[key]?.toString() ?? '';
+    if (!mounted) return;
+    _draftText = draft;
+    _controller.text = draft;
+    _controller.selection = TextSelection.fromPosition(
+      TextPosition(offset: _controller.text.length),
+    );
+  }
+
+  Future<void> _saveDraft(String text) async {
+    final settings = await settingsRepository.getSettings();
+    final drafts = Map<String, dynamic>.from((settings['chat_drafts'] as Map<String, dynamic>?) ?? {});
+    if (text.trim().isEmpty) {
+      drafts.remove(widget.otherId);
+    } else {
+      drafts[widget.otherId] = text;
+    }
+    await settingsRepository.updateSetting('chat_drafts', drafts);
   }
 
   Future<void> _loadOnlineVisibility() async {
@@ -722,6 +777,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
         child: Wrap(
           children: [
             ListTile(
+              leading: const Icon(Icons.emoji_emotions_outlined),
+              title: const Text('React 👍'),
+              onTap: () async {
+                Navigator.pop(context);
+                await chatRepository.toggleMessageReaction(messageId: msg.id, emoji: '👍');
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.reply_rounded),
               title: const Text('Reply'),
               onTap: () {
@@ -748,15 +811,79 @@ class _DmChatScreenState extends State<DmChatScreen> {
                 },
               )
             else
-              ListTile(
-                leading: const Icon(Icons.flag_outlined),
-                title: const Text('Report'),
-                onTap: () {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Report submitted')),
-                  );
-                },
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.flag_outlined),
+                    title: const Text('Report'),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      try {
+                        final reason = await showModalBottomSheet<String>(
+                          context: context,
+                          builder: (_) => SafeArea(
+                            child: Wrap(
+                              children: [
+                                for (final r in const [
+                                  'spam',
+                                  'harassment',
+                                  'scam',
+                                  'other'
+                                ])
+                                  ListTile(
+                                    title: Text(r),
+                                    onTap: () => Navigator.pop(context, r),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                        if (!mounted || reason == null) return;
+                        await userReportRepository.reportUser(widget.otherId);
+                        await chatRepository.submitChatReport(
+                          otherUserId: widget.otherId,
+                          messageId: msg.id,
+                          messagePreview: msg.previewText,
+                          reason: reason,
+                        );
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Report submitted: $reason')),
+                        );
+                      } catch (_) {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Could not submit report')),
+                        );
+                      }
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.block_rounded),
+                    title: const Text('Block and report'),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      final settings = await settingsRepository.getSettings();
+                      final blockedIds = (settings['blocked_user_ids'] as List?)
+                              ?.map((e) => e.toString())
+                              .toList() ??
+                          [];
+                      if (!blockedIds.contains(widget.otherId)) {
+                        blockedIds.add(widget.otherId);
+                      }
+                      await settingsRepository.updateSetting(
+                        'blocked_user_ids',
+                        blockedIds,
+                      );
+                      await userReportRepository.reportUser(widget.otherId);
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('User blocked and reported')),
+                      );
+                    },
+                  ),
+                ],
               ),
           ],
         ),
@@ -897,6 +1024,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
                                     time: _fmtTime(created),
                                     isMe: isMe,
                                     isRead: m['is_read'] == true || m['is_read'] == 1,
+                                    readAt: m['read_at']?.toString(),
+                                    reactions: (m['reactions'] as Map<String, dynamic>?) ?? const {},
+                                    onReact: (emoji) => chatRepository.toggleMessageReaction(messageId: m['id'].toString(), emoji: emoji),
                                     replyTo: parsed.payload.replyTo,
                                     onLongPress: () => _showMessageActions(parsed),
                                     onTapFile: _openFileUrl,
@@ -937,9 +1067,61 @@ class _DmChatScreenState extends State<DmChatScreen> {
                     ),
                   ),
                 ),
+
+              if (!_isOtherBlocked && _canChat)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final quick in const ['Nice!','Join now','Good luck','Thanks!'])
+                          Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: ActionChip(
+                              label: Text(quick),
+                              onPressed: () {
+                                _controller.text = quick;
+                                _controller.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: _controller.text.length),
+                                );
+                                _onTypingChanged(true);
+                                _saveDraft(quick);
+                                setState(() {});
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              StreamBuilder<bool>(
+                stream: _typingStream,
+                builder: (context, snapshot) {
+                  if (snapshot.data != true) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text(
+                      '${widget.otherName} is typing…',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  );
+                },
+              ),
               if (_isOtherBlocked)
                 _BlockedOverlay(
                   onUnblock: _unblockUser,
+                )
+              else if (!_canChat && _dmGateReason == 'needs_request')
+                _MessageRequestOverlay(
+                  sentRequestStatus: _sentRequestStatus,
+                  incomingRequestStatus: _incomingRequestStatus,
+                  onSendRequest: _sendMessageRequest,
+                  onAccept: () => _respondIncomingRequest(true),
+                  onDecline: () => _respondIncomingRequest(false),
                 )
               else
                 _InputBar(
@@ -950,6 +1132,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
                   },
                   onSendImage: _pickAndSendImage,
                   onSendFile: _pickAndSendDocument,
+                  onTypingChanged: _onTypingChanged,
+                  onTextChanged: _saveDraft,
                   isRecordingVoiceMessage: _isRecordingVoiceMessage,
                   recordingSeconds: _voiceRecordElapsedSeconds,
                 ),
@@ -990,6 +1174,41 @@ class _DmChatScreenState extends State<DmChatScreen> {
     
     await settingsRepository.updateSetting('blocked_user_ids', blockedIds);
     // Stream listener in initState will update state
+  }
+
+
+  Future<void> _loadDmGate() async {
+    try {
+      final state = await chatRepository.getDmGateState(widget.otherId);
+      if (!mounted) return;
+      setState(() {
+        _canChat = state['canChat'] == true;
+        _dmGateReason = state['reason']?.toString();
+        _sentRequestStatus = state['sentRequestStatus']?.toString();
+        _incomingRequestStatus = state['incomingRequestStatus']?.toString();
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _sendMessageRequest() async {
+    await chatRepository.sendMessageRequest(widget.otherId);
+    if (!mounted) return;
+    await _loadDmGate();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Message request sent')),
+    );
+  }
+
+  Future<void> _respondIncomingRequest(bool accept) async {
+    await chatRepository.respondToMessageRequest(
+      requesterId: widget.otherId,
+      accept: accept,
+    );
+    if (!mounted) return;
+    await _loadDmGate();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(accept ? 'Message request accepted' : 'Message request declined')),
+    );
   }
 
   String _fmtTime(DateTime dt) {
@@ -1136,8 +1355,11 @@ class _Bubble extends StatelessWidget {
   final bool isMe;
   final bool isRead;
   final String? replyTo;
+  final String? readAt;
+  final Map<String, dynamic> reactions;
   final VoidCallback? onLongPress;
   final ValueChanged<String>? onTapFile;
+  final ValueChanged<String>? onReact;
 
   const _Bubble({
     required this.text,
@@ -1146,8 +1368,11 @@ class _Bubble extends StatelessWidget {
     required this.isMe,
     required this.isRead,
     this.replyTo,
+    this.readAt,
+    this.reactions = const {},
     this.onLongPress,
     this.onTapFile,
+    this.onReact,
   });
 
   @override
@@ -1298,6 +1523,28 @@ class _Bubble extends StatelessWidget {
             ),
           ),
         ),
+
+        if (reactions.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Wrap(
+              spacing: 6,
+              children: reactions.entries.map((entry) {
+                final count = (entry.value as List?)?.length ?? 0;
+                return GestureDetector(
+                  onTap: () => onReact?.call(entry.key),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: scheme.onSurface.withValues(alpha: 0.08),
+                    ),
+                    child: Text('${entry.key} $count'),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
         if (isMe)
           Padding(
             padding: const EdgeInsets.only(top: 2, right: 4),
@@ -1409,6 +1656,8 @@ class _InputBar extends StatelessWidget {
   final VoidCallback onVoiceMessage;
   final VoidCallback onSendImage;
   final VoidCallback onSendFile;
+  final ValueChanged<bool> onTypingChanged;
+  final ValueChanged<String> onTextChanged;
   final bool isRecordingVoiceMessage;
   final int recordingSeconds;
 
@@ -1418,6 +1667,8 @@ class _InputBar extends StatelessWidget {
     required this.onVoiceMessage,
     required this.onSendImage,
     required this.onSendFile,
+    required this.onTypingChanged,
+    required this.onTextChanged,
     required this.isRecordingVoiceMessage,
     required this.recordingSeconds,
   });
@@ -1469,6 +1720,14 @@ class _InputBar extends StatelessWidget {
                     cursorColor: scheme.primary,
                     minLines: 1,
                     maxLines: 4,
+                    onChanged: (v) {
+                      onTypingChanged(v.trim().isNotEmpty);
+                      onTextChanged(v);
+                    },
+                    onSubmitted: (_) {
+                      onSend();
+                      onTypingChanged(false);
+                    },
                     decoration: InputDecoration(
                       hintText: "Message…",
                       hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
@@ -1551,6 +1810,70 @@ class _InputBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+class _MessageRequestOverlay extends StatelessWidget {
+  final String? sentRequestStatus;
+  final String? incomingRequestStatus;
+  final VoidCallback onSendRequest;
+  final VoidCallback onAccept;
+  final VoidCallback onDecline;
+
+  const _MessageRequestOverlay({
+    required this.sentRequestStatus,
+    required this.incomingRequestStatus,
+    required this.onSendRequest,
+    required this.onAccept,
+    required this.onDecline,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+      child: Glass(
+        radius: BorderRadius.circular(14),
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Messaging is restricted to friends. Send a message request to continue.',
+              style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            if (incomingRequestStatus == 'pending')
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: onDecline,
+                      child: const Text('Decline'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: onAccept,
+                      child: const Text('Accept request'),
+                    ),
+                  ),
+                ],
+              )
+            else if (sentRequestStatus == 'pending')
+              const Text('Request sent. Waiting for approval.', style: TextStyle(fontWeight: FontWeight.w700))
+            else
+              FilledButton.icon(
+                onPressed: onSendRequest,
+                icon: const Icon(Icons.send_rounded),
+                label: const Text('Send message request'),
+              ),
+          ],
+        ),
       ),
     );
   }
