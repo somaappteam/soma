@@ -10,7 +10,7 @@ import '../../core/theme/tokens.dart';
 import '../../models/leaderboard_player.dart';
 import '../../data/circle_voice_service.dart';
 import '../../data/profile_store.dart';
-import '../../data/agora_voice_service.dart';
+import '../../data/rtc_voice_service.dart';
 import '../../data/circles_repository.dart';
 import '../../data/quiz_repository.dart';
 import '../circles/circle_countdown_screen.dart';
@@ -126,7 +126,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
     await circleVoiceService.connect(circleId: circleId, name: name);
     final isSpectator = widget.leaderboard.every((p) => !p.isMe);
-    await agoraVoiceService.connect(circleId: circleId, asSpeaker: !isSpectator);
+    await rtcVoiceService.connect(circleId: circleId, asSpeaker: !isSpectator, prioritySpeaker: _isHostMe);
   }
   bool get _isHostMe {
     final me = widget.leaderboard.where((p) => p.isMe).toList();
@@ -268,7 +268,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
     }
     await circlesRepository.leaveCircle(circleId);
     await circleVoiceService.disconnectIfCircle(circleId);
-    await agoraVoiceService.disconnectIfCircle(circleId);
+    await rtcVoiceService.disconnectIfCircle(circleId);
     if (!mounted) return;
     Navigator.popUntil(context, (r) => r.isFirst);
   }
@@ -538,7 +538,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                     isMuted: muted,
                                     isSpeaking: speaking,
                                     lastAnswer: p.lastAnswer,
-                                    onToggleMute: p.isMe ? agoraVoiceService.toggleMuted : null,
+                                    onToggleMute: p.isMe ? rtcVoiceService.toggleMuted : null,
                                   ),
                                 ),
                               );

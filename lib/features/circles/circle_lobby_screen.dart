@@ -18,7 +18,7 @@ import '../../data/social_repository.dart';
 import '../../data/notifications_repository.dart';
 import '../../data/circle_voice_service.dart';
 import '../../data/profile_store.dart';
-import '../../data/agora_voice_service.dart';
+import '../../data/rtc_voice_service.dart';
 import '../../data/quiz_repository.dart';
 import '../../data/languages.dart';
 import '../profile/profile_screen.dart';
@@ -196,7 +196,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
               circleId: widget.circleId, newHostId: newHostId);
           await circlesRepository.leaveCircle(widget.circleId);
           await circleVoiceService.disconnectIfCircle(widget.circleId);
-          await agoraVoiceService.disconnectIfCircle(widget.circleId);
+          await rtcVoiceService.disconnectIfCircle(widget.circleId);
           if (mounted) Navigator.pop(context);
         } catch (e) {
           if (mounted) {
@@ -211,7 +211,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       await circlesRepository.endCircle(widget.circleId);
       await circlesRepository.leaveCircle(widget.circleId);
       await circleVoiceService.disconnectIfCircle(widget.circleId);
-      await agoraVoiceService.disconnectIfCircle(widget.circleId);
+      await rtcVoiceService.disconnectIfCircle(widget.circleId);
       if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted) {
@@ -590,7 +590,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       circleVoiceService.voiceFor(userId)?.speaking ?? false;
 
   void _toggleMuteFor(String userId) {
-    agoraVoiceService.toggleMuted();
+    rtcVoiceService.toggleMuted();
   }
 
   Future<void> _connectVoice() async {
@@ -601,8 +601,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
         : (profile.username.isNotEmpty ? profile.username : l10n.genericUser);
 
     await circleVoiceService.connect(circleId: widget.circleId, name: name);
-    await agoraVoiceService.connect(
-        circleId: widget.circleId, asSpeaker: !isSpectator);
+    await rtcVoiceService.connect(
+        circleId: widget.circleId, asSpeaker: !isSpectator, prioritySpeaker: isHost);
     _voiceSub?.cancel();
     _voiceSub = circleVoiceService.stream.listen((_) {
       if (mounted) {
@@ -612,8 +612,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   Future<void> _syncVoiceRole() async {
-    await agoraVoiceService.connect(
-        circleId: widget.circleId, asSpeaker: !isSpectator);
+    await rtcVoiceService.connect(
+        circleId: widget.circleId, asSpeaker: !isSpectator, prioritySpeaker: isHost);
   }
 
   Future<void> _inviteByUsername() async {
@@ -824,7 +824,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     try {
       await circlesRepository.leaveCircle(widget.circleId);
       await circleVoiceService.disconnectIfCircle(widget.circleId);
-      await agoraVoiceService.disconnectIfCircle(widget.circleId);
+      await rtcVoiceService.disconnectIfCircle(widget.circleId);
       if (!mounted) return;
       Navigator.pop(context);
     } catch (e) {
