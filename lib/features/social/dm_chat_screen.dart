@@ -24,7 +24,16 @@ import '../profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 enum DmCallState { idle, ringingOutgoing, ringingIncoming, connecting, connected }
-enum _DmMenuAction { media, documents, clearDraft, togglePinnedOnly }
+enum _DmMenuAction {
+  media,
+  documents,
+  clearDraft,
+  togglePinnedOnly,
+  scheduleMessage,
+  undoSend,
+  muteOneHour,
+  muteKeyword,
+}
 
 class DmChatScreen extends StatefulWidget {
   const DmChatScreen({
@@ -93,6 +102,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
   late Stream<bool> _typingStream;
   Timer? _typingDebounce;
   bool _typingStateSent = false;
+  Timer? _scheduledSendTimer;
+  String? _pendingUndoText;
+  DateTime? _muteUntil;
+  final Set<String> _mutedKeywords = <String>{};
 
   int get _maxImageBytes => _dmLimits.maxImageBytes;
 
@@ -152,6 +165,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _rtcTelemetrySub?.cancel();
     _settingsSub?.cancel(); // NEW
     _typingDebounce?.cancel();
+    _scheduledSendTimer?.cancel();
     _setTypingState(false, immediate: true);
     _saveDraft(_controller.text);
     _controller.dispose();
@@ -173,8 +187,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
   }
 
   void _send() {
+    _sendText(_controller.text.trim());
+  }
+
+  void _sendText(String text) {
     if (!_canChat) return;
-    final text = _controller.text.trim();
     if (text.isEmpty) return;
     if (text.length > _maxTextChars) {
       final allowed = _maxTextChars;
@@ -208,6 +225,95 @@ class _DmChatScreenState extends State<DmChatScreen> {
         );
       }
     });
+  }
+
+  Future<void> _sendWithUndoWindow() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    setState(() {
+      _pendingUndoText = text;
+      _controller.clear();
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Message queued for 5 seconds'),
+        action: SnackBarAction(
+          label: 'Undo',
+          onPressed: () {
+            if (!mounted) return;
+            setState(() {
+              _controller.text = _pendingUndoText ?? '';
+              _controller.selection = TextSelection.fromPosition(
+                TextPosition(offset: _controller.text.length),
+              );
+              _pendingUndoText = null;
+            });
+          },
+        ),
+      ),
+    );
+
+    await Future<void>.delayed(const Duration(seconds: 5));
+    if (!mounted || _pendingUndoText == null) return;
+    final toSend = _pendingUndoText!;
+    setState(() => _pendingUndoText = null);
+    _sendText(toSend);
+  }
+
+  Future<void> _scheduleMessage() async {
+    final selected = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    if (selected == null || !mounted) return;
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    final now = DateTime.now();
+    var when = DateTime(now.year, now.month, now.day, selected.hour, selected.minute);
+    if (when.isBefore(now)) when = when.add(const Duration(days: 1));
+    _scheduledSendTimer?.cancel();
+    _scheduledSendTimer = Timer(when.difference(now), () {
+      if (!mounted) return;
+      _sendText(text);
+    });
+    _controller.clear();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Scheduled for ${selected.format(context)}')),
+    );
+  }
+
+  Future<void> _muteConversationOneHour() async {
+    final until = DateTime.now().add(const Duration(hours: 1));
+    setState(() => _muteUntil = until);
+    await chatRepository.setConversationPreference(widget.otherId, muted: true);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Muted until ${TimeOfDay.fromDateTime(until).format(context)}')),
+    );
+  }
+
+  bool _isMessageMutedByKeyword(String text) {
+    if (_mutedKeywords.isEmpty) return false;
+    final lower = text.toLowerCase();
+    return _mutedKeywords.any(lower.contains);
+  }
+
+  Future<void> _addMutedKeyword() async {
+    final c = TextEditingController();
+    final value = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Mute keyword'),
+        content: TextField(
+          controller: c,
+          decoration: const InputDecoration(hintText: 'e.g. promo'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(onPressed: () => Navigator.pop(context, c.text.trim().toLowerCase()), child: const Text('Save')),
+        ],
+      ),
+    );
+    if (value == null || value.isEmpty || !mounted) return;
+    setState(() => _mutedKeywords.add(value));
   }
 
 
@@ -305,6 +411,18 @@ class _DmChatScreenState extends State<DmChatScreen> {
         break;
       case _DmMenuAction.togglePinnedOnly:
         setState(() => _showPinnedOnly = !_showPinnedOnly);
+        break;
+      case _DmMenuAction.scheduleMessage:
+        _scheduleMessage();
+        break;
+      case _DmMenuAction.undoSend:
+        _sendWithUndoWindow();
+        break;
+      case _DmMenuAction.muteOneHour:
+        _muteConversationOneHour();
+        break;
+      case _DmMenuAction.muteKeyword:
+        _addMutedKeyword();
         break;
     }
   }
@@ -1436,6 +1554,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
                             : msgs
                                 .where((m) => (m['content']?.toString().toLowerCase() ?? '').contains(_searchQuery))
                                 .toList();
+                        visibleMsgs = visibleMsgs.where((m) {
+                          final payload = _MessagePayload.parse(m['content']?.toString() ?? '');
+                          final text = payload.text ?? payload.fileName ?? '';
+                          return !_isMessageMutedByKeyword(text);
+                        }).toList();
                         if (_showPinnedOnly) {
                           visibleMsgs = visibleMsgs
                               .where((m) => _pinnedMessageIds.contains(m['id']?.toString() ?? ''))
@@ -1518,7 +1641,19 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       ],
                     ),
                   ),
-                if (!_canChat && _dmGateReason == null)
+                if (_muteUntil != null && _muteUntil!.isAfter(DateTime.now()))
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+                    child: Text(
+                      'Conversation muted until ${TimeOfDay.fromDateTime(_muteUntil!).format(context)}',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                if (_canChat)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
                     child: Wrap(
@@ -1565,6 +1700,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
                   )
                 else if (!_canChat && _dmGateReason == 'needs_request')
                   _MessageRequestOverlay(
+                    otherName: widget.otherName,
+                    username: _otherProfile?.username,
                     sentRequestStatus: _sentRequestStatus,
                     incomingRequestStatus: _incomingRequestStatus,
                     onSendRequest: _sendMessageRequest,
@@ -2095,6 +2232,22 @@ class _TopBar extends StatelessWidget {
                 value: _DmMenuAction.clearDraft,
                 child: Text('Clear draft'),
               ),
+              const PopupMenuItem(
+                value: _DmMenuAction.scheduleMessage,
+                child: Text('Schedule message'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.undoSend,
+                child: Text('Send with 5s undo'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.muteOneHour,
+                child: Text('Mute for 1 hour'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.muteKeyword,
+                child: Text('Mute keyword'),
+              ),
             ],
             child: Glass(
               radius: BorderRadius.circular(16),
@@ -2604,6 +2757,8 @@ class _InputBar extends StatelessWidget {
 
 
 class _MessageRequestOverlay extends StatelessWidget {
+  final String otherName;
+  final String? username;
   final String? sentRequestStatus;
   final String? incomingRequestStatus;
   final VoidCallback onSendRequest;
@@ -2611,6 +2766,8 @@ class _MessageRequestOverlay extends StatelessWidget {
   final VoidCallback onDecline;
 
   const _MessageRequestOverlay({
+    required this.otherName,
+    required this.username,
     required this.sentRequestStatus,
     required this.incomingRequestStatus,
     required this.onSendRequest,
@@ -2631,6 +2788,16 @@ class _MessageRequestOverlay extends StatelessWidget {
             const Text(
               'Messaging is restricted to friends. Send a message request to continue.',
               style: TextStyle(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'You are requesting to message $otherName ${username == null || username!.isEmpty ? '' : '(@$username)'}',
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'Suggested intro: “Hey! I found your profile through Soma circles and wanted to practice together.”',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
             ),
             const SizedBox(height: 8),
             if (incomingRequestStatus == 'pending')

@@ -398,6 +398,39 @@ class ChatRepository {
 
     if (otherIds.isEmpty) return [];
 
+    final friendshipRows = await _supabase
+        .from('friendships')
+        .select('requester_id,addressee_id,status')
+        .or('requester_id.eq.$uid,addressee_id.eq.$uid')
+        .eq('status', 'accepted');
+    final friendIds = <String>{};
+    for (final row in friendshipRows) {
+      final requester = row['requester_id']?.toString();
+      final addressee = row['addressee_id']?.toString();
+      if (requester == uid && addressee != null) friendIds.add(addressee);
+      if (addressee == uid && requester != null) friendIds.add(requester);
+    }
+
+    final requestRows = await _supabase
+        .from('message_requests')
+        .select('requester_id,recipient_id,status,updated_at')
+        .or('requester_id.eq.$uid,recipient_id.eq.$uid')
+        .inFilter('status', ['pending', 'accepted']);
+    final incomingPendingIds = <String>{};
+    final outgoingPendingIds = <String>{};
+    for (final row in requestRows) {
+      final requester = row['requester_id']?.toString();
+      final recipient = row['recipient_id']?.toString();
+      final status = row['status']?.toString();
+      if (status != 'pending') continue;
+      if (requester == uid && recipient != null) {
+        outgoingPendingIds.add(recipient);
+      }
+      if (recipient == uid && requester != null) {
+        incomingPendingIds.add(requester);
+      }
+    }
+
     final profiles = await _supabase
         .from('profiles')
         .select('id, username, avatar_url, settings')
@@ -430,10 +463,37 @@ class ChatRepository {
         'isMuted': row['is_muted'] == true,
         'isArchived': row['is_archived'] == true,
         'isOnline': showOnlineStatus && isOnline,
+        'isFriend': friendIds.contains(otherId),
+        'hasIncomingRequest': incomingPendingIds.contains(otherId),
+        'hasOutgoingRequest': outgoingPendingIds.contains(otherId),
+        'summary': _threadSummary(
+          unreadCount: row['unread_count'] is int
+              ? row['unread_count'] as int
+              : int.tryParse(row['unread_count']?.toString() ?? '0') ?? 0,
+          isFriend: friendIds.contains(otherId),
+          incomingRequest: incomingPendingIds.contains(otherId),
+          outgoingRequest: outgoingPendingIds.contains(otherId),
+          lastMessage: row['last_message']?.toString() ?? '',
+        ),
       });
     }
 
     return result;
+  }
+
+  String _threadSummary({
+    required int unreadCount,
+    required bool isFriend,
+    required bool incomingRequest,
+    required bool outgoingRequest,
+    required String lastMessage,
+  }) {
+    if (incomingRequest) return 'Incoming request · tap to respond';
+    if (outgoingRequest) return 'Request pending approval';
+    if (unreadCount > 0) return '$unreadCount unread · priority';
+    if (isFriend) return 'Friend chat';
+    if (lastMessage.isEmpty) return 'New connection';
+    return 'Recent activity';
   }
 }
 
