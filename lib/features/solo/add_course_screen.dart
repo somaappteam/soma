@@ -35,10 +35,16 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
     return Scaffold(
       body: SafeArea(
           child: ResponsiveFrame(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-              child: Column(
-                children: [
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final compactHeight = constraints.maxHeight < 760;
+                final sectionSpacing = compactHeight ? 14.0 : 18.0;
+                final bottomSpacing = compactHeight ? 8.0 : 10.0;
+
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+                  child: Column(
+                    children: [
                   Row(
                     children: [
                       Glass(
@@ -69,7 +75,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 18),
+                  SizedBox(height: sectionSpacing),
 
                   Glass(
                     radius: BorderRadius.circular(24),
@@ -91,7 +97,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                             if (v != null) setState(() => speak = v);
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: compactHeight ? 12 : 16),
                         _SelectTile(
                           label: l10n.iWantToLearn,
                           value: learn.name,
@@ -107,7 +113,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                           },
                         ),
                         if (!valid) ...[
-                          const SizedBox(height: 12),
+                          SizedBox(height: compactHeight ? 10 : 12),
                           Text(
                             l10n.chooseTwoDifferentLanguages,
                             style: TextStyle(
@@ -156,9 +162,11 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 10),
+                  SizedBox(height: bottomSpacing),
                 ],
               ),
+                );
+              },
             ),
           ),
         ),

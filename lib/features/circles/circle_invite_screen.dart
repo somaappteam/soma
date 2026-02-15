@@ -81,10 +81,15 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
       body: SafeArea(
           child: ResponsiveFrame(
             maxWidth: 420,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-              child: Column(
-                children: [
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final compactHeight = constraints.maxHeight < 760;
+                final sectionSpacing = compactHeight ? 12.0 : 16.0;
+
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+                  child: Column(
+                    children: [
                   Row(
                     children: [
                       Glass(
@@ -112,7 +117,7 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: sectionSpacing),
                   Glass(
                     radius: BorderRadius.circular(24),
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -161,7 +166,7 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
                         );
                       },
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: compactHeight ? 10 : 12),
                     Glass(
                       radius: BorderRadius.circular(999),
                       padding: EdgeInsets.zero,
@@ -196,9 +201,11 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
                       onTap: _isLoading ? null : _attemptJoin,
                     ),
                   ],
-                  const SizedBox(height: 18),
+                  SizedBox(height: compactHeight ? 14 : 18),
                 ],
               ),
+                );
+              },
             ),
           ),
       ),

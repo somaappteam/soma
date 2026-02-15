@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../core/widgets/glass.dart';
@@ -118,128 +119,162 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     return Scaffold(
       body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(16, 14, 16, 18),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    _IconGlass(
-                      icon: Icons.arrow_back_ios_new_rounded,
-                      onTap: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      l10n.addFriendTitle,
-                      style: TextStyle(
-                        color: scheme.onSurface,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                  Glass(
-                  radius: BorderRadius.circular(22),
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.addFriendFindByUsername,
-                        style: TextStyle(
-                          color: scheme.onSurface.withValues(alpha: 0.75),
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Glass(
-                        radius: BorderRadius.circular(18),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 10),
-                        child: Row(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compactHeight = constraints.maxHeight < 760;
+              final keyboardVisible = keyboardInset > 0;
+              final topSpacing = compactHeight ? 12.0 : 16.0;
+              final sectionSpacing = compactHeight ? 10.0 : 12.0;
+              final resultListHeight = keyboardVisible
+                  ? (compactHeight ? 110.0 : 130.0)
+                  : (compactHeight ? 160.0 : 200.0);
+
+              return Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 760),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () => FocusScope.of(context).unfocus(),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                      child: Column(
+                        children: [
+                        Row(
                           children: [
+                            _IconGlass(
+                              icon: Icons.arrow_back_ios_new_rounded,
+                              onTap: () => Navigator.pop(context),
+                            ),
+                            const SizedBox(width: 12),
                             Expanded(
-                              child: TextField(
-                                controller: controller,
-                                onChanged: _onSearchChanged,
+                              child: Text(
+                                l10n.addFriendTitle,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
-                                    color: scheme.onSurface, fontWeight: FontWeight.w800),
-                                cursorColor: scheme.primary,
-                                decoration: InputDecoration(
-                                  hintText: l10n.addFriendUsernameHint,
-                                  hintStyle: TextStyle(
-                                      color: scheme.onSurface.withValues(alpha: 0.45)),
-                                  border: InputBorder.none,
-                                  isDense: true,
+                                  color: scheme.onSurface,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w900,
                                 ),
                               ),
                             ),
-                            if (_searching)
-                              Padding(
-                                padding: const EdgeInsets.only(left: 8),
-                                child: SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: scheme.primary,
-                                  ),
-                                ),
-                              ),
                           ],
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      
-                      // Search Results List
-                      if (_searchResults.isNotEmpty) ...[
-                        Container(
-                          constraints: const BoxConstraints(maxHeight: 200),
-                          child: ListView.separated(
-                            shrinkWrap: true,
+                        SizedBox(height: topSpacing),
+                        Expanded(
+                          child: SingleChildScrollView(
                             physics: const BouncingScrollPhysics(),
-                            itemCount: _searchResults.length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 8),
-                            itemBuilder: (context, index) {
-                              final user = _searchResults[index];
-                              return _SearchResultRow(
-                                user: user,
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ProfileScreen(userId: user['id']),
+                            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                            child: Glass(
+                              radius: BorderRadius.circular(22),
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.addFriendFindByUsername,
+                                    style: TextStyle(
+                                      color: scheme.onSurface.withValues(alpha: 0.75),
+                                      fontWeight: FontWeight.w800,
                                     ),
-                                  );
-                                },
-                              );
-                            },
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Glass(
+                                    radius: BorderRadius.circular(18),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextField(
+                                            controller: controller,
+                                            onChanged: _onSearchChanged,
+                                            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w800),
+                                            cursorColor: scheme.primary,
+                                            decoration: InputDecoration(
+                                              hintText: l10n.addFriendUsernameHint,
+                                              hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
+                                              border: InputBorder.none,
+                                              isDense: true,
+                                            ),
+                                          ),
+                                        ),
+                                        if (_searching)
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 8),
+                                            child: SizedBox(
+                                              width: 16,
+                                              height: 16,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: scheme.primary,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(height: sectionSpacing),
+                                  if (_searchResults.isNotEmpty) ...[
+                                    ConstrainedBox(
+                                      constraints: BoxConstraints(maxHeight: resultListHeight),
+                                      child: ListView.separated(
+                                        shrinkWrap: true,
+                                        physics: const BouncingScrollPhysics(),
+                                        itemCount: _searchResults.length,
+                                        separatorBuilder: (_, __) => const SizedBox(height: 8),
+                                        itemBuilder: (context, index) {
+                                          final user = _searchResults[index];
+                                          return _SearchResultRow(
+                                            user: user,
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => ProfileScreen(userId: user['id']),
+                                                ),
+                                              );
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ] else ...[
+                                    Text(
+                                      l10n.addFriendTip,
+                                      style: TextStyle(
+                                        color: scheme.onSurface.withValues(alpha: 0.55),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                      ] else ...[
-                        Text(
-                          l10n.addFriendTip,
-                          style: TextStyle(
-                            color: scheme.onSurface.withValues(alpha: 0.55),
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
+                        AnimatedPadding(
+                          duration: const Duration(milliseconds: 180),
+                          curve: Curves.easeOut,
+                          padding: EdgeInsets.only(
+                            top: compactHeight ? 10 : 14,
+                            bottom: math.min(keyboardInset, 24),
+                          ),
+                          child: NeonButton(
+                            label: loading ? l10n.addFriendSending : l10n.addFriendSendRequest,
+                            onTap: loading ? () {} : _send,
                           ),
                         ),
                       ],
-                    ],
+                    ),
+                  ),
                   ),
                 ),
-                const Spacer(),
-                NeonButton(
-                  label: loading ? l10n.addFriendSending : l10n.addFriendSendRequest,
-                  onTap: loading ? () {} : _send,
-                ),
-              ],
-            ),
+              );
+            },
           ),
       ),
     );

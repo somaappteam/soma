@@ -287,11 +287,21 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
     return Scaffold(
       body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-            child: ListView(
-              physics: const BouncingScrollPhysics(),
-              children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compactHeight = constraints.maxHeight < 760;
+              final blockSpacing = compactHeight ? 12.0 : 16.0;
+              final rowSpacing = compactHeight ? 10.0 : 12.0;
+
+              return Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 820),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                    child: ListView(
+                      physics: const BouncingScrollPhysics(),
+                      children: [
                 // Top bar
                 Row(
                   children: [
@@ -329,7 +339,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 18),
+                SizedBox(height: blockSpacing),
 
                 // Main card
                 Glass(
@@ -390,12 +400,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         ],
                       ),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: compactHeight ? 12 : 14),
 
                       // Accuracy bar
                       _AccuracyBar(percent: pct),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: compactHeight ? 12 : 14),
 
                       // Stats row
                       Row(
@@ -408,7 +418,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               icon: Icons.check_circle_rounded,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: rowSpacing),
                           Expanded(
                             child: _StatTile(
                               title: l10n.statTotal,
@@ -420,7 +430,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         ],
                       ),
 
-                      const SizedBox(height: 12),
+                      SizedBox(height: compactHeight ? 10 : 12),
 
                       Row(
                         children: [
@@ -432,7 +442,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               icon: Icons.track_changes_rounded,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          SizedBox(width: rowSpacing),
                           Expanded(
                             child: _StatTile(
                               title: l10n.statRank,
@@ -447,7 +457,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: blockSpacing),
 
                 // Optional: a small highlight card
                 Glass(
@@ -475,7 +485,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: blockSpacing),
 
                 // Leaderboard
                 Glass(
@@ -507,7 +517,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: compactHeight ? 10 : 12),
 
                       StreamBuilder<Map<String, VoicePresence>>(
                         stream: circleVoiceService.stream,
@@ -550,7 +560,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 18),
+                SizedBox(height: compactHeight ? 14 : 18),
 
                 // Bottom buttons
                 if (widget.circleId != null) ...[
@@ -559,7 +569,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     onTap: _goBackToLobby,
                   ),
                   if (_isHostMe) ...[
-                    const SizedBox(height: 10),
+                    SizedBox(height: compactHeight ? 8 : 10),
                     _SecondaryButton(
                       label: l10n.resultsRematch,
                       onTap: () {
@@ -568,21 +578,25 @@ class _ResultsScreenState extends State<ResultsScreen> {
                       },
                     ),
                   ],
-                  const SizedBox(height: 14),
+                  SizedBox(height: compactHeight ? 12 : 14),
                 ] else ...[
                   NeonButton(
                     label: l10n.resultsBackToCircles,
                     onTap: widget.onPlayAgain ?? () => Navigator.pop(context),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: compactHeight ? 8 : 10),
                   _SecondaryButton(
                     label: l10n.resultsPlayAgain,
                     onTap: widget.onPlayAgain ?? () => Navigator.pop(context),
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: compactHeight ? 12 : 14),
                 ],
               ],
             ),
+          ),
+                ),
+              );
+            },
           ),
         ),
     );

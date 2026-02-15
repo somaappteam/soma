@@ -695,10 +695,16 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     return Scaffold(
       body: SafeArea(
         child: ResponsiveFrame(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-            child: Column(
-              children: [
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compactHeight = constraints.maxHeight < 760;
+              final topSpacing = compactHeight ? 10.0 : 12.0;
+              final sectionSpacing = compactHeight ? 10.0 : 12.0;
+              final answersTopSpacing = compactHeight ? 12.0 : 16.0;
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                child: Column(
+                  children: [
                 // Top Bar
                 Row(
                   children: [
@@ -736,7 +742,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                   ],
                 ),
                 
-                const SizedBox(height: 12),
+                SizedBox(height: topSpacing),
                 
                  // Timer Bar
                 ClipRRect(
@@ -754,7 +760,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: topSpacing),
 
                 // Leaderboard
                 Glass(
@@ -770,7 +776,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                   ),
                 ),
                   
-                const SizedBox(height: 12),
+                SizedBox(height: sectionSpacing),
 
                 // Question Card (Flexible)
                 ConstrainedBox(
@@ -778,8 +784,11 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                   child: Glass(
                     radius: BorderRadius.circular(22),
                     padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
-                    child: Column(
-                      children: [
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 96),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
                         if (_isSentenceQuestion(q))
                             Text(
                               q.prompt,
@@ -811,7 +820,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                             ),
                           ],
                           if (showTranslationLine) ...[
-                            const SizedBox(height: 10),
+                            SizedBox(height: compactHeight ? 8 : 10),
                             Text(
                               q.translation,
                               textAlign: TextAlign.center,
@@ -822,25 +831,31 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                               ),
                             ),
                           ],
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 12),
+                SizedBox(height: sectionSpacing),
 
-                _TtsControls(
-                    rates: const [0.75, 1.0, 1.25],
-                    selectedRate: _speechRate,
-                    onRateSelected: (rate) {
-                      setState(() => _speechRate = rate);
-                      ttsService.setRate(rate);
-                    },
-                    onSpeak: () => _onSpeakTap(q),
-                    disabled: _isSentenceQuestion(q) && !revealed,
+                Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 320),
+                    child: _TtsControls(
+                      rates: const [0.75, 1.0, 1.25],
+                      selectedRate: _speechRate,
+                      onRateSelected: (rate) {
+                        setState(() => _speechRate = rate);
+                        ttsService.setRate(rate);
+                      },
+                      onSpeak: () => _onSpeakTap(q),
+                      disabled: _isSentenceQuestion(q) && !revealed,
+                    ),
                   ),
+                ),
 
-                const SizedBox(height: 16),
+                SizedBox(height: answersTopSpacing),
                 
                  // Answers
                   Expanded(
@@ -951,7 +966,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                         ),
                       ),
                   ]
-              ],
+                  ],
+                ),
+              );
+            },
             ),
           ),
         ),
@@ -1453,7 +1471,7 @@ class _TtsControls extends StatelessWidget {
       opacity: opacity,
       child: Glass(
         radius: BorderRadius.circular(16),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         child: Row(
           children: [
             ...rates.map((rate) {
@@ -1504,8 +1522,8 @@ class _SpeedChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
       child: Container(
-        height: 24,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
+        height: 22,
+        padding: const EdgeInsets.symmetric(horizontal: 7),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
           color: selected ? Colors.white.withValues(alpha: 0.16) : Colors.white.withValues(alpha: 0.08),
@@ -1514,7 +1532,7 @@ class _SpeedChip extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           label,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 11),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 10),
         ),
       ),
     );

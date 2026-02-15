@@ -411,13 +411,18 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       final progress =
           timeLimit == null ? 1.0 : (remaining / timeLimit).clamp(0.0, 1.0);
 
-
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-          child: Column(
-            children: [
+      return Scaffold(
+        body: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final compactHeight = constraints.maxHeight < 760;
+              final topSpacing = compactHeight ? 12.0 : 18.0;
+              final sectionSpacing = compactHeight ? 10.0 : 14.0;
+              final choicesTopSpacing = compactHeight ? 20.0 : 30.0;
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                child: Column(
+                  children: [
               Row(
                 children: [
                   _IconGlass(
@@ -447,7 +452,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                       icon: Icons.layers_rounded),
                 ],
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: topSpacing),
               ClipRRect(
                 borderRadius: BorderRadius.circular(999),
                 child: SizedBox(
@@ -462,14 +467,17 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: topSpacing),
               ConstrainedBox(
                 constraints: const BoxConstraints(minWidth: 200),
                 child: Glass(
                   radius: BorderRadius.circular(22),
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                  child: Column(
-                    children: [
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 92),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                       Text(
                         _prompt.isNotEmpty
                             ? _prompt
@@ -496,7 +504,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                         ),
                       ],
                       if (showTranslation) ...[
-                        const SizedBox(height: 10),
+                        SizedBox(height: compactHeight ? 8 : 10),
                         Text(
                           q["translation"],
                           textAlign: TextAlign.center,
@@ -507,21 +515,27 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                         ),
                       ],
                     ],
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 14),
-              _TtsControls(
-                rates: const [0.75, 1.0, 1.25],
-                selectedRate: _speechRate,
-                onRateSelected: (rate) {
-                  setState(() => _speechRate = rate);
-                  ttsService.setRate(rate);
-                },
-                onSpeak: _onSpeakTap,
-                disabled: !revealed,
+              SizedBox(height: sectionSpacing),
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 330),
+                  child: _TtsControls(
+                    rates: const [0.75, 1.0, 1.25],
+                    selectedRate: _speechRate,
+                    onRateSelected: (rate) {
+                      setState(() => _speechRate = rate);
+                      ttsService.setRate(rate);
+                    },
+                    onSpeak: _onSpeakTap,
+                    disabled: !revealed,
+                  ),
+                ),
               ),
-              const SizedBox(height: 48),
+              SizedBox(height: choicesTopSpacing),
               Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
@@ -606,17 +620,19 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: compactHeight ? 8 : 10),
               if (revealed && widget.timePerQuestion == null)
                 NeonButton(
                   label: "Next",
                   onTap: _next,
                 ),
-            ],
+                  ],
+                ),
+              );
+            },
           ),
         ),
-      ),
-    );
+      );
     } catch (e, stack) {
       return Scaffold(
         body: Center(
@@ -686,7 +702,7 @@ class _TtsControls extends StatelessWidget {
       opacity: opacity,
       child: Glass(
         radius: BorderRadius.circular(16),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         child: Row(
           children: [
             ...rates.map((rate) {
