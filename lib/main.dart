@@ -9,6 +9,7 @@ import 'core/services/app_bootstrap.dart';
 import 'core/services/theme_mode_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/app_lock_gate.dart';
+import 'data/app_analytics_repository.dart';
 import 'data/content_sync_service.dart';
 import 'data/settings_repository.dart';
 import 'features/auth/splash_screen.dart';
@@ -50,6 +51,10 @@ Future<void> runContentSync() async {
     final delayMs = baseDelayMs * (1 << (attempt - 1));
     syncMessageNotifier.value =
         'Sync issue (${result.failedSteps.join(', ')}). Retrying (${attempt + 1}/$maxAttempts)…';
+    unawaited(appAnalyticsRepository.track('sync_retry_scheduled', metadata: {
+      'attempt': attempt + 1,
+      'failed_steps': result.failedSteps,
+    }));
     await Future.delayed(Duration(milliseconds: delayMs));
   }
 
@@ -146,7 +151,7 @@ class _AppState extends State<App> {
             final clampedMedia = media.copyWith(
               textScaler: media.textScaler.clamp(
                 minScaleFactor: 0.9,
-                maxScaleFactor: 1.15,
+                maxScaleFactor: 1.4,
               ),
             );
 
@@ -264,7 +269,10 @@ class _SyncStatusBanner extends StatelessWidget {
                 if (isError) ...[
                   const SizedBox(width: 8),
                   TextButton(
-                    onPressed: onRetry,
+                    onPressed: () {
+                      unawaited(appAnalyticsRepository.track('sync_retry_tapped'));
+                      onRetry();
+                    },
                     child: const Text('Retry'),
                   ),
                 ],

@@ -158,41 +158,24 @@ class _CirclesScreenState extends State<CirclesScreen> {
   }
 
   List<_ExchangeUser> _buildExchangeUsers() {
-    final users = <_ExchangeUser>[];
-    var addedCurrentUser = false;
     for (final course in _courses) {
       final option = _CourseOption.fromCourse(course);
       if (option.fromName.isEmpty || option.toName.isEmpty) continue;
-      if (!addedCurrentUser) {
-        users.add(
+      return [
         _ExchangeUser(
           userId: 'self',
           name: 'You',
           speaks: option.fromName,
           learns: option.toName,
-            level: 'B1',
-            compatibility: 100,
-            isCurrentUser: true,
-            isOnline: true,
-          ),
-        );
-        addedCurrentUser = true;
-      }
-
-      users.add(
-        _ExchangeUser(
-          userId: 'sample-${course.id}',
-          name: '${option.toName} learner',
-          speaks: option.toName,
-          learns: option.fromName,
-          level: 'A2',
-          compatibility: 92,
+          level: 'B1',
+          compatibility: 100,
+          isCurrentUser: true,
           isOnline: true,
         ),
-      );
+      ];
     }
 
-    return users;
+    return const [];
   }
 
   Future<void> _openExchangeCoursePicker() async {
@@ -835,7 +818,7 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
 
                   if (snapshot.hasError) {
                     return _ExchangeErrorState(
-                      message: 'Could not load exchange partners.',
+                      message: 'Unable to load exchange partners right now.',
                       onRetry: () => setState(() => _retryNonce++),
                     );
                   }
