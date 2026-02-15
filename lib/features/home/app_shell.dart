@@ -31,6 +31,16 @@ class _AppShellState extends State<AppShell> {
     setState(() => _index = nextIndex);
   }
 
+  Future<void> _openAuthFlow(Widget screen) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => screen),
+    );
+    if (mounted && !_isGuest) {
+      setState(() => _index = 1);
+    }
+  }
+
   Future<void> _showAuthRequiredDialog() async {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
@@ -79,6 +89,10 @@ class _AppShellState extends State<AppShell> {
                   height: 1.35,
                 ),
               ),
+              const SizedBox(height: 10),
+              _BenefitRow(label: 'Live circles with real learners'),
+              _BenefitRow(label: 'Voice rooms with instant practice'),
+              _BenefitRow(label: 'Friend challenges and saved progress'),
               const SizedBox(height: 18),
               Row(
                 children: [
@@ -99,10 +113,7 @@ class _AppShellState extends State<AppShell> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(ctx);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const SignInScreen()),
-                        );
+                        _openAuthFlow(const SignInScreen());
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: scheme.primary,
@@ -121,10 +132,7 @@ class _AppShellState extends State<AppShell> {
                 child: TextButton(
                   onPressed: () {
                     Navigator.pop(ctx);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const SignUpScreen()),
-                    );
+                    _openAuthFlow(const SignUpScreen());
                   },
                   child: Text(
                     l10n.signUp,
@@ -199,6 +207,37 @@ class _AppShellState extends State<AppShell> {
                 ),
         );
       },
+    );
+  }
+}
+
+
+class _BenefitRow extends StatelessWidget {
+  final String label;
+
+  const _BenefitRow({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle_rounded,
+              size: 16, color: scheme.tertiary.withValues(alpha: 0.9)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: scheme.onSurface.withValues(alpha: 0.78),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

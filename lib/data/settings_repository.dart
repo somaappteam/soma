@@ -5,25 +5,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 
 import '../core/i18n/ui_language.dart';
+import '../models/app_settings.dart';
 import 'soma_plus_repository.dart';
 
 class SettingsRepository {
   final _supabase = Supabase.instance.client;
   SharedPreferences? _prefs;
   final Map<String, dynamic> _guestSettings = {
-    'show_translation': true,
-    'show_reading': true,
-    'bg_music': true,
-    'sfx_enabled': true,
-    'haptics_enabled': true,
-    'push_notifications': true,
-    'default_timer_s': 15,
-    'match_difficulty': 'Adaptive',
-    'daily_reminder': '20:00',
-    'theme_mode': 'System',
-    'language_ui': 'en',
-    'plus_enabled': false,
-    'plus_plan': 'free',
+    ...AppSettings.defaults().toMap(),
     'plus_trial_started_at': null,
     'plus_expires_at': null,
   };
@@ -62,6 +51,11 @@ class SettingsRepository {
     return _effectiveSettings;
   }
 
+  Future<AppSettings> getTypedSettings() async {
+    final settings = await getSettings();
+    return AppSettings.fromMap(settings);
+  }
+
   /// Stream of the settings JSON object.
   Stream<Map<String, dynamic>> getSettingsStream() {
     return Stream<Map<String, dynamic>>.multi((controller) {
@@ -71,6 +65,10 @@ class SettingsRepository {
       final sub = _settingsController.stream.listen(controller.add);
       controller.onCancel = sub.cancel;
     });
+  }
+
+  Stream<AppSettings> getTypedSettingsStream() {
+    return getSettingsStream().map(AppSettings.fromMap);
   }
 
   void _initAuthListener() {
