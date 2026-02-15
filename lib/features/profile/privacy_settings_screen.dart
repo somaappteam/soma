@@ -10,7 +10,6 @@ import '../../data/settings_repository.dart';
 import '../../core/widgets/responsive.dart';
 import '../../data/auth_repository.dart';
 import '../../data/profile_repository.dart';
-import '../../data/stats_repository.dart';
 import '../../data/privacy_repository.dart';
 
 // Enum definitions (could be in a model file, but keeping here for simplicity as they were in privacy_store)
@@ -173,8 +172,8 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                               icon: Icons.block_rounded,
                               title: l10n.privacySectionBlockedUsers,
                               subtitle: blockedIds.isEmpty
-                                  ? AppLocalizations.of(context).privacyBlockedUsersComingSoon
-                                  : "${blockedIds.length} blocked",
+                                  ? 'No blocked users yet.'
+                                  : '${blockedIds.length} blocked users',
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -293,33 +292,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   Future<void> _exportData(BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     try {
-      final profile = await profileRepository.fetchProfile();
-      final settings = await settingsRepository.getSettings();
-      final stats = await statsRepository.getStats();
-      final payload = {
-        'profile': {
-          'id': profile?.id,
-          'display_name': profile?.displayName,
-          'username': profile?.username,
-          'bio': profile?.bio,
-          'location': profile?.location,
-          'daily_goal_minutes': profile?.dailyGoalMinutes,
-          'total_xp': profile?.totalXp,
-        },
-        'stats': {
-          'total_wins': stats.totalWins,
-          'streak_days': stats.streakDays,
-          'longest_streak': stats.longestStreak,
-          'total_quizzes': stats.totalQuizzes,
-          'total_correct': stats.totalCorrect,
-          'total_questions': stats.totalQuestions,
-          'perfect_quizzes': stats.perfectQuizzes,
-          'circles_joined': stats.circlesJoined,
-          'last_active_date': stats.lastActiveDate?.toIso8601String(),
-        },
-        'settings': settings,
-        'exported_at': DateTime.now().toIso8601String(),
-      };
+      final payload = await privacyRepository.exportUserDataSnapshot();
       final jsonData = const JsonEncoder.withIndent('  ').convert(payload);
       await Share.share(jsonData, subject: 'Soma data export');
     } catch (e) {
@@ -412,7 +385,7 @@ class _BlockedUsersScreenState extends State<_BlockedUsersScreen> {
                           radius: BorderRadius.circular(24),
                           padding: const EdgeInsets.all(16),
                           child: Text(
-                            l10n.privacyBlockedUsersComingSoon,
+                            'No blocked users yet.',
                             style: TextStyle(
                               color: scheme.onSurface.withValues(alpha: 0.75),
                               fontWeight: FontWeight.w700,
