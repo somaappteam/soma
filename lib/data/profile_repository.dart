@@ -87,6 +87,57 @@ class ProfileRepository {
     final data = await _supabase.from('profiles').select().inFilter('id', userIds);
     return List<Map<String, dynamic>>.from(data);
   }
+
+  // Fetch global exchange candidates (not limited to friends).
+  Future<List<Map<String, dynamic>>> getExchangeCandidateProfiles({
+    int limit = 100,
+    int offset = 0,
+  }) async {
+    final uid = currentUserId;
+    final query = _supabase
+        .from('profiles')
+        .select(
+          'id, username, daily_goal_minutes, total_xp, settings, updated_at, '
+          'native_languages, learning_languages, timezone, completed_exchange_sessions, report_count',
+        )
+        .order('updated_at', ascending: false)
+        .range(offset, offset + limit - 1);
+
+    final data = uid == null ? await query : await query.neq('id', uid);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
+  Stream<List<Map<String, dynamic>>> streamExchangeCandidateProfiles({int limit = 120}) {
+    final uid = currentUserId;
+    final stream = _supabase
+        .from('profiles')
+        .stream(primaryKey: ['id'])
+        .order('updated_at', ascending: false)
+        .limit(limit)
+        .map((rows) => rows.map((e) => Map<String, dynamic>.from(e)).toList());
+
+    if (uid == null) return stream;
+    return stream.map((rows) => rows.where((row) => row['id']?.toString() != uid).toList());
+  }
+
+  Future<List<Map<String, dynamic>>> getExchangeCandidateProfilesBefore({
+    required DateTime before,
+    int limit = 100,
+  }) async {
+    final uid = currentUserId;
+    final query = _supabase
+        .from('profiles')
+        .select(
+          'id, username, daily_goal_minutes, total_xp, settings, updated_at, '
+          'native_languages, learning_languages, timezone, completed_exchange_sessions, report_count',
+        )
+        .lt('updated_at', before.toIso8601String())
+        .order('updated_at', ascending: false)
+        .limit(limit);
+    final data = uid == null ? await query : await query.neq('id', uid);
+    return List<Map<String, dynamic>>.from(data);
+  }
+
 }
 
 final profileRepository = ProfileRepository();

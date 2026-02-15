@@ -4,11 +4,11 @@ import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../social/friends_screen.dart';
 import '../social/inbox_screen.dart';
-import '../../data/social_repository.dart';
 import '../../data/presence_repository.dart';
 import '../../data/user_report_repository.dart';
 import '../../data/settings_repository.dart';
 import '../../data/profile_repository.dart';
+import '../../data/exchange_analytics_repository.dart';
 import 'exchange_session_screen.dart';
 import 'create_circle_screen.dart';
 import 'circle_lobby_screen.dart';
@@ -688,63 +688,155 @@ class _LanguageExchangePanel extends StatefulWidget {
 
 class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
   int _retryNonce = 0;
+  bool _onlineOnly = true;
+  bool _strictDirection = true;
+  String _levelFilter = 'all';
+  bool _filtersHydrated = false;
+  final List<Map<String, dynamic>> _extraProfiles = [];
+  DateTime? _cursorBefore;
+  bool _loadingMore = false;
 
-  List<_ExchangeUser> _buildPartnerUsersFromFriends(
-    List<Map<String, dynamic>> friends,
-    Map<String, bool> onlineMap,
-    List<String> blockedIds,
-    Map<String, Map<String, dynamic>> profileMap,
-  ) {
-    final base = widget.selectedCourse;
-    if (base == null) return [];
-
-    final result = <_ExchangeUser>[];
-    for (var i = 0; i < friends.length; i++) {
-      final friend = friends[i];
-      final id = friend['id']?.toString() ?? '';
-      if (id.isEmpty || blockedIds.contains(id)) continue;
-      final username = friend['username']?.toString();
-      final name = (username == null || username.trim().isEmpty) ? 'Learner ${i + 1}' : username;
-      final profile = profileMap[id] ?? const <String, dynamic>{};
-      final dailyGoal = (profile['daily_goal_minutes'] as num?)?.toInt() ?? 10;
-      final totalXp = (profile['total_xp'] as num?)?.toInt() ?? 0;
-      final level = totalXp >= 3000
-          ? 'B2'
-          : totalXp >= 1200
-              ? 'B1'
-              : 'A2';
-      final compatibility = _compatibilityScore(
-        online: onlineMap[id] ?? false,
-        dailyGoalMinutes: dailyGoal,
-        totalXp: totalXp,
-      );
-      result.add(
-        _ExchangeUser(
-          userId: id,
-          name: name,
-          speaks: base.toName,
-          learns: base.fromName,
-          level: level,
-          compatibility: compatibility,
-          isOnline: onlineMap[id] ?? false,
-        ),
-      );
+  Set<String> _toLangSet(dynamic raw) {
+    if (raw is List) {
+      return raw.map((e) => e.toString().trim().toLowerCase()).where((e) => e.isNotEmpty).toSet();
     }
-    return result;
+    final value = raw?.toString() ?? '';
+    if (value.trim().isEmpty) return <String>{};
+    return value
+        .split(RegExp(r'[,;/|]'))
+        .map((e) => e.trim().toLowerCase())
+        .where((e) => e.isNotEmpty)
+        .toSet();
+  }
+
+
+  DateTime _updatedAtOf(Map<String, dynamic> row) {
+    return DateTime.tryParse(row['updated_at']?.toString() ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+  }
+
+  int _parseUtcOffsetHours(String timezone) {
+    final match = RegExp(r'([+-])(\d{1,2})').firstMatch(timezone);
+    if (match == null) return DateTime.now().timeZoneOffset.inHours;
+    final sign = match.group(1) == '-' ? -1 : 1;
+    final hours = int.tryParse(match.group(2) ?? '0') ?? 0;
+    return sign * hours;
+  }
+
+  String _firstLangLabel(Set<String> values, String fallback) {
+    if (values.isEmpty) return fallback;
+    final first = values.first;
+    return first.isEmpty ? fallback : '${first[0].toUpperCase()}${first.substring(1)}';
+  }
+
+  bool _matchesDirection(Map<String, dynamic> profile, _CourseOption base) {
+    if (!_strictDirection) return true;
+    final native = _toLangSet(profile['native_languages']);
+    final learning = _toLangSet(profile['learning_languages']);
+    if (native.isEmpty && learning.isEmpty) return true;
+    return native.contains(base.toName.toLowerCase()) && learning.contains(base.fromName.toLowerCase());
+  }
+
+  String _levelFromXp(int totalXp) {
+    if (totalXp >= 6000) return 'C1';
+    if (totalXp >= 3000) return 'B2';
+    if (totalXp >= 1200) return 'B1';
+    return 'A2';
+  }
+
+  int _trustScore(Map<String, dynamic> profile) {
+    final completed = (profile['completed_exchange_sessions'] as num?)?.toInt() ?? 0;
+    final reports = (profile['report_count'] as num?)?.toInt() ?? 0;
+    var trust = 60 + (completed ~/ 3);
+    trust -= (reports * 8);
+    return trust.clamp(15, 100);
   }
 
   int _compatibilityScore({
     required bool online,
     required int dailyGoalMinutes,
     required int totalXp,
+    required int trust,
+    required String timezone,
   }) {
-    var score = 70;
-    if (online) score += 12;
+    var score = 58;
+    if (online) score += 14;
     score += (dailyGoalMinutes ~/ 10).clamp(0, 8);
-    score += (totalXp ~/ 800).clamp(0, 10);
-    if (score > 99) return 99;
-    if (score < 40) return 40;
-    return score;
+    score += (totalXp ~/ 900).clamp(0, 10);
+    score += (trust ~/ 10).clamp(0, 10);
+    final localOffset = DateTime.now().timeZoneOffset.inHours;
+    final partnerOffset = _parseUtcOffsetHours(timezone);
+    final diff = (localOffset - partnerOffset).abs();
+    if (diff <= 2) score += 6;
+    if (diff <= 5) score += 3;
+    return score.clamp(30, 99);
+  }
+
+  List<_ExchangeUser> _buildPartnerUsersFromProfiles(
+    List<Map<String, dynamic>> profiles,
+    Map<String, bool> onlineMap,
+    List<String> blockedIds,
+  ) {
+    final base = widget.selectedCourse;
+    if (base == null) return [];
+
+    final result = <_ExchangeUser>[];
+    for (var i = 0; i < profiles.length; i++) {
+      final profile = profiles[i];
+      final id = profile['id']?.toString() ?? '';
+      if (id.isEmpty || blockedIds.contains(id)) continue;
+
+      final rawSettings = profile['settings'];
+      final settings = rawSettings is Map ? Map<String, dynamic>.from(rawSettings) : const <String, dynamic>{};
+      final showOnlineStatus = settings['show_online_status'] != false;
+      final exchangeActive = settings['exchange_active'] == true;
+      if (!showOnlineStatus || !exchangeActive) continue;
+      if (!_matchesDirection(profile, base)) continue;
+
+      final isOnline = onlineMap[id] ?? false;
+      if (_onlineOnly && !isOnline) continue;
+
+      final username = profile['username']?.toString();
+      final name = (username == null || username.trim().isEmpty) ? 'Learner ${i + 1}' : username;
+      final dailyGoal = (profile['daily_goal_minutes'] as num?)?.toInt() ?? 10;
+      final totalXp = (profile['total_xp'] as num?)?.toInt() ?? 0;
+      final level = _levelFromXp(totalXp);
+      if (_levelFilter != 'all' && level != _levelFilter) continue;
+      final trust = _trustScore(profile);
+      if (trust < 25) continue;
+      final timezone = profile['timezone']?.toString() ?? '';
+      final compatibility = _compatibilityScore(
+        online: isOnline,
+        dailyGoalMinutes: dailyGoal,
+        totalXp: totalXp,
+        trust: trust,
+        timezone: timezone,
+      );
+
+      final native = _toLangSet(profile['native_languages']);
+      final learning = _toLangSet(profile['learning_languages']);
+      final speaksLabel = _firstLangLabel(native, base.toName);
+      final learnsLabel = _firstLangLabel(learning, base.fromName);
+
+      result.add(
+        _ExchangeUser(
+          userId: id,
+          name: name,
+          speaks: speaksLabel,
+          learns: learnsLabel,
+          level: level,
+          compatibility: compatibility,
+          isOnline: isOnline,
+        ),
+      );
+    }
+
+    result.sort((a, b) {
+      final onlineCmp = (b.isOnline ? 1 : 0).compareTo(a.isOnline ? 1 : 0);
+      if (onlineCmp != 0) return onlineCmp;
+      return b.compatibility.compareTo(a.compatibility);
+    });
+
+    return result;
   }
 
   @override
@@ -767,7 +859,7 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
               ),
               const SizedBox(height: 6),
               Text(
-                'Structured turn chat with language lock, helper tools, and a session summary.',
+                'Global discovery + filter controls. Enable exchange visibility in Privacy settings to appear.',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 12,
@@ -788,10 +880,10 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                 spacing: 8,
                 runSpacing: 8,
                 children: const [
-                  _ToolChip(label: 'Translate'),
-                  _ToolChip(label: 'Suggest reply'),
-                  _ToolChip(label: 'Correct my sentence'),
-                  _ToolChip(label: '1 correction / round'),
+                  _ToolChip(label: 'Conversation requests'),
+                  _ToolChip(label: 'Rate limits'),
+                  _ToolChip(label: 'Turn timer + skip'),
+                  _ToolChip(label: 'Session insights'),
                 ],
               ),
               const SizedBox(height: 10),
@@ -804,179 +896,172 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
           child: FutureBuilder<Map<String, dynamic>>(
             future: settingsRepository.getSettings(),
             builder: (context, settingsSnapshot) {
-              final blockedIds = ((settingsSnapshot.data?['blocked_user_ids'] as List?) ?? const [])
+              final settingsData = settingsSnapshot.data ?? const <String, dynamic>{};
+              final blockedIds = ((settingsData['blocked_user_ids'] as List?) ?? const [])
                   .map((e) => e.toString())
                   .toList();
 
+              if (!_filtersHydrated) {
+                _filtersHydrated = true;
+                _onlineOnly = settingsData['exchange_filter_online_only'] != false;
+                _strictDirection = settingsData['exchange_filter_strict_direction'] != false;
+                _levelFilter = (settingsData['exchange_filter_level']?.toString() ?? 'all');
+              }
+
+              Future<void> persistFilters() => settingsRepository.updateSettings({
+                    'exchange_filter_online_only': _onlineOnly,
+                    'exchange_filter_strict_direction': _strictDirection,
+                    'exchange_filter_level': _levelFilter,
+                  });
+
               return StreamBuilder<List<Map<String, dynamic>>>(
-                key: ValueKey(_retryNonce),
-                stream: socialRepository.getFriendsStream(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                stream: profileRepository.streamExchangeCandidateProfiles(limit: 120),
+                builder: (context, liveSnapshot) {
+                  if (liveSnapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF)));
                   }
-
-                  if (snapshot.hasError) {
+                  if (liveSnapshot.hasError) {
                     return _ExchangeErrorState(
-                      message: 'Unable to load exchange partners right now.',
+                      message: 'Unable to load active exchange users right now.',
                       onRetry: () => setState(() => _retryNonce++),
                     );
                   }
 
-                  final friends = snapshot.data ?? [];
-                  if (friends.isEmpty) {
-                    return _ExchangeNoPartnersState(onOpenFriends: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const FriendsScreen()),
-                      );
-                    });
+                  final liveProfiles = liveSnapshot.data ?? <Map<String, dynamic>>[];
+                  final liveIds = liveProfiles.map((e) => e['id']?.toString() ?? '').toSet();
+                  final mergedProfiles = <Map<String, dynamic>>[
+                    ...liveProfiles,
+                    ..._extraProfiles.where((e) => !liveIds.contains(e['id']?.toString() ?? '')),
+                  ]..sort((a, b) => _updatedAtOf(b).compareTo(_updatedAtOf(a)));
+
+                  if (mergedProfiles.isNotEmpty) {
+                    _cursorBefore = _updatedAtOf(mergedProfiles.last);
                   }
 
-                  final ids = friends.map((f) => f['id']?.toString() ?? '').where((id) => id.isNotEmpty).toList();
+                  final ids = mergedProfiles
+                      .map((f) => f['id']?.toString() ?? '')
+                      .where((id) => id.isNotEmpty)
+                      .toList();
 
-                  return FutureBuilder<(Map<String, bool>, Map<String, Map<String, dynamic>>)>(
-                    future: () async {
-                      final online = await presenceRepository.fetchOnlineStatuses(ids);
-                      final profiles = await profileRepository.getProfilesByIds(ids);
-                      final profileMap = <String, Map<String, dynamic>>{
-                        for (final p in profiles) (p['id']?.toString() ?? ''): p,
-                      };
-                      return (online, profileMap);
-                    }(),
+                  return FutureBuilder<Map<String, bool>>(
+                    future: presenceRepository.fetchOnlineStatuses(ids),
                     builder: (context, dataSnapshot) {
                       if (dataSnapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF)));
                       }
 
-                      final payload = dataSnapshot.data;
-                      final onlineMap = payload?.$1 ?? <String, bool>{};
-                      final profileMap = payload?.$2 ?? <String, Map<String, dynamic>>{};
-                      final partners = _buildPartnerUsersFromFriends(friends, onlineMap, blockedIds, profileMap);
+                      final onlineMap = dataSnapshot.data ?? <String, bool>{};
+                      final partners = _buildPartnerUsersFromProfiles(mergedProfiles, onlineMap, blockedIds);
+                      if (partners.isNotEmpty) {
+                        exchangeAnalyticsRepository.track(
+                          'exchange_discovery_results',
+                          metadata: {
+                            'visible_users': partners.length,
+                            'online_only': _onlineOnly,
+                            'strict_direction': _strictDirection,
+                            'level_filter': _levelFilter,
+                          },
+                        );
+                      }
 
                       if (partners.isEmpty) {
-                        if (friends.isNotEmpty && blockedIds.length >= friends.length) {
-                          return _ExchangeBlockedAllState(onOpenFriends: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const FriendsScreen()),
-                            );
-                          });
-                        }
                         return _ExchangeNoCompatibleState(onOpenFriends: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const FriendsScreen()),
-                          );
+                          setState(() {
+                            _onlineOnly = false;
+                            _strictDirection = false;
+                          });
                         });
                       }
 
-                      return ListView.separated(
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: partners.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          final user = partners[index];
-                          return Glass(
-                            radius: BorderRadius.circular(14),
-                            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                      return Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: Wrap(
+                              spacing: 8,
+                              runSpacing: 4,
                               children: [
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 18,
-                                      backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
-                                      child: Text(
-                                        user.name.substring(0, 1).toUpperCase(),
-                                        style: const TextStyle(fontWeight: FontWeight.w800, color: Colors.black),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            user.name,
-                                            style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Speaks ${user.speaks} • Learns ${user.learns} • ${user.level}',
-                                            style: textTheme.bodySmall?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.72),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                      decoration: BoxDecoration(
-                                        color: user.isOnline ? const Color(0xFF2AFADF).withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.2),
-                                        borderRadius: BorderRadius.circular(999),
-                                      ),
-                                      child: Text(
-                                        user.isOnline ? 'Active' : 'Offline',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          color: user.isOnline ? const Color(0xFF2AFADF) : Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                ChoiceChip(
+                                  label: const Text('Online only'),
+                                  selected: _onlineOnly,
+                                  onSelected: (_) {
+                                    setState(() => _onlineOnly = true);
+                                    persistFilters();
+                                  },
                                 ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    _ToolChip(label: '${user.compatibility}% match'),
-                                    const SizedBox(width: 8),
-                                    const _ToolChip(label: 'Topic-safe rounds'),
-                                    const Spacer(),
-                                    SizedBox(
-                                      width: 112,
-                                      child: _ActionButton(
-                                        label: l10n.start,
-                                        filled: true,
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (_) => ExchangeSessionScreen(
-                                                partnerUserId: user.userId,
-                                                partnerName: user.name,
-                                                myLearningLanguage: user.speaks,
-                                                partnerLearningLanguage: user.learns,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ],
+                                ChoiceChip(
+                                  label: const Text('All available'),
+                                  selected: !_onlineOnly,
+                                  onSelected: (_) {
+                                    setState(() => _onlineOnly = false);
+                                    persistFilters();
+                                  },
                                 ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    TextButton.icon(
-                                      onPressed: () => _showModerationDialog(context, user),
-                                      icon: const Icon(Icons.report_gmailerrorred_rounded, size: 16),
-                                      label: const Text('Report'),
-                                    ),
-                                    TextButton.icon(
-                                      onPressed: () => _showBlockDialog(context, user),
-                                      icon: const Icon(Icons.block_rounded, size: 16),
-                                      label: const Text('Block'),
-                                    ),
+                                ChoiceChip(
+                                  label: const Text('Strict direction'),
+                                  selected: _strictDirection,
+                                  onSelected: (_) {
+                                    setState(() => _strictDirection = !_strictDirection);
+                                    persistFilters();
+                                  },
+                                ),
+                                DropdownButton<String>(
+                                  value: _levelFilter,
+                                  items: const [
+                                    DropdownMenuItem(value: 'all', child: Text('All levels')),
+                                    DropdownMenuItem(value: 'A2', child: Text('A2')),
+                                    DropdownMenuItem(value: 'B1', child: Text('B1')),
+                                    DropdownMenuItem(value: 'B2', child: Text('B2')),
+                                    DropdownMenuItem(value: 'C1', child: Text('C1')),
                                   ],
+                                  onChanged: (v) {
+                                    if (v == null) return;
+                                    setState(() => _levelFilter = v);
+                                    persistFilters();
+                                  },
                                 ),
                               ],
                             ),
-                          );
-                        },
+                          ),
+                          Expanded(
+                            child: ListView.separated(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: partners.length + 1,
+                              separatorBuilder: (_, __) => const SizedBox(height: 10),
+                              itemBuilder: (context, index) {
+                                if (index == partners.length) {
+                                  return Center(
+                                    child: TextButton.icon(
+                                      onPressed: _loadingMore || _cursorBefore == null
+                                          ? null
+                                          : () async {
+                                              setState(() => _loadingMore = true);
+                                              try {
+                                                final more = await profileRepository.getExchangeCandidateProfilesBefore(
+                                                  before: _cursorBefore!,
+                                                  limit: 80,
+                                                );
+                                                if (more.isNotEmpty) {
+                                                  setState(() {
+                                                    _extraProfiles.addAll(more);
+                                                    _cursorBefore = _updatedAtOf(more.last);
+                                                  });
+                                                }
+                                              } finally {
+                                                if (mounted) setState(() => _loadingMore = false);
+                                              }
+                                            },
+                                      icon: const Icon(Icons.expand_more_rounded),
+                                      label: Text(_loadingMore ? 'Loading...' : 'Load more users'),
+                                    ),
+                                  );
+                                }
+                                final user = partners[index];
+                                return _buildExchangeUserCard(context, textTheme, l10n, user);
+                              },
+                            ),
+                          ),
+                        ],
                       );
                     },
                   );
@@ -1178,9 +1263,9 @@ class _ExchangeNoCompatibleState extends StatelessWidget {
   Widget build(BuildContext context) {
     return _ExchangeEmptyBase(
       icon: Icons.filter_alt_off_rounded,
-      title: 'No compatible partners right now',
-      subtitle: 'Your friends are active, but none match this language direction yet.',
-      ctaLabel: 'Open friends',
+      title: 'No active users for this filter',
+      subtitle: 'Try switching filters to show all available exchange users.',
+      ctaLabel: 'Show all users',
       onTap: onOpenFriends,
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
@@ -26,6 +28,7 @@ class ExchangeSessionScreen extends StatefulWidget {
 class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
   final _input = TextEditingController();
   late final ExchangeSessionController _controller;
+  Timer? _turnTicker;
 
   @override
   void initState() {
@@ -33,14 +36,44 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     _controller = ExchangeSessionController(
       partnerName: widget.partnerName,
       partnerUserId: widget.partnerUserId,
-      sessionKey:
-          '${widget.partnerUserId}_${widget.myLearningLanguage}_${widget.partnerLearningLanguage}',
+      sessionKey: '${widget.partnerUserId}_${widget.myLearningLanguage}_${widget.partnerLearningLanguage}',
+      firstLanguageCode: _normalizeCode(widget.myLearningLanguage),
+      secondLanguageCode: _normalizeCode(widget.partnerLearningLanguage),
     )..hydrate();
+    _track('exchange_discovery_impression');
     _track('session_opened');
+    _controller.sendRequestIfNeeded().then((sent) {
+      if (sent) _track('conversation_request_sent');
+    });
+    _turnTicker = Timer.periodic(const Duration(seconds: 1), (_) async {
+      final skipped = await _controller.tickTurnAndAutoSkipIfNeeded();
+      if (skipped) {
+        await _track('turn_timeout_autoskip');
+      }
+    });
+  }
+
+  String _normalizeCode(String raw) {
+    final v = raw.toLowerCase();
+    if (v.startsWith('en') || v.contains('english')) return 'en';
+    if (v.startsWith('fr') || v.contains('french')) return 'fr';
+    if (v.startsWith('es') || v.contains('spanish')) return 'es';
+    if (v.startsWith('de') || v.contains('german')) return 'de';
+    return v.split(RegExp(r'[^a-z]')).firstWhere((e) => e.isNotEmpty, orElse: () => 'en');
+  }
+
+
+  String _tr(String en, {String? fr, String? es, String? de}) {
+    final code = Localizations.localeOf(context).languageCode;
+    if (code == 'fr') return fr ?? en;
+    if (code == 'es') return es ?? en;
+    if (code == 'de') return de ?? en;
+    return en;
   }
 
   @override
   void dispose() {
+    _turnTicker?.cancel();
     _input.dispose();
     _controller.dispose();
     super.dispose();
@@ -50,13 +83,41 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     return exchangeAnalyticsRepository.track(event, metadata: {
       'partner_id': widget.partnerUserId,
       'partner_name': widget.partnerName,
+      'active_lang': _controller.activeLanguageCode,
       ...?data,
     });
+  }
+
+  Future<void> _acceptRequest() async {
+    await _controller.acceptRequest();
+    await _track('conversation_request_accepted');
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Conversation request accepted. You can start chatting now.')),
+    );
+  }
+
+
+  Future<void> _declineRequest() async {
+    await _controller.declineRequest();
+    await _track('conversation_request_declined');
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Conversation request declined.')),
+    );
   }
 
   Future<void> _send() async {
     final text = _input.text.trim();
     if (text.isEmpty) return;
+
+    if (!_controller.requestAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Accept conversation request before messaging.')),
+      );
+      await _track('request_required_blocked_send');
+      return;
+    }
 
     if (!_controller.isMyTurn) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -70,15 +131,11 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     if (!ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            _controller.activeLanguage == ExchangeRoundLanguage.french
-                ? 'French round active: please send in French.'
-                : 'English round active: please send in English.',
-          ),
+          content: Text('Message blocked: use ${_controller.activeLanguageCode.toUpperCase()} and keep within limits/cooldown (${_controller.cooldownSecondsRemaining}s).'),
           backgroundColor: Colors.redAccent,
         ),
       );
-      await _track('language_lock_blocked');
+      await _track('language_or_rate_lock_blocked');
       return;
     }
 
@@ -87,18 +144,22 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
   }
 
   Future<void> _markPartnerReply() async {
-    await _controller.receivePartnerMessage(
-      _controller.activeLanguage == ExchangeRoundLanguage.french
-          ? 'Merci pour ton message.'
-          : 'Thanks for your message.',
-    );
+    await _controller.receivePartnerMessage('Thanks! Let us continue in ${_controller.activeLanguageCode.toUpperCase()}.');
     await _track('partner_reply_received');
   }
 
+  Future<void> _skipTurn() async {
+    await _controller.skipTurn();
+    await _track('turn_skipped_manual');
+  }
+
   Future<void> _suggestReply() async {
-    final options = _controller.activeLanguage == ExchangeRoundLanguage.french
-        ? ['Salut ! Comment ça va ?', 'Je vais bien, merci.', 'Qu’est-ce que tu fais ce week-end ?']
-        : ['Hi! How are you?', 'I am doing well, thanks.', 'What do you do on weekends?'];
+    final lang = _controller.activeLanguageCode;
+    final options = lang == 'fr'
+        ? ['Salut! Comment ça va ?', 'Je vais bien, merci.', 'Parlons de notre week-end.']
+        : lang == 'es'
+            ? ['Hola, ¿cómo estás?', 'Estoy bien, gracias.', '¿Qué hiciste hoy?']
+            : ['Hi! How are you?', 'I am doing well, thanks.', 'What did you do today?'];
     final selected = await showModalBottomSheet<String>(
       context: context,
       builder: (ctx) => SafeArea(
@@ -131,7 +192,10 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
       return;
     }
 
-    final corrected = original.replaceAll(RegExp(r'\s+'), ' ').trim();
+    final corrected = original
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .replaceAll(' i ', ' I ')
+        .trim();
     _input.text = corrected;
     await _track('helper_correct_sentence');
 
@@ -141,9 +205,9 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Correction suggestion'),
         content: Text(
-          'Correct: $corrected\n'
-          'Why: cleaned spacing and round-language formatting\n'
-          'Better version: $corrected ✅',
+          'Original: $original\n'
+          'Corrected: $corrected\n'
+          'Why: normalized spacing/capitalization, improved readability, and simplified CEFR-friendly phrasing.',
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
@@ -155,19 +219,16 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
   Future<void> _translateDraft() async {
     final text = _input.text.trim();
     if (text.isEmpty) return;
-    const frToEn = {
-      'bonjour': 'hello',
-      'merci': 'thanks',
-      'salut': 'hi',
-    };
-    const enToFr = {
-      'hello': 'bonjour',
-      'thanks': 'merci',
-      'hi': 'salut',
-    };
+    const frToEn = {'bonjour': 'hello', 'merci': 'thanks', 'salut': 'hi'};
+    const enToFr = {'hello': 'bonjour', 'thanks': 'merci', 'hi': 'salut'};
+    const esToEn = {'hola': 'hello', 'gracias': 'thanks'};
 
     final words = text.toLowerCase().split(' ');
-    final dict = _controller.activeLanguage == ExchangeRoundLanguage.french ? frToEn : enToFr;
+    final dict = switch (_controller.activeLanguageCode) {
+      'fr' => frToEn,
+      'es' => esToEn,
+      _ => enToFr,
+    };
     final translated = words.map((w) => dict[w] ?? w).join(' ');
     _input.text = translated;
     await _track('helper_translate');
@@ -184,17 +245,19 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
 
   Future<void> _showSummary() async {
     final minutes = DateTime.now().difference(_controller.startedAt).inMinutes;
-    final frenchWords = _controller.messages
-        .where((m) => m.language == ExchangeRoundLanguage.french)
+    final activeWords = _controller.messages
+        .where((m) => m.languageCode == _controller.activeLanguageCode)
         .fold<int>(0, (a, b) => a + b.text.split(' ').length);
-    final englishWords = _controller.messages
-        .where((m) => m.language == ExchangeRoundLanguage.english)
+    final otherWords = _controller.messages
+        .where((m) => m.languageCode != _controller.activeLanguageCode)
         .fold<int>(0, (a, b) => a + b.text.split(' ').length);
 
     await _track('session_completed', data: {
-      'french_words': frenchWords,
-      'english_words': englishWords,
+      'active_words': activeWords,
+      'other_words': otherWords,
       'duration_mins': minutes,
+      'total_messages': _controller.messages.length,
+      'corrections_used': _controller.myCorrectionsUsed,
     });
 
     if (!mounted) return;
@@ -204,13 +267,23 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Session summary'),
         content: Text(
-          'French words: $frenchWords\n'
-          'English words: $englishWords\n'
+          '${_controller.activeLanguageCode.toUpperCase()} words: $activeWords\n'
+          '${_controller.inactiveLanguageCode.toUpperCase()} words: $otherWords\n'
           'Corrections used: ${_controller.myCorrectionsUsed}\n'
+          'Messages: ${_controller.messages.length}\n'
           'Duration: ${minutes}m\n'
-          'Streak: +1',
+          'Recommendation: review words from the weaker-language turns.',
         ),
         actions: [
+          TextButton(
+            onPressed: () async {
+              await _track('review_weak_items_tap');
+              if (!mounted) return;
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tip: open Solo mode > Review to practice weak items.')));
+            },
+            child: const Text('Review weak items'),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
@@ -236,9 +309,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
       body: AnimatedBuilder(
         animation: _controller,
         builder: (context, _) {
-          final roundLabel = _controller.activeLanguage == ExchangeRoundLanguage.french
-              ? 'French round'
-              : 'English round';
+          final roundLabel = '${_controller.activeLanguageCode.toUpperCase()} round';
           return Column(
             children: [
               Padding(
@@ -255,8 +326,18 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Language lock active • ${_controller.isMyTurn ? 'Your turn' : 'Partner turn'} • Corrections left: ${1 - _controller.myCorrectionsUsed}',
+                        'Language lock • ${_controller.isMyTurn ? 'Your turn' : 'Partner turn'} • '
+                        'Corrections left: ${ExchangeSessionController.maxCorrectionPerRound - _controller.myCorrectionsUsed} • '
+                        'Turn timer: ${_controller.turnSecondsRemaining}s',
                       ),
+                      const SizedBox(height: 4),
+                      Text(_controller.requestAccepted
+                          ? 'Conversation status: accepted'
+                          : (_controller.requestStatus == 'declined'
+                              ? 'Conversation status: declined'
+                              : (_controller.requestStatus == 'expired'
+                                  ? 'Conversation status: expired'
+                                  : 'Conversation status: pending'))),
                     ],
                   ),
                 ),
@@ -278,7 +359,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                               : Colors.white.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Text('${m.from}: ${m.text}'),
+                        child: Text('${m.from}: ${m.text} (${m.languageCode.toUpperCase()})'),
                       ),
                     );
                   },
@@ -301,12 +382,22 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Row(
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 2,
                       children: [
+                        if (_controller.requestStatus == 'pending') ...[
+                          TextButton(onPressed: _acceptRequest, child: Text(_tr('Accept request', fr: 'Accepter', es: 'Aceptar', de: 'Annehmen'))),
+                          TextButton(onPressed: _declineRequest, child: Text(_tr('Decline request', fr: 'Refuser', es: 'Rechazar', de: 'Ablehnen'))),
+                        ] else if (_controller.requestStatus == 'accepted')
+                          TextButton(onPressed: null, child: Text(_tr('Request accepted', fr: 'Demande acceptée', es: 'Solicitud aceptada', de: 'Anfrage akzeptiert')) )
+                        else
+                          TextButton(onPressed: null, child: Text(_tr('Request ${_controller.requestStatus}', fr: 'Demande ${_controller.requestStatus}', es: 'Solicitud ${_controller.requestStatus}', de: 'Anfrage ${_controller.requestStatus}'))),
                         TextButton(onPressed: _translateDraft, child: const Text('Translate')),
                         TextButton(onPressed: _suggestReply, child: const Text('Suggest reply')),
                         TextButton(onPressed: _correctMySentence, child: const Text('Correct me')),
                         TextButton(onPressed: _markPartnerReply, child: const Text('Partner replied')),
+                        TextButton(onPressed: _skipTurn, child: const Text('Skip turn')),
                       ],
                     ),
                     const SizedBox(height: 2),
