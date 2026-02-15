@@ -8,7 +8,7 @@ import 'dm_chat_screen.dart';
 import 'select_friend_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
-enum _InboxFilter { all, unread, mentions }
+enum _InboxFilter { all, unread, friends, requests, muted, archived }
 enum _InboxSort { latest, unreadFirst, name }
 
 class InboxScreen extends StatefulWidget {
@@ -316,9 +316,44 @@ class _InboxScreenState extends State<InboxScreen> {
                     const SizedBox(width: 6),
                     Expanded(
                       child: _FilterPill(
-                        label: 'Mentions',
-                        selected: _filter == _InboxFilter.mentions,
-                        onTap: () => setState(() => _filter = _InboxFilter.mentions),
+                        label: 'Friends',
+                        selected: _filter == _InboxFilter.friends,
+                        onTap: () => setState(() => _filter = _InboxFilter.friends),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 6),
+              Glass(
+                radius: BorderRadius.circular(20),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _FilterPill(
+                        label: 'Requests',
+                        selected: _filter == _InboxFilter.requests,
+                        onTap: () => setState(() => _filter = _InboxFilter.requests),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _FilterPill(
+                        label: 'Muted',
+                        selected: _filter == _InboxFilter.muted,
+                        onTap: () => setState(() => _filter = _InboxFilter.muted),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _FilterPill(
+                        label: 'Archived',
+                        selected: _filter == _InboxFilter.archived,
+                        onTap: () => setState(() {
+                          _filter = _InboxFilter.archived;
+                          _showArchivedOnly = true;
+                        }),
                       ),
                     ),
                   ],
@@ -399,9 +434,16 @@ class _InboxScreenState extends State<InboxScreen> {
 
                       final unreadCount = (t['unreadCount'] as int?) ?? 0;
                       if (_filter == _InboxFilter.unread && unreadCount <= 0) return false;
-                      if (_filter == _InboxFilter.mentions && !(t['lastMsg']?.toString().contains('@') ?? false)) {
+                      if (_filter == _InboxFilter.friends && t['isFriend'] != true) return false;
+                      if (_filter == _InboxFilter.requests &&
+                          t['hasIncomingRequest'] != true &&
+                          t['hasOutgoingRequest'] != true) {
                         return false;
                       }
+                      if (_filter == _InboxFilter.muted && !_mutedThreadIds.contains(otherId)) {
+                        return false;
+                      }
+                      if (_filter == _InboxFilter.archived && !isArchived) return false;
                       return true;
                     }).toList();
 
@@ -526,12 +568,15 @@ class _InboxScreenState extends State<InboxScreen> {
                             otherId: otherId,
                             name: t['otherName'] ?? l10n.unknown,
                             lastText: t['lastMsg'] ?? '',
+                            summary: t['summary']?.toString(),
                             time: _fmtTime(context, t['time'] as DateTime),
                             unreadCount: unreadCount,
                             showOnlineIndicator: t['isOnline'] == true,
                             avatarUrl: t['avatar_url']?.toString(),
                             pinned: isPinned,
                             muted: isMuted,
+                            hasIncomingRequest: t['hasIncomingRequest'] == true,
+                            hasOutgoingRequest: t['hasOutgoingRequest'] == true,
                             selected: selected,
                             selectionMode: _selectionMode,
                             onTap: () async {
@@ -722,12 +767,15 @@ class _ThreadRow extends StatelessWidget {
   final String otherId;
   final String name;
   final String lastText;
+  final String? summary;
   final String time;
   final int unreadCount;
   final bool showOnlineIndicator;
   final String? avatarUrl;
   final bool pinned;
   final bool muted;
+  final bool hasIncomingRequest;
+  final bool hasOutgoingRequest;
   final bool selectionMode;
   final bool selected;
   final VoidCallback onTap;
@@ -737,12 +785,15 @@ class _ThreadRow extends StatelessWidget {
     required this.otherId,
     required this.name,
     required this.lastText,
+    required this.summary,
     required this.time,
     required this.unreadCount,
     required this.showOnlineIndicator,
     required this.avatarUrl,
     required this.pinned,
     required this.muted,
+    required this.hasIncomingRequest,
+    required this.hasOutgoingRequest,
     required this.selectionMode,
     required this.selected,
     required this.onTap,
@@ -828,17 +879,62 @@ class _ThreadRow extends StatelessWidget {
                     stream: chatRepository.typingStream(otherId),
                     builder: (context, snapshot) {
                       final isTyping = snapshot.data == true;
-                      return Text(
-                        isTyping ? 'Typing…' : lastText,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: TextStyle(
-                          color: isTyping
-                              ? Colors.orange
-                              : scheme.onSurface.withValues(alpha: 0.65),
-                          fontWeight: FontWeight.w700,
-                          fontSize: 12.5,
-                        ),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isTyping ? 'Typing…' : lastText,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                            style: TextStyle(
+                              color: isTyping
+                                  ? Colors.orange
+                                  : scheme.onSurface.withValues(alpha: 0.65),
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                          if (!isTyping && summary != null && summary!.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 3),
+                              child: Text(
+                                summary!,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: TextStyle(
+                                  color: scheme.primary.withValues(alpha: 0.9),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          if (hasIncomingRequest || hasOutgoingRequest)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(999),
+                                  color: hasIncomingRequest
+                                      ? Colors.green.withValues(alpha: 0.15)
+                                      : scheme.primary.withValues(alpha: 0.15),
+                                  border: Border.all(
+                                    color: hasIncomingRequest
+                                        ? Colors.green.withValues(alpha: 0.4)
+                                        : scheme.primary.withValues(alpha: 0.35),
+                                  ),
+                                ),
+                                child: Text(
+                                  hasIncomingRequest ? 'Request waiting' : 'Request sent',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    color: hasIncomingRequest ? Colors.green : scheme.primary,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
                       );
                     },
                   ),
