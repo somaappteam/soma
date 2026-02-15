@@ -72,10 +72,16 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
     return Scaffold(
       body: SafeArea(
           child: ResponsiveFrame(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-              child: Column(
-                children: [
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final compactHeight = constraints.maxHeight < 760;
+                final sectionSpacing = compactHeight ? 12.0 : 14.0;
+                final rowSpacing = compactHeight ? 8.0 : 10.0;
+
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+                  child: Column(
+                    children: [
                   _TopBar(
                     title: l10n.circlesCreateCircle,
                     onBack: () => Navigator.pop(context),
@@ -89,7 +95,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                     },
                   ),
 
-                  const SizedBox(height: 14),
+                  SizedBox(height: sectionSpacing),
 
                   Expanded(
                     child: ListView(
@@ -125,7 +131,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 ),
                               ),
 
-                              const SizedBox(height: 14),
+                              SizedBox(height: sectionSpacing),
 
                               _SectionTitle(l10n.circlesLanguages),
                               const SizedBox(height: 10),
@@ -168,7 +174,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 ],
                               ),
 
-                              const SizedBox(height: 14),
+                              SizedBox(height: sectionSpacing),
 
                               _SectionTitle(l10n.circlesModeTitle),
                               const SizedBox(height: 10),
@@ -181,7 +187,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 onChanged: (v) => setState(() => mode = v),
                               ),
 
-                              const SizedBox(height: 14),
+                              SizedBox(height: sectionSpacing),
 
                               _SectionTitle(l10n.circlesLevelTitle),
                               const SizedBox(height: 10),
@@ -213,10 +219,10 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 ],
                               ),
 
-                              const SizedBox(height: 16),
+                              SizedBox(height: compactHeight ? 14 : 16),
 
                               _SectionTitle(l10n.circlesRoomSetup),
-                              const SizedBox(height: 10),
+                              SizedBox(height: rowSpacing),
 
                               const SizedBox(height: 8),
                               Wrap(
@@ -253,7 +259,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 onMinus: maxPlayers > 1 ? () => setState(() => maxPlayers--) : null,
                                 onPlus: maxPlayers < 5 ? () => setState(() => maxPlayers++) : null,
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: rowSpacing),
 
                               _StepperRow(
                                 title: l10n.circlesQuestions,
@@ -272,10 +278,10 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 onPlus: timePerQ < 60 ? () => setState(() => timePerQ += 1) : null,
                               ),
 
-                              const SizedBox(height: 16),
+                              SizedBox(height: compactHeight ? 14 : 16),
 
                               _SectionTitle(l10n.circlesAdvanced),
-                              const SizedBox(height: 10),
+                              SizedBox(height: rowSpacing),
 
                               _ToggleRow(
                                 title: l10n.circlesAllowSpectators,
@@ -283,7 +289,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 value: allowSpectators,
                                 onChanged: (v) => setState(() => allowSpectators = v),
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: rowSpacing),
 
                               _ToggleRow(
                                 title: l10n.circlesLiveVoiceChat,
@@ -291,7 +297,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 value: enableVoice,
                                 onChanged: (v) => setState(() => enableVoice = v),
                               ),
-                              const SizedBox(height: 10),
+                              SizedBox(height: rowSpacing),
 
                               _ToggleRow(
                                 title: l10n.circlesLiveTextChat,
@@ -322,7 +328,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 14),
+                        SizedBox(height: sectionSpacing),
 
                         // Create button
                         NeonButton(
@@ -417,7 +423,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                           },
                         ),
 
-                        const SizedBox(height: 12),
+                        SizedBox(height: compactHeight ? 10 : 12),
 
                         // Helper hint
                         Text(
@@ -428,12 +434,14 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: compactHeight ? 16 : 20),
                       ],
                     ),
                   ),
                 ],
-              ),
+                  ),
+                );
+              },
             ),
           ),
       ),

@@ -19,69 +19,83 @@ class SoloCourseDetailScreen extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  _IconGlass(icon: Icons.arrow_back_ios_new_rounded, onTap: () => Navigator.pop(context)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      course.subtitle,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(color: scheme.onSurface, fontSize: 20, fontWeight: FontWeight.w900),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compactHeight = constraints.maxHeight < 760;
+            final sectionSpacing = compactHeight ? 10.0 : 12.0;
+            final topSpacing = compactHeight ? 12.0 : 18.0;
 
-              Expanded(
-                child: ListView(
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    _ModeCard(
-                      icon: Icons.fact_check_rounded,
-                      title: l10n.soloModeVocabulary,
-                      subtitle: l10n.soloModeVocabularySubtitle,
-                      onTap: () => _go(context, SoloMode.vocabulary),
-                    ),
-                    const SizedBox(height: 12),
-                    _ModeCard(
-                      icon: Icons.edit_note_rounded,
-                      title: l10n.soloModeSentences,
-                      subtitle: l10n.soloModeSentencesSubtitle,
-                      onTap: () => _go(context, SoloMode.sentences),
-                    ),
-                    const SizedBox(height: 12),
-                    Glass(
-                      radius: BorderRadius.circular(22),
-                      padding: const EdgeInsets.all(14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+            return Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                  child: Column(
+                    children: [
+                      Row(
                         children: [
-                          Text(l10n.soloModeReview,
-                              style: TextStyle(color: scheme.onSurface, fontSize: 16, fontWeight: FontWeight.w900)),
-                          const SizedBox(height: 8),
-                          Text(
-                            l10n.soloModeReviewDescription,
-                            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.65), fontSize: 12.5, fontWeight: FontWeight.w700),
-                          ),
-                          const SizedBox(height: 12),
-                          NeonButton(
-                            label: l10n.startReview,
-                            onTap: () => _go(context, SoloMode.review),
+                          _IconGlass(icon: Icons.arrow_back_ios_new_rounded, onTap: () => Navigator.pop(context)),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              course.subtitle,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: scheme.onSurface, fontSize: 20, fontWeight: FontWeight.w900),
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      SizedBox(height: topSpacing),
+
+                      Expanded(
+                        child: ListView(
+                          physics: const BouncingScrollPhysics(),
+                          children: [
+                            _ModeCard(
+                              icon: Icons.fact_check_rounded,
+                              title: l10n.soloModeVocabulary,
+                              subtitle: l10n.soloModeVocabularySubtitle,
+                              onTap: () => _go(context, SoloMode.vocabulary),
+                            ),
+                            SizedBox(height: sectionSpacing),
+                            _ModeCard(
+                              icon: Icons.edit_note_rounded,
+                              title: l10n.soloModeSentences,
+                              subtitle: l10n.soloModeSentencesSubtitle,
+                              onTap: () => _go(context, SoloMode.sentences),
+                            ),
+                            SizedBox(height: sectionSpacing),
+                            Glass(
+                              radius: BorderRadius.circular(22),
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(l10n.soloModeReview,
+                                      style: TextStyle(color: scheme.onSurface, fontSize: 16, fontWeight: FontWeight.w900)),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    l10n.soloModeReviewDescription,
+                                    style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.65), fontSize: 12.5, fontWeight: FontWeight.w700),
+                                  ),
+                                  SizedBox(height: compactHeight ? 10 : 12),
+                                  NeonButton(
+                                    label: l10n.startReview,
+                                    onTap: () => _go(context, SoloMode.review),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );

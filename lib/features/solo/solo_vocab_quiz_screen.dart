@@ -350,10 +350,16 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-          child: Column(
-            children: [
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compactHeight = constraints.maxHeight < 760;
+            final topSpacing = compactHeight ? 12.0 : 18.0;
+            final sectionSpacing = compactHeight ? 10.0 : 14.0;
+            final choicesTopSpacing = compactHeight ? 20.0 : 30.0;
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+              child: Column(
+                children: [
               Row(
                 children: [
                   _IconGlass(
@@ -383,7 +389,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                       icon: Icons.layers_rounded),
                 ],
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: topSpacing),
               ClipRRect(
                 borderRadius: BorderRadius.circular(999),
                 child: SizedBox(
@@ -398,11 +404,14 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: topSpacing),
               Glass(
                 radius: BorderRadius.circular(22),
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                child: Column(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 92),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _VocabPromptRow(question: q),
                     if (showReading &&
@@ -419,19 +428,25 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                       ),
                     ],
                   ],
+                  ),
                 ),
               ),
-              const SizedBox(height: 14),
-              _TtsControls(
-                rates: const [0.75, 1.0, 1.25],
-                selectedRate: _speechRate,
-                onRateSelected: (rate) {
-                  setState(() => _speechRate = rate);
-                  ttsService.setRate(rate);
-                },
-                onSpeak: _speakPrompt,
+              SizedBox(height: sectionSpacing),
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 330),
+                  child: _TtsControls(
+                    rates: const [0.75, 1.0, 1.25],
+                    selectedRate: _speechRate,
+                    onRateSelected: (rate) {
+                      setState(() => _speechRate = rate);
+                      ttsService.setRate(rate);
+                    },
+                    onSpeak: _speakPrompt,
+                  ),
+                ),
               ),
-              const SizedBox(height: 48),
+              SizedBox(height: choicesTopSpacing),
               Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
@@ -517,14 +532,16 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: compactHeight ? 8 : 10),
               if (revealed && widget.timePerQuestion == null)
                 NeonButton(
                   label: "Next",
                   onTap: _next,
                 ),
             ],
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -574,13 +591,13 @@ class _TtsControls extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(18),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       child: Row(
         children: [
           ...rates.map((rate) {
             final selected = rate == selectedRate;
             return Padding(
-              padding: const EdgeInsets.only(right: 8),
+              padding: const EdgeInsets.only(right: 6),
               child: _SpeedChip(
                 label: "${rate.toStringAsFixed(rate == 1.0 ? 0 : 2)}x",
                 selected: selected,
@@ -593,9 +610,9 @@ class _TtsControls extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             onTap: onSpeak,
             child: Padding(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(4),
               child: Icon(Icons.volume_up_rounded,
-                  color: scheme.onSurface.withValues(alpha: 0.9)),
+                  color: scheme.onSurface.withValues(alpha: 0.9), size: 18),
             ),
           ),
         ],
@@ -622,8 +639,8 @@ class _SpeedChip extends StatelessWidget {
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
       child: Container(
-        height: 30,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
+        height: 24,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
           color: selected
@@ -638,7 +655,7 @@ class _SpeedChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-              color: scheme.onSurface, fontWeight: FontWeight.w800, fontSize: 12),
+              color: scheme.onSurface, fontWeight: FontWeight.w800, fontSize: 11),
         ),
       ),
     );

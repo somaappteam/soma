@@ -125,11 +125,21 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-          child: ListView(
-            physics: const BouncingScrollPhysics(),
-            children: [
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compactHeight = constraints.maxHeight < 760;
+            final blockSpacing = compactHeight ? 12.0 : 14.0;
+            final buttonSpacing = compactHeight ? 8.0 : 10.0;
+
+            return Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    children: [
               // Top bar
               Row(
                 children: [
@@ -154,7 +164,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                 ],
               ),
 
-              const SizedBox(height: 14),
+              SizedBox(height: blockSpacing),
 
               // Summary card
               Glass(
@@ -227,11 +237,11 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                         ],
                       ),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: blockSpacing),
 
                       _AccuracyBar(percent: p),
 
-                      const SizedBox(height: 14),
+                      SizedBox(height: blockSpacing),
 
                       Row(
                         children: [
@@ -255,7 +265,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                         ],
                       ),
 
-                      const SizedBox(height: 10),
+                      SizedBox(height: buttonSpacing),
 
                       Row(
                         children: [
@@ -282,7 +292,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 14),
+                SizedBox(height: blockSpacing),
 
                 // Mistakes preview
                 Glass(
@@ -309,7 +319,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 18),
+                SizedBox(height: compactHeight ? 14 : 18),
 
                 // Buttons
                 if (widget.mistakes.isNotEmpty) ...[
@@ -345,21 +355,25 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                       }
                     },
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: buttonSpacing),
                 ],
                 _SecondaryButton(
                   label: l10n.playAgain,
                   onTap: widget.onPlayAgain,
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: buttonSpacing),
                 _SecondaryButton(
                   label: l10n.backToCourse,
                   onTap: () => Navigator.popUntil(context, (r) => r.isFirst),
                 ),
               ],
-            ),
-          ),
+                  ),
+                ),
+              ),
+            );
+          },
         ),
+          ),
     );
   }
 }

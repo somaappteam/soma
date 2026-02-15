@@ -146,11 +146,16 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
 
     return Scaffold(
       body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final compactHeight = constraints.maxHeight < 760;
+            final topSpacing = compactHeight ? 8.0 : 10.0;
+            final sectionSpacing = compactHeight ? 10.0 : 14.0;
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                 // Top bar
                 Row(
                   children: [
@@ -187,7 +192,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: topSpacing),
 
                 // Timer bar
                 Glass(
@@ -239,15 +244,18 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 14),
+                SizedBox(height: sectionSpacing),
 
                 // Prompt card
                 Glass(
                   radius: BorderRadius.circular(22),
                   padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 102),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
                      Text(
                       q.prompt,
                       textAlign: TextAlign.center,
@@ -305,7 +313,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 14),
+                SizedBox(height: sectionSpacing),
 
                 // Choices
                 Expanded(
