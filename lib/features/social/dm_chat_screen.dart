@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,6 +23,7 @@ import '../profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 enum DmCallState { idle, ringingOutgoing, ringingIncoming, connecting, connected }
+enum _DmMenuAction { media, documents, clearDraft, togglePinnedOnly }
 
 class DmChatScreen extends StatefulWidget {
   const DmChatScreen({
@@ -69,6 +71,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
   bool _showSearch = false;
   String _searchQuery = '';
   String _draftText = '';
+  bool _showPinnedOnly = false;
+  Set<String> _pinnedMessageIds = <String>{};
   // NEW: Track block status
   StreamSubscription? _settingsSub;
   bool _isOtherBlocked = false;
@@ -102,6 +106,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _typingStream = chatRepository.typingStream(widget.otherId);
     _loadDmGate();
     _loadDraft();
+    _loadPinnedMessages();
     
     // NEW: Listen to settings for block updates
     _settingsSub = settingsRepository.getSettingsStream().listen((settings) {
@@ -226,6 +231,66 @@ class _DmChatScreenState extends State<DmChatScreen> {
       drafts[widget.otherId] = text;
     }
     await settingsRepository.updateSetting('chat_drafts', drafts);
+  }
+
+  Future<void> _loadPinnedMessages() async {
+    final settings = await settingsRepository.getSettings();
+    final raw = settings['chat_pinned_message_ids'];
+    if (raw is! Map) return;
+    final scoped = raw[widget.otherId];
+    if (scoped is! List) return;
+    if (!mounted) return;
+    setState(() {
+      _pinnedMessageIds = scoped.map((e) => e.toString()).toSet();
+    });
+  }
+
+  Future<void> _persistPinnedMessages() async {
+    final settings = await settingsRepository.getSettings();
+    final raw = Map<String, dynamic>.from((settings['chat_pinned_message_ids'] as Map<String, dynamic>?) ?? {});
+    raw[widget.otherId] = _pinnedMessageIds.toList();
+    await settingsRepository.updateSetting('chat_pinned_message_ids', raw);
+  }
+
+  Future<void> _togglePinMessage(String messageId) async {
+    setState(() {
+      if (_pinnedMessageIds.contains(messageId)) {
+        _pinnedMessageIds.remove(messageId);
+      } else {
+        _pinnedMessageIds.add(messageId);
+      }
+    });
+    await _persistPinnedMessages();
+    if (!mounted) return;
+    final isPinned = _pinnedMessageIds.contains(messageId);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(isPinned ? 'Message pinned' : 'Message unpinned')),
+    );
+  }
+
+  void _handleMenuAction(_DmMenuAction action) {
+    switch (action) {
+      case _DmMenuAction.media:
+        setState(() {
+          _showSearch = true;
+          _searchQuery = '"type":"image"';
+        });
+        break;
+      case _DmMenuAction.documents:
+        setState(() {
+          _showSearch = true;
+          _searchQuery = '"type":"file"';
+        });
+        break;
+      case _DmMenuAction.clearDraft:
+        _controller.clear();
+        _saveDraft('');
+        _setTypingState(false, immediate: true);
+        break;
+      case _DmMenuAction.togglePinnedOnly:
+        setState(() => _showPinnedOnly = !_showPinnedOnly);
+        break;
+    }
   }
 
   Future<void> _loadOnlineVisibility() async {
@@ -886,6 +951,26 @@ class _DmChatScreenState extends State<DmChatScreen> {
                 setState(() => _replyPreview = msg.previewText);
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.copy_rounded),
+              title: const Text('Copy text'),
+              onTap: () async {
+                Navigator.pop(context);
+                await Clipboard.setData(ClipboardData(text: msg.previewText));
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Copied to clipboard')),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(_pinnedMessageIds.contains(msg.id) ? Icons.push_pin_outlined : Icons.push_pin_rounded),
+              title: Text(_pinnedMessageIds.contains(msg.id) ? 'Unpin message' : 'Pin message'),
+              onTap: () async {
+                Navigator.pop(context);
+                await _togglePinMessage(msg.id);
+              },
+            ),
             if (msg.isMine && msg.payload.type == 'text')
               ListTile(
                 leading: const Icon(Icons.edit_rounded),
@@ -1013,6 +1098,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
                           },
                           onCall: _toggleVoiceCall,
                           onToggleSearch: () => setState(() => _showSearch = !_showSearch),
+                          onMenuSelected: _handleMenuAction,
+                          showPinnedOnly: _showPinnedOnly,
                           isInCall: _isCallActive,
                           callStatusText: _callSubtitle,
                           callDuration: _callElapsedSeconds,
@@ -1037,6 +1124,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       },
                       onCall: _toggleVoiceCall,
                       onToggleSearch: () => setState(() => _showSearch = !_showSearch),
+                      onMenuSelected: _handleMenuAction,
+                      showPinnedOnly: _showPinnedOnly,
                       isInCall: _isCallActive,
                       callStatusText: _callSubtitle,
                       callDuration: _callElapsedSeconds,
@@ -1058,6 +1147,35 @@ class _DmChatScreenState extends State<DmChatScreen> {
                     ),
                   ),
                 ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                child: Row(
+                  children: [
+                    if (_searchQuery.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(999),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+                        ),
+                        child: Text(
+                          'Searching: $_searchQuery',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    const Spacer(),
+                    FilterChip(
+                      label: const Text('Pinned'),
+                      selected: _showPinnedOnly,
+                      onSelected: (v) => setState(() => _showPinnedOnly = v),
+                    ),
+                  ],
+                ),
+              ),
               Expanded(
                 child: StreamBuilder<List<Map<String, dynamic>>>(
                     stream: _messagesStream,
@@ -1074,11 +1192,16 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       }
 
                       final msgs = snapshot.data!;
-                      final visibleMsgs = _searchQuery.isEmpty
+                      var visibleMsgs = _searchQuery.isEmpty
                           ? msgs
                           : msgs
                               .where((m) => (m['content']?.toString().toLowerCase() ?? '').contains(_searchQuery))
                               .toList();
+                      if (_showPinnedOnly) {
+                        visibleMsgs = visibleMsgs
+                            .where((m) => _pinnedMessageIds.contains(m['id']?.toString() ?? ''))
+                            .toList();
+                      }
                       final hasUnread = visibleMsgs.any((m) => m['receiver_id'] == _myUserId && (m['is_read'] != true && m['is_read'] != 1));
                       if (hasUnread) {
                         _markConversationAsRead();
@@ -1124,6 +1247,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                                     replyTo: parsed.payload.replyTo,
                                     onLongPress: () => _showMessageActions(parsed),
                                     onTapFile: _openFileUrl,
+                                    pinned: _pinnedMessageIds.contains(parsed.id),
                                   ),
                                 ),
                                 const SizedBox(height: 10),
@@ -1323,6 +1447,8 @@ class _TopBar extends StatelessWidget {
   final VoidCallback onProfileTap;
   final VoidCallback onCall;
   final VoidCallback onToggleSearch;
+  final ValueChanged<_DmMenuAction> onMenuSelected;
+  final bool showPinnedOnly;
   final bool isInCall;
   final String callStatusText;
   final int callDuration;
@@ -1336,6 +1462,8 @@ class _TopBar extends StatelessWidget {
     required this.onProfileTap,
     required this.onCall,
     required this.onToggleSearch,
+    required this.onMenuSelected,
+    required this.showPinnedOnly,
     required this.isInCall,
     required this.callStatusText,
     required this.callDuration,
@@ -1426,6 +1554,37 @@ class _TopBar extends StatelessWidget {
           const SizedBox(width: 10),
           _IconGlass(icon: Icons.search_rounded, onTap: onToggleSearch),
           const SizedBox(width: 8),
+          PopupMenuButton<_DmMenuAction>(
+            onSelected: onMenuSelected,
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                value: _DmMenuAction.media,
+                child: Text('Find photos & videos'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.documents,
+                child: Text('Find documents'),
+              ),
+              PopupMenuItem(
+                value: _DmMenuAction.togglePinnedOnly,
+                child: Text(showPinnedOnly ? 'Show all messages' : 'Show pinned only'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.clearDraft,
+                child: Text('Clear draft'),
+              ),
+            ],
+            child: Glass(
+              radius: BorderRadius.circular(16),
+              padding: const EdgeInsets.all(10),
+              child: Icon(
+                Icons.more_horiz_rounded,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92),
+                size: 20,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           _IconGlass(
             icon: isInCall ? Icons.call_end_rounded : Icons.call_rounded,
             onTap: onCall,
@@ -1454,6 +1613,7 @@ class _Bubble extends StatelessWidget {
   final VoidCallback? onLongPress;
   final ValueChanged<String>? onTapFile;
   final ValueChanged<String>? onReact;
+  final bool pinned;
 
   const _Bubble({
     required this.text,
@@ -1467,6 +1627,7 @@ class _Bubble extends StatelessWidget {
     this.onLongPress,
     this.onTapFile,
     this.onReact,
+    this.pinned = false,
   });
 
   @override
@@ -1608,13 +1769,23 @@ class _Bubble extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.only(top: 4, right: isMe ? 4 : 0, left: isMe ? 0 : 4),
-          child: Text(
-            time,
-            style: TextStyle(
-              color: scheme.onSurface.withValues(alpha: 0.55),
-              fontSize: 10.5,
-              fontWeight: FontWeight.w700,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (pinned)
+                Padding(
+                  padding: const EdgeInsets.only(right: 4),
+                  child: Icon(Icons.push_pin_rounded, size: 12, color: scheme.primary),
+                ),
+              Text(
+                time,
+                style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.55),
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
         ),
 

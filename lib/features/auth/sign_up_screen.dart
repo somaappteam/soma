@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../home/app_shell.dart';
 import '../info/about_screen.dart';
 import '../../core/widgets/glass.dart';
@@ -82,6 +83,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
       }
+    }
+  }
+
+
+  Future<void> _handleOAuthSignUp(OAuthProvider provider) async {
+    final l10n = AppLocalizations.of(context);
+    try {
+      await authRepository.signInWithOAuth(provider);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${provider.name.toUpperCase()} ${l10n.signUp}...')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      await showPremiumDialog(
+        context: context,
+        title: l10n.signUp,
+        body: l10n.authError(e.toString()),
+        confirmText: l10n.ok,
+      );
     }
   }
 
@@ -184,6 +205,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             child: NeonButton(
                               label: _isLoading ? l10n.authCreating : l10n.authCreateAccount,
                               onTap: _isLoading ? () {} : _handleSignUp,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: _isLoading ? null : () => _handleOAuthSignUp(OAuthProvider.facebook),
+                              icon: const Icon(Icons.facebook_rounded),
+                              label: const Text('Continue with Facebook'),
                             ),
                           ),
                         ],

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/services/session_tracker.dart';
 import 'app_analytics_repository.dart';
@@ -42,6 +43,27 @@ class AuthRepository {
       await appAnalyticsRepository.track(
         'auth_sign_in_failed',
         metadata: {'reason': e.toString()},
+      );
+      rethrow;
+    }
+  }
+
+
+  Future<bool> signInWithOAuth(OAuthProvider provider) async {
+    try {
+      final launched = await _client.auth.signInWithOAuth(
+        provider,
+        redirectTo: kIsWeb ? null : 'soma://auth-callback',
+      );
+      await appAnalyticsRepository.track(
+        'auth_oauth_started',
+        metadata: {'provider': provider.name, 'launched': launched},
+      );
+      return launched;
+    } catch (e) {
+      await appAnalyticsRepository.track(
+        'auth_oauth_failed',
+        metadata: {'provider': provider.name, 'reason': e.toString()},
       );
       rethrow;
     }

@@ -8,6 +8,7 @@ import '../../data/auth_repository.dart';
 import 'edit_profile_screen.dart';
 import 'privacy_settings_screen.dart';
 import 'security_settings_screen.dart';
+import 'soma_plus_plans_screen.dart';
 import '../../data/profile_store.dart';
 import '../auth/welcome_screen.dart';
 import '../../core/services/theme_mode_controller.dart';
@@ -16,7 +17,6 @@ import '../../core/theme/spacing.dart';
 import '../../core/services/haptics_service.dart';
 import '../../core/widgets/premium_dialog.dart';
 import '../../core/widgets/selection_controls.dart';
-import '../../core/widgets/soma_plus_plan_cards.dart';
 import '../../data/soma_plus_repository.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -211,18 +211,79 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
 
-  Future<void> _selectTier(SomaSubscriptionTier tier) async {
-    if (tier == SomaSubscriptionTier.free) {
-      await settingsRepository.updateSettings({
-        'plus_plan': SomaPlusRepository.serializeTier(tier),
-        'plus_enabled': false,
-      });
-      return;
-    }
-    await settingsRepository.updateSettings({
-      'plus_plan': SomaPlusRepository.serializeTier(tier),
-      'plus_enabled': true,
-    });
+
+  Widget _buildAccountCenter(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Glass(
+      radius: BorderRadius.circular(22),
+      padding: const EdgeInsets.all(S.sm),
+      child: Column(
+        children: [
+          _NavRow(
+            icon: Icons.workspace_premium_rounded,
+            label: 'Manage subscription',
+            onTap: () => showPremiumDialog(
+              context: context,
+              title: 'Manage subscription',
+              body: 'Subscription controls are managed by your app store billing account.',
+              confirmText: 'Got it',
+            ),
+          ),
+          _DividerSoft(),
+          _NavRow(
+            icon: Icons.restore_rounded,
+            label: 'Restore purchases',
+            onTap: () => showPremiumDialog(
+              context: context,
+              title: 'Restore purchases',
+              body: 'Restores are supported for the same store account on this device.',
+              confirmText: 'Continue',
+            ),
+          ),
+          _DividerSoft(),
+          _NavRow(
+            icon: Icons.receipt_long_rounded,
+            label: 'Invoice history',
+            onTap: () => showPremiumDialog(
+              context: context,
+              title: 'Invoice history',
+              body: 'Invoices and receipts are available in your store purchase history.',
+              confirmText: 'Open store',
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Billing is monthly/annual depending on selected plan. Cancel anytime from your store settings.',
+            style: TextStyle(
+              color: scheme.onSurface.withValues(alpha: 0.72),
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTrustFooter(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final now = DateTime.now();
+    final hh = now.hour.toString().padLeft(2, '0');
+    final mm = now.minute.toString().padLeft(2, '0');
+    return Glass(
+      radius: BorderRadius.circular(18),
+      padding: const EdgeInsets.all(S.sm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('App version: $_appVersion', style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          Text('Last sync check: $hh:$mm', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75), fontWeight: FontWeight.w600, fontSize: 12)),
+          const SizedBox(height: 4),
+          Text('Service status: Operational', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75), fontWeight: FontWeight.w600, fontSize: 12)),
+        ],
+      ),
+    );
   }
 
 
@@ -333,12 +394,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       children: [
         const _SectionTitle('Soma Plus'),
         const SizedBox(height: S.xs),
-        SomaPlusPlanCards(
-          currentTier: _guestTier,
-          onSelect: (tier) async {
-            setState(() => _guestTier = tier);
-            await _selectTier(tier);
-          },
+        Glass(
+          radius: BorderRadius.circular(22),
+          padding: const EdgeInsets.all(S.sm),
+          child: _NavRow(
+            icon: Icons.workspace_premium_rounded,
+            label: 'Soma Plus plans',
+            trailingText: _guestTier.name.toUpperCase(),
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SomaPlusPlansScreen()),
+              );
+              if (!mounted) return;
+              await _loadGuestSettings();
+            },
+          ),
         ),
         const SizedBox(height: S.md),
         _SectionTitle(l10n.settingsSectionGameplay),
@@ -606,9 +677,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           const _SectionTitle('Soma Plus'),
                           const SizedBox(height: S.xs),
-                          SomaPlusPlanCards(
-                            currentTier: subscriptionTier,
-                            onSelect: _selectTier,
+                          Glass(
+                            radius: BorderRadius.circular(22),
+                            padding: const EdgeInsets.all(S.sm),
+                            child: _NavRow(
+                              icon: Icons.workspace_premium_rounded,
+                              label: 'Soma Plus plans',
+                              trailingText: subscriptionTier.name.toUpperCase(),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const SomaPlusPlansScreen(),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
                           const SizedBox(height: S.md),
                           _SectionTitle(l10n.settingsSectionAccount),
