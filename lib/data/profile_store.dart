@@ -4,8 +4,8 @@ import 'profile_repository.dart';
 
 class ProfileStore extends ChangeNotifier {
   UserProfile _profile = UserProfile(
-    displayName: "Loading...",
-    username: "...",
+    displayName: "Guest",
+    username: "",
     bio: "",
     location: "",
     dailyGoalMinutes: 10,
@@ -29,7 +29,7 @@ class ProfileStore extends ChangeNotifier {
   void reset() {
     _profile = UserProfile(
       displayName: "Guest",
-      username: "...",
+      username: "",
       bio: "",
       location: "",
       dailyGoalMinutes: 10,
@@ -41,9 +41,9 @@ class ProfileStore extends ChangeNotifier {
   void loginAsGuest() {
     _profile = UserProfile(
       displayName: "Guest",
-      username: "guest_user",
-      bio: "Just checking things out",
-      location: "Earth",
+      username: "",
+      bio: "",
+      location: "",
       dailyGoalMinutes: 10,
       avatarUrl: "",
       isGuest: true,
@@ -53,4 +53,3 @@ class ProfileStore extends ChangeNotifier {
 }
 
 final profileStore = ProfileStore();
-
