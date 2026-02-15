@@ -6,10 +6,12 @@ import '../core/database/database_helper.dart';
 class ContentSyncResult {
   final Duration duration;
   final List<String> failedSteps;
+  final Map<String, int> stepDurationsMs;
 
   const ContentSyncResult({
     required this.duration,
     required this.failedSteps,
+    required this.stepDurationsMs,
   });
 
   bool get success => failedSteps.isEmpty;
@@ -22,22 +24,27 @@ class ContentSyncService {
   Future<ContentSyncResult> syncEverything() async {
     final userId = _supabase.auth.currentUser?.id;
     final failedSteps = <String>[];
+    final stepDurationsMs = <String, int>{};
     final startedAt = DateTime.now();
 
     debugPrint('SYNC: Starting content sync...');
 
-    await _runStep('courses', _syncCourses, failedSteps);
-    await _runStep('vocabulary', _syncVocabulary, failedSteps);
-    await _runStep('sentences', _syncSentences, failedSteps);
+    await _runStep('courses', _syncCourses, failedSteps, stepDurationsMs);
+    await _runStep('vocabulary', _syncVocabulary, failedSteps, stepDurationsMs);
+    await _runStep('sentences', _syncSentences, failedSteps, stepDurationsMs);
 
     if (userId != null) {
-      await _runStep('profile', () => _syncProfile(userId), failedSteps);
-      await _runStep('user_progress', () => _syncUserProgress(userId), failedSteps);
-      await _runStep('user_stats', () => _syncUserStats(userId), failedSteps);
+      await _runStep('profile', () => _syncProfile(userId), failedSteps, stepDurationsMs);
+      await _runStep('user_progress', () => _syncUserProgress(userId), failedSteps, stepDurationsMs);
+      await _runStep('user_stats', () => _syncUserStats(userId), failedSteps, stepDurationsMs);
     }
 
     final duration = DateTime.now().difference(startedAt);
-    final result = ContentSyncResult(duration: duration, failedSteps: failedSteps);
+    final result = ContentSyncResult(
+      duration: duration,
+      failedSteps: failedSteps,
+      stepDurationsMs: stepDurationsMs,
+    );
 
     if (result.success) {
       debugPrint('SYNC: Content sync completed in ${duration.inMilliseconds}ms.');
@@ -55,12 +62,16 @@ class ContentSyncService {
     String name,
     Future<void> Function() action,
     List<String> failedSteps,
+    Map<String, int> stepDurationsMs,
   ) async {
+    final startedAt = DateTime.now();
     try {
       await action();
     } catch (e, st) {
       failedSteps.add(name);
       debugPrint('SYNC: $name failed: $e\n$st');
+    } finally {
+      stepDurationsMs[name] = DateTime.now().difference(startedAt).inMilliseconds;
     }
   }
 
