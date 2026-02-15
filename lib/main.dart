@@ -1,27 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-// import 'package:flutter_driver/driver_extension.dart';
-import 'core/theme/app_theme.dart';
-import 'features/auth/splash_screen.dart';
+import 'package:soma/l10n/gen/app_localizations.dart';
 
-
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'dart:io';
-import 'core/config/app_config.dart';
 import 'core/i18n/ui_language.dart';
+import 'core/services/app_bootstrap.dart';
+import 'core/services/theme_mode_controller.dart';
+import 'core/theme/app_theme.dart';
+import 'core/widgets/app_lock_gate.dart';
+import 'data/app_analytics_repository.dart';
 import 'data/content_sync_service.dart';
 import 'data/settings_repository.dart';
-import 'data/soma_plus_repository.dart';
-import 'core/services/session_tracker.dart';
-import 'core/services/theme_mode_controller.dart';
-import 'core/services/haptics_service.dart';
-import 'core/services/sfx_service.dart';
-import 'core/widgets/app_lock_gate.dart';
-import 'package:flutter/foundation.dart';
+import 'features/auth/splash_screen.dart';
+import 'models/app_settings.dart';
 
 enum SyncStatus { idle, syncing, error }
 
@@ -30,57 +22,51 @@ final syncMessageNotifier = ValueNotifier<String?>(null);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  const bootstrap = AppBootstrap();
+  await bootstrap.initialize();
 
-  if (!kIsWeb && Platform.isWindows) {
-    _fixSqliteDll();
-  }
-
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
-
-  AppConfig.validate();
-  await Supabase.initialize(
-    url: AppConfig.supabaseUrl,
-    anonKey: AppConfig.supabaseAnonKey,
-  );
-
-  try {
-    await sessionTracker.start();
-  } catch (e) {
-    debugPrint("Session tracking failed to start: $e");
-  }
-
-  await themeModeController.load();
-  await hapticsService.init();
-  await sfxService.init();
-  await settingsRepository.init();
-  await somaPlusRepository.init();
-  
-  _runContentSync();
+  unawaited(runContentSync());
   runApp(const App());
 }
 
-Future<void> _runContentSync() async {
-  await Future.delayed(const Duration(seconds: 1));
+Future<void> runContentSync() async {
   syncStatusNotifier.value = SyncStatus.syncing;
   syncMessageNotifier.value = null;
 
-  var result = await contentSyncService.syncEverything();
-  if (!result.success) {
-    await Future.delayed(const Duration(milliseconds: 800));
+  const baseDelayMs = 700;
+  const maxAttempts = 3;
+  ContentSyncResult? result;
+
+  for (var attempt = 1; attempt <= maxAttempts; attempt++) {
     result = await contentSyncService.syncEverything();
+    if (result.success) {
+      syncStatusNotifier.value = SyncStatus.idle;
+      return;
+    }
+
+    if (attempt == maxAttempts) {
+      break;
+    }
+
+    final delayMs = baseDelayMs * (1 << (attempt - 1));
+    syncMessageNotifier.value =
+        'Sync issue (${result.failedSteps.join(', ')}). Retrying (${attempt + 1}/$maxAttempts)…';
+    unawaited(appAnalyticsRepository.track('sync_retry_scheduled', metadata: {
+      'attempt': attempt + 1,
+      'failed_steps': result.failedSteps,
+    }));
+    await Future.delayed(Duration(milliseconds: delayMs));
   }
 
-  if (result.success) {
-    syncStatusNotifier.value = SyncStatus.idle;
-    return;
-  }
-
+  final failedSteps = result?.failedSteps ?? const <String>[];
+  final durations = result?.stepDurationsMs.entries
+          .map((e) => '${e.key}:${e.value}ms')
+          .join(' · ') ??
+      '';
   syncStatusNotifier.value = SyncStatus.error;
-  syncMessageNotifier.value =
-      'Sync completed with issues: ${result.failedSteps.join(', ')}';
+  syncMessageNotifier.value = failedSteps.isEmpty
+      ? 'Sync failed unexpectedly. Tap retry to try again.'
+      : 'Sync failed: ${failedSteps.join(', ')}. $durations Tap retry to try again.';
 }
 
 class App extends StatefulWidget {
@@ -95,7 +81,7 @@ class _AppState extends State<App> {
       kSupportedUiLanguages.map((item) => Locale(item.code)).toList();
 
   Locale? _currentLocale;
-  StreamSubscription<Map<String, dynamic>>? _settingsSubscription;
+  StreamSubscription<AppSettings>? _settingsSubscription;
 
   @override
   void initState() {
@@ -106,10 +92,9 @@ class _AppState extends State<App> {
 
   Future<void> _loadSavedLocale() async {
     try {
-      final settings = await settingsRepository.getSettings();
-      final languageUi = settings['language_ui'] as String?;
-      if (languageUi != null && mounted) {
-        final locale = uiLanguageToLocale(languageUi);
+      final settings = await settingsRepository.getTypedSettings();
+      if (mounted) {
+        final locale = uiLanguageToLocale(settings.languageUi);
         setState(() => _currentLocale = locale);
       }
     } catch (e) {
@@ -119,18 +104,15 @@ class _AppState extends State<App> {
 
   void _listenToSettingsChanges() {
     _settingsSubscription?.cancel();
-    _settingsSubscription = settingsRepository.getSettingsStream().listen((settings) {
-      final languageUi = settings['language_ui'] as String?;
-      final themeMode = settings['theme_mode'] as String?;
-      if (languageUi != null && mounted) {
-        final locale = uiLanguageToLocale(languageUi);
+    _settingsSubscription =
+        settingsRepository.getTypedSettingsStream().listen((settings) {
+      if (mounted) {
+        final locale = uiLanguageToLocale(settings.languageUi);
         if (_currentLocale != locale) {
           setState(() => _currentLocale = locale);
         }
       }
-      if (themeMode != null) {
-        themeModeController.setModeFromSetting(themeMode, persist: false);
-      }
+      themeModeController.setModeFromSetting(settings.themeMode, persist: false);
     });
   }
 
@@ -169,7 +151,7 @@ class _AppState extends State<App> {
             final clampedMedia = media.copyWith(
               textScaler: media.textScaler.clamp(
                 minScaleFactor: 0.9,
-                maxScaleFactor: 1.15,
+                maxScaleFactor: 1.4,
               ),
             );
 
@@ -218,7 +200,10 @@ class _AppState extends State<App> {
                                 horizontal: 16,
                                 vertical: 8,
                               ),
-                              child: _SyncStatusBanner(status: status),
+                              child: _SyncStatusBanner(
+                                status: status,
+                                onRetry: runContentSync,
+                              ),
                             ),
                           ),
                         ),
@@ -237,7 +222,12 @@ class _AppState extends State<App> {
 
 class _SyncStatusBanner extends StatelessWidget {
   final SyncStatus status;
-  const _SyncStatusBanner({required this.status});
+  final Future<void> Function() onRetry;
+
+  const _SyncStatusBanner({
+    required this.status,
+    required this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -245,7 +235,7 @@ class _SyncStatusBanner extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final isError = status == SyncStatus.error;
     final icon = isError ? Icons.wifi_off_rounded : Icons.sync_rounded;
-    final label = isError ? "Sync failed" : "Syncing…";
+    final label = isError ? 'Sync failed' : 'Syncing…';
 
     return ValueListenableBuilder<String?>(
       valueListenable: syncMessageNotifier,
@@ -276,25 +266,21 @@ class _SyncStatusBanner extends StatelessWidget {
                     ),
                   ),
                 ),
+                if (isError) ...[
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () {
+                      unawaited(appAnalyticsRepository.track('sync_retry_tapped'));
+                      onRetry();
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
               ],
             ),
           ),
         );
       },
     );
-  }
-}
-
-void _fixSqliteDll() {
-  try {
-    final scriptDir = File(Platform.resolvedExecutable).parent.path;
-    final src = File('$scriptDir\\sqlite3.dll');
-    final dest = File('$scriptDir\\sqlite3.x64.windows.dll');
-    if (src.existsSync() && !dest.existsSync()) {
-      src.copySync(dest.path);
-      debugPrint('SQLite DLL fixed: copied to ${dest.path}');
-    }
-  } catch (e) {
-    debugPrint('SQLite DLL fix failed: $e');
   }
 }
