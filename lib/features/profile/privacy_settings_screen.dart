@@ -627,34 +627,14 @@ class _SegmentedChoice extends StatelessWidget {
           Row(
             children: List.generate(options.length, (i) {
               final selected = i == selectedIndex;
-              final scheme = Theme.of(context).colorScheme;
               return Expanded(
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(999),
-                  onTap: () => onPick(i),
-                  child: Container(
-                    height: 44,
-                    margin: EdgeInsets.only(right: i == options.length - 1 ? 0 : 10),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(999),
-                      color: selected
-                          ? const Color(0xFF3A3568)
-                          : scheme.onSurface.withValues(alpha: 0.1),
-                      border: Border.all(
-                        color: selected
-                            ? const Color(0xFF6B5CFF)
-                            : scheme.onSurface.withValues(alpha: 0.15),
-                      ),
-                    ),
-                    child: Text(
-                      options[i].label,
-                      style: TextStyle(
-                        color: selected ? const Color(0xFF36F4E8) : scheme.onSurface,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 12.5,
-                      ),
-                    ),
+                child: Container(
+                  margin: EdgeInsets.only(right: i == options.length - 1 ? 0 : 10),
+                  child: AppSelectablePill(
+                    label: options[i].label,
+                    selected: selected,
+                    onTap: () => onPick(i),
+                    fontSize: 12.5,
                   ),
                 ),
               );

@@ -15,6 +15,7 @@ class AuthRepository {
       final response = await _client.auth.signUp(
         email: email,
         password: password,
+        emailRedirectTo: kIsWeb ? null : 'soma://auth-callback',
         data: username != null ? {'username': username} : null,
       );
       await appAnalyticsRepository.track('auth_sign_up_success');
@@ -27,6 +28,15 @@ class AuthRepository {
       rethrow;
     }
   }
+
+  Future<void> resendSignupConfirmation({required String email}) async {
+    await _client.auth.resend(
+      type: OtpType.signup,
+      email: email,
+      emailRedirectTo: kIsWeb ? null : 'soma://auth-callback',
+    );
+  }
+
 
   Future<AuthResponse> signIn({
     required String email,

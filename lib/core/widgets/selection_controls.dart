@@ -18,13 +18,16 @@ class AppSelectablePill extends StatelessWidget {
     this.height = 44,
   });
 
-  static const Color _selectedFill = Color(0xFF3A3568);
-  static const Color _selectedBorder = Color(0xFF6B5CFF);
-  static const Color _selectedText = Color(0xFF36F4E8);
-
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedFill = isDark
+        ? const Color(0xFF3A3568)
+        : Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), scheme.surface);
+    final selectedBorder = isDark ? const Color(0xFF6B5CFF) : scheme.primary.withValues(alpha: 0.35);
+    final selectedText = isDark ? const Color(0xFF36F4E8) : scheme.primary;
+
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
@@ -34,15 +37,15 @@ class AppSelectablePill extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: selected ? _selectedFill : scheme.onSurface.withValues(alpha: 0.08),
+          color: selected ? selectedFill : scheme.onSurface.withValues(alpha: 0.08),
           border: Border.all(
-            color: selected ? _selectedBorder : scheme.onSurface.withValues(alpha: 0.14),
+            color: selected ? selectedBorder : scheme.onSurface.withValues(alpha: 0.14),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? _selectedText : scheme.onSurface.withValues(alpha: 0.76),
+            color: selected ? selectedText : scheme.onSurface.withValues(alpha: 0.76),
             fontWeight: FontWeight.w900,
             fontSize: fontSize,
           ),
@@ -64,20 +67,33 @@ class AppNeonSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedThumb = isDark ? const Color(0xFF36F4E8) : scheme.onPrimary;
+    final selectedTrack = isDark
+        ? const Color(0xFF4A3EA1)
+        : Color.alphaBlend(scheme.primary.withValues(alpha: 0.78), scheme.surface);
+    final unselectedThumb = isDark
+        ? Colors.white.withValues(alpha: 0.85)
+        : scheme.outline.withValues(alpha: 0.85);
+    final unselectedTrack = isDark
+        ? Colors.white.withValues(alpha: 0.24)
+        : scheme.outlineVariant.withValues(alpha: 0.75);
+
     return Switch(
       value: value,
       onChanged: onChanged,
       thumbColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return const Color(0xFF36F4E8);
+          return selectedThumb;
         }
-        return Colors.white.withValues(alpha: 0.85);
+        return unselectedThumb;
       }),
       trackColor: WidgetStateProperty.resolveWith((states) {
         if (states.contains(WidgetState.selected)) {
-          return const Color(0xFF4A3EA1);
+          return selectedTrack;
         }
-        return Colors.white.withValues(alpha: 0.24);
+        return unselectedTrack;
       }),
       trackOutlineColor: WidgetStateProperty.all(Colors.transparent),
     );

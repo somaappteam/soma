@@ -58,6 +58,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
   static const int _freeDailyVoiceCalls = 3;
 
   final _controller = TextEditingController();
+  final _composerFocus = FocusNode();
   final _scroll = ScrollController();
   final _imagePicker = ImagePicker();
   late Stream<List<Map<String, dynamic>>> _messagesStream;
@@ -102,6 +103,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
   late Stream<bool> _typingStream;
   Timer? _typingDebounce;
   bool _typingStateSent = false;
+  bool _isComposerFocused = false;
   Timer? _scheduledSendTimer;
   String? _pendingUndoText;
   DateTime? _muteUntil;
@@ -145,6 +147,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
         setState(() => _isOtherBlocked = blocked);
       }
     });
+
+    _composerFocus.addListener(() {
+      if (!mounted) return;
+      setState(() => _isComposerFocused = _composerFocus.hasFocus);
+    });
   }
 
   @override
@@ -168,6 +175,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _scheduledSendTimer?.cancel();
     _setTypingState(false, immediate: true);
     _saveDraft(_controller.text);
+    _composerFocus.dispose();
     _controller.dispose();
     _scroll.dispose();
     super.dispose();
@@ -1653,27 +1661,25 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       ),
                     ),
                   ),
-                if (_canChat)
+                if (_canChat && !_isComposerFocused)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
                     child: Wrap(
                       spacing: 6,
+                      runSpacing: 6,
                       children: [
                         for (final quick in const ['Hey 👋', 'How are you?', 'Want to practice now?'])
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: ActionChip(
-                              label: Text(quick),
-                              onPressed: () {
-                                _controller.text = quick;
-                                _controller.selection = TextSelection.fromPosition(
-                                  TextPosition(offset: _controller.text.length),
-                                );
-                                _onTypingChanged(true);
-                                _saveDraft(quick);
-                                setState(() {});
-                              },
-                            ),
+                          ActionChip(
+                            label: Text(quick),
+                            onPressed: () {
+                              _controller.text = quick;
+                              _controller.selection = TextSelection.fromPosition(
+                                TextPosition(offset: _controller.text.length),
+                              );
+                              _onTypingChanged(true);
+                              _saveDraft(quick);
+                              _composerFocus.requestFocus();
+                            },
                           ),
                       ],
                     ),
@@ -1711,6 +1717,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
                 else
                   _InputBar(
                     controller: _controller,
+                    focusNode: _composerFocus,
+                    isComposerFocused: _isComposerFocused,
                     onSend: _send,
                     onVoiceMessage: () {
                       _handleVoiceMessageTap();
@@ -2592,6 +2600,8 @@ class _ChatMessage {
 
 class _InputBar extends StatelessWidget {
   final TextEditingController controller;
+  final FocusNode focusNode;
+  final bool isComposerFocused;
   final VoidCallback onSend;
   final VoidCallback onVoiceMessage;
   final VoidCallback onSendImage;
@@ -2603,6 +2613,8 @@ class _InputBar extends StatelessWidget {
 
   const _InputBar({
     required this.controller,
+    required this.focusNode,
+    required this.isComposerFocused,
     required this.onSend,
     required this.onVoiceMessage,
     required this.onSendImage,
@@ -2655,11 +2667,12 @@ class _InputBar extends StatelessWidget {
                 Expanded(
                   child: TextField(
                     controller: controller,
+                    focusNode: focusNode,
                     style: TextStyle(
                         color: scheme.onSurface, fontWeight: FontWeight.w700),
                     cursorColor: scheme.primary,
                     minLines: 1,
-                    maxLines: 4,
+                    maxLines: isComposerFocused ? 6 : 4,
                     onChanged: (v) {
                       onTypingChanged(v.trim().isNotEmpty);
                       onTextChanged(v);
@@ -2677,58 +2690,92 @@ class _InputBar extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                InkWell(
-                  borderRadius: BorderRadius.circular(18),
-                  onTap: onSendImage,
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: scheme.onSurface.withValues(alpha: 0.10),
-                      border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
-                    ),
-                    child: Icon(Icons.image_rounded, color: scheme.onSurface.withValues(alpha: 0.92)),
+                AnimatedSwitcher(
+                  duration: MotionTokens.medium,
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, animation) => SizeTransition(
+                    sizeFactor: animation,
+                    axis: Axis.horizontal,
+                    axisAlignment: -1,
+                    child: FadeTransition(opacity: animation, child: child),
                   ),
-                ),
-                const SizedBox(width: 8),
-                InkWell(
-                  borderRadius: BorderRadius.circular(18),
-                  onTap: onSendFile,
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: scheme.onSurface.withValues(alpha: 0.10),
-                      border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
-                    ),
-                    child: Icon(Icons.attach_file_rounded, color: scheme.onSurface.withValues(alpha: 0.92)),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                InkWell(
-                  borderRadius: BorderRadius.circular(18),
-                  onTap: onVoiceMessage,
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: isRecordingVoiceMessage
-                          ? const Color(0xFFFF6B6B).withValues(alpha: 0.18)
-                          : scheme.primary.withValues(alpha: 0.12),
-                      border: Border.all(
-                        color: isRecordingVoiceMessage
-                            ? const Color(0xFFFF6B6B)
-                            : scheme.primary.withValues(alpha: 0.22),
-                      ),
-                    ),
-                    child: Icon(
-                      isRecordingVoiceMessage ? Icons.stop_rounded : Icons.mic_rounded,
-                      color: isRecordingVoiceMessage ? const Color(0xFFFF6B6B) : scheme.primary,
-                    ),
-                  ),
+                  child: isComposerFocused
+                      ? InkWell(
+                          key: const ValueKey('expand-attachments'),
+                          borderRadius: BorderRadius.circular(18),
+                          onTap: () => focusNode.unfocus(),
+                          child: Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              color: scheme.onSurface.withValues(alpha: 0.10),
+                              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
+                            ),
+                            child: Icon(Icons.more_horiz_rounded,
+                                color: scheme.onSurface.withValues(alpha: 0.92)),
+                          ),
+                        )
+                      : Row(
+                          key: const ValueKey('full-actions'),
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            InkWell(
+                              borderRadius: BorderRadius.circular(18),
+                              onTap: onSendImage,
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: scheme.onSurface.withValues(alpha: 0.10),
+                                  border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
+                                ),
+                                child: Icon(Icons.image_rounded, color: scheme.onSurface.withValues(alpha: 0.92)),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(18),
+                              onTap: onSendFile,
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: scheme.onSurface.withValues(alpha: 0.10),
+                                  border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
+                                ),
+                                child: Icon(Icons.attach_file_rounded, color: scheme.onSurface.withValues(alpha: 0.92)),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(18),
+                              onTap: onVoiceMessage,
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: isRecordingVoiceMessage
+                                      ? const Color(0xFFFF6B6B).withValues(alpha: 0.18)
+                                      : scheme.primary.withValues(alpha: 0.12),
+                                  border: Border.all(
+                                    color: isRecordingVoiceMessage
+                                        ? const Color(0xFFFF6B6B)
+                                        : scheme.primary.withValues(alpha: 0.22),
+                                  ),
+                                ),
+                                child: Icon(
+                                  isRecordingVoiceMessage ? Icons.stop_rounded : Icons.mic_rounded,
+                                  color: isRecordingVoiceMessage ? const Color(0xFFFF6B6B) : scheme.primary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
                 const SizedBox(width: 8),
                 InkWell(
