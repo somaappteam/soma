@@ -90,5 +90,9 @@ class AppSettings {
         'language_ui': languageUi,
         'plus_enabled': plusEnabled,
         'plus_plan': plusPlan,
+        'exchange_active': false,
+        'exchange_filter_online_only': true,
+        'exchange_filter_strict_direction': true,
+        'exchange_filter_level': 'all',
       };
 }
