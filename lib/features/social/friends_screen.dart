@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../models/friend.dart';
 import '../../data/social_repository.dart';
 import '../../data/auth_repository.dart';
+import '../../data/settings_repository.dart';
 import 'add_friend_screen.dart';
 import 'dm_chat_screen.dart';
+import '../profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 class FriendsScreen extends StatefulWidget {
@@ -15,14 +18,48 @@ class FriendsScreen extends StatefulWidget {
   State<FriendsScreen> createState() => _FriendsScreenState();
 }
 
+enum FriendViewFilter { all, online, requests }
+enum FriendSortOption { recent, onlineFirst, name }
+
 
 
 class _FriendsScreenState extends State<FriendsScreen> {
   String query = "";
+  FriendViewFilter _filter = FriendViewFilter.all;
+  FriendSortOption _sort = FriendSortOption.recent;
+  Set<String> _favoriteFriendIds = <String>{};
 
   @override
   void initState() {
     super.initState();
+    _loadFavorites();
+  }
+
+  Future<void> _loadFavorites() async {
+    final settings = await settingsRepository.getSettings();
+    final ids = (settings['favorite_friend_ids'] as List?)
+            ?.map((e) => e.toString())
+            .where((e) => e.isNotEmpty)
+            .toSet() ??
+        <String>{};
+    if (!mounted) return;
+    setState(() => _favoriteFriendIds = ids);
+  }
+
+  Future<void> _toggleFavorite(String friendId) async {
+    final next = Set<String>.from(_favoriteFriendIds);
+    if (next.contains(friendId)) {
+      next.remove(friendId);
+    } else {
+      next.add(friendId);
+    }
+    setState(() => _favoriteFriendIds = next);
+    await settingsRepository.updateSetting('favorite_friend_ids', next.toList());
+    _trackUiEvent('favorite_toggle', {'friendId': friendId, 'favorited': next.contains(friendId)});
+  }
+
+  void _trackUiEvent(String event, [Map<String, dynamic>? extras]) {
+    debugPrint('[friends_ui] $event ${extras ?? const <String, dynamic>{}}');
   }
 
   // Simplified handling for mapping friendship ID
@@ -66,6 +103,30 @@ class _FriendsScreenState extends State<FriendsScreen> {
     );
     if (confirmed != true) return;
     await socialRepository.removeFriend(friendUserId);
+  }
+
+  Future<void> _acceptAll(List<Friend> incoming) async {
+    for (final f in incoming) {
+      await _accept(f.id);
+    }
+    _trackUiEvent('accept_all', {'count': incoming.length});
+  }
+
+  Future<void> _declineAll(List<Friend> incoming) async {
+    for (final f in incoming) {
+      await _decline(f.id);
+    }
+    _trackUiEvent('decline_all', {'count': incoming.length});
+  }
+
+  Future<void> _copyInviteLink() async {
+    final uid = authRepository.currentUser?.id ?? 'guest';
+    await Clipboard.setData(ClipboardData(text: 'https://soma.app/invite/$uid'));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Invite link copied')),
+    );
+    _trackUiEvent('invite_link_copy');
   }
 
   @override
@@ -201,18 +262,174 @@ class _FriendsScreenState extends State<FriendsScreen> {
                               }).toList();
 
                               final filtered = friends.where((f) {
-                                if (query.trim().isEmpty) return true;
-                                return f.username
-                                    .toLowerCase()
-                                    .contains(query.toLowerCase());
+                                final q = query.trim().toLowerCase();
+                                if (q.isEmpty) return true;
+                                return f.username.toLowerCase().contains(q) ||
+                                    (f.subtitle ?? '').toLowerCase().contains(q);
                               }).toList();
+
+                              filtered.sort((a, b) {
+                                final q = query.trim().toLowerCase();
+                                final aFav = _favoriteFriendIds.contains(a.id) ? 0 : 1;
+                                final bFav = _favoriteFriendIds.contains(b.id) ? 0 : 1;
+                                if (aFav != bFav) return aFav.compareTo(bFav);
+
+                                if (_sort == FriendSortOption.onlineFirst) {
+                                  final onlineCmp = (b.isOnline ? 1 : 0).compareTo(a.isOnline ? 1 : 0);
+                                  if (onlineCmp != 0) return onlineCmp;
+                                }
+
+                                if (_sort == FriendSortOption.name) {
+                                  return a.username.toLowerCase().compareTo(b.username.toLowerCase());
+                                }
+
+                                if (q.isNotEmpty) {
+                                  final aStarts = a.username.toLowerCase().startsWith(q) ? 0 : 1;
+                                  final bStarts = b.username.toLowerCase().startsWith(q) ? 0 : 1;
+                                  if (aStarts != bStarts) return aStarts.compareTo(bStarts);
+                                }
+
+                                return a.username.toLowerCase().compareTo(b.username.toLowerCase());
+                              });
+
+                              final visibleFriends = filtered.where((f) {
+                                return switch (_filter) {
+                                  FriendViewFilter.all => true,
+                                  FriendViewFilter.online => f.isOnline,
+                                  FriendViewFilter.requests => false,
+                                };
+                              }).toList();
+
+                              final totalRequests = incoming.length + outgoing.length;
 
                               return ListView(
                                 physics: const BouncingScrollPhysics(),
                                 children: [
-                                  if (incoming.isNotEmpty) ...[
+                                  _FriendsOverviewCard(
+                                    friendsCount: friends.length,
+                                    onlineCount: friends.where((f) => f.isOnline).length,
+                                    requestsCount: totalRequests,
+                                    onAddFriend: () async {
+                                      _trackUiEvent('add_friend_cta');
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const AddFriendScreen(),
+                                        ),
+                                      );
+                                    },
+                                    onShareInvite: _copyInviteLink,
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _FilterChip(
+                                          label: 'All',
+                                          selected: _filter == FriendViewFilter.all,
+                                          onTap: () {
+                                            _trackUiEvent('filter_all');
+                                            setState(() => _filter = FriendViewFilter.all);
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: _FilterChip(
+                                          label: 'Online',
+                                          selected: _filter == FriendViewFilter.online,
+                                          onTap: () {
+                                            _trackUiEvent('filter_online');
+                                            setState(() => _filter = FriendViewFilter.online);
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: _FilterChip(
+                                          label: 'Requests',
+                                          selected: _filter == FriendViewFilter.requests,
+                                          onTap: () {
+                                            _trackUiEvent('filter_requests');
+                                            setState(() => _filter = FriendViewFilter.requests);
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Align(
+                                    alignment: Alignment.centerRight,
+                                    child: PopupMenuButton<FriendSortOption>(
+                                      initialValue: _sort,
+                                      onSelected: (next) {
+                                        _trackUiEvent('sort_change', {'value': next.name});
+                                        setState(() => _sort = next);
+                                      },
+                                      itemBuilder: (_) => const [
+                                        PopupMenuItem(
+                                          value: FriendSortOption.recent,
+                                          child: Text('Sort: Recent activity'),
+                                        ),
+                                        PopupMenuItem(
+                                          value: FriendSortOption.onlineFirst,
+                                          child: Text('Sort: Online first'),
+                                        ),
+                                        PopupMenuItem(
+                                          value: FriendSortOption.name,
+                                          child: Text('Sort: Name A-Z'),
+                                        ),
+                                      ],
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(12),
+                                          color: scheme.onSurface.withValues(alpha: 0.08),
+                                          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.swap_vert_rounded, size: 16, color: scheme.onSurface.withValues(alpha: 0.86)),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              _sort == FriendSortOption.recent
+                                                  ? 'Recent'
+                                                  : _sort == FriendSortOption.onlineFirst
+                                                      ? 'Online first'
+                                                      : 'A-Z',
+                                              style: TextStyle(
+                                                color: scheme.onSurface.withValues(alpha: 0.86),
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  if (_filter != FriendViewFilter.online && incoming.isNotEmpty) ...[
                                     _SectionTitle(l10n.friendRequestsSection),
                                     const SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextButton.icon(
+                                            onPressed: () => _acceptAll(incoming),
+                                            icon: const Icon(Icons.done_all_rounded),
+                                            label: const Text('Accept all'),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: TextButton.icon(
+                                            onPressed: () => _declineAll(incoming),
+                                            icon: const Icon(Icons.close_rounded),
+                                            label: const Text('Decline all'),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                     Glass(
                                       radius: BorderRadius.circular(22),
                                       padding: const EdgeInsets.all(12),
@@ -228,7 +445,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                     ),
                                     const SizedBox(height: 16),
                                   ],
-                                  if (outgoing.isNotEmpty) ...[
+                                  if (_filter != FriendViewFilter.online && outgoing.isNotEmpty) ...[
                                     _SectionTitle(l10n.friendPendingSection),
                                     const SizedBox(height: 10),
                                     Glass(
@@ -246,9 +463,23 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                     ),
                                     const SizedBox(height: 16),
                                   ],
-                                  _SectionTitle(l10n.friendAllSection),
-                                  const SizedBox(height: 10),
-                                  if (filtered.isEmpty)
+                                  if (_filter != FriendViewFilter.requests) ...[
+                                    _SectionTitle('Active now'),
+                                    const SizedBox(height: 10),
+                                  ],
+                                  if (_filter == FriendViewFilter.requests && incoming.isEmpty && outgoing.isEmpty)
+                                    Glass(
+                                      radius: BorderRadius.circular(22),
+                                      padding: const EdgeInsets.all(16),
+                                      child: Text(
+                                        'No pending requests right now.',
+                                        style: TextStyle(
+                                          color: scheme.onSurface.withValues(alpha: 0.75),
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    )
+                                  else if (_filter != FriendViewFilter.requests && visibleFriends.isEmpty)
                                     Glass(
                                       radius: BorderRadius.circular(22),
                                       padding: const EdgeInsets.all(16),
@@ -262,14 +493,24 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         ),
                                       ),
                                     )
-                                  else
+                                  else if (_filter != FriendViewFilter.requests)
                                     Glass(
                                       radius: BorderRadius.circular(22),
                                       padding: const EdgeInsets.all(12),
                                       child: Column(
-                                        children: filtered.map((f) {
+                                        children: visibleFriends.where((f) => f.isOnline).map((f) {
                                           return _FriendRow(
                                             friend: f,
+                                            isFavorite: _favoriteFriendIds.contains(f.id),
+                                            onToggleFavorite: () => _toggleFavorite(f.id),
+                                            onOpenProfile: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => ProfileScreen(userId: f.id),
+                                                ),
+                                              );
+                                            },
                                             onMessage: () {
                                               Navigator.push(
                                                 context,
@@ -289,6 +530,45 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         }).toList(),
                                       ),
                                     ),
+                                  if (_filter != FriendViewFilter.requests && visibleFriends.any((f) => !f.isOnline)) ...[
+                                    const SizedBox(height: 14),
+                                    _SectionTitle('Recently active'),
+                                    const SizedBox(height: 10),
+                                    Glass(
+                                      radius: BorderRadius.circular(22),
+                                      padding: const EdgeInsets.all(12),
+                                      child: Column(
+                                        children: visibleFriends.where((f) => !f.isOnline).map((f) {
+                                          return _FriendRow(
+                                            friend: f,
+                                            isFavorite: _favoriteFriendIds.contains(f.id),
+                                            onToggleFavorite: () => _toggleFavorite(f.id),
+                                            onOpenProfile: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => ProfileScreen(userId: f.id),
+                                                ),
+                                              );
+                                            },
+                                            onMessage: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (_) => DmChatScreen(
+                                                    meId: socialRepository.currentUserId ?? authRepository.currentUser?.id ?? "me",
+                                                    otherId: f.id,
+                                                    otherName: f.username,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            onRemove: () => _removeFriend(f.id),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ],
                                 ],
                               );
                             },
@@ -307,6 +587,169 @@ class _FriendsScreenState extends State<FriendsScreen> {
 }
 
 // ---------------- UI rows ----------------
+
+class _FriendsOverviewCard extends StatelessWidget {
+  final int friendsCount;
+  final int onlineCount;
+  final int requestsCount;
+  final VoidCallback onAddFriend;
+  final VoidCallback onShareInvite;
+
+  const _FriendsOverviewCard({
+    required this.friendsCount,
+    required this.onlineCount,
+    required this.requestsCount,
+    required this.onAddFriend,
+    required this.onShareInvite,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Glass(
+      radius: BorderRadius.circular(22),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _OverviewMetric(
+                  label: 'Friends',
+                  value: '$friendsCount',
+                  icon: Icons.group_rounded,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _OverviewMetric(
+                  label: 'Online',
+                  value: '$onlineCount',
+                  icon: Icons.circle_rounded,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _OverviewMetric(
+                  label: 'Requests',
+                  value: '$requestsCount',
+                  icon: Icons.mark_email_unread_rounded,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: onAddFriend,
+                  icon: const Icon(Icons.person_add_alt_1_rounded),
+                  label: const Text('Find and add friends'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                onPressed: onShareInvite,
+                icon: const Icon(Icons.ios_share_rounded),
+                tooltip: 'Share invite',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _OverviewMetric extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _OverviewMetric({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        color: scheme.onSurface.withValues(alpha: 0.08),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 16, color: scheme.onSurface.withValues(alpha: 0.9)),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: TextStyle(
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              color: scheme.onSurface.withValues(alpha: 0.7),
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _FilterChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        height: 38,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: selected
+              ? scheme.primary.withValues(alpha: 0.18)
+              : scheme.onSurface.withValues(alpha: 0.06),
+          border: Border.all(
+            color: selected
+                ? scheme.primary.withValues(alpha: 0.45)
+                : scheme.onSurface.withValues(alpha: 0.14),
+          ),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: scheme.onSurface,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _SectionTitle extends StatelessWidget {
   final String text;
@@ -349,7 +792,8 @@ class _IconGlass extends StatelessWidget {
 
 class _AvatarDot extends StatelessWidget {
   final bool online;
-  const _AvatarDot({required this.online});
+  final String username;
+  const _AvatarDot({required this.online, required this.username});
 
   @override
   Widget build(BuildContext context) {
@@ -366,7 +810,7 @@ class _AvatarDot extends StatelessWidget {
         children: [
           Center(
             child: Text(
-              "🙂",
+              username.trim().isEmpty ? '?' : username.trim().substring(0, 1).toUpperCase(),
               style:
                   TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
             ),
@@ -395,11 +839,17 @@ class _AvatarDot extends StatelessWidget {
 
 class _FriendRow extends StatelessWidget {
   final Friend friend;
+  final bool isFavorite;
+  final VoidCallback onToggleFavorite;
+  final VoidCallback onOpenProfile;
   final VoidCallback onMessage;
   final VoidCallback onRemove;
 
   const _FriendRow({
     required this.friend,
+    required this.isFavorite,
+    required this.onToggleFavorite,
+    required this.onOpenProfile,
     required this.onMessage,
     required this.onRemove,
   });
@@ -418,7 +868,11 @@ class _FriendRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            _AvatarDot(online: friend.isOnline),
+            GestureDetector(
+              onTap: onOpenProfile,
+              onLongPress: onOpenProfile,
+              child: _AvatarDot(online: friend.isOnline, username: friend.username),
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -447,6 +901,11 @@ class _FriendRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
+            _MiniAction(
+              icon: isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+              onTap: onToggleFavorite,
+            ),
+            const SizedBox(width: 8),
             _MiniAction(icon: Icons.chat_bubble_rounded, onTap: onMessage),
             const SizedBox(width: 8),
             _MiniAction(icon: Icons.person_remove_rounded, onTap: onRemove),
@@ -482,7 +941,7 @@ class _RequestRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const _AvatarDot(online: false),
+            _AvatarDot(online: false, username: friend.username),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -524,7 +983,7 @@ class _PendingRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const _AvatarDot(online: false),
+            _AvatarDot(online: false, username: friend.username),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
