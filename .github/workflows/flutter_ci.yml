@@ -21,8 +21,15 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Check localization parity
+        run: dart run tool/check_l10n.dart
+
       - name: Analyze
         run: flutter analyze
 
       - name: Run tests
         run: flutter test --no-pub --coverage
+
+      - name: Enforce minimum coverage (20%)
+        run: |
+          dart run tool/check_coverage.dart coverage/lcov.info 20

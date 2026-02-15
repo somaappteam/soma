@@ -40,17 +40,6 @@ class DmChatScreen extends StatefulWidget {
 }
 
 class _DmChatScreenState extends State<DmChatScreen> {
-  static const int _freeMaxImageBytes = 2 * 1024 * 1024; // 2 MB
-  static const int _plusMaxImageBytes = 6 * 1024 * 1024; // 6 MB
-  static const int _proMaxImageBytes = 10 * 1024 * 1024; // 10 MB
-  static const int _freeMaxFileBytes = 3 * 1024 * 1024; // 3 MB
-  static const int _plusMaxFileBytes = 12 * 1024 * 1024; // 12 MB
-  static const int _proMaxFileBytes = 24 * 1024 * 1024; // 24 MB
-  static const int _freeMaxTextChars = 1200;
-  static const int _plusMaxTextChars = 2200;
-  static const int _proMaxTextChars = 3000;
-  static const int _freeMaxVoiceMessageSeconds = 30;
-  static const int _paidMaxVoiceMessageSeconds = 60;
   static const int _freeDailyVoiceMessages = 5;
   static const int _freeDailyImages = 5;
   static const int _freeDailyFiles = 5;
@@ -75,6 +64,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
   String? _replyPreview;
   UserProfile? _otherProfile;
   SomaSubscriptionTier _planTier = SomaSubscriptionTier.free;
+
+  DmPlanLimits get _dmLimits => SomaPlusRepository.dmLimitsForTier(_planTier);
   bool _showSearch = false;
   String _searchQuery = '';
   String _draftText = '';
@@ -89,46 +80,13 @@ class _DmChatScreenState extends State<DmChatScreen> {
   Timer? _typingDebounce;
   bool _typingStateSent = false;
 
-  int get _maxImageBytes {
-    switch (_planTier) {
-      case SomaSubscriptionTier.pro:
-        return _proMaxImageBytes;
-      case SomaSubscriptionTier.plus:
-        return _plusMaxImageBytes;
-      case SomaSubscriptionTier.free:
-      default:
-        return _freeMaxImageBytes;
-    }
-  }
+  int get _maxImageBytes => _dmLimits.maxImageBytes;
 
-  int get _maxFileBytes {
-    switch (_planTier) {
-      case SomaSubscriptionTier.pro:
-        return _proMaxFileBytes;
-      case SomaSubscriptionTier.plus:
-        return _plusMaxFileBytes;
-      case SomaSubscriptionTier.free:
-      default:
-        return _freeMaxFileBytes;
-    }
-  }
+  int get _maxFileBytes => _dmLimits.maxFileBytes;
 
-  int get _maxTextChars {
-    switch (_planTier) {
-      case SomaSubscriptionTier.pro:
-        return _proMaxTextChars;
-      case SomaSubscriptionTier.plus:
-        return _plusMaxTextChars;
-      case SomaSubscriptionTier.free:
-      default:
-        return _freeMaxTextChars;
-    }
-  }
+  int get _maxTextChars => _dmLimits.maxTextChars;
 
-  int get _maxVoiceMessageSeconds =>
-      _planTier == SomaSubscriptionTier.free
-          ? _freeMaxVoiceMessageSeconds
-          : _paidMaxVoiceMessageSeconds;
+  int get _maxVoiceMessageSeconds => _dmLimits.maxVoiceMessageSeconds;
 
   String get _myUserId => chatRepository.currentUserId ?? widget.meId;
 
