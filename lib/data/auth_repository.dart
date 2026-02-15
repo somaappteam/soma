@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/services/session_tracker.dart';
+import 'app_analytics_repository.dart';
 
 class AuthRepository {
   final SupabaseClient _client = Supabase.instance.client;
@@ -9,26 +11,76 @@ class AuthRepository {
     required String password,
     String? username,
   }) async {
-    return _client.auth.signUp(
-      email: email,
-      password: password,
-      data: username != null ? {'username': username} : null,
-    );
+    try {
+      final response = await _client.auth.signUp(
+        email: email,
+        password: password,
+        data: username != null ? {'username': username} : null,
+      );
+      await appAnalyticsRepository.track('auth_sign_up_success');
+      return response;
+    } catch (e) {
+      await appAnalyticsRepository.track(
+        'auth_sign_up_failed',
+        metadata: {'reason': e.toString()},
+      );
+      rethrow;
+    }
   }
 
   Future<AuthResponse> signIn({
     required String email,
     required String password,
   }) async {
-    return _client.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
+    try {
+      final response = await _client.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      await appAnalyticsRepository.track('auth_sign_in_success');
+      return response;
+    } catch (e) {
+      await appAnalyticsRepository.track(
+        'auth_sign_in_failed',
+        metadata: {'reason': e.toString()},
+      );
+      rethrow;
+    }
+  }
+
+
+  Future<bool> signInWithOAuth(OAuthProvider provider) async {
+    try {
+      final launched = await _client.auth.signInWithOAuth(
+        provider,
+        redirectTo: kIsWeb ? null : 'soma://auth-callback',
+      );
+      await appAnalyticsRepository.track(
+        'auth_oauth_started',
+        metadata: {'provider': provider.name, 'launched': launched},
+      );
+      return launched;
+    } catch (e) {
+      await appAnalyticsRepository.track(
+        'auth_oauth_failed',
+        metadata: {'provider': provider.name, 'reason': e.toString()},
+      );
+      rethrow;
+    }
   }
 
   Future<void> signOut() async {
-    await sessionTracker.endCurrentSession();
-    await _client.auth.signOut();
+    try {
+      await sessionTracker.endCurrentSession();
+      await _client.auth.signOut();
+      await appAnalyticsRepository.track('auth_sign_out_success');
+    } catch (e) {
+      await appAnalyticsRepository.track(
+        'auth_sign_out_failed',
+        metadata: {'reason': e.toString()},
+      );
+      rethrow;
+    }
   }
 
 
@@ -37,7 +89,16 @@ class AuthRepository {
   }
 
   Future<void> resetPassword({required String email}) async {
-    await _client.auth.resetPasswordForEmail(email);
+    try {
+      await _client.auth.resetPasswordForEmail(email);
+      await appAnalyticsRepository.track('auth_password_reset_sent');
+    } catch (e) {
+      await appAnalyticsRepository.track(
+        'auth_password_reset_failed',
+        metadata: {'reason': e.toString()},
+      );
+      rethrow;
+    }
   }
 
   User? get currentUser => _client.auth.currentUser;

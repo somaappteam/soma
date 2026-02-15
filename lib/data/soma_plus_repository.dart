@@ -6,6 +6,21 @@ import 'settings_repository.dart';
 
 enum SomaSubscriptionTier { free, plus, pro }
 
+
+class DmPlanLimits {
+  final int maxImageBytes;
+  final int maxFileBytes;
+  final int maxTextChars;
+  final int maxVoiceMessageSeconds;
+
+  const DmPlanLimits({
+    required this.maxImageBytes,
+    required this.maxFileBytes,
+    required this.maxTextChars,
+    required this.maxVoiceMessageSeconds,
+  });
+}
+
 class SomaPlanLimits {
   final int? cloudBackupGb;
   final int? voiceMinutesPerDay;
@@ -92,7 +107,7 @@ const List<SomaSubscriptionPlan> kSomaSubscriptionPlans = [
     limits: SomaPlanLimits(
       cloudBackupGb: 0,
       voiceMinutesPerDay: 30,
-      fileUploadMbPerFile: 10,
+      fileUploadMbPerFile: 3,
     ),
     features: [
       'Unlimited Solo Learning (offline)',
@@ -107,7 +122,7 @@ const List<SomaSubscriptionPlan> kSomaSubscriptionPlans = [
     terms: [
       'No cloud backup (local device only)',
       'Voice usage hard-stop after 30 minutes/day',
-      'File uploads limited to 10 MB per file',
+      'File uploads limited to 3 MB per file',
       'Monthly billing only (no annual discount)',
     ],
     compliance: [
@@ -124,7 +139,7 @@ const List<SomaSubscriptionPlan> kSomaSubscriptionPlans = [
     highlighted: true,
     limits: SomaPlanLimits(
       cloudBackupGb: 5,
-      fileUploadMbPerFile: 50,
+      fileUploadMbPerFile: 12,
       voiceBitrateKbps: 64,
     ),
     sla: SomaPlanSla(
@@ -147,7 +162,7 @@ const List<SomaSubscriptionPlan> kSomaSubscriptionPlans = [
     ],
     terms: [
       '5GB cloud sync and backup across devices',
-      'File uploads up to 50 MB per file',
+      'File uploads up to 12 MB per file',
       'Standard voice quality up to 64 kbps',
       'Priority support first response in <24h (business days, chat/email)',
       'Cancel anytime (no partial-month refunds)',
@@ -167,7 +182,7 @@ const List<SomaSubscriptionPlan> kSomaSubscriptionPlans = [
     highlighted: false,
     limits: SomaPlanLimits(
       cloudBackupGb: -1,
-      fileUploadMbPerFile: 250,
+      fileUploadMbPerFile: 24,
       voiceBitrateKbps: 128,
     ),
     sla: SomaPlanSla(
@@ -196,7 +211,7 @@ const List<SomaSubscriptionPlan> kSomaSubscriptionPlans = [
       '2 x 30-minute 1:1 coaching credits per month',
     ],
     terms: [
-      'File uploads up to 250 MB per file',
+      'File uploads up to 24 MB per file',
       'High-fidelity voice quality up to 128 kbps',
       'VIP support first response in <2h (24/7, chat/email)',
       'Data retention controls (30/90/365-day options)',
@@ -257,6 +272,33 @@ class SomaPlusRepository {
   StreamSubscription<Map<String, dynamic>>? _subscription;
 
   ValueListenable<SomaPlusState> get state => _stateNotifier;
+
+  static DmPlanLimits dmLimitsForTier(SomaSubscriptionTier tier) {
+    switch (tier) {
+      case SomaSubscriptionTier.pro:
+        return const DmPlanLimits(
+          maxImageBytes: 10 * 1024 * 1024,
+          maxFileBytes: 24 * 1024 * 1024,
+          maxTextChars: 3000,
+          maxVoiceMessageSeconds: 60,
+        );
+      case SomaSubscriptionTier.plus:
+        return const DmPlanLimits(
+          maxImageBytes: 6 * 1024 * 1024,
+          maxFileBytes: 12 * 1024 * 1024,
+          maxTextChars: 2200,
+          maxVoiceMessageSeconds: 60,
+        );
+      case SomaSubscriptionTier.free:
+      default:
+        return const DmPlanLimits(
+          maxImageBytes: 2 * 1024 * 1024,
+          maxFileBytes: 3 * 1024 * 1024,
+          maxTextChars: 1200,
+          maxVoiceMessageSeconds: 30,
+        );
+    }
+  }
 
   Future<void> init() async {
     final settings = await settingsRepository.getSettings();

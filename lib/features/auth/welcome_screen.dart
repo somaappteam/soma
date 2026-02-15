@@ -31,6 +31,45 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     ];
   }
 
+
+  Widget _buildOnboardingStory(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final items = const [
+      ('Learn faster', 'Daily guided drills tuned to your level.'),
+      ('Practice with people', 'Join live circles and voice practice rooms.'),
+      ('Track mastery', 'See streaks, retention, and skill recovery.'),
+    ];
+
+    return Column(
+      children: [
+        for (final item in items)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Glass(
+              radius: BorderRadius.circular(16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              child: Row(
+                children: [
+                  Icon(Icons.check_circle_rounded, size: 18, color: scheme.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      '${item.$1}: ${item.$2}',
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.88),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12.5,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -103,6 +142,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                              _buildOnboardingStory(context),
+                              const SizedBox(height: 12),
                               SizedBox(
                                 width: double.infinity,
                                 child: NeonButton(

@@ -12,6 +12,7 @@ enum AboutView {
 }
 
 class AboutScreen extends StatelessWidget {
+  static const _appVersion = String.fromEnvironment('APP_VERSION', defaultValue: '1.0.0');
   final AboutView view;
 
   const AboutScreen({super.key, required this.view});
@@ -67,7 +68,7 @@ class AboutScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        l10n.aboutVersion("1.0.0"),
+                        l10n.aboutVersion(_appVersion),
                         style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                       ),
                       const SizedBox(height: 20),
@@ -100,7 +101,7 @@ class AboutScreen extends StatelessWidget {
                         onTap: () => showLicensePage(
                           context: context,
                           applicationName: "SOMA",
-                          applicationVersion: "1.0.0",
+                          applicationVersion: _appVersion,
                           applicationLegalese: LegalData.attributions,
                           useRootNavigator: true,
                         ),

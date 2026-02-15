@@ -9,6 +9,7 @@ import 'select_friend_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 enum _InboxFilter { all, unread, mentions }
+enum _InboxSort { latest, unreadFirst, name }
 
 class InboxScreen extends StatefulWidget {
   const InboxScreen({super.key});
@@ -29,6 +30,8 @@ class _InboxScreenState extends State<InboxScreen> {
   bool _selectionMode = false;
   _InboxFilter _filter = _InboxFilter.all;
   String _onboardingPrompt = 'Start with a quick hello to a friend.';
+  int _refreshNonce = 0;
+  _InboxSort _sort = _InboxSort.latest;
 
   @override
   void initState() {
@@ -36,7 +39,6 @@ class _InboxScreenState extends State<InboxScreen> {
     _threadsStream = _inboxThreadsStream();
     _loadExperimentPrompt();
   }
-
 
   Future<void> _loadExperimentPrompt() async {
     final v = await experimentRepository.variant('inbox_onboarding_prompt', buckets: const ['A', 'B']);
@@ -46,6 +48,12 @@ class _InboxScreenState extends State<InboxScreen> {
           ? 'Tip: pin your most important chats.'
           : 'Start with a quick hello to a friend.';
     });
+  }
+
+  Future<void> _refreshInbox() async {
+    await chatRepository.getInboxThreads();
+    if (!mounted) return;
+    setState(() => _refreshNonce++);
   }
 
   Stream<List<Map<String, dynamic>>> _inboxThreadsStream() async* {
@@ -173,6 +181,18 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 
+  String _sortLabel(_InboxSort sort) {
+    switch (sort) {
+      case _InboxSort.unreadFirst:
+        return 'Unread first';
+      case _InboxSort.name:
+        return 'Name';
+      case _InboxSort.latest:
+      default:
+        return 'Latest';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -218,6 +238,32 @@ class _InboxScreenState extends State<InboxScreen> {
                     }),
                   ),
                   const SizedBox(width: 8),
+                  PopupMenuButton<_InboxSort>(
+                    onSelected: (value) => setState(() => _sort = value),
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: _InboxSort.latest,
+                        child: Text('Sort: Latest'),
+                      ),
+                      const PopupMenuItem(
+                        value: _InboxSort.unreadFirst,
+                        child: Text('Sort: Unread first'),
+                      ),
+                      const PopupMenuItem(
+                        value: _InboxSort.name,
+                        child: Text('Sort: Name'),
+                      ),
+                    ],
+                    child: Glass(
+                      radius: BorderRadius.circular(16),
+                      padding: const EdgeInsets.all(10),
+                      child: Icon(
+                        Icons.tune_rounded,
+                        color: scheme.onSurface.withValues(alpha: 0.92),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   _IconGlass(
                     icon: Icons.edit_rounded,
                     onTap: () async {
@@ -233,22 +279,68 @@ class _InboxScreenState extends State<InboxScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  ChoiceChip(
-                    label: const Text('All'),
-                    selected: _filter == _InboxFilter.all,
-                    onSelected: (_) => setState(() => _filter = _InboxFilter.all),
-                  ),
-                  const SizedBox(width: 8),
-                  ChoiceChip(
-                    label: const Text('Unread'),
-                    selected: _filter == _InboxFilter.unread,
-                    onSelected: (_) => setState(() => _filter = _InboxFilter.unread),
-                  ),
-                  const SizedBox(width: 8),
-                  ChoiceChip(
-                    label: const Text('Mentions'),
-                    selected: _filter == _InboxFilter.mentions,
-                    onSelected: (_) => setState(() => _filter = _InboxFilter.mentions),
+                  _SectionTitle(_showArchivedOnly ? 'Archived chats' : 'Recent chats'),
+                  const Spacer(),
+                  if (_selectionMode && _selectedThreadIds.isNotEmpty)
+                    Text(
+                      '${_selectedThreadIds.length} selected',
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.72),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Glass(
+                radius: BorderRadius.circular(20),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _FilterPill(
+                        label: 'All',
+                        selected: _filter == _InboxFilter.all,
+                        onTap: () => setState(() => _filter = _InboxFilter.all),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _FilterPill(
+                        label: 'Unread',
+                        selected: _filter == _InboxFilter.unread,
+                        onTap: () => setState(() => _filter = _InboxFilter.unread),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _FilterPill(
+                        label: 'Mentions',
+                        selected: _filter == _InboxFilter.mentions,
+                        onTap: () => setState(() => _filter = _InboxFilter.mentions),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(999),
+                      color: scheme.onSurface.withValues(alpha: 0.08),
+                    ),
+                    child: Text(
+                      'Sort: ${_sortLabel(_sort)}',
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.78),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -283,7 +375,10 @@ class _InboxScreenState extends State<InboxScreen> {
               ),
               const SizedBox(height: 12),
               Expanded(
-                child: StreamBuilder<List<Map<String, dynamic>>>(
+                child: RefreshIndicator(
+                  onRefresh: _refreshInbox,
+                  child: StreamBuilder<List<Map<String, dynamic>>>(
+                  key: ValueKey('inbox-stream-$_refreshNonce'),
                   stream: _threadsStream,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
@@ -316,6 +411,19 @@ class _InboxScreenState extends State<InboxScreen> {
                       final aPinned = _pinnedThreadIds.contains(aId);
                       final bPinned = _pinnedThreadIds.contains(bId);
                       if (aPinned != bPinned) return aPinned ? -1 : 1;
+
+                      if (_sort == _InboxSort.unreadFirst) {
+                        final au = (a['unreadCount'] as int?) ?? 0;
+                        final bu = (b['unreadCount'] as int?) ?? 0;
+                        if ((au > 0) != (bu > 0)) return au > 0 ? -1 : 1;
+                      }
+
+                      if (_sort == _InboxSort.name) {
+                        final an = (a['otherName']?.toString() ?? '').toLowerCase();
+                        final bn = (b['otherName']?.toString() ?? '').toLowerCase();
+                        final cmp = an.compareTo(bn);
+                        if (cmp != 0) return cmp;
+                      }
 
                       final at = a['time'] as DateTime? ?? DateTime.fromMillisecondsSinceEpoch(0);
                       final bt = b['time'] as DateTime? ?? DateTime.fromMillisecondsSinceEpoch(0);
@@ -354,6 +462,23 @@ class _InboxScreenState extends State<InboxScreen> {
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    OutlinedButton.icon(
+                                      onPressed: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (_) => const SelectFriendScreen()),
+                                        );
+                                        if (mounted) setState(() => _refreshNonce++);
+                                      },
+                                      icon: const Icon(Icons.edit_rounded, size: 16),
+                                      label: const Text('New chat'),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ],
                           ),
@@ -361,7 +486,11 @@ class _InboxScreenState extends State<InboxScreen> {
                       );
                     }
 
-                    return ListView.separated(
+                    return Glass(
+                      radius: BorderRadius.circular(22),
+                      padding: const EdgeInsets.all(10),
+                      child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                       itemCount: visibleThreads.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
@@ -437,8 +566,10 @@ class _InboxScreenState extends State<InboxScreen> {
                           ),
                         );
                       },
+                    ),
                     );
                   },
+                ),
                 ),
               ),
             ],
@@ -456,6 +587,73 @@ class _InboxScreenState extends State<InboxScreen> {
     if (diff.inMinutes < 60) return l10n.timeShortMinutes(diff.inMinutes);
     if (diff.inHours < 24) return l10n.timeShortHours(diff.inHours);
     return l10n.timeShortDays(diff.inDays);
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String text;
+
+  const _SectionTitle(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Text(
+      text,
+      style: TextStyle(
+        color: scheme.onSurface.withValues(alpha: 0.85),
+        fontSize: 14,
+        fontWeight: FontWeight.w900,
+      ),
+    );
+  }
+}
+
+class _FilterPill extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _FilterPill({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          color: selected
+              ? scheme.primary.withValues(alpha: 0.22)
+              : Colors.transparent,
+          border: Border.all(
+            color: selected
+                ? scheme.primary.withValues(alpha: 0.55)
+                : scheme.onSurface.withValues(alpha: 0.12),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected
+                  ? scheme.primary
+                  : scheme.onSurface.withValues(alpha: 0.78),
+              fontWeight: FontWeight.w800,
+              fontSize: 12.5,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
