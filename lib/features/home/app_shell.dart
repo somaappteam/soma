@@ -414,9 +414,18 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final color = selected ? const Color(0xFF36F4E8) : scheme.onSurface.withValues(alpha: 0.65);
-    final bg = selected ? const Color(0xFF3A3568) : Colors.transparent;
-    final border = selected ? const Color(0xFF6B5CFF) : Colors.transparent;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = selected
+        ? (isDark ? const Color(0xFF36F4E8) : scheme.primary)
+        : scheme.onSurface.withValues(alpha: 0.65);
+    final bg = selected
+        ? (isDark
+            ? const Color(0xFF3A3568)
+            : Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), scheme.surface))
+        : Colors.transparent;
+    final border = selected
+        ? (isDark ? const Color(0xFF6B5CFF) : scheme.primary.withValues(alpha: 0.35))
+        : Colors.transparent;
 
     return PressableScale(
       onTap: onTap,
@@ -518,9 +527,18 @@ class _RailItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final color = selected ? const Color(0xFF36F4E8) : scheme.onSurface.withValues(alpha: 0.65);
-    final bg = selected ? const Color(0xFF3A3568) : Colors.transparent;
-    final border = selected ? const Color(0xFF6B5CFF) : Colors.transparent;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final color = selected
+        ? (isDark ? const Color(0xFF36F4E8) : scheme.primary)
+        : scheme.onSurface.withValues(alpha: 0.65);
+    final bg = selected
+        ? (isDark
+            ? const Color(0xFF3A3568)
+            : Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), scheme.surface))
+        : Colors.transparent;
+    final border = selected
+        ? (isDark ? const Color(0xFF6B5CFF) : scheme.primary.withValues(alpha: 0.35))
+        : Colors.transparent;
 
     return PressableScale(
       onTap: onTap,

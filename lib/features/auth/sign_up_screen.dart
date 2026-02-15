@@ -48,11 +48,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await authRepository.signUp(
+      final result = await authRepository.signUp(
         email: email,
         password: password,
         username: username,
       );
+
+      // If email confirmation is enabled, Supabase returns no active session.
+      if (result.session == null) {
+        if (!mounted) return;
+        _showEmailConfirmationSnackBar(email);
+        return;
+      }
 
       // Refresh profile state for the app
       await profileStore.load();
@@ -84,6 +91,46 @@ class _SignUpScreenState extends State<SignUpScreen> {
         setState(() => _isLoading = false);
       }
     }
+  }
+
+
+  void _showEmailConfirmationSnackBar(String email) {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
+    messenger.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 8),
+        content: Text(
+          'We sent a SOMA confirmation email to $email. Please confirm your email before continuing.',
+        ),
+        action: SnackBarAction(
+          label: 'Resend',
+          onPressed: () async {
+            try {
+              await authRepository.resendSignupConfirmation(email: email);
+              if (!mounted) return;
+              messenger.hideCurrentSnackBar();
+              messenger.showSnackBar(
+                const SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  content: Text('Confirmation email resent.'),
+                ),
+              );
+            } catch (e) {
+              if (!mounted) return;
+              messenger.hideCurrentSnackBar();
+              messenger.showSnackBar(
+                SnackBar(
+                  behavior: SnackBarBehavior.floating,
+                  content: Text('Could not resend confirmation email: $e'),
+                ),
+              );
+            }
+          },
+        ),
+      ),
+    );
   }
 
 

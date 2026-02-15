@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Confirm your SOMA account</title>
+  </head>
+  <body style="margin:0;padding:0;background:#0b0c2a;font-family:Arial,Helvetica,sans-serif;color:#f4f5ff;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#0b0c2a;padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#15173f;border:1px solid #2c2f66;border-radius:16px;padding:24px;">
+            <tr>
+              <td align="center" style="font-size:34px;font-weight:800;letter-spacing:6px;padding-bottom:8px;">SOMA</td>
+            </tr>
+            <tr>
+              <td align="center" style="font-size:14px;opacity:0.88;padding-bottom:24px;">Learn. Compete. Master.</td>
+            </tr>
+            <tr>
+              <td style="font-size:24px;font-weight:700;padding-bottom:12px;">Confirm your email</td>
+            </tr>
+            <tr>
+              <td style="font-size:15px;line-height:1.5;color:#d8dbff;padding-bottom:22px;">
+                Welcome to SOMA! Tap the button below to activate your account and start learning.
+              </td>
+            </tr>
+            <tr>
+              <td align="center" style="padding-bottom:18px;">
+                <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:linear-gradient(90deg,#6b5cff,#ff43b5);color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:700;">Confirm my email</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size:12px;line-height:1.5;color:#aeb5ff;">
+                If the button doesn't open, copy and paste this link into your browser:<br />
+                <a href="{{ .ConfirmationURL }}" style="color:#8be9ff;word-break:break-all;">{{ .ConfirmationURL }}</a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -45,6 +45,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isReportSubmitting = false;
   String? _pendingFriendshipId;
   Future<UserStats>? _statsFuture;
+  Future<List<Map<String, dynamic>>>? _friendsFuture;
   Future<List<Achievement>>? _achievementsFuture;
 
   bool get _isGuest => authRepository.currentUser == null;
@@ -60,6 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       _loadProfile();
       _statsFuture = statsRepository.getStats(userId: _viewedUserId);
+      _friendsFuture = _isVisitorView ? null : socialRepository.getFriends();
       _achievementsFuture = achievementsRepository.getAchievements();
     }
   }
@@ -437,7 +439,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           },
                         ),
                         const SizedBox(height: S.sm),
-                        const _FriendsCard(),
+                        FutureBuilder<List<Map<String, dynamic>>>(
+                          future: _friendsFuture,
+                          builder: (context, snapshot) {
+                            return _FriendsCard(friends: snapshot.data ?? const <Map<String, dynamic>>[]);
+                          },
+                        ),
                         const SizedBox(height: S.sm),
                         FutureBuilder<List<Achievement>>(
                           future: _achievementsFuture,
@@ -538,134 +545,223 @@ class _GuestProfileView extends StatelessWidget {
 
     return Scaffold(
       body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
-            child: Column(
-              children: [
-                _TopBar(
-                  onSettings: onSettings,
-                  title: l10n.profileTitle,
-                ),
-                const SizedBox(height: S.sm),
-                Expanded(
-                  child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    children: [
-                      Glass(
-                        radius: BorderRadius.circular(22),
-                        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
-                        child: Row(
-                          children: [
-                            _AvatarGlow(
-                              size: 64,
-                              image: const AssetImage("assets/avatar/avatar_1.png"),
-                              showOnlineIndicator: false,
-                            ),
-                            const SizedBox(width: S.sm),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "@$username • ${l10n.guestSessionLabel}",
-                                    style: textTheme.bodySmall?.copyWith(
-                                      color: scheme.onSurface.withValues(alpha: 0.65),
-                                      fontWeight: FontWeight.w600,
-                                    ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
+          child: Column(
+            children: [
+              _TopBar(
+                onSettings: onSettings,
+                title: l10n.profileTitle,
+              ),
+              const SizedBox(height: S.sm),
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  children: [
+                    Glass(
+                      radius: BorderRadius.circular(22),
+                      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _AvatarGlow(
+                            size: 72,
+                            image: const AssetImage("assets/avatar/avatar_1.png"),
+                            showOnlineIndicator: false,
+                          ),
+                          const SizedBox(width: S.sm),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.guestSessionLabel,
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: scheme.onSurface.withValues(alpha: 0.62),
+                                    fontWeight: FontWeight.w700,
                                   ),
-                                  if (profile.bio.isNotEmpty) ...[
-                                    const SizedBox(height: S.xs),
-                                    Text(
-                                      profile.bio,
-                                      style: textTheme.bodySmall?.copyWith(
-                                        color: scheme.onSurface.withValues(alpha: 0.6),
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: S.sm),
-                      Glass(
-                        radius: BorderRadius.circular(22),
-                        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.unlockFullProfile,
-                              style: textTheme.titleMedium?.copyWith(
-                                color: scheme.onSurface,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            const SizedBox(height: S.xs),
-                            _GuestInfoRow(
-                              icon: Icons.cloud_done_rounded,
-                              text: l10n.guestBenefitSync,
-                            ),
-                            const SizedBox(height: S.xs),
-                            _GuestInfoRow(
-                              icon: Icons.public_rounded,
-                              text: l10n.guestBenefitCircles,
-                            ),
-                            const SizedBox(height: S.xs),
-                            _GuestInfoRow(
-                              icon: Icons.notifications_active_rounded,
-                              text: l10n.guestBenefitNotifications,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: S.lg),
-                      NeonButton(
-                        label: l10n.authCreateAccount,
-                        onTap: onSignUp,
-                      ),
-                      const SizedBox(height: S.sm),
-                      Glass(
-                        radius: BorderRadius.circular(999),
-                        padding: EdgeInsets.zero,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(999),
-                          onTap: onSignIn,
-                          child: SizedBox(
-                            height: 56,
-                            child: Center(
-                              child: Text(
-                                l10n.signIn,
-                                style: textTheme.titleMedium?.copyWith(
-                                  color: scheme.onSurface,
-                                  fontWeight: FontWeight.w800,
                                 ),
-                              ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '@$username',
+                                  style: textTheme.titleLarge?.copyWith(
+                                    color: scheme.onSurface,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                                ),
+                                const SizedBox(height: S.xs),
+                                Text(
+                                  profile.bio.isNotEmpty ? profile.bio : l10n.profileDefaultBio,
+                                  style: textTheme.bodyMedium?.copyWith(
+                                    color: scheme.onSurface.withValues(alpha: 0.68),
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: S.xs),
-                      Center(
-                        child: Text(
-                          l10n.progressStaysOnDevice,
-                          style: textTheme.bodySmall?.copyWith(
-                            color: scheme.onSurface.withValues(alpha: 0.55),
-                            fontWeight: FontWeight.w600,
+                    ),
+                    const SizedBox(height: S.sm),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _GuestMiniStatCard(
+                            icon: Icons.local_fire_department_rounded,
+                            label: l10n.profileXpProgress,
+                            value: l10n.profileXpValue(profile.totalXp),
                           ),
                         ),
+                        const SizedBox(width: S.sm),
+                        Expanded(
+                          child: _GuestMiniStatCard(
+                            icon: Icons.timer_rounded,
+                            label: l10n.profileGoalLabel(profile.dailyGoalMinutes),
+                            value: l10n.minutesShort(profile.dailyGoalMinutes),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: S.sm),
+                    Glass(
+                      radius: BorderRadius.circular(22),
+                      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.unlockFullProfile,
+                            style: textTheme.titleMedium?.copyWith(
+                              color: scheme.onSurface,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: S.xs),
+                          _GuestInfoRow(
+                            icon: Icons.cloud_done_rounded,
+                            text: l10n.guestBenefitSync,
+                          ),
+                          const SizedBox(height: S.xs),
+                          _GuestInfoRow(
+                            icon: Icons.public_rounded,
+                            text: l10n.guestBenefitCircles,
+                          ),
+                          const SizedBox(height: S.xs),
+                          _GuestInfoRow(
+                            icon: Icons.notifications_active_rounded,
+                            text: l10n.guestBenefitNotifications,
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: S.xs),
-                    ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: S.md),
+              NeonButton(
+                label: l10n.authCreateAccount,
+                onTap: onSignUp,
+              ),
+              const SizedBox(height: S.sm),
+              Glass(
+                radius: BorderRadius.circular(999),
+                padding: EdgeInsets.zero,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(999),
+                  onTap: onSignIn,
+                  child: SizedBox(
+                    height: 56,
+                    child: Center(
+                      child: Text(
+                        l10n.signIn,
+                        style: textTheme.titleMedium?.copyWith(
+                          color: scheme.onSurface,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: S.xs),
+              Center(
+                child: Text(
+                  l10n.progressStaysOnDevice,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurface.withValues(alpha: 0.55),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GuestMiniStatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _GuestMiniStatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Glass(
+      radius: BorderRadius.circular(18),
+      padding: const EdgeInsets.fromLTRB(S.sm, S.sm, S.sm, S.sm),
+      child: Row(
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: scheme.onSurface.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 18, color: scheme.primary),
+          ),
+          const SizedBox(width: S.xs),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: scheme.onSurface.withValues(alpha: 0.62),
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: textTheme.titleSmall?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
               ],
             ),
           ),
-        ),
-      );
+        ],
+      ),
+    );
   }
 }
 
@@ -745,29 +841,10 @@ class _HeaderCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    Row(
-                      children: [
-                        // Timer Pill - Lowered and Smaller
-                        _Pill(
-                          text: l10n.profileGoalLabel(profile.dailyGoalMinutes),
-                          icon: Icons.timer_rounded,
-                          isSmall: true,
-                        ),
-                        if (profile.bio.isNotEmpty) ...[
-                          const SizedBox(width: 8),
-                          Flexible(
-                            child: Text(
-                              profile.bio,
-                              style: textTheme.bodySmall?.copyWith(
-                                color: scheme.onSurface.withValues(alpha: 0.5),
-                                fontWeight: FontWeight.w600,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ],
+                    _Pill(
+                      text: l10n.profileGoalLabel(profile.dailyGoalMinutes),
+                      icon: Icons.timer_rounded,
+                      isSmall: true,
                     ),
                   ],
                 ),
@@ -1072,13 +1149,17 @@ class _StatTile extends StatelessWidget {
 }
 
 class _FriendsCard extends StatelessWidget {
-  const _FriendsCard();
+  final List<Map<String, dynamic>> friends;
+
+  const _FriendsCard({required this.friends});
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final visibleFriends = friends.take(5).toList();
+    final remainingCount = friends.length - visibleFriends.length;
     return Glass(
       radius: BorderRadius.circular(22),
       padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
@@ -1115,19 +1196,29 @@ class _FriendsCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: S.sm),
-          Row(
-            children: const [
-              _MiniAvatar(asset: "assets/avatar/avatar_2.png"),
-              SizedBox(width: S.xs),
-              _MiniAvatar(asset: "assets/avatar/avatar_3.png"),
-              SizedBox(width: S.xs),
-              _MiniAvatar(asset: "assets/avatar/avatar_4.png"),
-              SizedBox(width: S.xs),
-              _MiniAvatar(asset: "assets/avatar/avatar_5.png"),
-              SizedBox(width: S.xs),
-              _MiniAvatarPlus(),
-            ],
-          ),
+          if (visibleFriends.isEmpty)
+            Text(
+              'No friends yet. Add friends to see them here.',
+              style: textTheme.bodySmall?.copyWith(
+                color: scheme.onSurface.withValues(alpha: 0.6),
+                fontWeight: FontWeight.w600,
+              ),
+            )
+          else
+            Wrap(
+              spacing: S.xs,
+              runSpacing: S.xs,
+              children: [
+                for (final friend in visibleFriends)
+                  _MiniAvatar(
+                    image: (friend['avatar_url']?.toString().isNotEmpty == true)
+                        ? NetworkImage(friend['avatar_url'].toString()) as ImageProvider
+                        : const AssetImage("assets/avatar/avatar_1.png"),
+                    tooltip: '@${friend['username']?.toString() ?? 'friend'}',
+                  ),
+                if (remainingCount > 0) _MiniAvatarPlus(count: remainingCount),
+              ],
+            ),
         ],
       ),
     );
@@ -1760,32 +1851,38 @@ class _AvatarGlow extends StatelessWidget {
 }
 
 class _MiniAvatar extends StatelessWidget {
-  final String asset;
-  const _MiniAvatar({required this.asset});
+  final ImageProvider image;
+  final String? tooltip;
+  const _MiniAvatar({required this.image, this.tooltip});
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Container(
-      width: 38,
-      height: 38,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.18)),
-      ),
-      child: ClipOval(
-        child: Image.asset(asset, fit: BoxFit.cover),
+    return Tooltip(
+      message: tooltip ?? '',
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.18)),
+        ),
+        child: ClipOval(
+          child: Image(image: image, fit: BoxFit.cover),
+        ),
       ),
     );
   }
 }
 
 class _MiniAvatarPlus extends StatelessWidget {
-  const _MiniAvatarPlus();
+  final int count;
+  const _MiniAvatarPlus({required this.count});
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
     return Container(
       width: 38,
       height: 38,
@@ -1794,7 +1891,15 @@ class _MiniAvatarPlus extends StatelessWidget {
         color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
         border: Border.all(color: scheme.onSurface.withValues(alpha: 0.18)),
       ),
-      child: Icon(Icons.add_rounded, color: scheme.onSurface.withValues(alpha: 0.85)),
+      child: Center(
+        child: Text(
+          '+$count',
+          style: textTheme.bodySmall?.copyWith(
+            color: scheme.onSurface.withValues(alpha: 0.85),
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
     );
   }
 }
