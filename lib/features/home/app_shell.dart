@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../data/settings_repository.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../data/auth_repository.dart';
 import '../../core/widgets/glass.dart';
@@ -7,6 +8,7 @@ import '../auth/sign_up_screen.dart';
 import '../circles/circles_screen.dart';
 import 'home_screen.dart';
 import '../profile/profile_screen.dart';
+import '../social/dm_chat_screen.dart';
 import '../../core/theme/motion.dart';
 import '../../core/widgets/pressable_scale.dart';
 import '../../core/widgets/responsive.dart';
@@ -188,17 +190,52 @@ class _AppShellState extends State<AppShell> {
 
         return Scaffold(
           backgroundColor: Colors.transparent,
-          body: isWide
-              ? Row(
-                  children: [
-                    _SomaSideNav(
-                      index: _index,
-                      onChanged: _handleNavChange,
+          body: Stack(
+            children: [
+              isWide
+                  ? Row(
+                      children: [
+                        _SomaSideNav(
+                          index: _index,
+                          onChanged: _handleNavChange,
+                        ),
+                        Expanded(child: activePage),
+                      ],
+                    )
+                  : activePage,
+              StreamBuilder<Map<String, dynamic>>(
+                stream: settingsRepository.getSettingsStream(),
+                builder: (context, snapshot) {
+                  final call = snapshot.data?['dm_active_call'];
+                  final isActive = call is Map && call['active'] == true;
+                  final name = call is Map ? (call['other_name']?.toString() ?? 'Voice call') : 'Voice call';
+                  final otherId = call is Map ? call['other_id']?.toString() : null;
+                  if (!isActive) return const SizedBox.shrink();
+                  return Positioned(
+                    right: 14,
+                    top: 16,
+                    child: _GlobalActiveCallPill(
+                      name: name,
+                      onTap: otherId == null || otherId.isEmpty
+                          ? null
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => DmChatScreen(
+                                    meId: authRepository.currentUser?.id ?? '',
+                                    otherId: otherId,
+                                    otherName: name,
+                                  ),
+                                ),
+                              );
+                            },
                     ),
-                    Expanded(child: activePage),
-                  ],
-                )
-              : activePage,
+                  );
+                },
+              ),
+            ],
+          ),
           bottomNavigationBar: isWide
               ? null
               : _SomaBottomNav(
@@ -207,6 +244,38 @@ class _AppShellState extends State<AppShell> {
                 ),
         );
       },
+    );
+  }
+}
+
+class _GlobalActiveCallPill extends StatelessWidget {
+  final String name;
+  final VoidCallback? onTap;
+  const _GlobalActiveCallPill({required this.name, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: onTap,
+      child: Glass(
+        radius: BorderRadius.circular(999),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.call_rounded, size: 16, color: scheme.primary),
+            const SizedBox(width: 6),
+            Text(
+              'In call • $name',
+              style: TextStyle(
+                color: scheme.onSurface,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

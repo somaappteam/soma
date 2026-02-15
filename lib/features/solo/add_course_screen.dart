@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/theme/tokens.dart';
+import '../../core/widgets/language_picker_sheet.dart';
 import '../../models/solo_course.dart';
 import '../../core/widgets/responsive.dart';
 
@@ -237,171 +238,16 @@ Future<LangOption?> _pickLanguage(
   required List<LangOption> items,
   required LangOption current,
 }) async {
-  final l10n = AppLocalizations.of(context);
-  final scheme = Theme.of(context).colorScheme;
-  
   return showModalBottomSheet<LangOption>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder: (ctx) {
-      String query = "";
-      bool showSearch = false;
-      final searchFocus = FocusNode();
-
-      return StatefulBuilder(
-        builder: (context, setModalState) {
-          final normalized = query.trim().toLowerCase();
-          final filtered = normalized.isEmpty
-              ? items
-              : items
-                  .where((e) =>
-                      e.name.toLowerCase().contains(normalized) ||
-                      e.code.toLowerCase().contains(normalized))
-                  .toList();
-
-          final maxHeight = MediaQuery.of(context).size.height * 0.75;
-
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-              child: Glass(
-                radius: BorderRadius.circular(26),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                child: SizedBox(
-                  height: maxHeight,
-                  child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            title,
-                            style: TextStyle(
-                              color: scheme.onSurface,
-                              fontWeight: FontWeight.w900,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const Spacer(),
-                          IconButton(
-                            onPressed: () {
-                              final nextShow = !showSearch;
-                              setModalState(() {
-                                showSearch = nextShow;
-                                if (!nextShow) query = "";
-                              });
-                              if (nextShow) {
-                                Future.delayed(Duration.zero,
-                                    () => searchFocus.requestFocus());
-                              }
-                            },
-                            icon: Icon(
-                              showSearch
-                                  ? Icons.search_off_rounded
-                                  : Icons.search_rounded,
-                              color: scheme.onSurface.withValues(alpha: 0.85),
-                            ),
-                          ),
-                          IconButton(
-                            onPressed: () => Navigator.pop(ctx),
-                            icon: Icon(Icons.close_rounded,
-                                color: scheme.onSurface.withValues(alpha: 0.85)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      if (showSearch) ...[
-                        Container(
-                          height: 44,
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            color: Theme.of(context).brightness == Brightness.light
-                                ? scheme.onSurface.withValues(alpha: 0.08)
-                                : T.fieldFill,
-                            border: Border.all(
-                                color: scheme.onSurface.withValues(alpha: 0.2)),
-                          ),
-                          child: TextField(
-                            focusNode: searchFocus,
-                            onChanged: (v) => setModalState(() => query = v),
-                            style: TextStyle(
-                                color: scheme.onSurface,
-                                fontWeight: FontWeight.w700),
-                            cursorColor: scheme.primary,
-                            textInputAction: TextInputAction.search,
-                            decoration: InputDecoration(
-                              hintText: l10n.searchLanguage,
-                              hintStyle: TextStyle(
-                                  color: scheme.onSurface.withValues(alpha: 0.5)),
-                              border: InputBorder.none,
-                              prefixIcon: Icon(Icons.search_rounded,
-                                  color: scheme.onSurface.withValues(alpha: 0.7)),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                      if (filtered.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Text(
-                            l10n.noMatches,
-                            style: TextStyle(
-                                color: scheme.onSurface.withValues(alpha: 0.7),
-                                fontWeight: FontWeight.w700),
-                          ),
-                        )
-                      else
-                        ...filtered.map((e) {
-                          final selected = e.code == current.code;
-                          return InkWell(
-                            borderRadius: BorderRadius.circular(16),
-                            onTap: () => Navigator.pop(ctx, e),
-                            child: Container(
-                              height: 52,
-                              margin: const EdgeInsets.only(bottom: 10),
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 14),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                color: selected
-                                    ? scheme.primary.withValues(alpha: 0.15)
-                                    : scheme.onSurface.withValues(alpha: 0.1),
-                                border: Border.all(
-                                  color: selected
-                                      ? scheme.primary.withValues(alpha: 0.5)
-                                      : scheme.onSurface.withValues(alpha: 0.15),
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      e.name,
-                                      style: TextStyle(
-                                        color: scheme.onSurface,
-                                        fontWeight: FontWeight.w800,
-                                      ),
-                                    ),
-                                  ),
-                                  if (selected)
-                                    Icon(Icons.check_rounded,
-                                        color: scheme.primary),
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    },
+    builder: (ctx) => LanguagePickerSheet(
+      title: title,
+      searchHint: l10n.searchLanguage,
+      noMatchesText: l10n.noMatches,
+      items: items,
+      current: current,
+    ),
   );
 }

@@ -11,6 +11,7 @@ import '../../core/theme/motion.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/staggered_in.dart';
+import '../../core/services/haptics_service.dart';
 import '../../data/rtc_voice_service.dart';
 import '../../data/chat_repository.dart';
 import '../../data/presence_repository.dart';
@@ -60,9 +61,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
   Timer? _voiceRecordTimer;
   Timer? _callTimer;
   Timer? _callSetupTimeoutTimer;
+  Timer? _outgoingRingTimer;
   int _callElapsedSeconds = 0;
   RealtimeChannel? _dmCallChannel;
   StreamSubscription<bool>? _rtcConnectionSub;
+  StreamSubscription<Map<String, dynamic>>? _rtcTelemetrySub;
   String? _replyPreview;
   UserProfile? _otherProfile;
   SomaSubscriptionTier _planTier = SomaSubscriptionTier.free;
@@ -72,6 +75,13 @@ class _DmChatScreenState extends State<DmChatScreen> {
   String _searchQuery = '';
   String _draftText = '';
   bool _showPinnedOnly = false;
+  bool _callPanelMinimized = false;
+  bool _isMicMuted = false;
+  bool _isSpeakerOn = true;
+  bool _isRtcConnected = false;
+  Offset _floatingChipOffset = Offset.zero;
+  int _callQualityScore = 78;
+  int _smoothedCallQualityScore = 78;
   Set<String> _pinnedMessageIds = <String>{};
   // NEW: Track block status
   StreamSubscription? _settingsSub;
@@ -107,6 +117,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _loadDmGate();
     _loadDraft();
     _loadPinnedMessages();
+    _initDmCallSignaling();
+    _rtcConnectionSub = rtcVoiceService.connectionStream.listen(_onRtcConnectionState);
+    _rtcTelemetrySub = rtcVoiceService.telemetryStream.listen(_onRtcTelemetry);
+    _loadCallChipOffset();
     
     // NEW: Listen to settings for block updates
     _settingsSub = settingsRepository.getSettingsStream().listen((settings) {
@@ -133,7 +147,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _voiceRecordTimer?.cancel();
     _callTimer?.cancel();
     _callSetupTimeoutTimer?.cancel();
+    _outgoingRingTimer?.cancel();
     _rtcConnectionSub?.cancel();
+    _rtcTelemetrySub?.cancel();
     _settingsSub?.cancel(); // NEW
     _typingDebounce?.cancel();
     _setTypingState(false, immediate: true);
@@ -392,6 +408,134 @@ class _DmChatScreenState extends State<DmChatScreen> {
     };
   }
 
+  bool get _isOutgoingDialing =>
+      _callState == DmCallState.ringingOutgoing || _callState == DmCallState.connecting;
+
+  String get _callQualityLabel {
+    if (!_isCallActive) return 'Idle';
+    if (_smoothedCallQualityScore >= 80) return 'Excellent';
+    if (_smoothedCallQualityScore >= 55) return 'Fair';
+    return 'Poor';
+  }
+
+  void _startOutgoingRing() {
+    _outgoingRingTimer?.cancel();
+    _outgoingRingTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      if (!mounted || !_isOutgoingDialing) return;
+      SystemSound.play(SystemSoundType.alert);
+    });
+  }
+
+  void _stopOutgoingRing() {
+    _outgoingRingTimer?.cancel();
+    _outgoingRingTimer = null;
+  }
+
+  Future<void> _toggleMicMute() async {
+    final next = !_isMicMuted;
+    await rtcVoiceService.setMuted(next);
+    if (!mounted) return;
+    hapticsService.selectionClick();
+    setState(() => _isMicMuted = next);
+  }
+
+  void _toggleSpeakerOutput() {
+    final next = !_isSpeakerOn;
+    rtcVoiceService.setSpeakerEnabled(next).then((_) {
+      if (!mounted) return;
+      hapticsService.selectionClick();
+      setState(() => _isSpeakerOn = next);
+    }).catchError((_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to switch audio output right now.')),
+      );
+    });
+  }
+
+  void _onFloatingChipDragUpdate(DragUpdateDetails details, BoxConstraints constraints) {
+    final next = _floatingChipOffset + details.delta;
+    final maxX = (constraints.maxWidth - 170).clamp(0, double.infinity).toDouble();
+    final maxY = (constraints.maxHeight - 220).clamp(0, double.infinity).toDouble();
+    setState(() {
+      _floatingChipOffset = Offset(
+        next.dx.clamp(0.0, maxX),
+        next.dy.clamp(0.0, maxY),
+      );
+    });
+  }
+
+  Future<void> _loadCallChipOffset() async {
+    try {
+      final settings = await settingsRepository.getSettings();
+      final raw = settings['dm_call_chip_offset'];
+      if (raw is Map) {
+        final dx = double.tryParse('${raw['dx']}');
+        final dy = double.tryParse('${raw['dy']}');
+        if (dx != null && dy != null && mounted) {
+          setState(() => _floatingChipOffset = Offset(dx, dy));
+        }
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _persistCallChipOffset() async {
+    await settingsRepository.updateSetting('dm_call_chip_offset', {
+      'dx': _floatingChipOffset.dx,
+      'dy': _floatingChipOffset.dy,
+    });
+  }
+
+  DmCallState? _nextStateFor(DmCallState from, String event) {
+    switch (from) {
+      case DmCallState.idle:
+        return event == 'invite' ? DmCallState.ringingIncoming : null;
+      case DmCallState.ringingOutgoing:
+        if (event == 'accept') return DmCallState.connecting;
+        if (event == 'end') return DmCallState.idle;
+        return null;
+      case DmCallState.ringingIncoming:
+        if (event == 'accept') return DmCallState.connecting;
+        if (event == 'decline' || event == 'end') return DmCallState.idle;
+        return null;
+      case DmCallState.connecting:
+        if (event == 'connected') return DmCallState.connected;
+        if (event == 'end' || event == 'decline') return DmCallState.idle;
+        return null;
+      case DmCallState.connected:
+        if (event == 'end') return DmCallState.idle;
+        return null;
+    }
+  }
+
+  bool _canTransition(String event) => _nextStateFor(_callState, event) != null;
+
+  void _onRtcTelemetry(Map<String, dynamic> data) {
+    final retries = (data['turnRetries'] as num?)?.toInt() ?? 0;
+    final buffered = (data['candidateBuffered'] as num?)?.toInt() ?? 0;
+    final peers = (data['peerCount'] as num?)?.toInt() ?? 0;
+    var score = 90;
+    score -= (retries * 8);
+    score -= (buffered > 0 ? 12 : 0);
+    score -= (peers > 2 ? (peers - 2) * 3 : 0);
+    if (!_isRtcConnected) score -= 25;
+    final clamped = score.clamp(15, 98).toInt();
+    final smoothed = ((_smoothedCallQualityScore * 0.7) + (clamped * 0.3)).round();
+    if (!mounted) return;
+    setState(() {
+      _callQualityScore = clamped;
+      _smoothedCallQualityScore = smoothed;
+    });
+  }
+
+  Future<void> _setGlobalCallState({required bool active}) async {
+    await settingsRepository.updateSetting('dm_active_call', {
+      'active': active,
+      'other_id': widget.otherId,
+      'other_name': widget.otherName,
+    });
+  }
+
   void _initDmCallSignaling() {
     final channelId = _dmVoiceChannelId();
     final channel = Supabase.instance.client.channel(
@@ -421,9 +565,13 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final type = data['type']?.toString();
 
     if (type == 'call_invite') {
+      if (!_canTransition('invite')) return;
       if (_isCallActive) return;
       if (!mounted) return;
-      setState(() => _callState = DmCallState.ringingIncoming);
+      setState(() {
+        _callState = DmCallState.ringingIncoming;
+        _callPanelMinimized = false;
+      });
       final accepted = await _showIncomingCallDialog();
       if (!mounted || _callState != DmCallState.ringingIncoming) return;
 
@@ -432,12 +580,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
         await _startVoiceCall(sendInvite: false, incoming: true);
       } else {
         setState(() => _callState = DmCallState.idle);
+        _stopOutgoingRing();
         await _emitDmCallSignal('call_decline');
       }
       return;
     }
 
     if (type == 'call_accept') {
+      if (!_canTransition('accept')) return;
       if (_callState == DmCallState.ringingOutgoing) {
         setState(() => _callState = DmCallState.connecting);
         _startCallSetupTimeout();
@@ -446,17 +596,20 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
 
     if (type == 'call_connected') {
+      if (!_canTransition('connected')) return;
       _markCallConnected();
       return;
     }
 
     if (type == 'call_decline') {
+      if (!_canTransition('decline')) return;
       if (!_isCallActive) return;
       await _endVoiceCall(showRemoteEnded: true, message: 'Voice call declined');
       return;
     }
 
     if (type == 'call_end') {
+      if (!_canTransition('end')) return;
       if (!_isCallActive) return;
       await _endVoiceCall(showRemoteEnded: true);
     }
@@ -466,19 +619,52 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final response = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Incoming voice call'),
-        content: Text('${widget.otherName} is calling you.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Decline'),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Glass(
+          radius: BorderRadius.circular(24),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Incoming voice call',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
+                    ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '${widget.otherName} is calling you.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      icon: const Icon(Icons.call_end_rounded),
+                      label: const Text('Decline'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      icon: const Icon(Icons.call_rounded),
+                      label: const Text('Accept'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Accept'),
-          ),
-        ],
+        ),
       ),
     );
 
@@ -487,6 +673,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   void _onRtcConnectionState(bool connected) {
     if (!mounted) return;
+    setState(() => _isRtcConnected = connected);
     if (!connected) return;
     if (!_isCallActive) return;
 
@@ -500,9 +687,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
     _callSetupTimeoutTimer?.cancel();
     _callTimer?.cancel();
+    _stopOutgoingRing();
     setState(() {
       _callState = DmCallState.connected;
       _callElapsedSeconds = 0;
+      _callPanelMinimized = false;
+      _isRtcConnected = true;
     });
     _callTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || _callState != DmCallState.connected) return;
@@ -566,11 +756,20 @@ class _DmChatScreenState extends State<DmChatScreen> {
       setState(() {
         _callState = incoming ? DmCallState.connecting : DmCallState.ringingOutgoing;
         _callElapsedSeconds = 0;
+        _callPanelMinimized = false;
+        _isMicMuted = false;
+        _isSpeakerOn = true;
+        _isRtcConnected = false;
+        _callQualityScore = 78;
+        _smoothedCallQualityScore = 78;
       });
 
       if (sendInvite) {
         await _emitDmCallSignal('call_invite');
+        _startOutgoingRing();
       }
+
+      await _setGlobalCallState(active: true);
 
       _startCallSetupTimeout();
 
@@ -582,6 +781,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       return true;
     } catch (_) {
       if (!mounted) return false;
+      _stopOutgoingRing();
       setState(() => _callState = DmCallState.idle);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.chatCallLater)),
@@ -595,7 +795,17 @@ class _DmChatScreenState extends State<DmChatScreen> {
     if (!mounted) return;
     _callTimer?.cancel();
     _callSetupTimeoutTimer?.cancel();
-    setState(() => _callState = DmCallState.idle);
+    _stopOutgoingRing();
+    setState(() {
+      _callState = DmCallState.idle;
+      _callPanelMinimized = false;
+      _isMicMuted = false;
+      _isSpeakerOn = true;
+      _isRtcConnected = false;
+      _callQualityScore = 78;
+      _smoothedCallQualityScore = 78;
+    });
+    await _setGlobalCallState(active: false);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
@@ -607,6 +817,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   Future<void> _toggleVoiceCall() async {
     if (_isCallActive) {
+      final shouldEnd = await _confirmEndActiveCall();
+      if (!shouldEnd) return;
       await _emitDmCallSignal('call_end');
       await _endVoiceCall(showRemoteEnded: false);
       return;
@@ -647,6 +859,30 @@ class _DmChatScreenState extends State<DmChatScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Voice message sent')),
     );
+  }
+
+  Future<bool> _confirmEndActiveCall() async {
+    if (_callState != DmCallState.connected || _callElapsedSeconds < 5) {
+      return true;
+    }
+    final shouldEnd = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('End voice call?'),
+        content: Text('You are currently in an active call (${_formatCallDuration(_callElapsedSeconds)}).'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Keep call'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('End call'),
+          ),
+        ],
+      ),
+    );
+    return shouldEnd == true;
   }
 
   void _startVoiceRecording() {
@@ -1072,230 +1308,225 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
-          child: Column(
-            children: [
-              _showOnlineIndicator
-                  ? StreamBuilder<bool>(
-                      stream: _onlineStream,
-                      builder: (context, snapshot) {
-                        return _TopBar(
-                          title: _otherProfile?.displayName.isNotEmpty == true
-                              ? _otherProfile!.displayName
-                              : widget.otherName,
-                          username: _otherProfile?.username,
-                          avatarUrl: _otherProfile?.avatarUrl,
-                          showOnlineIndicator: snapshot.data == true,
-                          onBack: () => Navigator.pop(context),
-                          onProfileTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => ProfileScreen(userId: widget.otherId),
-                              ),
-                            );
-                          },
-                          onCall: _toggleVoiceCall,
-                          onToggleSearch: () => setState(() => _showSearch = !_showSearch),
-                          onMenuSelected: _handleMenuAction,
-                          showPinnedOnly: _showPinnedOnly,
-                          isInCall: _isCallActive,
-                          callStatusText: _callSubtitle,
-                          callDuration: _callElapsedSeconds,
-                        );
-                      },
-                    )
-                  : _TopBar(
-                      title: _otherProfile?.displayName.isNotEmpty == true
-                          ? _otherProfile!.displayName
-                          : widget.otherName,
-                      username: _otherProfile?.username,
-                      avatarUrl: _otherProfile?.avatarUrl,
-                      showOnlineIndicator: false,
-                      onBack: () => Navigator.pop(context),
-                      onProfileTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => ProfileScreen(userId: widget.otherId),
-                          ),
-                        );
-                      },
-                      onCall: _toggleVoiceCall,
-                      onToggleSearch: () => setState(() => _showSearch = !_showSearch),
-                      onMenuSelected: _handleMenuAction,
-                      showPinnedOnly: _showPinnedOnly,
-                      isInCall: _isCallActive,
-                      callStatusText: _callSubtitle,
-                      callDuration: _callElapsedSeconds,
-                    ),
-              const SizedBox(height: 8),
-              if (_showSearch)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
-                  child: Glass(
-                    radius: BorderRadius.circular(12),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    child: TextField(
-                      onChanged: (v) => setState(() => _searchQuery = v.trim().toLowerCase()),
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        border: InputBorder.none,
-                        hintText: 'Search in conversation',
-                      ),
-                    ),
-                  ),
-                ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
-                child: Row(
-                  children: [
-                    if (_searchQuery.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(999),
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-                        ),
-                        child: Text(
-                          'Searching: $_searchQuery',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    const Spacer(),
-                    FilterChip(
-                      label: const Text('Pinned'),
-                      selected: _showPinnedOnly,
-                      onSelected: (v) => setState(() => _showPinnedOnly = v),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: StreamBuilder<List<Map<String, dynamic>>>(
-                    stream: _messagesStream,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Center(
-                            child: Text("Error: ${snapshot.error}",
-                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface)));
-                      }
-                      if (!snapshot.hasData) {
-                        return const Center(
-                            child: CircularProgressIndicator(
-                                color: Color(0xFF2AFADF)));
-                      }
-
-                      final msgs = snapshot.data!;
-                      var visibleMsgs = _searchQuery.isEmpty
-                          ? msgs
-                          : msgs
-                              .where((m) => (m['content']?.toString().toLowerCase() ?? '').contains(_searchQuery))
-                              .toList();
-                      if (_showPinnedOnly) {
-                        visibleMsgs = visibleMsgs
-                            .where((m) => _pinnedMessageIds.contains(m['id']?.toString() ?? ''))
-                            .toList();
-                      }
-                      final hasUnread = visibleMsgs.any((m) => m['receiver_id'] == _myUserId && (m['is_read'] != true && m['is_read'] != 1));
-                      if (hasUnread) {
-                        _markConversationAsRead();
-                      }
-                      if (visibleMsgs.isEmpty) {
-                        return Center(
-                            child: Text(_searchQuery.isEmpty
-                                ? "Say hi to ${widget.otherName}! 👋"
-                                : 'No messages match your search',
-                                style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))));
-                      }
-
-                      return ListView.builder(
-                        controller: _scroll,
-                        padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
-                        itemCount: visibleMsgs.length,
-                        itemBuilder: (context, i) {
-                          final m = visibleMsgs[i];
-                          final senderId = m['sender_id'];
-                          final isMe = senderId == _myUserId;
-                          final parsed = _ChatMessage.fromRow(m, isMe: isMe);
-                          // Supabase returns ISO string
-                          final created =
-                              DateTime.parse(m['created_at']).toLocal();
-
-                          return StaggeredIn(
-                            index: i,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Align(
-                                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                                  child: _Bubble(
-                                    text: parsed.previewText,
-                                    rawContent: parsed.rawContent,
-                                    time: _fmtTime(created),
-                                    isMe: isMe,
-                                    isRead: m['is_read'] == true || m['is_read'] == 1,
-                                    readAt: m['read_at']?.toString(),
-                                    reactions: (m['reactions'] as Map<String, dynamic>?) ?? const {},
-                                    onReact: (emoji) => chatRepository.toggleMessageReaction(messageId: m['id'].toString(), emoji: emoji),
-                                    replyTo: parsed.payload.replyTo,
-                                    onLongPress: () => _showMessageActions(parsed),
-                                    onTapFile: _openFileUrl,
-                                    pinned: _pinnedMessageIds.contains(parsed.id),
-                                  ),
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                _showOnlineIndicator
+                    ? StreamBuilder<bool>(
+                        stream: _onlineStream,
+                        builder: (context, snapshot) {
+                          return _TopBar(
+                            title: _otherProfile?.displayName.isNotEmpty == true
+                                ? _otherProfile!.displayName
+                                : widget.otherName,
+                            username: _otherProfile?.username,
+                            avatarUrl: _otherProfile?.avatarUrl,
+                            showOnlineIndicator: snapshot.data == true,
+                            onBack: () => Navigator.pop(context),
+                            onProfileTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ProfileScreen(userId: widget.otherId),
                                 ),
-                                const SizedBox(height: 10),
-                              ],
+                              );
+                            },
+                            onCall: _toggleVoiceCall,
+                            onToggleSearch: () => setState(() => _showSearch = !_showSearch),
+                            onMenuSelected: _handleMenuAction,
+                            showPinnedOnly: _showPinnedOnly,
+                            isInCall: _isCallActive,
+                            callStatusText: _callSubtitle,
+                            callDuration: _callElapsedSeconds,
+                          );
+                        },
+                      )
+                    : _TopBar(
+                        title: _otherProfile?.displayName.isNotEmpty == true
+                            ? _otherProfile!.displayName
+                            : widget.otherName,
+                        username: _otherProfile?.username,
+                        avatarUrl: _otherProfile?.avatarUrl,
+                        showOnlineIndicator: false,
+                        onBack: () => Navigator.pop(context),
+                        onProfileTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProfileScreen(userId: widget.otherId),
                             ),
                           );
                         },
-                      );
-                    }),
-              ),
-              if (_replyPreview != null)
+                        onCall: _toggleVoiceCall,
+                        onToggleSearch: () => setState(() => _showSearch = !_showSearch),
+                        onMenuSelected: _handleMenuAction,
+                        showPinnedOnly: _showPinnedOnly,
+                        isInCall: _isCallActive,
+                        callStatusText: _callSubtitle,
+                        callDuration: _callElapsedSeconds,
+                      ),
+                const SizedBox(height: 8),
+                if (_showSearch)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                    child: Glass(
+                      radius: BorderRadius.circular(12),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      child: TextField(
+                        onChanged: (v) => setState(() => _searchQuery = v.trim().toLowerCase()),
+                        decoration: const InputDecoration(
+                          isDense: true,
+                          border: InputBorder.none,
+                          hintText: 'Search in conversation',
+                        ),
+                      ),
+                    ),
+                  ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
-                  child: Glass(
-                    radius: BorderRadius.circular(12),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                  child: Row(
+                    children: [
+                      if (_searchQuery.isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(999),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                          ),
                           child: Text(
-                            'Replying to: $_replyPreview',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                            'Searching: $_searchQuery',
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              fontSize: 11,
                               fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () => setState(() => _replyPreview = null),
-                          child: const Icon(Icons.close_rounded, size: 18),
+                      const Spacer(),
+                      FilterChip(
+                        label: const Text('Pinned'),
+                        selected: _showPinnedOnly,
+                        onSelected: (v) => setState(() => _showPinnedOnly = v),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: StreamBuilder<List<Map<String, dynamic>>>(
+                      stream: _messagesStream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(
+                              child: Text("Error: ${snapshot.error}",
+                                  style: TextStyle(color: theme.colorScheme.onSurface)));
+                        }
+                        if (!snapshot.hasData) {
+                          return const Center(
+                              child: CircularProgressIndicator(
+                                  color: Color(0xFF2AFADF)));
+                        }
+
+                        final msgs = snapshot.data!;
+                        var visibleMsgs = _searchQuery.isEmpty
+                            ? msgs
+                            : msgs
+                                .where((m) => (m['content']?.toString().toLowerCase() ?? '').contains(_searchQuery))
+                                .toList();
+                        if (_showPinnedOnly) {
+                          visibleMsgs = visibleMsgs
+                              .where((m) => _pinnedMessageIds.contains(m['id']?.toString() ?? ''))
+                              .toList();
+                        }
+
+                        if (visibleMsgs.isEmpty) {
+                          return Center(
+                            child: Text(_searchQuery.isEmpty
+                                ? 'No messages yet'
+                                : 'No messages match your search',
+                              style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w700),
+                            ),
+                          );
+                        }
+
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (_scroll.hasClients) {
+                            _scroll.animateTo(
+                              _scroll.position.maxScrollExtent,
+                              duration: MotionTokens.medium,
+                              curve: Curves.easeOut,
+                            );
+                          }
+                        });
+
+                        return ListView.builder(
+                          controller: _scroll,
+                          padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: visibleMsgs.length,
+                          itemBuilder: (context, i) {
+                            final m = visibleMsgs[i];
+                            final isMe = (m['sender_id']?.toString() ?? '') == _myUserId;
+                            final dt = DateTime.tryParse(m['created_at']?.toString() ?? '')?.toLocal() ?? DateTime.now();
+                            final payload = _MessagePayload.parse(m['content']?.toString() ?? '');
+                            final readAt = m['read_at']?.toString();
+                            final pinned = _pinnedMessageIds.contains(m['id']?.toString() ?? '');
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: _Bubble(
+                                text: payload.text ?? payload.fileName ?? 'Attachment',
+                                rawContent: m['content']?.toString() ?? '',
+                                time: _fmtTime(dt),
+                                isMe: isMe,
+                                isRead: readAt != null,
+                                replyTo: payload.replyTo,
+                                readAt: readAt,
+                                reactions: (m['reactions'] as Map<String, dynamic>?) ?? const {},
+                                pinned: pinned,
+                                onLongPress: () => _showMessageActions(m),
+                                onTapFile: _openFileUrl,
+                                onReact: (emoji) => chatRepository.toggleMessageReaction(messageId: m['id'].toString(), emoji: emoji),
+                              ),
+                            );
+                          },
+                        );
+                      }),
+                ),
+                if (_replyPreview != null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Replying to: ${_replyPreview!}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.75),
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => setState(() => _replyPreview = null),
+                          icon: const Icon(Icons.close_rounded),
                         ),
                       ],
                     ),
                   ),
-                ),
-
-              if (!_isOtherBlocked && _canChat)
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
+                if (!_canChat && _dmGateReason == null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+                    child: Wrap(
+                      spacing: 6,
                       children: [
-                        for (final quick in const ['Nice!','Join now','Good luck','Thanks!'])
+                        for (final quick in const ['Hey 👋', 'How are you?', 'Want to practice now?'])
                           Padding(
-                            padding: const EdgeInsets.only(right: 6),
+                            padding: const EdgeInsets.only(bottom: 6),
                             child: ActionChip(
                               label: Text(quick),
                               onPressed: () {
@@ -1312,51 +1543,145 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       ],
                     ),
                   ),
-                ),
-              StreamBuilder<bool>(
-                stream: _typingStream,
-                builder: (context, snapshot) {
-                  if (snapshot.data != true) return const SizedBox.shrink();
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Text(
-                      '${widget.otherName} is typing…',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                        fontWeight: FontWeight.w600,
+                StreamBuilder<bool>(
+                  stream: _typingStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.data != true) return const SizedBox.shrink();
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Text(
+                        '${widget.otherName} is typing…',
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
-              if (_isOtherBlocked)
-                _BlockedOverlay(
-                  onUnblock: _unblockUser,
-                )
-              else if (!_canChat && _dmGateReason == 'needs_request')
-                _MessageRequestOverlay(
-                  sentRequestStatus: _sentRequestStatus,
-                  incomingRequestStatus: _incomingRequestStatus,
-                  onSendRequest: _sendMessageRequest,
-                  onAccept: () => _respondIncomingRequest(true),
-                  onDecline: () => _respondIncomingRequest(false),
-                )
-              else
-                _InputBar(
-                  controller: _controller,
-                  onSend: _send,
-                  onVoiceMessage: () {
-                    _handleVoiceMessageTap();
+                    );
                   },
-                  onSendImage: _pickAndSendImage,
-                  onSendFile: _pickAndSendDocument,
-                  onTypingChanged: _onTypingChanged,
-                  onTextChanged: _saveDraft,
-                  isRecordingVoiceMessage: _isRecordingVoiceMessage,
-                  recordingSeconds: _voiceRecordElapsedSeconds,
                 ),
-            ],
-          ),
+                if (_isOtherBlocked)
+                  _BlockedOverlay(
+                    onUnblock: _unblockUser,
+                  )
+                else if (!_canChat && _dmGateReason == 'needs_request')
+                  _MessageRequestOverlay(
+                    sentRequestStatus: _sentRequestStatus,
+                    incomingRequestStatus: _incomingRequestStatus,
+                    onSendRequest: _sendMessageRequest,
+                    onAccept: () => _respondIncomingRequest(true),
+                    onDecline: () => _respondIncomingRequest(false),
+                  )
+                else
+                  _InputBar(
+                    controller: _controller,
+                    onSend: _send,
+                    onVoiceMessage: () {
+                      _handleVoiceMessageTap();
+                    },
+                    onSendImage: _pickAndSendImage,
+                    onSendFile: _pickAndSendDocument,
+                    onTypingChanged: _onTypingChanged,
+                    onTextChanged: _saveDraft,
+                    isRecordingVoiceMessage: _isRecordingVoiceMessage,
+                    recordingSeconds: _voiceRecordElapsedSeconds,
+                  ),
+              ],
+            ),
+            if (_isCallActive && !_callPanelMinimized)
+              Positioned(
+                left: 14,
+                right: 14,
+                bottom: 84,
+                child: _VoiceCallPanel(
+                  name: _otherProfile?.displayName.isNotEmpty == true
+                      ? _otherProfile!.displayName
+                      : widget.otherName,
+                  status: _callSubtitle,
+                  duration: _callElapsedSeconds,
+                  quality: _callQualityLabel,
+                  state: _callState,
+                  onMinimize: () => setState(() => _callPanelMinimized = true),
+                  onToggleMute: _toggleMicMute,
+                  onToggleSpeaker: _toggleSpeakerOutput,
+                  isMuted: _isMicMuted,
+                  isSpeakerOn: _isSpeakerOn,
+                  onHangup: () async {
+                    final shouldEnd = await _confirmEndActiveCall();
+                    if (!shouldEnd) return;
+                    await _emitDmCallSignal('call_end');
+                    await _endVoiceCall(showRemoteEnded: false);
+                  },
+                ),
+              ),
+            if (_isCallActive && _callPanelMinimized)
+              Positioned.fill(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    const chipWidth = 170.0;
+                    final defaultLeft = (constraints.maxWidth - chipWidth - 14).clamp(0.0, constraints.maxWidth);
+                    final defaultTop = (constraints.maxHeight - 150).clamp(0.0, constraints.maxHeight);
+                    return Stack(
+                      children: [
+                        Positioned(
+                          left: (defaultLeft - _floatingChipOffset.dx)
+                              .clamp(0.0, (constraints.maxWidth - chipWidth).clamp(0.0, constraints.maxWidth)),
+                          top: (defaultTop + _floatingChipOffset.dy)
+                              .clamp(0.0, (constraints.maxHeight - 70).clamp(0.0, constraints.maxHeight)),
+                          child: GestureDetector(
+                            onPanUpdate: (details) =>
+                                _onFloatingChipDragUpdate(details, constraints),
+                            onPanEnd: (_) => _persistCallChipOffset(),
+                            onLongPress: () async {
+                              final action = await showModalBottomSheet<String>(
+                                context: context,
+                                builder: (context) => SafeArea(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      ListTile(
+                                        leading: Icon(_isMicMuted ? Icons.mic_rounded : Icons.mic_off_rounded),
+                                        title: Text(_isMicMuted ? 'Unmute' : 'Mute'),
+                                        onTap: () => Navigator.pop(context, 'toggle_mute'),
+                                      ),
+                                      ListTile(
+                                        leading: const Icon(Icons.open_in_full_rounded),
+                                        title: const Text('Restore call panel'),
+                                        onTap: () => Navigator.pop(context, 'restore'),
+                                      ),
+                                      ListTile(
+                                        leading: const Icon(Icons.call_end_rounded),
+                                        title: const Text('End call'),
+                                        onTap: () => Navigator.pop(context, 'end'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                              if (!mounted) return;
+                              if (action == 'toggle_mute') {
+                                await _toggleMicMute();
+                              } else if (action == 'end') {
+                                final shouldEnd = await _confirmEndActiveCall();
+                                if (!shouldEnd) return;
+                                await _emitDmCallSignal('call_end');
+                                await _endVoiceCall(showRemoteEnded: false);
+                              } else {
+                                setState(() => _callPanelMinimized = false);
+                              }
+                            },
+                            child: _FloatingCallChip(
+                              subtitle: _callSubtitle,
+                              onTap: () => setState(() => _callPanelMinimized = false),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -1437,6 +1762,203 @@ class _DmChatScreenState extends State<DmChatScreen> {
 }
 
 // ---------------- UI pieces ----------------
+
+class _VoiceCallPanel extends StatelessWidget {
+  final String name;
+  final String status;
+  final String quality;
+  final int duration;
+  final DmCallState state;
+  final VoidCallback onMinimize;
+  final VoidCallback onToggleMute;
+  final VoidCallback onToggleSpeaker;
+  final bool isMuted;
+  final bool isSpeakerOn;
+  final VoidCallback onHangup;
+
+  const _VoiceCallPanel({
+    required this.name,
+    required this.status,
+    required this.quality,
+    required this.duration,
+    required this.state,
+    required this.onMinimize,
+    required this.onToggleMute,
+    required this.onToggleSpeaker,
+    required this.isMuted,
+    required this.isSpeakerOn,
+    required this.onHangup,
+  });
+
+  String get _durationLabel {
+    final mm = (duration ~/ 60).toString().padLeft(2, '0');
+    final ss = (duration % 60).toString().padLeft(2, '0');
+    return '$mm:$ss';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final active = state == DmCallState.connected;
+
+    return Glass(
+      radius: BorderRadius.circular(24),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(13),
+                  gradient: LinearGradient(
+                    colors: [
+                      scheme.primary.withValues(alpha: 0.95),
+                      scheme.tertiary.withValues(alpha: 0.92),
+                    ],
+                  ),
+                ),
+                child: Icon(active ? Icons.graphic_eq_rounded : Icons.phone_in_talk_rounded,
+                    color: scheme.onPrimary, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.titleMedium?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    Text(
+                      active ? 'In call • $_durationLabel' : status,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: textTheme.bodySmall?.copyWith(
+                        color: active ? scheme.primary : scheme.onSurface.withValues(alpha: 0.72),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Row(
+                      children: [
+                        Icon(
+                          quality == 'Excellent'
+                              ? Icons.network_cell_rounded
+                              : quality == 'Fair'
+                                  ? Icons.network_wifi_2_bar_rounded
+                                  : Icons.network_check_rounded,
+                          size: 13,
+                          color: quality == 'Excellent'
+                              ? const Color(0xFF58F7B6)
+                              : quality == 'Fair'
+                                  ? const Color(0xFFFFD166)
+                                  : const Color(0xFFFF6B6B),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Quality: $quality',
+                          style: textTheme.labelSmall?.copyWith(
+                            color: scheme.onSurface.withValues(alpha: 0.76),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                onPressed: onMinimize,
+                icon: Icon(Icons.open_in_new_rounded, color: scheme.onSurface.withValues(alpha: 0.86)),
+                tooltip: 'Minimize',
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onToggleMute,
+                  icon: Icon(isMuted ? Icons.mic_off_rounded : Icons.mic_rounded),
+                  label: Text(isMuted ? 'Unmute' : 'Mute'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: onToggleSpeaker,
+                  icon: Icon(isSpeakerOn ? Icons.volume_up_rounded : Icons.hearing_rounded),
+                  label: Text(isSpeakerOn ? 'Speaker' : 'Earpiece'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: onHangup,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF4D6D),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  icon: const Icon(Icons.call_end_rounded),
+                  label: const Text('End call'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FloatingCallChip extends StatelessWidget {
+  final String subtitle;
+  final VoidCallback onTap;
+
+  const _FloatingCallChip({required this.subtitle, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return GestureDetector(
+      onTap: onTap,
+      child: Glass(
+        radius: BorderRadius.circular(999),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.call_rounded, size: 18, color: scheme.primary),
+            const SizedBox(width: 6),
+            Text(
+              subtitle,
+              style: TextStyle(
+                color: scheme.onSurface,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _TopBar extends StatelessWidget {
   final String title;

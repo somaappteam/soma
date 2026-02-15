@@ -402,7 +402,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _ProfileSpotlightCard(profile: profile),
                       const SizedBox(height: S.sm),
                       if (_isVisitorView) ...[
-                        _VisitorPremiumHeroCard(profile: profile),
+                        _VisitorOverviewCard(
+                          profile: profile,
+                          isBlocked: _isBlocked,
+                          isReported: _isReported,
+                        ),
                         const SizedBox(height: S.sm),
                         _VisitorActionsCard(
                           isSending: _isRequestSending,
@@ -417,14 +421,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           onToggleBlocked: () => _toggleBlocked(profile),
                           onToggleReported: () => _toggleReported(profile),
                         ),
-                        const SizedBox(height: S.sm),
-                        _VisitorTrustSignalsCard(
-                          profile: profile,
-                          isBlocked: _isBlocked,
-                          isReported: _isReported,
-                        ),
-                        const SizedBox(height: S.sm),
-                        _VisitorStatsCard(profile: profile),
                       ] else ...[
                         FutureBuilder<UserStats>(
                           future: _statsFuture,
@@ -1432,36 +1428,96 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-class _VisitorStatsCard extends StatelessWidget {
+class _VisitorOverviewCard extends StatelessWidget {
   final UserProfile profile;
-  const _VisitorStatsCard({required this.profile});
+  final bool isBlocked;
+  final bool isReported;
+
+  const _VisitorOverviewCard({
+    required this.profile,
+    required this.isBlocked,
+    required this.isReported,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final location = profile.location.isNotEmpty ? profile.location : l10n.profileLocationHidden;
-    final bio = profile.bio.isNotEmpty ? profile.bio : l10n.profileBioHidden;
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final location = profile.location.isNotEmpty ? profile.location : l10n.profileLocationHidden;
+    final bio = profile.bio.isNotEmpty ? profile.bio : l10n.profileBioHidden;
+
+    final signals = <({IconData icon, String label, bool active})>[
+      (
+        icon: profile.showOnlineStatus ? Icons.circle_rounded : Icons.circle_outlined,
+        label: profile.showOnlineStatus ? 'Online status visible' : 'Online status hidden',
+        active: profile.showOnlineStatus,
+      ),
+      (
+        icon: isBlocked ? Icons.block_rounded : Icons.mark_email_read_rounded,
+        label: isBlocked ? 'Messaging disabled (blocked)' : 'Messaging available',
+        active: !isBlocked,
+      ),
+      (
+        icon: isReported ? Icons.flag_rounded : Icons.shield_outlined,
+        label: isReported ? 'Reported by you' : 'No report from your account',
+        active: !isReported,
+      ),
+    ];
 
     return Glass(
-      radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
+      radius: BorderRadius.circular(24),
+      padding: const EdgeInsets.all(S.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.profileSnapshot,
-            style: textTheme.titleMedium?.copyWith(
-              color: scheme.onSurface,
-              fontWeight: FontWeight.w900,
-            ),
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  gradient: LinearGradient(
+                    colors: [
+                      scheme.primary.withValues(alpha: 0.94),
+                      scheme.tertiary.withValues(alpha: 0.9),
+                    ],
+                  ),
+                ),
+                child: Icon(Icons.account_circle_rounded, color: scheme.onPrimary, size: 22),
+              ),
+              const SizedBox(width: S.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '@${profile.username}',
+                      style: textTheme.titleMedium?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Learner overview',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: scheme.onSurface.withValues(alpha: 0.66),
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _Pill(text: location, icon: Icons.place_rounded, isSmall: true),
+            ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: S.sm),
           Text(
-            'Quick overview of this learner profile.',
-            style: textTheme.bodySmall?.copyWith(
-              color: scheme.onSurface.withValues(alpha: 0.62),
+            bio,
+            style: textTheme.bodyMedium?.copyWith(
+              color: scheme.onSurface.withValues(alpha: 0.86),
               fontWeight: FontWeight.w700,
             ),
           ),
@@ -1471,7 +1527,7 @@ class _VisitorStatsCard extends StatelessWidget {
               Expanded(
                 child: _VisitorMetricTile(
                   icon: Icons.timer_rounded,
-                  title: 'Daily Goal',
+                  title: 'Daily goal',
                   value: '${profile.dailyGoalMinutes}m',
                 ),
               ),
@@ -1485,91 +1541,19 @@ class _VisitorStatsCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: S.xs),
-          _MetaRow(icon: Icons.info_outline_rounded, label: bio),
-          const SizedBox(height: S.xs),
-          _MetaRow(icon: Icons.place_rounded, label: location),
-        ],
-      ),
-    );
-  }
-}
-
-class _VisitorPremiumHeroCard extends StatelessWidget {
-  final UserProfile profile;
-  const _VisitorPremiumHeroCard({required this.profile});
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final location = profile.location.isNotEmpty ? profile.location : l10n.profileLocationHidden;
-
-    return Glass(
-      radius: BorderRadius.circular(24),
-      padding: const EdgeInsets.all(S.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14),
-                  gradient: LinearGradient(
-                    colors: [
-                      scheme.primary.withValues(alpha: 0.92),
-                      scheme.tertiary.withValues(alpha: 0.92),
-                    ],
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: scheme.primary.withValues(alpha: 0.28),
-                      blurRadius: 16,
-                      spreadRadius: 1,
-                    ),
-                  ],
-                ),
-                child: Icon(Icons.workspace_premium_rounded, color: scheme.onPrimary, size: 22),
-              ),
-              const SizedBox(width: S.sm),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.profileTitle,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: scheme.onSurface.withValues(alpha: 0.65),
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '@${profile.username}',
-                      style: textTheme.titleMedium?.copyWith(
-                        color: scheme.onSurface,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              _Pill(text: location, icon: Icons.place_rounded, isSmall: true),
-            ],
-          ),
           const SizedBox(height: S.sm),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: [
-              _Pill(text: l10n.profileMessage, icon: Icons.chat_bubble_rounded, isSmall: true),
-              _Pill(text: l10n.profileDailyGoal(profile.dailyGoalMinutes), icon: Icons.timer_rounded, isSmall: true),
-              _Pill(text: l10n.profileXpValue(profile.totalXp), icon: Icons.bolt_rounded, isSmall: true),
-            ],
+            children: signals
+                .map(
+                  (signal) => _SignalChip(
+                    icon: signal.icon,
+                    label: signal.label,
+                    active: signal.active,
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -1577,56 +1561,51 @@ class _VisitorPremiumHeroCard extends StatelessWidget {
   }
 }
 
-class _VisitorTrustSignalsCard extends StatelessWidget {
-  final UserProfile profile;
-  final bool isBlocked;
-  final bool isReported;
+class _SignalChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool active;
 
-  const _VisitorTrustSignalsCard({
-    required this.profile,
-    required this.isBlocked,
-    required this.isReported,
+  const _SignalChip({
+    required this.icon,
+    required this.label,
+    required this.active,
   });
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
-    return Glass(
-      radius: BorderRadius.circular(22),
-      padding: const EdgeInsets.all(S.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: 7),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: active
+            ? scheme.primary.withValues(alpha: 0.14)
+            : scheme.surfaceContainerHighest.withValues(alpha: 0.62),
+        border: Border.all(
+          color: active
+              ? scheme.primary.withValues(alpha: 0.35)
+              : scheme.onSurface.withValues(alpha: 0.14),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            children: [
-              Icon(Icons.verified_user_rounded, color: scheme.primary, size: 18),
-              const SizedBox(width: S.xs),
-              Text(
-                'Visitor trust signals',
-                style: textTheme.titleSmall?.copyWith(
-                  color: scheme.onSurface,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ],
+          Icon(
+            icon,
+            size: 15,
+            color: active
+                ? scheme.primary
+                : scheme.onSurface.withValues(alpha: 0.78),
           ),
-          const SizedBox(height: S.xs),
-          _MetaRow(
-            icon: Icons.circle_rounded,
-            label: profile.showOnlineStatus ? 'Online status can be shown on this profile.' : 'Online status is hidden on this profile.',
-          ),
-          const SizedBox(height: 6),
-          _MetaRow(
-            icon: isBlocked ? Icons.block_rounded : Icons.mark_email_read_rounded,
-            label: isBlocked ? 'Messaging disabled while this user is blocked.' : '${l10n.profileMessage} is available from Connect.',
-          ),
-          const SizedBox(height: 6),
-          _MetaRow(
-            icon: isReported ? Icons.flag_rounded : Icons.shield_outlined,
-            label: isReported ? 'This profile is currently reported by you.' : 'No active report from your account.',
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: textTheme.labelMedium?.copyWith(
+              color: scheme.onSurface.withValues(alpha: 0.86),
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ],
       ),
@@ -1672,33 +1651,6 @@ class _VisitorMetricTile extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _MetaRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  const _MetaRow({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    return Row(
-      children: [
-        Icon(icon, color: scheme.onSurface.withValues(alpha: 0.7), size: 16),
-        const SizedBox(width: S.xs),
-        Expanded(
-          child: Text(
-            label,
-            style: textTheme.bodySmall?.copyWith(
-              color: scheme.onSurface.withValues(alpha: 0.75),
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -52,6 +52,8 @@ class RtcVoiceService {
 
   Stream<bool> get connectionStream => _connectionStream.stream;
   Stream<Map<String, dynamic>> get telemetryStream => _telemetryStream.stream;
+  bool get isMuted => _muted;
+  bool get isSpeakerEnabled => _asSpeaker;
 
   Future<void> connect({
     required String circleId,
@@ -438,6 +440,16 @@ class RtcVoiceService {
     _muted = muted;
     _applyMutedToTrack();
     circleVoiceService.setMuted(muted);
+  }
+
+  Future<void> setSpeakerEnabled(bool enabled) async {
+    _asSpeaker = enabled;
+    _applyMutedToTrack();
+    try {
+      await Helper.setSpeakerphoneOn(enabled);
+    } catch (_) {
+      // best-effort audio routing
+    }
   }
 
   Future<void> toggleMuted() async {
