@@ -4,6 +4,12 @@ import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../social/friends_screen.dart';
 import '../social/inbox_screen.dart';
+import '../../data/social_repository.dart';
+import '../../data/presence_repository.dart';
+import '../../data/user_report_repository.dart';
+import '../../data/settings_repository.dart';
+import '../../data/profile_repository.dart';
+import 'exchange_session_screen.dart';
 import 'create_circle_screen.dart';
 import 'circle_lobby_screen.dart';
 import '../../core/theme/tokens.dart';
@@ -30,11 +36,13 @@ class _CirclesScreenState extends State<CirclesScreen> {
   String _selectedCourseId = _courseAll;
   String _selectedMode = _modeAll;
   String _selectedLevel = _levelAll;
+  _CirclesHomeTab _selectedTab = _CirclesHomeTab.activeCircles;
 
   List<SoloCourse> _courses = [];
   int _coursesRevision = 0;
+  bool _isOpeningExchangeCoursePicker = false;
+  bool _hasAutoOpenedExchangeCoursePicker = false;
   late final Stream<List<Map<String, dynamic>>> _openCirclesStream;
-
 
   @override
   void initState() {
@@ -149,6 +157,76 @@ class _CirclesScreenState extends State<CirclesScreen> {
     return fromLabel == option.fromName.toLowerCase() && toLabel == option.toName.toLowerCase();
   }
 
+  List<_ExchangeUser> _buildExchangeUsers() {
+    final users = <_ExchangeUser>[];
+    var addedCurrentUser = false;
+    for (final course in _courses) {
+      final option = _CourseOption.fromCourse(course);
+      if (option.fromName.isEmpty || option.toName.isEmpty) continue;
+      if (!addedCurrentUser) {
+        users.add(
+        _ExchangeUser(
+          userId: 'self',
+          name: 'You',
+          speaks: option.fromName,
+          learns: option.toName,
+            level: 'B1',
+            compatibility: 100,
+            isCurrentUser: true,
+            isOnline: true,
+          ),
+        );
+        addedCurrentUser = true;
+      }
+
+      users.add(
+        _ExchangeUser(
+          userId: 'sample-${course.id}',
+          name: '${option.toName} learner',
+          speaks: option.toName,
+          learns: option.fromName,
+          level: 'A2',
+          compatibility: 92,
+          isOnline: true,
+        ),
+      );
+    }
+
+    return users;
+  }
+
+  Future<void> _openExchangeCoursePicker() async {
+    if (_isOpeningExchangeCoursePicker) return;
+    _isOpeningExchangeCoursePicker = true;
+    try {
+      final created = await Navigator.push<SoloCourse>(
+        context,
+        MaterialPageRoute(builder: (_) => const AddCourseScreen()),
+      );
+
+      if (created != null) {
+        await coursesRepository.addCustomCourse(created);
+        await _loadCourses(selectCourseId: created.id);
+      }
+
+      if (mounted && created != null) {
+        setState(() => _selectedTab = _CirclesHomeTab.exchangeChat);
+      }
+    } finally {
+      _isOpeningExchangeCoursePicker = false;
+    }
+  }
+
+  void _maybeAutoOpenCoursePickerForExchange() {
+    if (_selectedTab != _CirclesHomeTab.exchangeChat) return;
+    if (_courses.isNotEmpty || _isOpeningExchangeCoursePicker || _hasAutoOpenedExchangeCoursePicker) return;
+    _hasAutoOpenedExchangeCoursePicker = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _selectedTab != _CirclesHomeTab.exchangeChat) return;
+      _openExchangeCoursePicker();
+    });
+  }
+
   Future<void> _selectCourseFilter(List<_CourseOption> options) async {
     final l10n = AppLocalizations.of(context);
     final items = <_FilterOption>[
@@ -223,6 +301,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
     final l10n = AppLocalizations.of(context);
     final isCompactWidth = MediaQuery.sizeOf(context).width < 380;
     _syncCoursesIfNeeded();
+    _maybeAutoOpenCoursePickerForExchange();
     final courseOptions = _buildCourseOptions();
     _CourseOption? selectedCourseOption;
     if (_selectedCourseId != _courseAll) {
@@ -264,6 +343,15 @@ class _CirclesScreenState extends State<CirclesScreen> {
               ),
 
               const SizedBox(height: 14),
+
+              _CirclesTabSelector(
+                selectedTab: _selectedTab,
+                onTabChanged: (tab) => setState(() => _selectedTab = tab),
+              ),
+
+              const SizedBox(height: 14),
+
+              if (_selectedTab == _CirclesHomeTab.activeCircles) ...[
 
               // Filters row
               Glass(
@@ -426,25 +514,803 @@ class _CirclesScreenState extends State<CirclesScreen> {
                 ),
               ),
 
-              // Create Circle CTA
-              const SizedBox(height: 10),
-              SizedBox(
-                width: double.infinity,
-                child: NeonButton(
-                  label: l10n.circlesCreateCircle,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CreateCircleScreen(),
-                      ),
-                    );
-                  },
+              ] else ...[
+                Expanded(
+                  child: _courses.isEmpty
+                      ? _ExchangeCourseRequired(onSelectCourse: _openExchangeCoursePicker)
+                      : _LanguageExchangePanel(
+                          users: _buildExchangeUsers(),
+                          selectedCourse: selectedCourseOption,
+                        ),
                 ),
-              ),
+              ],
+
+              // Create Circle CTA
+              if (_selectedTab == _CirclesHomeTab.activeCircles) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: NeonButton(
+                    label: l10n.circlesCreateCircle,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CreateCircleScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+enum _CirclesHomeTab { activeCircles, exchangeChat }
+
+class _CirclesTabSelector extends StatelessWidget {
+  final _CirclesHomeTab selectedTab;
+  final ValueChanged<_CirclesHomeTab> onTabChanged;
+
+  const _CirclesTabSelector({
+    required this.selectedTab,
+    required this.onTabChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Glass(
+      radius: BorderRadius.circular(16),
+      padding: const EdgeInsets.all(6),
+      child: Row(
+        children: [
+          Expanded(
+            child: _TabPill(
+              label: 'Active circles',
+              selected: selectedTab == _CirclesHomeTab.activeCircles,
+              onTap: () => onTabChanged(_CirclesHomeTab.activeCircles),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _TabPill(
+              label: '2-language exchange',
+              selected: selectedTab == _CirclesHomeTab.exchangeChat,
+              onTap: () => onTabChanged(_CirclesHomeTab.exchangeChat),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TabPill extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _TabPill({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color: selected ? AppTokens.accent : Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: selected ? Colors.black : colors.onSurface.withValues(alpha: 0.88),
+              fontWeight: FontWeight.w800,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ExchangeUser {
+  final String userId;
+  final String name;
+  final String speaks;
+  final String learns;
+  final String level;
+  final int compatibility;
+  final bool isCurrentUser;
+  final bool isOnline;
+
+  const _ExchangeUser({
+    required this.userId,
+    required this.name,
+    required this.speaks,
+    required this.learns,
+    required this.level,
+    required this.compatibility,
+    this.isCurrentUser = false,
+    this.isOnline = true,
+  });
+}
+
+
+class _ExchangeCourseRequired extends StatelessWidget {
+  final Future<void> Function() onSelectCourse;
+
+  const _ExchangeCourseRequired({required this.onSelectCourse});
+
+  @override
+  Widget build(BuildContext context) {
+    return Glass(
+      radius: BorderRadius.circular(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Select a course to start Social Exchange',
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'We use your selected course to match people by speaks/learns language.',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.78),
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: NeonButton(
+              label: 'Select course',
+              onTap: onSelectCourse,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LanguageExchangePanel extends StatefulWidget {
+  final List<_ExchangeUser> users;
+  final _CourseOption? selectedCourse;
+
+  const _LanguageExchangePanel({
+    required this.users,
+    required this.selectedCourse,
+  });
+
+  @override
+  State<_LanguageExchangePanel> createState() => _LanguageExchangePanelState();
+}
+
+class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
+  int _retryNonce = 0;
+
+  List<_ExchangeUser> _buildPartnerUsersFromFriends(
+    List<Map<String, dynamic>> friends,
+    Map<String, bool> onlineMap,
+    List<String> blockedIds,
+    Map<String, Map<String, dynamic>> profileMap,
+  ) {
+    final base = widget.selectedCourse;
+    if (base == null) return [];
+
+    final result = <_ExchangeUser>[];
+    for (var i = 0; i < friends.length; i++) {
+      final friend = friends[i];
+      final id = friend['id']?.toString() ?? '';
+      if (id.isEmpty || blockedIds.contains(id)) continue;
+      final username = friend['username']?.toString();
+      final name = (username == null || username.trim().isEmpty) ? 'Learner ${i + 1}' : username;
+      final profile = profileMap[id] ?? const <String, dynamic>{};
+      final dailyGoal = (profile['daily_goal_minutes'] as num?)?.toInt() ?? 10;
+      final totalXp = (profile['total_xp'] as num?)?.toInt() ?? 0;
+      final level = totalXp >= 3000
+          ? 'B2'
+          : totalXp >= 1200
+              ? 'B1'
+              : 'A2';
+      final compatibility = _compatibilityScore(
+        online: onlineMap[id] ?? false,
+        dailyGoalMinutes: dailyGoal,
+        totalXp: totalXp,
+      );
+      result.add(
+        _ExchangeUser(
+          userId: id,
+          name: name,
+          speaks: base.toName,
+          learns: base.fromName,
+          level: level,
+          compatibility: compatibility,
+          isOnline: onlineMap[id] ?? false,
+        ),
+      );
+    }
+    return result;
+  }
+
+  int _compatibilityScore({
+    required bool online,
+    required int dailyGoalMinutes,
+    required int totalXp,
+  }) {
+    var score = 70;
+    if (online) score += 12;
+    score += (dailyGoalMinutes ~/ 10).clamp(0, 8);
+    score += (totalXp ~/ 800).clamp(0, 10);
+    if (score > 99) return 99;
+    if (score < 40) return 40;
+    return score;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
+    final myUser = widget.users.where((u) => u.isCurrentUser).toList();
+
+    return Column(
+      children: [
+        Glass(
+          radius: BorderRadius.circular(16),
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Two-Language Exchange Chat',
+                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Structured turn chat with language lock, helper tools, and a session summary.',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.82),
+                ),
+              ),
+              if (myUser.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  'You: ${myUser.first.speaks} → ${myUser.first.learns} (${myUser.first.level})',
+                  style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ],
+              const SizedBox(height: 10),
+              const _RoundFlowPreview(),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: const [
+                  _ToolChip(label: 'Translate'),
+                  _ToolChip(label: 'Suggest reply'),
+                  _ToolChip(label: 'Correct my sentence'),
+                  _ToolChip(label: '1 correction / round'),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const _SessionProgressPreview(),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Expanded(
+          child: FutureBuilder<Map<String, dynamic>>(
+            future: settingsRepository.getSettings(),
+            builder: (context, settingsSnapshot) {
+              final blockedIds = ((settingsSnapshot.data?['blocked_user_ids'] as List?) ?? const [])
+                  .map((e) => e.toString())
+                  .toList();
+
+              return StreamBuilder<List<Map<String, dynamic>>>(
+                key: ValueKey(_retryNonce),
+                stream: socialRepository.getFriendsStream(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF)));
+                  }
+
+                  if (snapshot.hasError) {
+                    return _ExchangeErrorState(
+                      message: 'Could not load exchange partners.',
+                      onRetry: () => setState(() => _retryNonce++),
+                    );
+                  }
+
+                  final friends = snapshot.data ?? [];
+                  if (friends.isEmpty) {
+                    return _ExchangeNoPartnersState(onOpenFriends: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const FriendsScreen()),
+                      );
+                    });
+                  }
+
+                  final ids = friends.map((f) => f['id']?.toString() ?? '').where((id) => id.isNotEmpty).toList();
+
+                  return FutureBuilder<(Map<String, bool>, Map<String, Map<String, dynamic>>)>(
+                    future: () async {
+                      final online = await presenceRepository.fetchOnlineStatuses(ids);
+                      final profiles = await profileRepository.getProfilesByIds(ids);
+                      final profileMap = <String, Map<String, dynamic>>{
+                        for (final p in profiles) (p['id']?.toString() ?? ''): p,
+                      };
+                      return (online, profileMap);
+                    }(),
+                    builder: (context, dataSnapshot) {
+                      if (dataSnapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF)));
+                      }
+
+                      final payload = dataSnapshot.data;
+                      final onlineMap = payload?.$1 ?? <String, bool>{};
+                      final profileMap = payload?.$2 ?? <String, Map<String, dynamic>>{};
+                      final partners = _buildPartnerUsersFromFriends(friends, onlineMap, blockedIds, profileMap);
+
+                      if (partners.isEmpty) {
+                        if (friends.isNotEmpty && blockedIds.length >= friends.length) {
+                          return _ExchangeBlockedAllState(onOpenFriends: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const FriendsScreen()),
+                            );
+                          });
+                        }
+                        return _ExchangeNoCompatibleState(onOpenFriends: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const FriendsScreen()),
+                          );
+                        });
+                      }
+
+                      return ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: partners.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        itemBuilder: (context, index) {
+                          final user = partners[index];
+                          return Glass(
+                            radius: BorderRadius.circular(14),
+                            padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 18,
+                                      backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.7),
+                                      child: Text(
+                                        user.name.substring(0, 1).toUpperCase(),
+                                        style: const TextStyle(fontWeight: FontWeight.w800, color: Colors.black),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            user.name,
+                                            style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            'Speaks ${user.speaks} • Learns ${user.learns} • ${user.level}',
+                                            style: textTheme.bodySmall?.copyWith(
+                                              fontWeight: FontWeight.w600,
+                                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.72),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: user.isOnline ? const Color(0xFF2AFADF).withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.2),
+                                        borderRadius: BorderRadius.circular(999),
+                                      ),
+                                      child: Text(
+                                        user.isOnline ? 'Active' : 'Offline',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          color: user.isOnline ? const Color(0xFF2AFADF) : Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    _ToolChip(label: '${user.compatibility}% match'),
+                                    const SizedBox(width: 8),
+                                    const _ToolChip(label: 'Topic-safe rounds'),
+                                    const Spacer(),
+                                    SizedBox(
+                                      width: 112,
+                                      child: _ActionButton(
+                                        label: l10n.start,
+                                        filled: true,
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => ExchangeSessionScreen(
+                                                partnerUserId: user.userId,
+                                                partnerName: user.name,
+                                                myLearningLanguage: user.speaks,
+                                                partnerLearningLanguage: user.learns,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    TextButton.icon(
+                                      onPressed: () => _showModerationDialog(context, user),
+                                      icon: const Icon(Icons.report_gmailerrorred_rounded, size: 16),
+                                      label: const Text('Report'),
+                                    ),
+                                    TextButton.icon(
+                                      onPressed: () => _showBlockDialog(context, user),
+                                      icon: const Icon(Icons.block_rounded, size: 16),
+                                      label: const Text('Block'),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showModerationDialog(BuildContext context, _ExchangeUser user) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Report user?'),
+        content: Text('We will review reports for @${user.name} to keep exchange safe.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Report')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (user.userId.isEmpty) return;
+    await userReportRepository.reportUser(user.userId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User reported')));
+  }
+
+  Future<void> _showBlockDialog(BuildContext context, _ExchangeUser user) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Block user?'),
+        content: Text('You will no longer see @${user.name} in exchange suggestions.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Block')),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (user.userId.isEmpty) return;
+
+    final settings = await settingsRepository.getSettings();
+    final blockedIds = ((settings['blocked_user_ids'] as List?) ?? const []).map((e) => e.toString()).toList();
+    if (!blockedIds.contains(user.userId)) blockedIds.add(user.userId);
+    await settingsRepository.updateSetting('blocked_user_ids', blockedIds);
+    await userReportRepository.reportUser(user.userId);
+
+    if (!mounted) return;
+    setState(() => _retryNonce++);
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User blocked and reported')));
+  }
+}
+
+class _ExchangeErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _ExchangeErrorState({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Glass(
+      radius: BorderRadius.circular(14),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.wifi_off_rounded, size: 34),
+          const SizedBox(height: 10),
+          Text(message, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w800)),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: _ActionButton(label: 'Retry', filled: true, onTap: onRetry),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoundFlowPreview extends StatelessWidget {
+  const _RoundFlowPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: const [
+        _RoundRuleRow(
+          roundLabel: 'Round 1 • French',
+          detail: 'Both users write in French. English is blocked.',
+        ),
+        SizedBox(height: 8),
+        _RoundRuleRow(
+          roundLabel: 'Round 2 • English',
+          detail: 'Both users write in English. French is blocked.',
+        ),
+      ],
+    );
+  }
+}
+
+class _RoundRuleRow extends StatelessWidget {
+  final String roundLabel;
+  final String detail;
+
+  const _RoundRuleRow({required this.roundLabel, required this.detail});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            roundLabel,
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            detail,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 11.5,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ToolChip extends StatelessWidget {
+  final String label;
+  const _ToolChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        color: Colors.black.withValues(alpha: 0.14),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 11,
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
+        ),
+      ),
+    );
+  }
+}
+
+class _SessionProgressPreview extends StatelessWidget {
+  const _SessionProgressPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        color: AppTokens.accent.withValues(alpha: 0.12),
+        border: Border.all(color: AppTokens.accent.withValues(alpha: 0.28)),
+      ),
+      child: const Text(
+        'Session target: 10 rounds / 10 mins • Progress summary at end',
+        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+      ),
+    );
+  }
+}
+
+
+class _ExchangeNoCompatibleState extends StatelessWidget {
+  final VoidCallback onOpenFriends;
+
+  const _ExchangeNoCompatibleState({required this.onOpenFriends});
+
+  @override
+  Widget build(BuildContext context) {
+    return _ExchangeEmptyBase(
+      icon: Icons.filter_alt_off_rounded,
+      title: 'No compatible partners right now',
+      subtitle: 'Your friends are active, but none match this language direction yet.',
+      ctaLabel: 'Open friends',
+      onTap: onOpenFriends,
+    );
+  }
+}
+
+class _ExchangeBlockedAllState extends StatelessWidget {
+  final VoidCallback onOpenFriends;
+
+  const _ExchangeBlockedAllState({required this.onOpenFriends});
+
+  @override
+  Widget build(BuildContext context) {
+    return _ExchangeEmptyBase(
+      icon: Icons.block_rounded,
+      title: 'All available partners are blocked',
+      subtitle: 'Unblock someone from privacy settings or add new friends.',
+      ctaLabel: 'Open friends',
+      onTap: onOpenFriends,
+    );
+  }
+}
+
+class _ExchangeEmptyBase extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String ctaLabel;
+  final VoidCallback onTap;
+
+  const _ExchangeEmptyBase({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.ctaLabel,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Glass(
+      radius: BorderRadius.circular(14),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 34),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            subtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.74),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: NeonButton(
+              label: ctaLabel,
+              onTap: onTap,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExchangeNoPartnersState extends StatelessWidget {
+  final VoidCallback onOpenFriends;
+
+  const _ExchangeNoPartnersState({required this.onOpenFriends});
+
+  @override
+  Widget build(BuildContext context) {
+    return Glass(
+      radius: BorderRadius.circular(14),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.people_outline_rounded, size: 34),
+          const SizedBox(height: 10),
+          const Text(
+            'No compatible active users yet',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Add friends or wait for learners with matching language goals.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.74),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: NeonButton(
+              label: 'Open friends',
+              onTap: onOpenFriends,
+            ),
+          ),
+        ],
       ),
     );
   }
