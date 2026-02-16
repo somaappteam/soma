@@ -15,9 +15,13 @@ import '../../data/notifications_repository.dart';
 import '../../data/notifications_store.dart';
 import '../../data/auth_repository.dart';
 import '../../data/settings_repository.dart';
+import '../../data/social_repository.dart';
+import '../../data/presence_repository.dart';
+import '../../data/profile_repository.dart';
 import '../../core/theme/motion.dart';
 import '../../core/widgets/responsive.dart';
 import '../../core/theme/spacing.dart';
+import '../profile/profile_screen.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -185,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Text(
             l10n.myCourses,
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: scheme.onBackground,
+                  color: scheme.onSurface,
                   fontWeight: FontWeight.w800,
                   fontSize: 18,
                 ),
@@ -202,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text(
               editing ? l10n.done : l10n.editCourses,
               style: TextStyle(
-                color: editing ? scheme.primary : scheme.onBackground.withValues(alpha: 0.8),
+                color: editing ? scheme.primary : scheme.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w900,
                 fontSize: 12.5,
               ),
@@ -297,54 +301,80 @@ class _HomeScreenState extends State<HomeScreen> {
                 Row(
                   children: [
                     // Profile Pic + Username
-                    AnimatedBuilder(
-                      animation: profileStore,
-                      builder: (context, _) {
-                        final p = profileStore.profile;
-                        final hasAvatar = p.avatarUrl != null && p.avatarUrl!.isNotEmpty;
-                        final username = p.username.isNotEmpty ? p.username : l10n.guestUsername;
+                    StreamBuilder<Map<String, bool>>(
+                      stream: presenceRepository.streamMultipleOnlineStatuses([authRepository.currentUser?.id].whereType<String>().toList()),
+                      builder: (context, presenceSnapshot) {
+                        final isOnline = presenceSnapshot.data?[authRepository.currentUser?.id] ?? false;
                         
-                        return Row(
-                          children: [
-                            Container(
-                              width: 38,
-                              height: 38,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                image: hasAvatar
-                                    ? DecorationImage(
-                                        image: NetworkImage(p.avatarUrl!),
-                                        fit: BoxFit.cover,
-                                      )
-                                    : null,
-                                border: Border.all(
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: !hasAvatar
-                                  ? Center(
-                                      child: Text(
-                                        username.isNotEmpty ? username[0].toUpperCase() : "?",
-                                        style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurface,
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 16,
+                        return AnimatedBuilder(
+                          animation: profileStore,
+                          builder: (context, _) {
+                            final p = profileStore.profile;
+                            final hasAvatar = p.avatarUrl != null && p.avatarUrl!.isNotEmpty;
+                            final username = p.username.isNotEmpty ? p.username : l10n.guestUsername;
+                            final userId = authRepository.currentUser?.id;
+                            
+                            return Row(
+                              children: [
+                                Stack(
+                                  children: [
+                                    Container(
+                                      width: 38,
+                                      height: 38,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                        image: hasAvatar
+                                            ? DecorationImage(
+                                                image: NetworkImage(p.avatarUrl!),
+                                                fit: BoxFit.cover,
+                                              )
+                                            : null,
+                                        border: Border.all(
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                                          width: 1.5,
                                         ),
                                       ),
-                                    )
-                                  : null,
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              username,
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 17,
-                                  ),
-                            ),
-                          ],
+                                      child: !hasAvatar
+                                          ? Center(
+                                              child: Text(
+                                                username.isNotEmpty ? username[0].toUpperCase() : "?",
+                                                style: TextStyle(
+                                                  color: Theme.of(context).colorScheme.onSurface,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            )
+                                          : null,
+                                    ),
+                                    if (isOnline)
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: Container(
+                                          width: 11,
+                                          height: 11,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: const Color(0xFF58F7B6),
+                                            border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  username,
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 17,
+                                      ),
+                                ),
+                              ],
+                            );
+                          },
                         );
                       },
                     ),
@@ -388,6 +418,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 const SizedBox(height: S.lg),
+
+                if (!isGuest) ...[
+                  _ActiveFriendsStrip(),
+                  const SizedBox(height: S.lg),
+                ],
 
                 // Welcome
                 _buildWelcomeRow(editing: _isEditingCourses),
@@ -857,6 +892,128 @@ class _BellWithBadge extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class _ActiveFriendsStrip extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+
+    return StreamBuilder<List<Map<String, dynamic>>>(
+      stream: socialRepository.getFriendsStream(),
+      builder: (context, friendsSnapshot) {
+        final friends = friendsSnapshot.data ?? [];
+        if (friends.isEmpty) return const SizedBox.shrink();
+
+        final friendIds = friends
+            .map((f) => f['id']?.toString())
+            .whereType<String>()
+            .toList();
+
+        return StreamBuilder<Map<String, bool>>(
+          stream: presenceRepository.streamMultipleOnlineStatuses(friendIds),
+          builder: (context, presenceSnapshot) {
+            final onlineStatuses = presenceSnapshot.data ?? {};
+            final onlineFriends = friends.where((f) => onlineStatuses[f['id']?.toString()] == true).toList();
+
+            if (onlineFriends.isEmpty) return const SizedBox.shrink();
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Text(
+                    "Active Now",
+                    style: TextStyle(
+                      color: scheme.onSurface,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 60,
+                  child: ListView.separated(
+                    padding: EdgeInsets.zero,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: onlineFriends.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 14),
+                    itemBuilder: (context, index) {
+                      final f = onlineFriends[index];
+                      final avatarUrl = f['avatar_url']?.toString();
+                      final username = f['username']?.toString() ?? "";
+                      final userId = f['id']?.toString();
+
+                      return GestureDetector(
+                        onTap: userId == null
+                            ? null
+                            : () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => ProfileScreen(userId: userId)),
+                                ),
+                        child: Column(
+                          children: [
+                            Stack(
+                              children: [
+                                Container(
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: scheme.primary.withValues(alpha: 0.4),
+                                      width: 1.5,
+                                    ),
+                                    image: (avatarUrl != null && avatarUrl.isNotEmpty)
+                                        ? DecorationImage(
+                                            image: NetworkImage(avatarUrl),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                  ),
+                                  child: (avatarUrl == null || avatarUrl.isEmpty)
+                                      ? Center(
+                                          child: Text(
+                                            username.isNotEmpty ? username[0].toUpperCase() : "?",
+                                            style: TextStyle(
+                                              color: scheme.onSurface,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        )
+                                      : null,
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color(0xFF58F7B6),
+                                      border: Border.all(color: scheme.surface, width: 2),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

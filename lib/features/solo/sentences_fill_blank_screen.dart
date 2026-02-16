@@ -312,6 +312,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                     ],
                   ),
                 ),
+              ),
 
                 SizedBox(height: sectionSpacing),
 
@@ -323,7 +324,6 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                     itemBuilder: (context, i) {
                       final isSelected = _selected == i;
                       final isCorrect = i == q.correctIndex;
-
                       return GestureDetector(
                         onTap: _locked ? null : () => setState(() => _selected = i),
                         child: AnimatedContainer(
@@ -418,10 +418,12 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                 ),
               ],
             ),
-          ),
-        ),
-      );
-  }
+          );
+        },
+      ),
+    ),
+  );
+}
 }
 
 class _Pill extends StatelessWidget {

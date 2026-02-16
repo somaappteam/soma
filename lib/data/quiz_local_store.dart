@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
+import 'offline_queue_repository.dart';
 
 class QuizCache {
   static const Duration defaultMaxAge = Duration(days: 7);
@@ -86,9 +87,16 @@ class VocabSrsStore {
       await _dbHelper.upsertUserLearnedItem(item);
 
       if (uid != 'guest') {
-        _supabase.from('user_learned_items').upsert(item, onConflict: 'user_id, course_id, concept_id').then((_) {}).catchError((e) {
-          debugPrint("Cloud SRS push failed: $e");
-        });
+        try {
+          await _supabase.from('user_learned_items').upsert(item, onConflict: 'user_id, course_id, concept_id');
+        } catch (e) {
+          debugPrint("Cloud SRS push failed: $e. Enqueuing.");
+          await offlineQueueRepository.enqueue(
+            tableName: 'user_learned_items',
+            operation: 'UPSERT',
+            data: item,
+          );
+        }
       }
     }
   }

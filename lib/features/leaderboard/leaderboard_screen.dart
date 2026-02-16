@@ -6,6 +6,7 @@ import '../../core/widgets/glass.dart';
 import '../../core/widgets/pressable_scale.dart';
 import '../../core/widgets/staggered_in.dart';
 import '../../data/leaderboard_repository.dart';
+import '../../data/presence_repository.dart';
 import '../profile/profile_screen.dart';
 
 class LeaderboardScreen extends StatefulWidget {
@@ -150,99 +151,130 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       );
                     }
 
-                    return ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: data.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (context, index) {
-                        final user = data[index];
-                        final rank = user['rank'] ?? (index + 1);
-                        final isTop3 = rank <= 3;
-                        final avatarUrl = user['avatar_url']?.toString();
-                        final displayName = user['display_name']?.toString();
-                        final username = user['username']?.toString();
-                        final userId = user['id']?.toString() ?? user['user_id']?.toString();
-                        final name = (displayName != null && displayName.trim().isNotEmpty)
-                            ? displayName
-                            : (username?.isNotEmpty == true ? username! : l10n.userFallbackName);
+                    final userIds = data
+                        .map((u) => (u['id'] ?? u['user_id'])?.toString())
+                        .whereType<String>()
+                        .toList();
 
-                        return StaggeredIn(
-                          index: index,
-                          child: PressableScale(
-                            onTap: userId == null
-                                ? null
-                                : () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (_) => ProfileScreen(userId: userId)),
-                                    );
-                                  },
-                            child: Glass(
-                              radius: BorderRadius.circular(18),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 42,
-                                    child: Text(
-                                      "#$rank",
-                                      style: TextStyle(
-                                        color: isTop3 ? scheme.primary : scheme.onSurface.withValues(alpha: 0.52),
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 15,
+                    return StreamBuilder<Map<String, bool>>(
+                      stream: presenceRepository.streamMultipleOnlineStatuses(userIds),
+                      builder: (context, presenceSnapshot) {
+                        final onlineStatuses = presenceSnapshot.data ?? {};
+
+                        return ListView.separated(
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: data.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            final user = data[index];
+                            final rank = user['rank'] ?? (index + 1);
+                            final isTop3 = rank <= 3;
+                            final avatarUrl = user['avatar_url']?.toString();
+                            final displayName = user['display_name']?.toString();
+                            final username = user['username']?.toString();
+                            final userId = user['id']?.toString() ?? user['user_id']?.toString();
+                            final name = (displayName != null && displayName.trim().isNotEmpty)
+                                ? displayName
+                                : (username?.isNotEmpty == true ? username! : l10n.userFallbackName);
+                            final isOnline = onlineStatuses[userId] == true;
+
+                            return StaggeredIn(
+                              index: index,
+                              child: PressableScale(
+                                onTap: userId == null
+                                    ? null
+                                    : () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (_) => ProfileScreen(userId: userId)),
+                                        );
+                                      },
+                                child: Glass(
+                                  radius: BorderRadius.circular(18),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 42,
+                                        child: Text(
+                                          "#$rank",
+                                          style: TextStyle(
+                                            color: isTop3 ? scheme.primary : scheme.onSurface.withValues(alpha: 0.52),
+                                            fontWeight: FontWeight.w900,
+                                            fontSize: 15,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  Hero(
-                                    tag: userId == null ? "leader-avatar-$rank" : "profile-avatar-$userId",
-                                    child: Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: scheme.onSurface.withValues(alpha: 0.08),
-                                      ),
-                                      child: (avatarUrl != null && avatarUrl.trim().isNotEmpty)
-                                          ? ClipOval(
-                                              child: Image.network(
-                                                avatarUrl,
-                                                width: 40,
-                                                height: 40,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (_, __, ___) => Icon(
-                                                  Icons.person,
-                                                  color: scheme.onSurface,
+                                      Hero(
+                                        tag: userId == null ? "leader-avatar-$rank" : "profile-avatar-$userId",
+                                        child: Stack(
+                                          children: [
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: scheme.onSurface.withValues(alpha: 0.08),
+                                              ),
+                                              child: (avatarUrl != null && avatarUrl.trim().isNotEmpty)
+                                                  ? ClipOval(
+                                                      child: Image.network(
+                                                        avatarUrl,
+                                                        width: 40,
+                                                        height: 40,
+                                                        fit: BoxFit.cover,
+                                                        errorBuilder: (_, __, ___) => Icon(
+                                                          Icons.person,
+                                                          color: scheme.onSurface,
+                                                        ),
+                                                      ),
+                                                    )
+                                                  : Icon(Icons.person, color: scheme.onSurface),
+                                            ),
+                                            if (isOnline)
+                                              Positioned(
+                                                bottom: 1,
+                                                right: 1,
+                                                child: Container(
+                                                  width: 10,
+                                                  height: 10,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: const Color(0xFF58F7B6),
+                                                    border: Border.all(color: scheme.surface, width: 2),
+                                                  ),
                                                 ),
                                               ),
-                                            )
-                                          : Icon(Icons.person, color: scheme.onSurface),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Text(
-                                      name,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: scheme.onSurface,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 16,
+                                          ],
+                                        ),
                                       ),
-                                    ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          name,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: scheme.onSurface,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        l10n.profileXpValue(user['xp'] ?? 0),
+                                        style: TextStyle(
+                                          color: scheme.onSurface.withValues(alpha: 0.9),
+                                          fontWeight: FontWeight.w800,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    l10n.profileXpValue(user['xp'] ?? 0),
-                                    style: TextStyle(
-                                      color: scheme.onSurface.withValues(alpha: 0.9),
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
+                                ),
                               ),
-                            ),
-                          ),
+                            );
+                          },
                         );
                       },
                     );

@@ -16,6 +16,25 @@ class PresenceRepository {
         .map(_isOnlineFromRows);
   }
 
+  Stream<Map<String, bool>> streamMultipleOnlineStatuses(List<String> userIds) {
+    if (userIds.isEmpty) return Stream.value({});
+    return _supabase
+        .from('user_sessions')
+        .stream(primaryKey: ['id'])
+        .inFilter('user_id', userIds)
+        .map((rows) {
+      final grouped = <String, List<Map<String, dynamic>>>{};
+      for (final row in rows) {
+        final uid = row['user_id']?.toString();
+        if (uid == null) continue;
+        grouped.putIfAbsent(uid, () => []).add(row);
+      }
+      return {
+        for (final uid in userIds) uid: _isOnlineFromRows(grouped[uid] ?? []),
+      };
+    });
+  }
+
   Future<bool> fetchOnlineStatus(String userId) async {
     final rows = await _supabase
         .from('user_sessions')

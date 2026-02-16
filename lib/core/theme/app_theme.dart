@@ -63,12 +63,9 @@ class AppTheme {
       tertiary: Color(0xFFFF8A4C),
       surface: Color(0xFFFFFFFF),
       surfaceContainerHighest: Color(0xFFF5FBF7),
-      background: Colors.transparent, // Allow global gradient to show through
       onPrimary: Colors.white,
       onSecondary: Color(0xFF1B2418),
-      onTertiary: Colors.white,
       onSurface: Color(0xFF10221D),
-      onBackground: Color(0xFF10221D),
     );
 
     const glass = GlassTheme(
@@ -94,7 +91,7 @@ class AppTheme {
       brightness: Brightness.light,
       glass: glass,
       background: background,
-      scaffoldBackground: scheme.background,
+      scaffoldBackground: scheme.surface,
     );
   }
 
@@ -102,14 +99,11 @@ class AppTheme {
     const scheme = ColorScheme.dark(
       primary: T.neonA,
       secondary: T.neonB,
-      tertiary: T.neonC,
       surface: Color(0xFF15162C),
       surfaceContainerHighest: Color(0xFF1E1E3A),
-      background: Color(0xFF0B0B2D),
       onPrimary: Colors.white,
       onSecondary: Colors.black,
       onSurface: Color(0xFFF6F5FF),
-      onBackground: Color(0xFFF6F5FF),
     );
 
     const glass = GlassTheme(
@@ -130,7 +124,7 @@ class AppTheme {
       brightness: Brightness.dark,
       glass: glass,
       background: background,
-      scaffoldBackground: scheme.background,
+      scaffoldBackground: scheme.surface,
     );
   }
 
@@ -202,9 +196,9 @@ class AppTheme {
         scrolledUnderElevation: isLight ? 2 : 0,
         shadowColor: cardShadow.withValues(alpha: 0.6),
         elevation: 0,
-        iconTheme: IconThemeData(color: scheme.onBackground),
+        iconTheme: IconThemeData(color: scheme.onSurface),
         titleTextStyle: TextStyle(
-          color: scheme.onBackground,
+          color: scheme.onSurface,
           fontWeight: FontWeight.w800,
           fontSize: 18,
         ),
@@ -350,8 +344,8 @@ class AppTheme {
         bodyMedium: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
         bodySmall: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w400),
       ).apply(
-        bodyColor: scheme.onBackground,
-        displayColor: scheme.onBackground,
+        bodyColor: scheme.onSurface,
+        displayColor: scheme.onSurface,
       ),
       extensions: [glass, background],
     );
@@ -362,8 +356,8 @@ class _FastPageTransitionsBuilder extends PageTransitionsBuilder {
   const _FastPageTransitionsBuilder();
 
   @override
-  Widget buildTransitions<T>(
-    PageRoute<T> route,
+  Widget buildTransitions<R>(
+    PageRoute<R> route,
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,

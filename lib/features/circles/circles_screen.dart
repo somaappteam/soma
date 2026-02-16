@@ -54,14 +54,6 @@ class _CirclesScreenState extends State<CirclesScreen> {
     // _cleanupGhostCircles(); // Disable heavy client-side cleanup
   }
 
-  Future<void> _cleanupGhostCircles() async {
-    try {
-      await circlesRepository.cleanupGhostCircles();
-    } catch (e) {
-      debugPrint("Cleanup failed: $e");
-    }
-  }
-
   Future<void> _loadCourses({String? selectCourseId}) async {
     final courses = await coursesRepository.getUserCourses();
     if (!mounted) return;
@@ -588,7 +580,7 @@ class _TabPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Material(
-      color: selected ? AppTokens.accent : Colors.transparent,
+      color: selected ? T.accent : Colors.transparent,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -943,10 +935,10 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                       .where((id) => id.isNotEmpty)
                       .toList();
 
-                  return FutureBuilder<Map<String, bool>>(
-                    future: presenceRepository.fetchOnlineStatuses(ids),
+                  return StreamBuilder<Map<String, bool>>(
+                    stream: presenceRepository.streamMultipleOnlineStatuses(ids),
                     builder: (context, dataSnapshot) {
-                      if (dataSnapshot.connectionState == ConnectionState.waiting) {
+                      if (dataSnapshot.connectionState == ConnectionState.waiting && !dataSnapshot.hasData) {
                         return const Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF)));
                       }
 
@@ -1074,6 +1066,104 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
     );
   }
 
+  Widget _buildExchangeUserCard(
+    BuildContext context,
+    TextTheme textTheme,
+    AppLocalizations l10n,
+    _ExchangeUser user,
+  ) {
+    final colors = Theme.of(context).colorScheme;
+    return Glass(
+      radius: BorderRadius.circular(16),
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: user.isCurrentUser ? T.accent.withValues(alpha: 0.2) : colors.surfaceContainerHighest,
+              border: Border.all(color: user.isCurrentUser ? T.accent.withValues(alpha: 0.4) : Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: Stack(
+              children: [
+                Center(
+                  child: Text(
+                    user.name.isEmpty ? "?" : user.name.substring(0, 1).toUpperCase(),
+                    style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+                  ),
+                ),
+                if (user.isOnline)
+                  Positioned(
+                    right: 2,
+                    bottom: 2,
+                    child: _LiveDot(live: user.isOnline),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      user.isCurrentUser ? 'You' : '@${user.name}',
+                      style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w900, color: colors.onSurface),
+                    ),
+                    const SizedBox(width: 4),
+                    if (user.compatibility > 0)
+                      _Pill(
+                        label: '${user.compatibility}%',
+                        filled: user.compatibility >= 80,
+                        backgroundColor: user.compatibility >= 80 ? T.accent.withValues(alpha: 0.2) : null,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Speaks ${user.speaks} • Learns ${user.learns}',
+                  style: textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: colors.onSurface.withValues(alpha: 0.65),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (!user.isCurrentUser)
+            _SmallIconButton(
+              icon: Icons.chat_bubble_outline_rounded,
+              onTap: () async {
+                if (!mounted) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ExchangeSessionScreen(
+                      partnerUserId: user.userId,
+                      partnerName: user.name,
+                      myLearningLanguage: widget.selectedCourse?.toName ?? 'English',
+                      partnerLearningLanguage: widget.selectedCourse?.fromName ?? 'French',
+                    ),
+                  ),
+                );
+              },
+            ),
+          if (!user.isCurrentUser) ...[
+            const SizedBox(width: 8),
+            _SmallIconButton(
+              icon: Icons.more_vert_rounded,
+              onTap: () => _showModerationDialog(context, user),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Future<void> _showModerationDialog(BuildContext context, _ExchangeUser user) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -1089,7 +1179,7 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
     if (confirmed != true) return;
     if (user.userId.isEmpty) return;
     await userReportRepository.reportUser(user.userId);
-    if (!mounted) return;
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User reported')));
   }
 
@@ -1114,7 +1204,7 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
     await settingsRepository.updateSetting('blocked_user_ids', blockedIds);
     await userReportRepository.reportUser(user.userId);
 
-    if (!mounted) return;
+    if (!context.mounted) return;
     setState(() => _retryNonce++);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('User blocked and reported')));
   }
@@ -1242,8 +1332,8 @@ class _SessionProgressPreview extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: AppTokens.accent.withValues(alpha: 0.12),
-        border: Border.all(color: AppTokens.accent.withValues(alpha: 0.28)),
+        color: T.accent.withValues(alpha: 0.12),
+        border: Border.all(color: T.accent.withValues(alpha: 0.28)),
       ),
       child: const Text(
         'Session target: 10 rounds / 10 mins • Progress summary at end',
@@ -1844,10 +1934,17 @@ class _LiveDot extends StatelessWidget {
 }
 
 class _Pill extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
   final String label;
+  final bool filled;
+  final Color? backgroundColor;
 
-  const _Pill({required this.icon, required this.label});
+  const _Pill({
+    this.icon,
+    required this.label,
+    this.filled = false,
+    this.backgroundColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1855,14 +1952,16 @@ class _Pill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        color: Colors.black.withValues(alpha: 0.16),
+        color: backgroundColor ?? Colors.black.withValues(alpha: 0.16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: Colors.white.withValues(alpha: 0.8)),
-          const SizedBox(width: 5),
+          if (icon != null) ...[
+            Icon(icon, size: 14, color: Colors.white.withValues(alpha: 0.8)),
+            const SizedBox(width: 5),
+          ],
           Text(
             label,
             style: TextStyle(

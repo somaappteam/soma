@@ -7,6 +7,9 @@ class T {
   static const bg1 = Color(0xFF0B0B2D);
   static const bg2 = Color(0xFF120A3D);
 
+  // Aliases
+  static const accent = neonA;
+
   // Text
   static const textHi = Color(0xFFFFFFFF);
   static const textLo = Color(0xB3FFFFFF);

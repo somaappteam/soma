@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -6,6 +8,7 @@ import '../../models/friend.dart';
 import '../../data/social_repository.dart';
 import '../../data/auth_repository.dart';
 import '../../data/settings_repository.dart';
+import '../../data/presence_repository.dart';
 import 'add_friend_screen.dart';
 import 'dm_chat_screen.dart';
 import '../profile/profile_screen.dart';
@@ -28,11 +31,30 @@ class _FriendsScreenState extends State<FriendsScreen> {
   FriendViewFilter _filter = FriendViewFilter.all;
   FriendSortOption _sort = FriendSortOption.recent;
   Set<String> _favoriteFriendIds = <String>{};
+  Map<String, bool> _onlineStatuses = {};
+  StreamSubscription? _onlineSub;
+  List<String> _currentFriendIds = [];
 
   @override
   void initState() {
     super.initState();
     _loadFavorites();
+  }
+
+  @override
+  void dispose() {
+    _onlineSub?.cancel();
+    super.dispose();
+  }
+
+  void _updateOnlineSubscription(List<String> ids) {
+    if (listEquals(ids, _currentFriendIds)) return;
+    _currentFriendIds = ids;
+    _onlineSub?.cancel();
+    _onlineSub = presenceRepository.streamMultipleOnlineStatuses(ids).listen((statuses) {
+      if (!mounted) return;
+      setState(() => _onlineStatuses = statuses);
+    });
   }
 
   Future<void> _loadFavorites() async {
@@ -240,6 +262,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         status: FriendStatus.friend,
                                       ))
                                   .toList();
+                              
+                              _updateOnlineSubscription(friends.map((f) => f.id).toList());
 
                               final incoming = incomingData.map((data) {
                                 final requester = data['requester'] ?? {};
@@ -275,7 +299,9 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                 if (aFav != bFav) return aFav.compareTo(bFav);
 
                                 if (_sort == FriendSortOption.onlineFirst) {
-                                  final onlineCmp = (b.isOnline ? 1 : 0).compareTo(a.isOnline ? 1 : 0);
+                                  final aOnline = _onlineStatuses[a.id] == true;
+                                  final bOnline = _onlineStatuses[b.id] == true;
+                                  final onlineCmp = (bOnline ? 1 : 0).compareTo(aOnline ? 1 : 0);
                                   if (onlineCmp != 0) return onlineCmp;
                                 }
 
@@ -293,9 +319,10 @@ class _FriendsScreenState extends State<FriendsScreen> {
                               });
 
                               final visibleFriends = filtered.where((f) {
+                                final isOnline = _onlineStatuses[f.id] == true;
                                 return switch (_filter) {
                                   FriendViewFilter.all => true,
-                                  FriendViewFilter.online => f.isOnline,
+                                  FriendViewFilter.online => isOnline,
                                   FriendViewFilter.requests => false,
                                 };
                               }).toList();
@@ -307,7 +334,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                 children: [
                                   _FriendsOverviewCard(
                                     friendsCount: friends.length,
-                                    onlineCount: friends.where((f) => f.isOnline).length,
+                                    onlineCount: friends.where((f) => _onlineStatuses[f.id] == true).length,
                                     requestsCount: totalRequests,
                                     onAddFriend: () async {
                                       _trackUiEvent('add_friend_cta');
@@ -498,7 +525,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                       radius: BorderRadius.circular(22),
                                       padding: const EdgeInsets.all(12),
                                       child: Column(
-                                        children: visibleFriends.where((f) => f.isOnline).map((f) {
+                                        children: visibleFriends.where((f) => _onlineStatuses[f.id] == true).map((f) {
                                           return _FriendRow(
                                             friend: f,
                                             isFavorite: _favoriteFriendIds.contains(f.id),
@@ -526,49 +553,51 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                               );
                                             },
                                             onRemove: () => _removeFriend(f.id),
+                                            isOnline: true,
                                           );
                                         }).toList(),
                                       ),
                                     ),
-                                  if (_filter != FriendViewFilter.requests && visibleFriends.any((f) => !f.isOnline)) ...[
-                                    const SizedBox(height: 14),
-                                    _SectionTitle('Recently active'),
-                                    const SizedBox(height: 10),
-                                    Glass(
-                                      radius: BorderRadius.circular(22),
-                                      padding: const EdgeInsets.all(12),
-                                      child: Column(
-                                        children: visibleFriends.where((f) => !f.isOnline).map((f) {
-                                          return _FriendRow(
-                                            friend: f,
-                                            isFavorite: _favoriteFriendIds.contains(f.id),
-                                            onToggleFavorite: () => _toggleFavorite(f.id),
-                                            onOpenProfile: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) => ProfileScreen(userId: f.id),
-                                                ),
-                                              );
-                                            },
-                                            onMessage: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (_) => DmChatScreen(
-                                                    meId: socialRepository.currentUserId ?? authRepository.currentUser?.id ?? "me",
-                                                    otherId: f.id,
-                                                    otherName: f.username,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            onRemove: () => _removeFriend(f.id),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                  ],
+                                   if (_filter != FriendViewFilter.requests && visibleFriends.any((f) => _onlineStatuses[f.id] != true)) ...[
+                                     const SizedBox(height: 14),
+                                     _SectionTitle('Recently active'),
+                                     const SizedBox(height: 10),
+                                     Glass(
+                                       radius: BorderRadius.circular(22),
+                                       padding: const EdgeInsets.all(12),
+                                       child: Column(
+                                         children: visibleFriends.where((f) => _onlineStatuses[f.id] != true).map((f) {
+                                           return _FriendRow(
+                                             friend: f,
+                                             isFavorite: _favoriteFriendIds.contains(f.id),
+                                             onToggleFavorite: () => _toggleFavorite(f.id),
+                                             onOpenProfile: () {
+                                               Navigator.push(
+                                                 context,
+                                                 MaterialPageRoute(
+                                                   builder: (_) => ProfileScreen(userId: f.id),
+                                                 ),
+                                               );
+                                             },
+                                             onMessage: () {
+                                               Navigator.push(
+                                                 context,
+                                                 MaterialPageRoute(
+                                                   builder: (_) => DmChatScreen(
+                                                     meId: socialRepository.currentUserId ?? authRepository.currentUser?.id ?? "me",
+                                                     otherId: f.id,
+                                                     otherName: f.username,
+                                                   ),
+                                                 ),
+                                               );
+                                             },
+                                             onRemove: () => _removeFriend(f.id),
+                                             isOnline: false,
+                                           );
+                                         }).toList(),
+                                       ),
+                                     ),
+                                   ],
                                 ],
                               );
                             },
@@ -844,6 +873,7 @@ class _FriendRow extends StatelessWidget {
   final VoidCallback onOpenProfile;
   final VoidCallback onMessage;
   final VoidCallback onRemove;
+  final bool isOnline;
 
   const _FriendRow({
     required this.friend,
@@ -852,6 +882,7 @@ class _FriendRow extends StatelessWidget {
     required this.onOpenProfile,
     required this.onMessage,
     required this.onRemove,
+    required this.isOnline,
   });
 
   @override
@@ -871,32 +902,44 @@ class _FriendRow extends StatelessWidget {
             GestureDetector(
               onTap: onOpenProfile,
               onLongPress: onOpenProfile,
-              child: _AvatarDot(online: friend.isOnline, username: friend.username),
+              child: _AvatarDot(online: isOnline, username: friend.username),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    friend.username,
-                    style: TextStyle(
-                      color: scheme.onSurface,
-                      fontWeight: FontWeight.w900,
-                      fontSize: 14.5,
-                    ),
-                  ),
-                  if (friend.subtitle != null) ...[
-                    const SizedBox(height: 3),
-                    Text(
-                      friend.subtitle!,
-                      style: TextStyle(
-                        color: scheme.onSurface.withValues(alpha: 0.60),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
+                  Row(
+                    children: [
+                      Text(
+                        friend.username,
+                        style: TextStyle(
+                            color: scheme.onSurface,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w900),
                       ),
-                    ),
-                  ],
+                      if (isOnline) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          width: 7,
+                          height: 7,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF58F7B6),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  Text(
+                    isOnline ? 'Online' : (friend.subtitle ?? 'Learning'),
+                    style: TextStyle(
+                        color: isOnline
+                            ? const Color(0xFF58F7B6)
+                            : scheme.onSurface.withValues(alpha: 0.65),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700),
+                  ),
                 ],
               ),
             ),

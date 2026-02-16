@@ -16,7 +16,7 @@ class AppLocalizationsNo extends AppLocalizations {
 
   @override
   String welcome(Object name) {
-    return 'Welcome, $name!';
+    return 'Velkommen, $name!';
   }
 
   @override
@@ -32,27 +32,46 @@ class AppLocalizationsNo extends AppLocalizations {
   String get authFillAllFields => 'Please fill in all fields';
 
   @override
-  String get authForgotPassword => 'Forgot password?';
+  String get authForgotPassword => 'Glemt passord?';
 
   @override
-  String get authForgotPasswordTitle => 'Reset password';
+  String get authForgotPasswordTitle => 'Tilbakestill passord';
 
   @override
   String get authForgotPasswordBody =>
-      'Enter the email linked to your account. We\'ll send a secure reset link.';
+      'Skriv inn e-posten knyttet til kontoen din. Vi sender deg en sikker lenke.';
 
   @override
-  String get authSendResetLink => 'Send reset link';
+  String get authSendResetLink => 'Send tilbakestillingslenke';
 
   @override
-  String get authResetSentTitle => 'Check your email';
+  String get authResetSentTitle => 'Sjekk e-posten din';
 
   @override
   String get authResetSentBody =>
-      'We sent a password reset link. Follow the instructions to set a new password.';
+      'Vi har sendt en lenke for å tilbakestille passordet. Følg instruksjonene for å velge et nytt passord.';
 
   @override
-  String get authResetFailedTitle => 'Reset failed';
+  String get authResetFailedTitle => 'Tilbakestilling mislyktes';
+
+  @override
+  String get authSignUpConfirmTitle => 'Bekreft e-posten din';
+
+  @override
+  String authSignUpConfirmBody(Object email) {
+    return 'Vi har sendt en bekreftelses-e-post til $email. Vennligst bekreft e-posten før du fortsetter.';
+  }
+
+  @override
+  String get authEmailResent => 'Bekreftelses-e-post sendt på nytt.';
+
+  @override
+  String authEmailResendFailed(Object error) {
+    return 'Kunne ikke sende bekreftelses-e-post på nytt: $error';
+  }
+
+  @override
+  String get resend => 'Send på nytt';
 
   @override
   String authError(Object error) {
@@ -1496,17 +1515,17 @@ class AppLocalizationsNo extends AppLocalizations {
   String get circlesLiveTextChatSubtitle => 'Tillat meldinger under kamp';
 
   @override
-  String get circlesRoomLocked => 'Room locked';
+  String get circlesRoomLocked => 'Rommet er låst';
 
   @override
-  String get circlesRoomUnlocked => 'Room unlocked';
+  String get circlesRoomUnlocked => 'Rommet er låst opp';
 
   @override
-  String get circlesSettingsSaved => 'Room settings saved';
+  String get circlesSettingsSaved => 'Romsinnstillinger lagret';
 
   @override
   String circlesUpdateFailed(Object error) {
-    return 'Couldn\'t update room: $error';
+    return 'Kunne ikke oppdatere rommet: $error';
   }
 
   @override

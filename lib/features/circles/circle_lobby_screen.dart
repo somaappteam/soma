@@ -23,6 +23,7 @@ import '../../data/quiz_repository.dart';
 import '../../data/languages.dart';
 import '../../data/settings_repository.dart';
 import '../../data/soma_plus_repository.dart';
+import '../../data/presence_repository.dart';
 import '../profile/profile_screen.dart';
 
 class CircleLobbyScreen extends StatefulWidget {
@@ -352,7 +353,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
         timePerQ: _editTimePerQ,
       );
 
-      final courseId = "${_editSpeakLang}-${_editLearnLang}";
+      final courseId = "$_editSpeakLang-$_editLearnLang";
       List<Map<String, dynamic>> newQuestions = [];
       if (_editMode == "Vocabulary") {
         newQuestions = await quizRepository.getVocabQuestionsFromSupabase(
@@ -1114,7 +1115,6 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
             : modeRaw;
     final levelRaw = circleData?['level']?.toString() ?? '';
     final levelLabel = _localizedLevelLabel(l10n, levelRaw);
-    final displayPlayers = <PlayerSlot>[];
     final playerParticipants = participants
         .where((p) => p['role'] != 'spectator' && p['role'] != 'pending')
         .toList();
@@ -1123,43 +1123,10 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     final pendingParticipants =
         participants.where((p) => p['role'] == 'pending').toList();
 
-    for (int i = 0; i < maxPlayers; i++) {
-      if (i < playerParticipants.length) {
-        final p = playerParticipants[i];
-        final uid = p['user_id'];
-        final profile = profilesCache[uid];
-        final isPReady = p['is_ready'] ?? false;
-        final role = p['role'];
-        final userId = uid?.toString();
-        final isSelf =
-            userId != null && userId == circlesRepository.currentUserId;
-        final isMuted = userId != null ? _isMutedFor(userId) : false;
-        final isSpeaking = userId != null ? _isSpeakingFor(userId) : false;
-
-        displayPlayers.add(PlayerSlot(
-          name: profile?['display_name'] ??
-              profile?['username'] ??
-              l10n.loading,
-          isHost: role == 'host',
-          isReady: isPReady,
-          score: 0,
-          userId: userId,
-          isMuted: isMuted,
-          isSpeaking: isSpeaking,
-          isSelf: isSelf,
-        ));
-      } else {
-        displayPlayers.add(PlayerSlot(
-            name: l10n.circlesEmptySlot,
-            isHost: false,
-            isReady: false,
-            score: 0,
-            isEmpty: true));
-      }
-    }
-
-    final allReady =
-        displayPlayers.where((p) => !p.isEmpty).every((p) => p.isReady);
+    final participantIds = participants
+        .map((p) => p['user_id']?.toString())
+        .whereType<String>()
+        .toList();
 
     return PopScope(
       canPop: !isHost,
@@ -1171,7 +1138,49 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       },
       child: Scaffold(
         body: SafeArea(
-            child: ResponsiveFrame(
+          child: StreamBuilder<Map<String, bool>>(
+            stream: presenceRepository.streamMultipleOnlineStatuses(participantIds),
+            builder: (context, presenceSnapshot) {
+              final presence = presenceSnapshot.data ?? {};
+              final allReady = playerParticipants.every((p) => (p['is_ready'] == true) || p['role'] == 'host');
+              
+              final displayPlayers = <PlayerSlot>[];
+              for (int i = 0; i < maxPlayers; i++) {
+                if (i < playerParticipants.length) {
+                  final p = playerParticipants[i];
+                  final uid = p['user_id'];
+                  final profile = profilesCache[uid];
+                  final isPReady = p['is_ready'] ?? false;
+                  final role = p['role'];
+                  final userId = uid?.toString();
+                  final isSelf = userId != null && userId == circlesRepository.currentUserId;
+                  final isMuted = userId != null ? _isMutedFor(userId) : false;
+                  final isSpeaking = userId != null ? _isSpeakingFor(userId) : false;
+                  final isOnline = userId != null && (presence[userId] ?? false);
+
+                  displayPlayers.add(PlayerSlot(
+                    name: profile?['display_name'] ?? profile?['username'] ?? l10n.loading,
+                    isHost: role == 'host',
+                    isReady: isPReady,
+                    score: 0,
+                    userId: userId,
+                    isMuted: isMuted,
+                    isSpeaking: isSpeaking,
+                    isSelf: isSelf,
+                    isOnline: isOnline,
+                  ));
+                } else {
+                  displayPlayers.add(PlayerSlot(
+                    name: l10n.circlesEmptySlot,
+                    isHost: false,
+                    isReady: false,
+                    score: 0,
+                    isEmpty: true,
+                  ));
+                }
+              }
+
+              return ResponsiveFrame(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
                 child: Column(
@@ -1643,6 +1652,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                           l10n.circlesSpectator;
                                       return _SpectatorChip(
                                         name: name,
+                                        isOnline: uid != null && (presence[uid.toString()] ?? false),
                                         onTap: uid != null
                                             ? () => _openProfileSheet(
                                                 uid.toString())
@@ -1704,6 +1714,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                     return _JoinRequestRow(
                                       name: name,
                                       canAccept: canAccept,
+                                      isOnline: presence[uid] ?? false,
                                       onAccept: () => _approveJoin(uid,
                                           hasCapacity: hasCapacity),
                                       onDecline: () => _declineJoin(uid),
@@ -1851,7 +1862,6 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                               ],
                             ),
                           ],
-
                           const SizedBox(height: 20),
                         ],
                       ),
@@ -1859,11 +1869,13 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                   ],
                 ),
               ),
-            ),
-          ),
+            );
+          },
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 enum _HostExitAction { transfer, end }
@@ -1895,6 +1907,7 @@ class PlayerSlot {
   final bool isMuted;
   final bool isSpeaking;
   final bool isSelf;
+  final bool isOnline;
 
   PlayerSlot({
     required this.name,
@@ -1906,6 +1919,7 @@ class PlayerSlot {
     this.isMuted = false,
     this.isSpeaking = false,
     this.isSelf = false,
+    this.isOnline = false,
   });
 }
 
@@ -2647,6 +2661,7 @@ class _PlayerRow extends StatelessWidget {
               empty: player.isEmpty,
               muted: player.isMuted,
               speaking: player.isSpeaking,
+              isOnline: player.isOnline,
             ),
           ),
           const SizedBox(width: 10),
@@ -2841,6 +2856,7 @@ class _MicBadge extends StatelessWidget {
 class _JoinRequestRow extends StatelessWidget {
   final String name;
   final bool canAccept;
+  final bool isOnline;
   final VoidCallback onAccept;
   final VoidCallback onDecline;
 
@@ -2849,6 +2865,7 @@ class _JoinRequestRow extends StatelessWidget {
     required this.canAccept,
     required this.onAccept,
     required this.onDecline,
+    this.isOnline = false,
   });
 
   @override
@@ -2866,7 +2883,25 @@ class _JoinRequestRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(Icons.person_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
+            Stack(
+              children: [
+                Icon(Icons.person_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
+                if (isOnline)
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF58F7B6),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Theme.of(context).colorScheme.surface, width: 1),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -2928,12 +2963,14 @@ class _AvatarDot extends StatelessWidget {
   final bool empty;
   final bool muted;
   final bool speaking;
+  final bool isOnline;
 
   const _AvatarDot({
     required this.glow,
     required this.empty,
     required this.muted,
     required this.speaking,
+    this.isOnline = false,
   });
 
   @override
@@ -2981,14 +3018,16 @@ class _AvatarDot extends StatelessWidget {
               height: 16,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: muted ? 0.55 : 0.9),
+                color: isOnline 
+                    ? const Color(0xFF58F7B6)
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: muted ? 0.55 : 0.9),
                 border: Border.all(
                   color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
                   width: 1.5,
                 ),
               ),
               child: Icon(
-                muted ? Icons.mic_off_rounded : Icons.mic_rounded,
+                isOnline ? Icons.check_circle_rounded : (muted ? Icons.mic_off_rounded : Icons.mic_rounded),
                 size: 10,
                 color: Theme.of(context).colorScheme.surface,
               ),
@@ -3001,9 +3040,10 @@ class _AvatarDot extends StatelessWidget {
 
 class _SpectatorChip extends StatelessWidget {
   final String name;
+  final bool isOnline;
   final VoidCallback? onTap;
 
-  const _SpectatorChip({required this.name, required this.onTap});
+  const _SpectatorChip({required this.name, required this.onTap, this.isOnline = false});
 
   @override
   Widget build(BuildContext context) {
@@ -3026,8 +3066,15 @@ class _SpectatorChip extends StatelessWidget {
               width: 10,
               height: 10,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
+                color: isOnline ? const Color(0xFF58F7B6) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  if (isOnline)
+                    BoxShadow(
+                      color: const Color(0xFF58F7B6).withValues(alpha: 0.3),
+                      blurRadius: 4,
+                    ),
+                ],
               ),
             ),
             const SizedBox(width: 8),

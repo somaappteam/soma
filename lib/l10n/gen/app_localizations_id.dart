@@ -55,6 +55,25 @@ class AppLocalizationsId extends AppLocalizations {
   String get authResetFailedTitle => 'Reset failed';
 
   @override
+  String get authSignUpConfirmTitle => 'Confirm your email';
+
+  @override
+  String authSignUpConfirmBody(Object email) {
+    return 'We sent a SOMA confirmation email to $email. Please confirm your email before continuing.';
+  }
+
+  @override
+  String get authEmailResent => 'Confirmation email resent.';
+
+  @override
+  String authEmailResendFailed(Object error) {
+    return 'Could not resend confirmation email: $error';
+  }
+
+  @override
+  String get resend => 'Resend';
+
+  @override
   String authError(Object error) {
     return 'Kesalahan: $error';
   }

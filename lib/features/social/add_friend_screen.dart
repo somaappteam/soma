@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../data/social_repository.dart';
+import '../../data/presence_repository.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../profile/profile_screen.dart';
 
@@ -323,22 +324,47 @@ class _SearchResultRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: scheme.primary.withValues(alpha: 0.2),
-              ),
-              child: Center(
-                child: Text(
-                  username.substring(0, 1).toUpperCase(),
-                  style: TextStyle(
-                    color: scheme.primary,
-                    fontWeight: FontWeight.bold,
+            Stack(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: scheme.primary.withValues(alpha: 0.2),
+                  ),
+                  child: Center(
+                    child: Text(
+                      username.substring(0, 1).toUpperCase(),
+                      style: TextStyle(
+                        color: scheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                StreamBuilder<bool>(
+                  stream: presenceRepository.streamOnlineStatus(user['id'] ?? ''),
+                  builder: (context, snapshot) {
+                    if (snapshot.data == true) {
+                      return Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF58F7B6),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.black, width: 1.5),
+                          ),
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ],
             ),
             const SizedBox(width: 12),
             Expanded(

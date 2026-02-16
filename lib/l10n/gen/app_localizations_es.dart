@@ -16,7 +16,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String welcome(Object name) {
-    return 'Welcome, $name!';
+    return '¡Bienvenido, $name!';
   }
 
   @override
@@ -32,27 +32,46 @@ class AppLocalizationsEs extends AppLocalizations {
   String get authFillAllFields => 'Por favor completa todos los campos';
 
   @override
-  String get authForgotPassword => 'Forgot password?';
+  String get authForgotPassword => '¿Olvidaste tu contraseña?';
 
   @override
-  String get authForgotPasswordTitle => 'Reset password';
+  String get authForgotPasswordTitle => 'Restablecer contraseña';
 
   @override
   String get authForgotPasswordBody =>
-      'Enter the email linked to your account. We\'ll send a secure reset link.';
+      'Ingresa el correo vinculado a tu cuenta. Te enviaremos un enlace de recuperación.';
 
   @override
-  String get authSendResetLink => 'Send reset link';
+  String get authSendResetLink => 'Enviar enlace de recuperación';
 
   @override
-  String get authResetSentTitle => 'Check your email';
+  String get authResetSentTitle => 'Revisa tu correo';
 
   @override
   String get authResetSentBody =>
-      'We sent a password reset link. Follow the instructions to set a new password.';
+      'Enviamos un enlace para restablecer tu contraseña. Sigue las instrucciones para establecer una nueva.';
 
   @override
-  String get authResetFailedTitle => 'Reset failed';
+  String get authResetFailedTitle => 'Error al restablecer';
+
+  @override
+  String get authSignUpConfirmTitle => 'Confirma tu correo';
+
+  @override
+  String authSignUpConfirmBody(Object email) {
+    return 'Enviamos un correo de confirmación de SOMA a $email. Por favor confírmalo antes de continuar.';
+  }
+
+  @override
+  String get authEmailResent => 'Correo de confirmación enviado de nuevo.';
+
+  @override
+  String authEmailResendFailed(Object error) {
+    return 'No se pudo reenviar el correo: $error';
+  }
+
+  @override
+  String get resend => 'Reenviar';
 
   @override
   String authError(Object error) {
@@ -1507,17 +1526,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get circlesLiveTextChatSubtitle => 'Habilita chat durante el match.';
 
   @override
-  String get circlesRoomLocked => 'Room locked';
+  String get circlesRoomLocked => 'Sala bloqueada';
 
   @override
-  String get circlesRoomUnlocked => 'Room unlocked';
+  String get circlesRoomUnlocked => 'Sala desbloqueada';
 
   @override
-  String get circlesSettingsSaved => 'Room settings saved';
+  String get circlesSettingsSaved => 'Ajustes de sala guardados';
 
   @override
   String circlesUpdateFailed(Object error) {
-    return 'Couldn\'t update room: $error';
+    return 'No se pudo actualizar la sala: $error';
   }
 
   @override

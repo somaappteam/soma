@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/database/database_helper.dart';
 import 'app_analytics_repository.dart';
 import 'settings_repository.dart';
+import 'offline_queue_repository.dart';
 
 class ContentSyncResult {
   final Duration duration;
@@ -31,6 +32,13 @@ class ContentSyncService {
     final settings = await settingsRepository.getSettings();
 
     debugPrint('SYNC: Starting content sync...');
+
+    await _runStep(
+      'offline_queue',
+      _processOfflineQueue,
+      failedSteps,
+      stepDurationsMs,
+    );
 
     await _runStep(
       'courses',
@@ -250,6 +258,45 @@ class ContentSyncService {
       await _persistCursor('sync_cursor_user_stats', statsResp);
       debugPrint('SYNC: Synced user stats for $userId.');
     }
+  }
+
+  Future<void> _processOfflineQueue() async {
+    final items = await offlineQueueRepository.getAll();
+    if (items.isEmpty) return;
+    
+    print('SYNC: Processing ${items.length} offline items...');
+    final currentUserId = _supabase.auth.currentUser?.id;
+    print('SYNC: Current Auth UID: $currentUserId');
+
+    for (int i = 0; i < items.length; i++) {
+      final item = items[i];
+      try {
+        print('SYNC: Processing offline item ${i + 1}/${items.length}: ${item.tableName} ${item.operation}');
+        print('SYNC: Item data: ${item.data}');
+        
+        if (item.data['user_id'] != currentUserId) {
+          print('WARNING: item.user_id (${item.data['user_id']}) does not match currentUserId ($currentUserId)');
+        }
+
+        if (item.operation == 'UPSERT') {
+          String? onConflict;
+          if (item.tableName == 'user_learned_items') {
+            onConflict = 'user_id,course_id,concept_id';
+          } else if (item.tableName == 'user_courses') {
+            onConflict = 'user_id,course_id';
+          }
+          await _supabase.from(item.tableName).upsert(item.data, onConflict: onConflict);
+        } else if (item.operation == 'RPC') {
+           final funcName = item.tableName.split(':').last;
+           await _supabase.rpc(funcName, params: item.data);
+        }
+        await offlineQueueRepository.delete(item.id!);
+      } catch (e) {
+        print("Offline Sync failed for item ${item.id}: $e");
+        rethrow;
+      }
+    }
+    debugPrint('SYNC: Offline queue processed successfully.');
   }
 }
 

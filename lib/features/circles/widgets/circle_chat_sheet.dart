@@ -7,6 +7,7 @@ import 'package:soma/core/widgets/pressable_scale.dart';
 import 'package:soma/data/circle_chat_repository.dart';
 import 'package:soma/data/profile_repository.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
+import 'package:soma/data/presence_repository.dart';
 
 class CircleChatSheet extends StatefulWidget {
   const CircleChatSheet({
@@ -357,13 +358,35 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                                   if (!isMe)
                                     Padding(
                                       padding: const EdgeInsets.only(bottom: 4),
-                                      child: Text(
-                                        senderName,
-                                        style: TextStyle(
-                                          color: Colors.white.withValues(alpha: 0.6),
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            senderName,
+                                            style: TextStyle(
+                                              color: Colors.white.withValues(alpha: 0.6),
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 4),
+                                          StreamBuilder<bool>(
+                                            stream: presenceRepository.streamOnlineStatus(senderId),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.data == true) {
+                                                return Container(
+                                                  width: 6,
+                                                  height: 6,
+                                                  decoration: const BoxDecoration(
+                                                    color: Color(0xFF58F7B6),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                );
+                                              }
+                                              return const SizedBox.shrink();
+                                            },
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   GestureDetector(

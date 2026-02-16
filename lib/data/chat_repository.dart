@@ -9,7 +9,7 @@ class ChatRepository {
   static const int _maxMessagesPerMinute = 20;
   static const int _newConnectionMaxMessagesPerMinute = 8;
 
-  final _supabase = Supabase.instance.client;
+  final SupabaseClient _supabase = Supabase.instance.client;
   final List<DateTime> _sendTimestamps = [];
   final List<_PendingDmSend> _pendingDmSends = [];
   Timer? _retryTimer;
@@ -162,10 +162,10 @@ class ChatRepository {
         .from('dm_typing')
         .stream(primaryKey: ['user_id', 'other_user_id'])
         .eq('user_id', otherUserId)
-        .eq('other_user_id', uid)
         .map((rows) {
-      if (rows.isEmpty) return false;
-      final row = rows.first;
+      final matches = rows.where((r) => r['other_user_id'] == uid).toList();
+      if (matches.isEmpty) return false;
+      final row = matches.first;
       final isTyping = row['is_typing'] == true;
       final updatedAt = DateTime.tryParse(row['updated_at']?.toString() ?? '');
       if (!isTyping || updatedAt == null) return false;
@@ -373,6 +373,20 @@ class ChatRepository {
       'user_id': uid,
       'other_user_id': otherUserId,
       ...update,
+    });
+  }
+
+  Stream<Map<String, dynamic>?> streamConversation(String otherUserId) {
+    final uid = currentUserId;
+    if (uid == null) return Stream.value(null);
+
+    return _supabase
+        .from('conversations')
+        .stream(primaryKey: ['user_id', 'other_user_id'])
+        .eq('user_id', uid)
+        .map((event) {
+      final matches = event.where((e) => e['other_user_id'] == otherUserId);
+      return matches.isNotEmpty ? matches.first : null;
     });
   }
 

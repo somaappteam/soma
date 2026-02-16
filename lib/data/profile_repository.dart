@@ -94,16 +94,12 @@ class ProfileRepository {
     int offset = 0,
   }) async {
     final uid = currentUserId;
-    final query = _supabase
-        .from('profiles')
-        .select(
-          'id, username, daily_goal_minutes, total_xp, settings, updated_at, '
-          'native_languages, learning_languages, timezone, completed_exchange_sessions, report_count',
-        )
-        .order('updated_at', ascending: false)
-        .range(offset, offset + limit - 1);
-
-    final data = uid == null ? await query : await query.neq('id', uid);
+    final baseQuery = _supabase.from('profiles').select(
+      'id, username, daily_goal_minutes, total_xp, settings, updated_at, '
+      'native_languages, learning_languages, timezone, completed_exchange_sessions, report_count',
+    );
+    final filteredQuery = uid == null ? baseQuery : baseQuery.neq('id', uid);
+    final data = await filteredQuery.order('updated_at', ascending: false).range(offset, offset + limit - 1);
     return List<Map<String, dynamic>>.from(data);
   }
 
@@ -125,16 +121,13 @@ class ProfileRepository {
     int limit = 100,
   }) async {
     final uid = currentUserId;
-    final query = _supabase
-        .from('profiles')
-        .select(
-          'id, username, daily_goal_minutes, total_xp, settings, updated_at, '
-          'native_languages, learning_languages, timezone, completed_exchange_sessions, report_count',
-        )
-        .lt('updated_at', before.toIso8601String())
-        .order('updated_at', ascending: false)
-        .limit(limit);
-    final data = uid == null ? await query : await query.neq('id', uid);
+    final baseQuery = _supabase.from('profiles').select(
+      'id, username, daily_goal_minutes, total_xp, settings, updated_at, '
+      'native_languages, learning_languages, timezone, completed_exchange_sessions, report_count',
+    );
+    final filteredQuery = (uid == null ? baseQuery : baseQuery.neq('id', uid))
+        .lt('updated_at', before.toIso8601String());
+    final data = await filteredQuery.order('updated_at', ascending: false).limit(limit);
     return List<Map<String, dynamic>>.from(data);
   }
 

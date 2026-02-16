@@ -3,11 +3,10 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  agora_rtc_engine
   app_links
   file_selector_windows
   flutter_tts
-  iris_method_channel
+  flutter_webrtc
   local_auth_windows
   permission_handler_windows
   share_plus

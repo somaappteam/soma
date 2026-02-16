@@ -95,26 +95,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
 
   void _showEmailConfirmationSnackBar(String email) {
+    final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 8),
-        content: Text(
-          'We sent a SOMA confirmation email to $email. Please confirm your email before continuing.',
-        ),
+        content: Text(l10n.authSignUpConfirmBody(email)),
         action: SnackBarAction(
-          label: 'Resend',
+          label: l10n.resend,
           onPressed: () async {
             try {
               await authRepository.resendSignupConfirmation(email: email);
               if (!mounted) return;
               messenger.hideCurrentSnackBar();
               messenger.showSnackBar(
-                const SnackBar(
+                SnackBar(
                   behavior: SnackBarBehavior.floating,
-                  content: Text('Confirmation email resent.'),
+                  content: Text(l10n.authEmailResent),
                 ),
               );
             } catch (e) {
@@ -123,7 +122,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               messenger.showSnackBar(
                 SnackBar(
                   behavior: SnackBarBehavior.floating,
-                  content: Text('Could not resend confirmation email: $e'),
+                  content: Text(l10n.authEmailResendFailed(e.toString())),
                 ),
               );
             }

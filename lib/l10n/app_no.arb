@@ -785,18 +785,38 @@
       "id": {}
     }
   },
-  "welcome": "Welcome, {name}!",
-  "authForgotPassword": "Forgot password?",
-  "authForgotPasswordTitle": "Reset password",
-  "authForgotPasswordBody": "Enter the email linked to your account. We'll send a secure reset link.",
-  "authSendResetLink": "Send reset link",
-  "authResetSentTitle": "Check your email",
-  "authResetSentBody": "We sent a password reset link. Follow the instructions to set a new password.",
-  "authResetFailedTitle": "Reset failed",
-  "circlesRoomLocked": "Room locked",
-  "circlesRoomUnlocked": "Room unlocked",
-  "circlesSettingsSaved": "Room settings saved",
-  "circlesUpdateFailed": "Couldn't update room: {error}",
+  "welcome": "Velkommen, {name}!",
+  "@welcome": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "authForgotPassword": "Glemt passord?",
+  "authForgotPasswordTitle": "Tilbakestill passord",
+  "authForgotPasswordBody": "Skriv inn e-posten knyttet til kontoen din. Vi sender deg en sikker lenke.",
+  "authSendResetLink": "Send tilbakestillingslenke",
+  "authResetSentTitle": "Sjekk e-posten din",
+  "authResetSentBody": "Vi har sendt en lenke for å tilbakestille passordet. Følg instruksjonene for å velge et nytt passord.",
+  "authResetFailedTitle": "Tilbakestilling mislyktes",
+  "authSignUpConfirmTitle": "Bekreft e-posten din",
+  "authSignUpConfirmBody": "Vi har sendt en bekreftelses-e-post til {email}. Vennligst bekreft e-posten før du fortsetter.",
+  "@authSignUpConfirmBody": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "authEmailResent": "Bekreftelses-e-post sendt på nytt.",
+  "authEmailResendFailed": "Kunne ikke sende bekreftelses-e-post på nytt: {error}",
+  "@authEmailResendFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resend": "Send på nytt",
+  "circlesRoomLocked": "Rommet er låst",
+  "circlesRoomUnlocked": "Rommet er låst opp",
+  "circlesSettingsSaved": "Romsinnstillinger lagret",
+  "circlesUpdateFailed": "Kunne ikke oppdatere rommet: {error}",
   "@circlesUpdateFailed": {
     "placeholders": {
       "error": {}
@@ -806,6 +826,5 @@
   "circlesLiveChatPlaceholder": "Type a message",
   "circlesLiveChatEmpty": "No messages yet. Start the chat!",
   "circlesLiveChatUnavailable": "Live chat is available inside active circles.",
-  "circlesCreateHelpTitle": "Create a circle",
-  "circlesCreateHelpBody": "Choose your languages, mode, and difficulty, then set room limits. Spectators can watch, and live chat lets everyone talk during the match."
+  "circlesCreateHelpTitle": "Create a circle"
 }

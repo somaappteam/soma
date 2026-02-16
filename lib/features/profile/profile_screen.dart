@@ -339,7 +339,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_isLoading) {
       final scheme = Theme.of(context).colorScheme;
       return Scaffold(
-        backgroundColor: scheme.background,
+        backgroundColor: scheme.surface,
         body: Center(
           child: CircularProgressIndicator(color: scheme.primary),
         ),
@@ -1205,19 +1205,28 @@ class _FriendsCard extends StatelessWidget {
               ),
             )
           else
-            Wrap(
-              spacing: S.xs,
-              runSpacing: S.xs,
-              children: [
-                for (final friend in visibleFriends)
-                  _MiniAvatar(
-                    image: (friend['avatar_url']?.toString().isNotEmpty == true)
-                        ? NetworkImage(friend['avatar_url'].toString()) as ImageProvider
-                        : const AssetImage("assets/avatar/avatar_1.png"),
-                    tooltip: '@${friend['username']?.toString() ?? 'friend'}',
-                  ),
-                if (remainingCount > 0) _MiniAvatarPlus(count: remainingCount),
-              ],
+            StreamBuilder<Map<String, bool>>(
+              stream: presenceRepository.streamMultipleOnlineStatuses(
+                visibleFriends.map((f) => f['id']?.toString() ?? '').toList(),
+              ),
+              builder: (context, presenceSnapshot) {
+                final onlineStatuses = presenceSnapshot.data ?? {};
+                return Wrap(
+                  spacing: S.xs,
+                  runSpacing: S.xs,
+                  children: [
+                    for (final friend in visibleFriends)
+                      _MiniAvatar(
+                        image: (friend['avatar_url']?.toString().isNotEmpty == true)
+                            ? NetworkImage(friend['avatar_url'].toString()) as ImageProvider
+                            : const AssetImage("assets/avatar/avatar_1.png"),
+                        tooltip: '@${friend['username']?.toString() ?? 'friend'}',
+                        isOnline: onlineStatuses[friend['id']?.toString()] == true,
+                      ),
+                    if (remainingCount > 0) _MiniAvatarPlus(count: remainingCount),
+                  ],
+                );
+              },
             ),
         ],
       ),
@@ -1853,7 +1862,8 @@ class _AvatarGlow extends StatelessWidget {
 class _MiniAvatar extends StatelessWidget {
   final ImageProvider image;
   final String? tooltip;
-  const _MiniAvatar({required this.image, this.tooltip});
+  final bool isOnline;
+  const _MiniAvatar({required this.image, this.tooltip, this.isOnline = false});
 
   @override
   Widget build(BuildContext context) {
@@ -1867,8 +1877,26 @@ class _MiniAvatar extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: scheme.onSurface.withValues(alpha: 0.18)),
         ),
-        child: ClipOval(
-          child: Image(image: image, fit: BoxFit.cover),
+        child: Stack(
+          children: [
+            ClipOval(
+              child: Image(image: image, fit: BoxFit.cover),
+            ),
+            if (isOnline)
+              Positioned(
+                bottom: 1,
+                right: 1,
+                child: Container(
+                  width: 9,
+                  height: 9,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF58F7B6),
+                    border: Border.all(color: scheme.surface, width: 1.5),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

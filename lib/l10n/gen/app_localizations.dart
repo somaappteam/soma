@@ -250,6 +250,36 @@ abstract class AppLocalizations {
   /// **'Reset failed'**
   String get authResetFailedTitle;
 
+  /// No description provided for @authSignUpConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm your email'**
+  String get authSignUpConfirmTitle;
+
+  /// No description provided for @authSignUpConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a SOMA confirmation email to {email}. Please confirm your email before continuing.'**
+  String authSignUpConfirmBody(Object email);
+
+  /// No description provided for @authEmailResent.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmation email resent.'**
+  String get authEmailResent;
+
+  /// No description provided for @authEmailResendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not resend confirmation email: {error}'**
+  String authEmailResendFailed(Object error);
+
+  /// No description provided for @resend.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend'**
+  String get resend;
+
   /// No description provided for @authError.
   ///
   /// In en, this message translates to:

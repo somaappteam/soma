@@ -33,6 +33,8 @@ enum _DmMenuAction {
   undoSend,
   muteOneHour,
   muteKeyword,
+  togglePin,
+  toggleMute,
 }
 
 class DmChatScreen extends StatefulWidget {
@@ -119,6 +121,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   String get _myUserId => chatRepository.currentUserId ?? widget.meId;
 
+  StreamSubscription<Map<String, dynamic>?>? _conversationSub;
+  bool _isConversationPinned = false;
+  bool _isConversationMuted = false;
+  bool _isConversationArchived = false;
+
   @override
   void initState() {
     super.initState();
@@ -136,6 +143,15 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _rtcConnectionSub = rtcVoiceService.connectionStream.listen(_onRtcConnectionState);
     _rtcTelemetrySub = rtcVoiceService.telemetryStream.listen(_onRtcTelemetry);
     _loadCallChipOffset();
+
+    _conversationSub = chatRepository.streamConversation(widget.otherId).listen((conv) {
+      if (!mounted || conv == null) return;
+      setState(() {
+        _isConversationPinned = conv['is_pinned'] == true;
+        _isConversationMuted = conv['is_muted'] == true;
+        _isConversationArchived = conv['is_archived'] == true;
+      });
+    });
     
     // NEW: Listen to settings for block updates
     _settingsSub = settingsRepository.getSettingsStream().listen((settings) {
@@ -170,6 +186,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _outgoingRingTimer?.cancel();
     _rtcConnectionSub?.cancel();
     _rtcTelemetrySub?.cancel();
+    _conversationSub?.cancel();
     _settingsSub?.cancel(); // NEW
     _typingDebounce?.cancel();
     _scheduledSendTimer?.cancel();
@@ -431,6 +448,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
         break;
       case _DmMenuAction.muteKeyword:
         _addMutedKeyword();
+        break;
+      case _DmMenuAction.togglePin:
+        chatRepository.setConversationPreference(widget.otherId, pinned: !_isConversationPinned);
+        break;
+      case _DmMenuAction.toggleMute:
+        chatRepository.setConversationPreference(widget.otherId, muted: !_isConversationMuted);
         break;
     }
   }
@@ -1468,6 +1491,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
                             isInCall: _isCallActive,
                             callStatusText: _callSubtitle,
                             callDuration: _callElapsedSeconds,
+                            isConversationPinned: _isConversationPinned,
+                            isConversationMuted: _isConversationMuted,
                           );
                         },
                       )
@@ -1494,6 +1519,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         isInCall: _isCallActive,
                         callStatusText: _callSubtitle,
                         callDuration: _callElapsedSeconds,
+                        isConversationPinned: _isConversationPinned,
+                        isConversationMuted: _isConversationMuted,
                       ),
                 const SizedBox(height: 8),
                 if (_showSearch)
@@ -1617,7 +1644,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                                 readAt: readAt,
                                 reactions: (m['reactions'] as Map<String, dynamic>?) ?? const {},
                                 pinned: pinned,
-                                onLongPress: () => _showMessageActions(m),
+                                onLongPress: () => _showMessageActions(_ChatMessage.fromRow(m, isMe: isMe)),
                                 onTapFile: _openFileUrl,
                                 onReact: (emoji) => chatRepository.toggleMessageReaction(messageId: m['id'].toString(), emoji: emoji),
                               ),
@@ -1870,10 +1897,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
       final state = await chatRepository.getDmGateState(widget.otherId);
       if (!mounted) return;
       setState(() {
-        _canChat = state['canChat'] == true;
+        _canChat = state['can_chat'] == true;
         _dmGateReason = state['reason']?.toString();
-        _sentRequestStatus = state['sentRequestStatus']?.toString();
-        _incomingRequestStatus = state['incomingRequestStatus']?.toString();
+        _sentRequestStatus = state['sent_request_status']?.toString();
+        _incomingRequestStatus = state['incoming_request_status']?.toString();
       });
     } catch (_) {}
   }
@@ -2134,7 +2161,12 @@ class _TopBar extends StatelessWidget {
     required this.isInCall,
     required this.callStatusText,
     required this.callDuration,
+    required this.isConversationPinned,
+    required this.isConversationMuted,
   });
+
+  final bool isConversationPinned;
+  final bool isConversationMuted;
 
   @override
   Widget build(BuildContext context) {
@@ -2255,6 +2287,14 @@ class _TopBar extends StatelessWidget {
               const PopupMenuItem(
                 value: _DmMenuAction.muteKeyword,
                 child: Text('Mute keyword'),
+              ),
+              PopupMenuItem(
+                value: _DmMenuAction.togglePin,
+                child: Text(isConversationPinned ? 'Unpin thread' : 'Pin thread'),
+              ),
+              PopupMenuItem(
+                value: _DmMenuAction.toggleMute,
+                child: Text(isConversationMuted ? 'Unmute thread' : 'Mute thread'),
               ),
             ],
             child: Glass(

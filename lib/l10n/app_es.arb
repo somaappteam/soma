@@ -785,18 +785,38 @@
       "id": {}
     }
   },
-  "welcome": "Welcome, {name}!",
-  "authForgotPassword": "Forgot password?",
-  "authForgotPasswordTitle": "Reset password",
-  "authForgotPasswordBody": "Enter the email linked to your account. We'll send a secure reset link.",
-  "authSendResetLink": "Send reset link",
-  "authResetSentTitle": "Check your email",
-  "authResetSentBody": "We sent a password reset link. Follow the instructions to set a new password.",
-  "authResetFailedTitle": "Reset failed",
-  "circlesRoomLocked": "Room locked",
-  "circlesRoomUnlocked": "Room unlocked",
-  "circlesSettingsSaved": "Room settings saved",
-  "circlesUpdateFailed": "Couldn't update room: {error}",
+  "welcome": "¡Bienvenido, {name}!",
+  "@welcome": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "authForgotPassword": "¿Olvidaste tu contraseña?",
+  "authForgotPasswordTitle": "Restablecer contraseña",
+  "authForgotPasswordBody": "Ingresa el correo vinculado a tu cuenta. Te enviaremos un enlace de recuperación.",
+  "authSendResetLink": "Enviar enlace de recuperación",
+  "authResetSentTitle": "Revisa tu correo",
+  "authResetSentBody": "Enviamos un enlace para restablecer tu contraseña. Sigue las instrucciones para establecer una nueva.",
+  "authResetFailedTitle": "Error al restablecer",
+  "authSignUpConfirmTitle": "Confirma tu correo",
+  "authSignUpConfirmBody": "Enviamos un correo de confirmación de SOMA a {email}. Por favor confírmalo antes de continuar.",
+  "@authSignUpConfirmBody": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "authEmailResent": "Correo de confirmación enviado de nuevo.",
+  "authEmailResendFailed": "No se pudo reenviar el correo: {error}",
+  "@authEmailResendFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resend": "Reenviar",
+  "circlesRoomLocked": "Sala bloqueada",
+  "circlesRoomUnlocked": "Sala desbloqueada",
+  "circlesSettingsSaved": "Ajustes de sala guardados",
+  "circlesUpdateFailed": "No se pudo actualizar la sala: {error}",
   "@circlesUpdateFailed": {
     "placeholders": {
       "error": {}

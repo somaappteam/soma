@@ -246,6 +246,7 @@ Future<LangOption?> _pickLanguage(
   required List<LangOption> items,
   required LangOption current,
 }) async {
+  final l10n = AppLocalizations.of(context);
   return showModalBottomSheet<LangOption>(
     context: context,
     backgroundColor: Colors.transparent,

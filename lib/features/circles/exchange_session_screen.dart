@@ -6,6 +6,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../data/exchange_analytics_repository.dart';
 import 'exchange_session_controller.dart';
+import '../../data/presence_repository.dart';
 
 class ExchangeSessionScreen extends StatefulWidget {
   final String partnerUserId;
@@ -128,6 +129,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     }
 
     final ok = await _controller.sendMessage(text);
+    if (!context.mounted) return;
     if (!ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -185,6 +187,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     if (original.isEmpty) return;
 
     final allowed = await _controller.markCorrectionUsed();
+    if (!context.mounted) return;
     if (!allowed) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Correction limit reached for this round (1 max).')),
@@ -278,7 +281,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
           TextButton(
             onPressed: () async {
               await _track('review_weak_items_tap');
-              if (!mounted) return;
+              if (!context.mounted) return;
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tip: open Solo mode > Review to practice weak items.')));
             },
@@ -301,7 +304,35 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text('Exchange with ${widget.partnerName}'),
+        title: Row(
+          children: [
+            Text('Exchange with ${widget.partnerName}'),
+            const SizedBox(width: 8),
+            StreamBuilder<bool>(
+              stream: presenceRepository.streamOnlineStatus(widget.partnerUserId),
+              builder: (context, snapshot) {
+                final isOnline = snapshot.data ?? false;
+                return Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: isOnline ? const Color(0xFF58F7B6) : Colors.grey,
+                    shape: BoxShape.circle,
+                    boxShadow: isOnline
+                        ? [
+                            BoxShadow(
+                              color: const Color(0xFF58F7B6).withValues(alpha: 0.4),
+                              blurRadius: 4,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                        : null,
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
         actions: [
           TextButton(onPressed: _nextRound, child: const Text('Next round')),
         ],

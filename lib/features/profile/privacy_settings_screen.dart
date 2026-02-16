@@ -278,6 +278,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
       destructive: true,
     ).then((confirmed) {
       if (confirmed != true) return;
+      if (!mounted) return;
       _deleteAccount(context);
     });
   }

@@ -4,6 +4,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../models/friend.dart';
 import '../../data/social_repository.dart';
+import '../../data/presence_repository.dart';
 import 'dm_chat_screen.dart';
 
 class SelectFriendScreen extends StatefulWidget {
@@ -131,26 +132,35 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
                       : Glass(
                           radius: BorderRadius.circular(22),
                           padding: const EdgeInsets.all(12),
-                          child: ListView(
-                            physics: const BouncingScrollPhysics(),
-                            children: filtered.map((f) {
-                              return _PickRow(
-                                friend: f,
-                                onTap: () {
-                                  // Start chat
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => DmChatScreen(
-                                        meId: socialRepository.currentUserId ?? "me",
-                                        otherId: f.id,
-                                        otherName: f.username,
-                                      ),
-                                    ),
+                          child: StreamBuilder<Map<String, bool>>(
+                            stream: presenceRepository.streamMultipleOnlineStatuses(
+                              filtered.map((f) => f.id).toList(),
+                            ),
+                            builder: (context, presenceSnapshot) {
+                              final onlineStatuses = presenceSnapshot.data ?? {};
+                              return ListView(
+                                physics: const BouncingScrollPhysics(),
+                                children: filtered.map((f) {
+                                  return _PickRow(
+                                    friend: f,
+                                    isOnline: onlineStatuses[f.id] ?? false,
+                                    onTap: () {
+                                      // Start chat
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => DmChatScreen(
+                                            meId: socialRepository.currentUserId ?? "me",
+                                            otherId: f.id,
+                                            otherName: f.username,
+                                          ),
+                                        ),
+                                      );
+                                    },
                                   );
-                                },
+                                }).toList(),
                               );
-                            }).toList(),
+                            },
                           ),
                         ),
                 ),
@@ -186,10 +196,12 @@ class _IconGlass extends StatelessWidget {
 
 class _PickRow extends StatelessWidget {
   final Friend friend;
+  final bool isOnline;
   final VoidCallback onTap;
 
   const _PickRow({
     required this.friend,
+    required this.isOnline,
     required this.onTap,
   });
 
@@ -210,7 +222,7 @@ class _PickRow extends StatelessWidget {
           ),
           child: Row(
             children: [
-              _AvatarDot(online: friend.isOnline),
+              _AvatarDot(online: isOnline),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(

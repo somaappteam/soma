@@ -14,6 +14,21 @@
   "authResetSentTitle": "Check your email",
   "authResetSentBody": "We sent a password reset link. Follow the instructions to set a new password.",
   "authResetFailedTitle": "Reset failed",
+  "authSignUpConfirmTitle": "Confirm your email",
+  "authSignUpConfirmBody": "We sent a SOMA confirmation email to {email}. Please confirm your email before continuing.",
+  "@authSignUpConfirmBody": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "authEmailResent": "Confirmation email resent.",
+  "authEmailResendFailed": "Could not resend confirmation email: {error}",
+  "@authEmailResendFailed": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "resend": "Resend",
   "authError": "Error: {error}",
   "@authError": {
     "placeholders": {

@@ -72,12 +72,13 @@ class PrivacyRepository {
 
   Future<Map<String, dynamic>?> _safeSelectSingle({
     required String table,
-    required PostgrestFilterBuilder<dynamic> Function(PostgrestFilterBuilder<dynamic>) filters,
+    required PostgrestTransformBuilder<dynamic> Function(PostgrestFilterBuilder<dynamic>) filters,
   }) async {
     try {
-      final data = await filters(_supabase.from(table).select()).maybeSingle();
-      if (data is Map<String, dynamic>) return data;
-      if (data is Map) return Map<String, dynamic>.from(data);
+      final res = await filters(_supabase.from(table).select()).maybeSingle();
+      if (res == null) return null;
+      if (res is Map<String, dynamic>) return res;
+      if (res is Map) return Map<String, dynamic>.from(res);
       return null;
     } catch (e) {
       return {'_error': e.toString()};
@@ -86,7 +87,7 @@ class PrivacyRepository {
 
   Future<List<Map<String, dynamic>>> _safeSelectList({
     required String table,
-    required PostgrestFilterBuilder<dynamic> Function(PostgrestFilterBuilder<dynamic>) filters,
+    required PostgrestTransformBuilder<dynamic> Function(PostgrestFilterBuilder<dynamic>) filters,
     int? limit,
   }) async {
     try {

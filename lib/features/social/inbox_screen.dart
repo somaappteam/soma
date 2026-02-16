@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/premium_dialog.dart';
+import '../../data/auth_repository.dart';
 import '../../data/chat_repository.dart';
 import '../../data/experiment_repository.dart';
+import '../../data/presence_repository.dart';
 import 'dm_chat_screen.dart';
 import 'select_friend_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
@@ -68,9 +70,23 @@ class _InboxScreenState extends State<InboxScreen> {
       final otherId = t['otherId']?.toString();
       if (otherId == null || otherId.isEmpty) continue;
 
-      if (t['isPinned'] == true) _pinnedThreadIds.add(otherId);
-      if (t['isMuted'] == true) _mutedThreadIds.add(otherId);
-      if (t['isArchived'] == true) _archivedThreadIds.add(otherId);
+      if (t['isPinned'] == true) {
+        _pinnedThreadIds.add(otherId);
+      } else {
+        _pinnedThreadIds.remove(otherId);
+      }
+
+      if (t['isMuted'] == true) {
+        _mutedThreadIds.add(otherId);
+      } else {
+        _mutedThreadIds.remove(otherId);
+      }
+
+      if (t['isArchived'] == true) {
+        _archivedThreadIds.add(otherId);
+      } else {
+        _archivedThreadIds.remove(otherId);
+      }
     }
   }
 
@@ -133,12 +149,14 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 
+  /*
   Future<void> _unarchiveThread(String otherId) async {
     setState(() {
       _archivedThreadIds.remove(otherId);
     });
     await chatRepository.setConversationPreference(otherId, archived: false);
   }
+  */
 
   Future<void> _togglePinnedThread(String otherId, {required bool next}) async {
     setState(() {
@@ -170,6 +188,7 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 
+  /*
   Future<bool?> _confirmDelete() {
     return showPremiumDialog(
       context: context,
@@ -180,6 +199,7 @@ class _InboxScreenState extends State<InboxScreen> {
       destructive: true,
     );
   }
+  */
 
   String _sortLabel(_InboxSort sort) {
     switch (sort) {
@@ -188,7 +208,6 @@ class _InboxScreenState extends State<InboxScreen> {
       case _InboxSort.name:
         return 'Name';
       case _InboxSort.latest:
-      default:
         return 'Latest';
     }
   }
@@ -528,101 +547,109 @@ class _InboxScreenState extends State<InboxScreen> {
                       );
                     }
 
+                    final participantIds = visibleThreads.map((t) => t['otherId']?.toString() ?? '').where((id) => id.isNotEmpty).toList();
                     return Glass(
                       radius: BorderRadius.circular(22),
                       padding: const EdgeInsets.all(10),
-                      child: ListView.separated(
-                        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                      itemCount: visibleThreads.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (context, index) {
-                        final t = visibleThreads[index];
-                        final otherId = t['otherId']?.toString() ?? '';
-                        final isPinned = _pinnedThreadIds.contains(otherId);
-                        final isMuted = _mutedThreadIds.contains(otherId);
-                        final unreadCount = t['unreadCount'] ?? 0;
-                        final selected = _selectedThreadIds.contains(otherId);
+                      child: StreamBuilder<Map<String, bool>>(
+                        stream: presenceRepository.streamMultipleOnlineStatuses(participantIds),
+                        builder: (context, presenceSnapshot) {
+                          final onlineStatuses = presenceSnapshot.data ?? {};
+                          return ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                          itemCount: visibleThreads.length,
+                          separatorBuilder: (_, __) => const SizedBox(height: 10),
+                          itemBuilder: (context, index) {
+                            final t = visibleThreads[index];
+                            final otherId = t['otherId']?.toString() ?? '';
+                            final isPinned = _pinnedThreadIds.contains(otherId);
+                            final isMuted = _mutedThreadIds.contains(otherId);
+                            final unreadCount = t['unreadCount'] ?? 0;
+                            final selected = _selectedThreadIds.contains(otherId);
 
-                        return Dismissible(
-                          key: ValueKey('thread-$otherId'),
-                          direction: _selectionMode ? DismissDirection.none : DismissDirection.horizontal,
-                          confirmDismiss: (direction) async {
-                            if (direction == DismissDirection.startToEnd) {
-                              await _togglePinnedThread(otherId, next: !isPinned);
-                            } else {
-                              await _toggleMutedThread(otherId, next: !isMuted);
-                            }
-                            return false;
-                          },
-                          background: _SwipeActionBackground(
-                            alignment: Alignment.centerLeft,
-                            icon: isPinned ? Icons.push_pin_outlined : Icons.push_pin_rounded,
-                            label: isPinned ? 'Unpin' : 'Pin',
-                          ),
-                          secondaryBackground: _SwipeActionBackground(
-                            alignment: Alignment.centerRight,
-                            icon: isMuted ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
-                            label: isMuted ? 'Unmute' : 'Mute',
-                          ),
-                          child: _ThreadRow(
-                            otherId: otherId,
-                            name: t['otherName'] ?? l10n.unknown,
-                            lastText: t['lastMsg'] ?? '',
-                            summary: t['summary']?.toString(),
-                            time: _fmtTime(context, t['time'] as DateTime),
-                            unreadCount: unreadCount,
-                            showOnlineIndicator: t['isOnline'] == true,
-                            avatarUrl: t['avatar_url']?.toString(),
-                            pinned: isPinned,
-                            muted: isMuted,
-                            hasIncomingRequest: t['hasIncomingRequest'] == true,
-                            hasOutgoingRequest: t['hasOutgoingRequest'] == true,
-                            selected: selected,
-                            selectionMode: _selectionMode,
-                            onTap: () async {
-                              if (_selectionMode) {
-                                setState(() {
-                                  if (selected) {
-                                    _selectedThreadIds.remove(otherId);
+                            return Dismissible(
+                              key: ValueKey('thread-$otherId'),
+                              direction: _selectionMode ? DismissDirection.none : DismissDirection.horizontal,
+                              confirmDismiss: (direction) async {
+                                if (direction == DismissDirection.startToEnd) {
+                                  await _togglePinnedThread(otherId, next: !isPinned);
+                                } else {
+                                  await _toggleMutedThread(otherId, next: !isMuted);
+                                }
+                                return false;
+                              },
+                              background: _SwipeActionBackground(
+                                alignment: Alignment.centerLeft,
+                                icon: isPinned ? Icons.push_pin_outlined : Icons.push_pin_rounded,
+                                label: isPinned ? 'Unpin' : 'Pin',
+                              ),
+                              secondaryBackground: _SwipeActionBackground(
+                                alignment: Alignment.centerRight,
+                                icon: isMuted ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
+                                label: isMuted ? 'Unmute' : 'Mute',
+                              ),
+                              child: _ThreadRow(
+                                otherId: otherId,
+                                name: t['otherName'] ?? l10n.unknown,
+                                lastText: t['lastMsg'] ?? '',
+                                summary: t['summary']?.toString(),
+                                time: _fmtTime(context, t['time'] as DateTime),
+                                unreadCount: unreadCount,
+                                showOnlineIndicator: onlineStatuses[otherId] == true,
+                                avatarUrl: t['avatar_url']?.toString(),
+                                pinned: isPinned,
+                                muted: isMuted,
+                                hasIncomingRequest: t['hasIncomingRequest'] == true,
+                                hasOutgoingRequest: t['hasOutgoingRequest'] == true,
+                                selected: selected,
+                                selectionMode: _selectionMode,
+                                onTap: () async {
+                                  if (_selectionMode) {
+                                    setState(() {
+                                      if (selected) {
+                                        _selectedThreadIds.remove(otherId);
+                                      } else {
+                                        _selectedThreadIds.add(otherId);
+                                      }
+                                    });
                                   } else {
-                                    _selectedThreadIds.add(otherId);
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => DmChatScreen(
+                                          meId: authRepository.currentUser?.id ?? "me",
+                                          otherId: otherId,
+                                          otherName: t['otherName'] ?? l10n.unknown,
+                                        ),
+                                      ),
+                                    );
+                                    if (mounted) setState(() => _refreshNonce++);
                                   }
-                                });
-                                return;
-                              }
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => DmChatScreen(
-                                    meId: chatRepository.currentUserId ?? "me",
-                                    otherId: t['otherId'],
-                                    otherName: t['otherName'] ?? l10n.genericUser,
-                                  ),
+                                },
+                                onLongPress: () {
+                                  if (!_selectionMode) {
+                                    setState(() {
+                                      _selectionMode = true;
+                                      });
+                                    }
+                                  },
                                 ),
                               );
-                              if (mounted) setState(() {});
                             },
-                            onLongPress: () async {
-                              final shouldDelete = await _confirmDelete();
-                              if (shouldDelete == true) {
-                                await _deleteThread(otherId);
-                              }
-                            },
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        },
+                      ),
                     );
                   },
                 ),
-                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   String _fmtTime(BuildContext context, DateTime dt) {
     final l10n = AppLocalizations.of(context);

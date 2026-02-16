@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_stats.dart';
 import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
+import 'offline_queue_repository.dart';
 
 class StatsRepository {
   final _supabase = Supabase.instance.client;
@@ -39,11 +40,17 @@ class StatsRepository {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return UserStats.empty();
 
-    final existing = await _supabase
-        .from('user_stats')
-        .select()
-        .eq('user_id', uid)
-        .maybeSingle();
+    Map<String, dynamic>? existing;
+    try {
+      existing = await _supabase
+          .from('user_stats')
+          .select()
+          .eq('user_id', uid)
+          .maybeSingle();
+    } catch (_) {
+      // Offline fallback: try local
+      existing = await DatabaseHelper.instance.getUserStats(uid);
+    }
 
     final now = DateTime.now().toUtc();
     final today = DateTime.utc(now.year, now.month, now.day);
@@ -96,27 +103,45 @@ class StatsRepository {
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    final updated = await _supabase
-        .from('user_stats')
-        .upsert(payload, onConflict: 'user_id')
-        .select()
-        .single();
-
-    // Mirror to local SQLite
-    await DatabaseHelper.instance.upsertUserStats(updated);
-
-    return UserStats.fromRow(updated);
+    try {
+      final updated = await _supabase
+          .from('user_stats')
+          .upsert(payload, onConflict: 'user_id')
+          .select()
+          .single();
+      
+      // Mirror to local SQLite
+      await DatabaseHelper.instance.upsertUserStats(updated);
+      return UserStats.fromRow(updated);
+      
+    } catch (e) {
+      debugPrint("Cloud User Stats Upsert failed: $e. Enqueuing.");
+      await offlineQueueRepository.enqueue(
+          tableName: 'user_stats',
+          operation: 'UPSERT',
+          data: payload,
+      );
+      
+      // Update local SQLite anyway
+      await DatabaseHelper.instance.upsertUserStats(payload);
+      return UserStats.fromRow(payload);
+    }
   }
 
   Future<UserStats> incrementCirclesJoined() async {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return UserStats.empty();
 
-    final existing = await _supabase
-        .from('user_stats')
-        .select()
-        .eq('user_id', uid)
-        .maybeSingle();
+    Map<String, dynamic>? existing;
+    try {
+      existing = await _supabase
+          .from('user_stats')
+          .select()
+          .eq('user_id', uid)
+          .maybeSingle();
+    } catch (_) {
+      existing = await DatabaseHelper.instance.getUserStats(uid);
+    }
 
     final next = (existing?['circles_joined'] ?? 0) + 1;
 
@@ -126,16 +151,26 @@ class StatsRepository {
       'updated_at': DateTime.now().toIso8601String(),
     };
 
-    final updated = await _supabase
-        .from('user_stats')
-        .upsert(payload, onConflict: 'user_id')
-        .select()
-        .single();
-
-    // Mirror to local SQLite
-    await DatabaseHelper.instance.upsertUserStats(updated);
-
-    return UserStats.fromRow(updated);
+    try {
+      final updated = await _supabase
+          .from('user_stats')
+          .upsert(payload, onConflict: 'user_id')
+          .select()
+          .single();
+      
+      await DatabaseHelper.instance.upsertUserStats(updated);
+      return UserStats.fromRow(updated);
+    } catch (e) {
+      debugPrint("Cloud Stats (Circles) Upsert failed: $e. Enqueuing.");
+      await offlineQueueRepository.enqueue(
+        tableName: 'user_stats',
+        operation: 'UPSERT',
+        data: payload,
+      );
+      
+      await DatabaseHelper.instance.upsertUserStats(payload);
+      return UserStats.fromRow(payload);
+    }
   }
 
   static DateTime? _parseDate(dynamic value) {

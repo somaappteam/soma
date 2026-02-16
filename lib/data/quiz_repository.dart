@@ -7,6 +7,7 @@ import 'stats_repository.dart';
 import 'achievements_repository.dart';
 import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
+import 'offline_queue_repository.dart';
 
 class QuizRepository {
   final SupabaseClient _client = Supabase.instance.client;
@@ -531,7 +532,16 @@ class QuizRepository {
 
     try {
       // 1. Update Profile Total XP
-      await client.rpc('update_profile_xp', params: {'increment_xp': xpEarned});
+      try {
+        await client.rpc('update_profile_xp', params: {'increment_xp': xpEarned});
+      } catch (e) {
+         debugPrint("Cloud Update XP RPC failed: $e. Enqueuing.");
+         await offlineQueueRepository.enqueue(
+           tableName: 'rpc:update_profile_xp',
+           operation: 'RPC',
+           data: {'increment_xp': xpEarned},
+         );
+      }
 
       final stats = await statsRepository.recordQuizResult(
         correctCount: correctCount,
@@ -550,12 +560,22 @@ class QuizRepository {
       }
 
       // 2. Update User Course Progress
-      final courseProgress = await client
-          .from('user_courses')
-          .select()
-          .eq('user_id', userId)
-          .eq('course_id', courseId)
-          .maybeSingle();
+      Map<String, dynamic>? courseProgress;
+      try {
+        courseProgress = await client
+            .from('user_courses')
+            .select()
+            .eq('user_id', userId)
+            .eq('course_id', courseId)
+            .maybeSingle();
+      } catch (_) {
+         // Offline fetch failed, try local
+         final localCourses = await DatabaseHelper.instance.getUserCourses(userId);
+         // Find matching course manually
+         try {
+           courseProgress = localCourses.firstWhere((c) => c['course_id'] == courseId);
+         } catch (_) {}
+      }
 
       final int oldCourseXp = courseProgress != null ? (courseProgress['progress_xp'] as int) : 0;
 
@@ -566,8 +586,20 @@ class QuizRepository {
         'last_accessed': DateTime.now().toIso8601String(),
       };
 
-      await client.from('user_courses').upsert(updatedCourse, onConflict: 'user_id, course_id');
+      try {
+        await client.from('user_courses').upsert(updatedCourse, onConflict: 'user_id, course_id');
+      } catch (e) {
+        debugPrint("Cloud User Course Upsert failed: $e. Enqueuing.");
+        await offlineQueueRepository.enqueue(
+          tableName: 'user_courses',
+          operation: 'UPSERT',
+          data: updatedCourse,
+        );
+      }
       
+      // Always update local for immediate feedback
+      await DatabaseHelper.instance.upsertUserCourse(updatedCourse);
+
     } catch (e) {
       debugPrint("Error saving quiz result: $e");
     }

@@ -23,6 +23,7 @@ import '../../data/settings_repository.dart';
 import '../../data/profile_repository.dart';
 import '../../data/profile_store.dart';
 import '../../data/rtc_voice_service.dart';
+import '../../data/presence_repository.dart';
 import '../../core/services/tts_service.dart';
 import '../profile/profile_screen.dart';
 
@@ -766,13 +767,22 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                 Glass(
                   radius: BorderRadius.circular(18),
                   padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                  child: _LiveLeaderboardStrip(
-                    leaders: sortedLeaders,
-                    onAvatarTap: (leader) {
-                      if (leader.userId != null) {
-                        _openProfileSheet(leader.userId);
-                      }
-                    },
+                  child: StreamBuilder<Map<String, bool>>(
+                    stream: presenceRepository.streamMultipleOnlineStatuses(
+                      leaders.map((l) => l.userId).whereType<String>().toList(),
+                    ),
+                    builder: (context, presenceSnapshot) {
+                      final presence = presenceSnapshot.data ?? {};
+                      return _LiveLeaderboardStrip(
+                        leaders: sortedLeaders,
+                        presence: presence,
+                        onAvatarTap: (leader) {
+                          if (leader.userId != null) {
+                            _openProfileSheet(leader.userId);
+                          }
+                        },
+                      );
+                    }
                   ),
                 ),
                   
@@ -970,7 +980,6 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                 ),
               );
             },
-            ),
           ),
         ),
       ),
@@ -1000,9 +1009,14 @@ class _TinyGlass extends StatelessWidget {
 
 class _LiveLeaderboardStrip extends StatelessWidget {
   final List<_Leader> leaders;
+  final Map<String, bool> presence;
   final ValueChanged<_Leader>? onAvatarTap;
 
-  const _LiveLeaderboardStrip({required this.leaders, this.onAvatarTap});
+  const _LiveLeaderboardStrip({
+    required this.leaders, 
+    required this.presence,
+    this.onAvatarTap
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1037,6 +1051,7 @@ class _LiveLeaderboardStrip extends StatelessWidget {
                 child: _CompactLeaderChip(
                   rank: index + 1,
                   leader: leader,
+                  isOnline: leader.userId != null && (presence[leader.userId] ?? false),
                   onTap: onAvatarTap == null ? null : () => onAvatarTap!(leader),
                 ),
               );
@@ -1051,9 +1066,15 @@ class _LiveLeaderboardStrip extends StatelessWidget {
 class _CompactLeaderChip extends StatelessWidget {
   final int rank;
   final _Leader leader;
+  final bool isOnline;
   final VoidCallback? onTap;
 
-  const _CompactLeaderChip({required this.rank, required this.leader, this.onTap});
+  const _CompactLeaderChip({
+    required this.rank, 
+    required this.leader, 
+    required this.isOnline,
+    this.onTap
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1100,11 +1121,12 @@ class _CompactLeaderChip extends StatelessWidget {
                     child: _AvatarBubble(
                       name: leader.name,
                       heroTag: leader.userId == null ? null : "profile-avatar-${leader.userId}",
-                      muted: leader.isMuted,
-                      speaking: leader.isSpeaking,
-                      avatarUrl: leader.avatarUrl,
-                      size: 32,
-                    ),
+                       muted: leader.isMuted,
+                       speaking: leader.isSpeaking,
+                       isOnline: isOnline,
+                       avatarUrl: leader.avatarUrl,
+                       size: 32,
+                     ),
                   ),
                   if (statusColor != null)
                     Positioned(
@@ -1235,6 +1257,7 @@ class _AvatarBubble extends StatelessWidget {
   final String? heroTag;
   final bool muted;
   final bool speaking;
+  final bool isOnline;
   final String? avatarUrl;
   final double size;
 
@@ -1243,6 +1266,7 @@ class _AvatarBubble extends StatelessWidget {
     this.heroTag,
     required this.muted,
     required this.speaking,
+    this.isOnline = false,
     this.avatarUrl,
     this.size = 36,
   });
@@ -1304,6 +1328,26 @@ class _AvatarBubble extends StatelessWidget {
                   ),
           ),
         ),
+        if (isOnline)
+          Positioned(
+            top: 0,
+            right: 0,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: const Color(0xFF58F7B6),
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.black, width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF58F7B6).withValues(alpha: 0.3),
+                    blurRadius: 4,
+                  ),
+                ],
+              ),
+            ),
+          ),
         Positioned(
           bottom: -2,
           right: -2,

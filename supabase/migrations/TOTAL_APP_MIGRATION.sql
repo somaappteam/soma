@@ -84,6 +84,15 @@ CREATE TABLE IF NOT EXISTS public.vocabulary (
   created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
+-- Align existing table if needed
+DO $$ BEGIN
+  ALTER TABLE public.vocabulary ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now() NOT NULL;
+  -- Ensure 'id' exists and is not null (already exists as uuid but might be nullable in old schema)
+  ALTER TABLE public.vocabulary ALTER COLUMN id SET DEFAULT gen_random_uuid();
+  UPDATE public.vocabulary SET id = gen_random_uuid() WHERE id IS NULL;
+  ALTER TABLE public.vocabulary ALTER COLUMN id SET NOT NULL;
+EXCEPTION WHEN OTHERS THEN NULL; END $$;
+
 -- 3.2. SENTENCES
 CREATE TABLE IF NOT EXISTS public.sentences (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -97,6 +106,14 @@ CREATE TABLE IF NOT EXISTS public.sentences (
   level text,
   created_at timestamp with time zone DEFAULT now() NOT NULL
 );
+
+-- Align existing table if needed
+DO $$ BEGIN
+  ALTER TABLE public.sentences ADD COLUMN IF NOT EXISTS created_at timestamp with time zone DEFAULT now() NOT NULL;
+  ALTER TABLE public.sentences ALTER COLUMN id SET DEFAULT gen_random_uuid();
+  UPDATE public.sentences SET id = gen_random_uuid() WHERE id IS NULL;
+  ALTER TABLE public.sentences ALTER COLUMN id SET NOT NULL;
+EXCEPTION WHEN OTHERS THEN NULL; END $$;
 
 -- ----------------------------------------------------------------------------
 -- 4. THE WIRING (Connecting existing CSV data to Concepts)
@@ -127,6 +144,18 @@ BEGIN
 
     -- Add uniques for upsert support
     IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'vocab_concept_lang_unique') THEN
+        -- Deduplicate before adding unique constraint
+        DELETE FROM public.vocabulary
+        WHERE id IN (
+            SELECT id
+            FROM (
+                SELECT id,
+                       ROW_NUMBER() OVER (PARTITION BY concept_id, lang ORDER BY id DESC) as row_num
+                FROM public.vocabulary
+                WHERE concept_id IS NOT NULL
+            ) t
+            WHERE t.row_num > 1
+        );
         ALTER TABLE public.vocabulary ADD CONSTRAINT vocab_concept_lang_unique UNIQUE(concept_id, lang);
     END IF;
 

@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 4,
+      version: 5,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -36,6 +36,9 @@ class DatabaseHelper {
       } catch (_) {
         // Column might already exist
       }
+    }
+    if (oldVersion < 5) {
+      await _createOfflineQueueTable(db);
     }
   }
 
@@ -88,6 +91,7 @@ class DatabaseHelper {
     ''');
 
     await _createUserTables(db);
+    await _createOfflineQueueTable(db);
   }
 
   Future<void> _createUserTables(Database db) async {
@@ -143,6 +147,18 @@ class DatabaseHelper {
         total_xp INTEGER,
         avatar_url TEXT,
         updated_at TEXT
+      )
+    ''');
+  }
+
+  Future<void> _createOfflineQueueTable(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS offline_queue (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        table_name TEXT NOT NULL,
+        operation TEXT NOT NULL,
+        data TEXT NOT NULL,
+        created_at TEXT NOT NULL
       )
     ''');
   }

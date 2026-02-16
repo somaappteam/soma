@@ -13,6 +13,7 @@ import '../../data/profile_store.dart';
 import '../../data/rtc_voice_service.dart';
 import '../../data/circles_repository.dart';
 import '../../data/quiz_repository.dart';
+import '../../data/presence_repository.dart';
 import '../circles/circle_countdown_screen.dart';
 import '../circles/circle_lobby_screen.dart';
 import '../circles/live_quiz_screen.dart';
@@ -548,6 +549,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                     isMuted: muted,
                                     isSpeaking: speaking,
                                     lastAnswer: p.lastAnswer,
+                                    userId: p.userId,
                                     onToggleMute: p.isMe ? rtcVoiceService.toggleMuted : null,
                                   ),
                                 ),
@@ -802,6 +804,7 @@ class _LeaderboardRow extends StatelessWidget {
     required this.isSpeaking,
     required this.lastAnswer,
     required this.onToggleMute,
+    this.userId,
   });
 
   final int rank;
@@ -814,6 +817,7 @@ class _LeaderboardRow extends StatelessWidget {
   final bool isSpeaking;
   final LeaderboardAnswer lastAnswer;
   final VoidCallback? onToggleMute;
+  final String? userId;
 
   @override
   Widget build(BuildContext context) {
@@ -832,7 +836,7 @@ class _LeaderboardRow extends StatelessWidget {
         children: [
           _RowRankChip(rank: rank),
           const SizedBox(width: 10),
-          _RowAvatarBubble(name: name),
+          _RowAvatarBubble(name: name, userId: userId),
           const SizedBox(width: 10),
           if (onToggleMute != null)
             InkWell(
@@ -953,30 +957,57 @@ class _RowRankChip extends StatelessWidget {
 
 class _RowAvatarBubble extends StatelessWidget {
   final String name;
+  final String? userId;
 
-  const _RowAvatarBubble({required this.name});
+  const _RowAvatarBubble({required this.name, this.userId});
 
   @override
   Widget build(BuildContext context) {
     final trimmed = name.trim();
     final initial = trimmed.isNotEmpty ? trimmed.substring(0, 1).toUpperCase() : "?";
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: T.neonGradient,
-      ),
-      child: Center(
-        child: Text(
-          initial,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w900,
-            fontSize: 14,
+    return Stack(
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: T.neonGradient,
+          ),
+          child: Center(
+            child: Text(
+              initial,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                fontSize: 14,
+              ),
+            ),
           ),
         ),
-      ),
+        if (userId != null)
+          StreamBuilder<bool>(
+            stream: presenceRepository.streamOnlineStatus(userId!),
+            builder: (context, snapshot) {
+              if (snapshot.data == true) {
+                return Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF58F7B6),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.black, width: 1.5),
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+      ],
     );
   }
 }

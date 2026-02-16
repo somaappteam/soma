@@ -50,7 +50,6 @@ class ThemeModeController extends ChangeNotifier {
       case ThemeMode.light:
         return 'Light';
       case ThemeMode.system:
-      default:
         return 'System';
     }
   }
