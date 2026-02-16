@@ -84,10 +84,33 @@ class ChatRepository {
     try {
       final data = jsonDecode(content);
       if (data is Map<String, dynamic>) {
-        if (data['type'] == 'text') return data['text']?.toString() ?? '';
-        if (data['type'] == 'image') return 'Photo';
-        if (data['type'] == 'document') return 'Document';
-        if (data['type'] == 'voice') return 'Voice Message';
+        final type = data['type']?.toString().toLowerCase();
+        final text = data['text']?.toString() ?? '';
+        final label = data['label']?.toString() ?? '';
+        switch (type) {
+          case 'text':
+            return text;
+          case 'image':
+            return 'Photo';
+          case 'document':
+          case 'file':
+            return 'Document';
+          case 'voice':
+            return 'Voice message';
+          case 'location':
+            return label.isNotEmpty ? label : 'Location card';
+          case 'contact':
+            return label.isNotEmpty ? label : 'Contact card';
+          case 'invite':
+            return label.isNotEmpty ? label : (text.isNotEmpty ? text : 'Practice invite');
+          case 'poll':
+            return label.isNotEmpty ? label : 'Poll';
+          case 'checklist':
+            return text.isNotEmpty ? text : 'Checklist';
+          default:
+            if (label.isNotEmpty) return label;
+            if (text.isNotEmpty) return text;
+        }
       }
     } catch (_) {
       // Fallback to raw content if not JSON
@@ -594,12 +617,9 @@ class ChatRepository {
               ? profile!['username'].toString()
               : 'User ${otherId.substring(0, 4)}');
 
-      final reliabilityScore =
-          ((settings['reply_consistency_score'] as num?)?.toInt() ?? 72).clamp(0, 100);
-      final correctionHelpfulnessScore =
-          ((settings['correction_helpfulness_score'] as num?)?.toInt() ?? 68).clamp(0, 100);
-      final voiceFeedbackScore =
-          ((settings['voice_feedback_quality_score'] as num?)?.toInt() ?? 70).clamp(0, 100);
+      final reliabilityScore = ((settings['reply_consistency_score'] as num?)?.toInt())?.clamp(0, 100);
+      final correctionHelpfulnessScore = ((settings['correction_helpfulness_score'] as num?)?.toInt())?.clamp(0, 100);
+      final voiceFeedbackScore = ((settings['voice_feedback_quality_score'] as num?)?.toInt())?.clamp(0, 100);
       final verifiedSeriousLearner = settings['verified_serious_learner'] == true;
 
       final lastMessageRaw = row['last_message']?.toString() ?? '';
@@ -637,9 +657,9 @@ class ChatRepository {
         'hasCorrectionUnread': hasCorrectionUnread,
         'hasVoiceFeedback': hasVoiceFeedback,
         'practiceStreakAtRisk': practiceStreakAtRisk,
-        'partnerQuality':
-            ((friendIds.contains(otherId) ? 80 : 55) + (incomingPendingIds.contains(otherId) ? 5 : 0))
-                .clamp(0, 99),
+        'partnerQuality': settings['partner_quality_score'] is num
+            ? (settings['partner_quality_score'] as num).toInt().clamp(0, 100)
+            : null,
         'reliabilityScore': reliabilityScore,
         'correctionHelpfulnessScore': correctionHelpfulnessScore,
         'voiceFeedbackScore': voiceFeedbackScore,

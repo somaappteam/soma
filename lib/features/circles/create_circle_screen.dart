@@ -116,16 +116,16 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16),
                                   color: T.fieldFill,
-                                  border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
                                 ),
                                 child: TextField(
                                   onChanged: (value) => setState(() => circleName = value),
-                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-                                  cursorColor: Colors.white,
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w700),
+                                  cursorColor: Theme.of(context).colorScheme.primary,
                                   textInputAction: TextInputAction.done,
                                   decoration: InputDecoration(
                                     hintText: l10n.circlesEnterName,
-                                    hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                                    hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                                     border: InputBorder.none,
                                   ),
                                 ),
@@ -430,7 +430,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                           l10n.circlesHostTip,
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.70),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.72),
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -470,8 +470,8 @@ class _TopBar extends StatelessWidget {
         const SizedBox(width: 12),
         Text(
           title,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.w900,
           ),
@@ -501,7 +501,7 @@ class _IconGlassButton extends StatelessWidget {
           width: 46,
           height: 46,
           child: Center(
-            child: Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 22),
+            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92), size: 22),
           ),
         ),
       ),
@@ -518,7 +518,7 @@ class _SectionTitle extends StatelessWidget {
     return Text(
       text,
       style: TextStyle(
-        color: Colors.white.withValues(alpha: 0.92),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92),
         fontWeight: FontWeight.w900,
         fontSize: 14,
         letterSpacing: 0.2,
@@ -550,12 +550,12 @@ class _SelectTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.black.withValues(alpha: 0.14),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white.withValues(alpha: 0.9)),
+            Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9)),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -565,7 +565,7 @@ class _SelectTile extends StatelessWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.65),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62),
                       fontWeight: FontWeight.w700,
                       fontSize: 12,
                     ),
@@ -574,8 +574,8 @@ class _SelectTile extends StatelessWidget {
                   Text(
                     value,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
                       fontSize: 14.5,
                     ),
@@ -583,7 +583,7 @@ class _SelectTile extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.expand_more_rounded, color: Colors.white.withValues(alpha: 0.65)),
+            Icon(Icons.expand_more_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62)),
           ],
         ),
       ),
@@ -704,8 +704,8 @@ class _StepperRow extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.black.withValues(alpha: 0.14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
@@ -715,8 +715,8 @@ class _StepperRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w900,
                     fontSize: 13.5,
                   ),
@@ -725,7 +725,7 @@ class _StepperRow extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.65),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62),
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
@@ -740,8 +740,8 @@ class _StepperRow extends StatelessWidget {
             child: Text(
               valueText,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w900,
                 fontSize: 14,
               ),
@@ -772,11 +772,11 @@ class _MiniBtn extends StatelessWidget {
         height: 42,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          color: Colors.black.withValues(alpha: disabled ? 0.06 : 0.14),
-          border: Border.all(color: Colors.white.withValues(alpha: disabled ? 0.08 : 0.14)),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: disabled ? 0.04 : 0.08),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: disabled ? 0.08 : 0.14)),
         ),
         child: Center(
-          child: Icon(icon, color: Colors.white.withValues(alpha: disabled ? 0.35 : 0.90)),
+          child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: disabled ? 0.35 : 0.90)),
         ),
       ),
     );
@@ -802,8 +802,8 @@ class _ToggleRow extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: Colors.black.withValues(alpha: 0.14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
@@ -813,8 +813,8 @@ class _ToggleRow extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w900,
                     fontSize: 13.5,
                   ),
@@ -823,7 +823,7 @@ class _ToggleRow extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.65),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62),
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
@@ -876,12 +876,12 @@ class _PresetChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: Colors.white.withValues(alpha: 0.08),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
         ),
         child: Text(
           label,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w700),
         ),
       ),
     );

@@ -285,6 +285,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final pct = (accuracy * 100).round();
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: SafeArea(
@@ -307,12 +308,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                      icon: Icon(Icons.arrow_back_ios_new_rounded, color: scheme.onSurface),
                       onPressed: widget.circleId != null ? _confirmExitCircle : () => Navigator.pop(context),
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(Icons.close_rounded, color: Colors.white),
+                      icon: Icon(Icons.close_rounded, color: scheme.onSurface),
                       onPressed: widget.circleId != null ? _confirmExitCircle : () => Navigator.popUntil(context, (r) => r.isFirst),
                     ),
                   ],
@@ -323,8 +324,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 // Title
                 Text(
                   l10n.resultsMatchTitle,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: scheme.onSurface,
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.2,
@@ -334,7 +335,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                 Text(
                   l10n.resultsNiceWork(widget.playerName),
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.70),
+                    color: scheme.onSurface.withValues(alpha: 0.72),
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -359,8 +360,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               children: [
                                 Text(
                                   _placeLabel(l10n),
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: scheme.onSurface,
                                     fontSize: 18,
                                     fontWeight: FontWeight.w800,
                                   ),
@@ -369,7 +370,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                 Text(
                                   l10n.resultsOutOfPlayers(widget.playersCount),
                                   style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.60),
+                                    color: scheme.onSurface.withValues(alpha: 0.62),
                                     fontSize: 12,
                                   ),
                                 ),
@@ -381,8 +382,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                             children: [
                               Text(
                                 l10n.pointsLabel,
-                                style: const TextStyle(
-                                  color: Colors.white70,
+                                style: TextStyle(
+                                  color: scheme.onSurface.withValues(alpha: 0.7),
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -390,8 +391,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 "+${widget.points}",
-                                style: const TextStyle(
-                                  color: Colors.white,
+                                style: TextStyle(
+                                  color: scheme.onSurface,
                                   fontSize: 22,
                                   fontWeight: FontWeight.w900,
                                 ),
@@ -466,7 +467,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                   radius: BorderRadius.circular(18),
                   child: Row(
                     children: [
-                      const Icon(Icons.auto_awesome_rounded, color: Colors.white),
+                      Icon(Icons.auto_awesome_rounded, color: scheme.onSurface),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
@@ -476,7 +477,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                   ? l10n.resultsHighlightGreatAccuracy
                                   : l10n.resultsHighlightKeepGoing),
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.85),
+                            color: scheme.onSurface.withValues(alpha: 0.85),
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -497,12 +498,12 @@ class _ResultsScreenState extends State<ResultsScreen> {
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.leaderboard_rounded, color: Colors.white),
+                          Icon(Icons.leaderboard_rounded, color: scheme.onSurface),
                           const SizedBox(width: 10),
                           Text(
                             l10n.resultsLeaderboardTitle,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: scheme.onSurface,
                               fontSize: 16,
                               fontWeight: FontWeight.w900,
                             ),
@@ -511,7 +512,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           Text(
                             l10n.resultsPlayersCount(widget.leaderboard.length),
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.55),
+                              color: scheme.onSurface.withValues(alpha: 0.58),
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
@@ -624,10 +625,10 @@ class _Badge extends StatelessWidget {
       height: 44,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        color: Colors.white.withValues(alpha: 0.08),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18)),
       ),
-      child: Icon(icon, color: Colors.white),
+      child: Icon(icon, color: Theme.of(context).colorScheme.onSurface),
     );
   }
 }
@@ -647,12 +648,12 @@ class _AccuracyBar extends StatelessWidget {
           children: [
             Text(
               l10n.statAccuracy,
-              style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w700),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.w700),
             ),
             const Spacer(),
             Text(
               "$clamped%",
-              style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.w800),
             ),
           ],
         ),
@@ -661,7 +662,7 @@ class _AccuracyBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           child: Container(
             height: 10,
-            color: Colors.white.withValues(alpha: 0.10),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
             child: Align(
               alignment: Alignment.centerLeft,
               child: FractionallySizedBox(
@@ -705,10 +706,10 @@ class _StatTile extends StatelessWidget {
             height: 38,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              color: Colors.white.withValues(alpha: 0.08),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18)),
             ),
-            child: Icon(icon, color: Colors.white, size: 20),
+            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -718,7 +719,7 @@ class _StatTile extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.70),
+                    color: scheme.onSurface.withValues(alpha: 0.72),
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                   ),
@@ -726,8 +727,8 @@ class _StatTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   value,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: scheme.onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.w900,
                   ),
@@ -736,7 +737,7 @@ class _StatTile extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.55),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.58),
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
@@ -764,14 +765,14 @@ class _SecondaryButton extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: Colors.black.withValues(alpha: 0.22),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
         ),
         alignment: Alignment.center,
         child: Text(
           label,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 16,
             fontWeight: FontWeight.w800,
           ),
@@ -827,9 +828,13 @@ class _LeaderboardRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        color: isMe ? Colors.white.withValues(alpha: 0.10) : Colors.white.withValues(alpha: 0.06),
+        color: isMe
+            ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10)
+            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
         border: Border.all(
-          color: isMe ? Colors.white.withValues(alpha: 0.28) : Colors.white.withValues(alpha: 0.14),
+          color: isMe
+              ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.28)
+              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
         ),
       ),
       child: Row(
@@ -858,8 +863,8 @@ class _LeaderboardRow extends StatelessWidget {
                       child: Text(
                         name,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 13.5,
                           fontWeight: FontWeight.w900,
                         ),
@@ -887,7 +892,7 @@ class _LeaderboardRow extends StatelessWidget {
                               ? l10n.statusWrong
                               : l10n.statusNone,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.6),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62),
                         fontWeight: FontWeight.w700,
                         fontSize: 11.5,
                       ),
@@ -904,8 +909,8 @@ class _LeaderboardRow extends StatelessWidget {
             children: [
               Text(
                 "$points",
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
                 ),
@@ -914,7 +919,7 @@ class _LeaderboardRow extends StatelessWidget {
               Text(
                 l10n.pointsAbbrev,
                 style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.55),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.58),
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                 ),
@@ -939,14 +944,14 @@ class _RowRankChip extends StatelessWidget {
       height: 34,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        color: Colors.black.withValues(alpha: 0.18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
       ),
       alignment: Alignment.center,
       child: Text(
         "#$rank",
         style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.8),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.82),
           fontWeight: FontWeight.w900,
           fontSize: 11,
         ),
@@ -977,8 +982,8 @@ class _RowAvatarBubble extends StatelessWidget {
           child: Center(
             child: Text(
               initial,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w900,
                 fontSize: 14,
               ),
@@ -1020,8 +1025,9 @@ class _RowVoiceBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = muted ? Colors.white.withValues(alpha: 0.55) : Colors.white.withValues(alpha: 0.92);
-    final bg = muted ? Colors.white.withValues(alpha: 0.08) : Colors.white.withValues(alpha: 0.12);
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final color = muted ? onSurface.withValues(alpha: 0.55) : onSurface.withValues(alpha: 0.92);
+    final bg = muted ? onSurface.withValues(alpha: 0.08) : onSurface.withValues(alpha: 0.12);
 
     return Stack(
       alignment: Alignment.center,
@@ -1032,7 +1038,7 @@ class _RowVoiceBadge extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             color: bg,
-            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+            border: Border.all(color: onSurface.withValues(alpha: 0.14)),
             boxShadow: speaking
                 ? [
                     BoxShadow(
@@ -1080,7 +1086,7 @@ class _RowAnswerIndicator extends StatelessWidget {
         ? const Color(0xFF2AFADF)
         : isWrong
             ? const Color(0xFFFF4FD8)
-            : Colors.white.withValues(alpha: 0.35);
+            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35);
 
     final icon = isCorrect
         ? Icons.check_rounded
@@ -1114,13 +1120,13 @@ class _RowTag extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
           fontWeight: FontWeight.w800,
           fontSize: 9.5,
           letterSpacing: 0.4,

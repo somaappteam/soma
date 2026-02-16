@@ -36,9 +36,12 @@ class AboutScreen extends StatelessWidget {
                 child: InkWell(
                   onTap: () => Navigator.pop(context),
                   borderRadius: BorderRadius.circular(12),
-                  child: const Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                 ),
               ),
@@ -46,7 +49,7 @@ class AboutScreen extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                     ),
               ),
@@ -62,19 +65,19 @@ class AboutScreen extends StatelessWidget {
                       Text(
                         "SOMA",
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.w900,
                             ),
                       ),
                       const SizedBox(height: 10),
                       Text(
                         l10n.aboutVersion(_appVersion),
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.72)),
                       ),
                       const SizedBox(height: 20),
                       Text(
                         l10n.aboutDescription,
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.9), height: 1.5),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), height: 1.5),
                       ),
                     ],
                   ),
@@ -90,12 +93,12 @@ class AboutScreen extends StatelessWidget {
                         label: l10n.aboutTerms,
                         onTap: () => _openLegalDoc(context, l10n.aboutTerms, LegalData.termsOfService),
                       ),
-                      const Divider(color: Colors.white12),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
                       _InfoRow(
                         label: l10n.aboutPrivacy,
                         onTap: () => _openLegalDoc(context, l10n.aboutPrivacy, LegalData.privacyPolicy),
                       ),
-                      const Divider(color: Colors.white12),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
                       _InfoRow(
                         label: l10n.aboutOpenSource,
                         onTap: () => showLicensePage(
@@ -142,13 +145,13 @@ class _InfoRow extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: Colors.white.withValues(alpha: 0.5)),
+            Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55)),
           ],
         ),
       ),
@@ -174,10 +177,10 @@ class _LegalDetailScreen extends StatelessWidget {
       body: Markdown(
         data: content,
         styleSheet: MarkdownStyleSheet(
-          p: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 15, height: 1.5),
-          h1: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
-          h2: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, height: 2),
-          listBullet: const TextStyle(color: Colors.white),
+          p: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), fontSize: 15, height: 1.5),
+          h1: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 24, fontWeight: FontWeight.bold),
+          h2: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold, height: 2),
+          listBullet: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           blockSpacing: 16,
         ),
       ),
