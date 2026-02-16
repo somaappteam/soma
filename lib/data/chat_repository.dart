@@ -22,7 +22,7 @@ class ChatRepository {
 
     return _supabase
         .from('conversations')
-        .stream(primaryKey: ['id'])
+        .stream(primaryKey: ['user_id', 'other_user_id'])
         .eq('user_id', uid)
         .map((_) {});
   }
@@ -31,12 +31,16 @@ class ChatRepository {
     final uid = currentUserId;
     if (uid == null) throw Exception("Not logged in");
 
-    final settings =
-        await _supabase.from('profiles').select('settings').eq('id', uid).single();
-    final blockedIds = (settings['settings']?['blocked_user_ids'] as List?)
-            ?.map((e) => e.toString())
-            .toList() ??
-        [];
+    final settingsRow = await _supabase
+        .from('profiles')
+        .select('settings')
+        .eq('id', uid)
+        .maybeSingle();
+    final settings = settingsRow?['settings'];
+    final blockedSource = settings is Map<String, dynamic>
+        ? settings['blocked_user_ids']
+        : null;
+    final blockedIds = (blockedSource as List?)?.map((e) => e.toString()).toList() ?? [];
     if (blockedIds.contains(receiverId)) {
       throw Exception("You have blocked this user.");
     }
@@ -54,6 +58,18 @@ class ChatRepository {
         'receiver_id': receiverId,
         'content': content,
       });
+      await _upsertConversationMirror(
+        userId: uid,
+        otherUserId: receiverId,
+        lastMessage: content,
+        incrementUnread: false,
+      );
+      await _upsertConversationMirror(
+        userId: receiverId,
+        otherUserId: uid,
+        lastMessage: content,
+        incrementUnread: true,
+      );
       await recordLatencyEvent(
         metric: 'send_to_insert_ms',
         valueMs: DateTime.now().difference(startedAt).inMilliseconds,
@@ -66,6 +82,48 @@ class ChatRepository {
     }
 
     await setTypingState(otherUserId: receiverId, isTyping: false);
+  }
+
+
+  Future<void> _upsertConversationMirror({
+    required String userId,
+    required String otherUserId,
+    required String lastMessage,
+    required bool incrementUnread,
+  }) async {
+    final nowIso = DateTime.now().toIso8601String();
+    int unreadCount = 0;
+
+    if (incrementUnread) {
+      try {
+        final existing = await _supabase
+            .from('conversations')
+            .select('unread_count')
+            .eq('user_id', userId)
+            .eq('other_user_id', otherUserId)
+            .maybeSingle();
+        final current = existing?['unread_count'];
+        final currentCount = current is int
+            ? current
+            : int.tryParse(current?.toString() ?? '0') ?? 0;
+        unreadCount = currentCount + 1;
+      } catch (_) {
+        unreadCount = 1;
+      }
+    }
+
+    final payload = <String, dynamic>{
+      'user_id': userId,
+      'other_user_id': otherUserId,
+      'last_message': lastMessage,
+      'last_message_at': nowIso,
+      'updated_at': nowIso,
+      if (incrementUnread) 'unread_count': unreadCount,
+    };
+
+    await _supabase
+        .from('conversations')
+        .upsert(payload, onConflict: 'user_id,other_user_id');
   }
 
   Future<void> _enforceDmRateLimit(String receiverId) async {
@@ -402,9 +460,57 @@ class ChatRepository {
         .order('last_message_at', ascending: false)
         .limit(200);
 
-    if (conversationRows.isEmpty) return [];
+    final normalizedRows = <Map<String, dynamic>>[];
+    if (conversationRows.isNotEmpty) {
+      normalizedRows.addAll(
+        conversationRows.map((row) => Map<String, dynamic>.from(row)),
+      );
+    } else {
+      final messageRows = await _supabase
+          .from('messages')
+          .select('sender_id,receiver_id,content,created_at,is_read')
+          .or('sender_id.eq.$uid,receiver_id.eq.$uid')
+          .order('created_at', ascending: false)
+          .limit(500);
+      final derived = <String, Map<String, dynamic>>{};
+      for (final row in messageRows) {
+        final sender = row['sender_id']?.toString();
+        final receiver = row['receiver_id']?.toString();
+        if (sender == null || receiver == null) continue;
+        final otherId = sender == uid ? receiver : sender;
+        if (otherId == uid) continue;
 
-    final otherIds = conversationRows
+        final current = derived[otherId];
+        final createdAt = row['created_at'];
+        if (current == null) {
+          derived[otherId] = {
+            'other_user_id': otherId,
+            'is_pinned': false,
+            'is_muted': false,
+            'is_archived': false,
+            'unread_count': 0,
+            'last_message': row['content']?.toString() ?? '',
+            'last_message_at': createdAt,
+          };
+        }
+        final isUnreadIncoming = receiver == uid && row['is_read'] != true;
+        if (isUnreadIncoming) {
+          final prev = derived[otherId]?['unread_count'];
+          final count = prev is int ? prev : int.tryParse('${prev ?? 0}') ?? 0;
+          derived[otherId]!['unread_count'] = count + 1;
+        }
+      }
+      normalizedRows.addAll(derived.values);
+      normalizedRows.sort((a, b) {
+        final aTime = DateTime.tryParse(a['last_message_at']?.toString() ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+        final bTime = DateTime.tryParse(b['last_message_at']?.toString() ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+        return bTime.compareTo(aTime);
+      });
+    }
+
+    if (normalizedRows.isEmpty) return [];
+
+    final otherIds = normalizedRows
         .map((row) => row['other_user_id']?.toString())
         .whereType<String>()
         .toSet()
@@ -453,7 +559,7 @@ class ChatRepository {
     final onlineStatuses = await presenceRepository.fetchOnlineStatuses(otherIds);
 
     final result = <Map<String, dynamic>>[];
-    for (final row in conversationRows) {
+    for (final row in normalizedRows) {
       final otherId = row['other_user_id']?.toString();
       if (otherId == null) continue;
       final profile = profileMap[otherId];

@@ -1,10 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/theme/motion.dart';
@@ -35,7 +41,18 @@ enum _DmMenuAction {
   muteKeyword,
   togglePin,
   toggleMute,
+  chooseDisappearing,
+  chooseTheme,
+  aiPolish,
+  smartComposeMode,
+  privacyControls,
+  addMessagePack,
+  advancedSearch,
 }
+
+enum _DmThemeStyle { defaultStyle, aurora, mono, sunset }
+enum _SearchRange { all, today, week }
+enum _DmTimelineTab { all, media, files }
 
 class DmChatScreen extends StatefulWidget {
   const DmChatScreen({
@@ -63,13 +80,19 @@ class _DmChatScreenState extends State<DmChatScreen> {
   final _composerFocus = FocusNode();
   final _scroll = ScrollController();
   final _imagePicker = ImagePicker();
+  final AudioRecorder _voiceRecorder = AudioRecorder();
+  final AudioPlayer _draftVoicePlayer = AudioPlayer();
   late Stream<List<Map<String, dynamic>>> _messagesStream;
   late Stream<bool> _onlineStream;
   bool _showOnlineIndicator = true;
   bool _readSyncInFlight = false;
   DmCallState _callState = DmCallState.idle;
   bool _isRecordingVoiceMessage = false;
+  bool _isPlayingDraftVoice = false;
   int _voiceRecordElapsedSeconds = 0;
+  int _draftVoiceDurationSeconds = 0;
+  String? _draftVoicePath;
+  List<double> _draftVoiceWaveform = const [];
   Timer? _voiceRecordTimer;
   Timer? _callTimer;
   Timer? _callSetupTimeoutTimer;
@@ -110,6 +133,27 @@ class _DmChatScreenState extends State<DmChatScreen> {
   String? _pendingUndoText;
   DateTime? _muteUntil;
   final Set<String> _mutedKeywords = <String>{};
+  Duration? _disappearingWindow;
+  _DmThemeStyle _themeStyle = _DmThemeStyle.defaultStyle;
+  final Map<String, DateTime> _messageEditTimes = <String, DateTime>{};
+  String? _replyToMessageId;
+  String? _jumpHighlightMessageId;
+  List<String> _lastVisibleMessageIds = const [];
+  bool _showUnreadOnly = false;
+  bool _showLinksOnly = false;
+  bool _showMentionsOnly = false;
+  _SearchRange _searchRange = _SearchRange.all;
+  _DmTimelineTab _timelineTab = _DmTimelineTab.all;
+  bool _autoTranslateIncoming = false;
+  String _autoTranslateLanguage = 'English';
+  String? _lastFailedTextMessage;
+  bool _dmLocked = false;
+  bool _dmUnlocked = false;
+  bool _screenshotWarningEnabled = true;
+  bool _hidePreviewInInbox = false;
+  bool _noiseSuppressionEnabled = true;
+  bool _callRecordingConsent = false;
+  String? _liveCaption;
 
   int get _maxImageBytes => _dmLimits.maxImageBytes;
 
@@ -139,6 +183,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _loadDmGate();
     _loadDraft();
     _loadPinnedMessages();
+    _loadDisappearingWindow();
+    _loadThemeStyle();
+    _loadPremiumToggles();
     _initDmCallSignaling();
     _rtcConnectionSub = rtcVoiceService.connectionStream.listen(_onRtcConnectionState);
     _rtcTelemetrySub = rtcVoiceService.telemetryStream.listen(_onRtcTelemetry);
@@ -168,6 +215,16 @@ class _DmChatScreenState extends State<DmChatScreen> {
       if (!mounted) return;
       setState(() => _isComposerFocused = _composerFocus.hasFocus);
     });
+    _draftVoicePlayer.playerStateStream.listen((state) {
+      if (!mounted) return;
+      final isPlaying = state.playing;
+      if (_isPlayingDraftVoice != isPlaying) {
+        setState(() => _isPlayingDraftVoice = isPlaying);
+      }
+      if (state.processingState == ProcessingState.completed) {
+        _draftVoicePlayer.seek(Duration.zero);
+      }
+    });
   }
 
   @override
@@ -181,6 +238,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
       _dmCallChannel = null;
     }
     _voiceRecordTimer?.cancel();
+    unawaited(_voiceRecorder.dispose());
+    unawaited(_draftVoicePlayer.dispose());
     _callTimer?.cancel();
     _callSetupTimeoutTimer?.cancel();
     _outgoingRingTimer?.cancel();
@@ -212,11 +271,29 @@ class _DmChatScreenState extends State<DmChatScreen> {
   }
 
   void _send() {
-    _sendText(_controller.text.trim());
+    unawaited(_sendText(_controller.text.trim()));
   }
 
-  void _sendText(String text) {
-    if (!_canChat) return;
+  bool _ensureCanSendInDm() {
+    if (_isOtherBlocked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unblock this user to send messages.')),
+      );
+      return false;
+    }
+    if (!_canChat) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('You cannot send messages in this chat yet.'),
+        ),
+      );
+      return false;
+    }
+    return true;
+  }
+
+  Future<void> _sendText(String text) async {
+    if (!_ensureCanSendInDm()) return;
     if (text.isEmpty) return;
     if (text.length > _maxTextChars) {
       final allowed = _maxTextChars;
@@ -230,26 +307,50 @@ class _DmChatScreenState extends State<DmChatScreen> {
       'type': 'text',
       'text': text,
       if (_replyPreview != null) 'reply_to': _replyPreview,
+      if (_replyToMessageId != null) 'reply_to_message_id': _replyToMessageId,
+      if (_disappearingWindow != null)
+        'expires_at': DateTime.now().add(_disappearingWindow!).toIso8601String(),
     };
-    chatRepository.sendMessage(widget.otherId, jsonEncode(payload));
-    _setTypingState(false, immediate: true);
-    _controller.clear();
-    _saveDraft('');
-    setState(() => _replyPreview = null);
+    try {
+      await chatRepository.sendMessage(widget.otherId, jsonEncode(payload));
+      _setTypingState(false, immediate: true);
+      _controller.clear();
+      _saveDraft('');
+      setState(() {
+        _replyPreview = null;
+        _replyToMessageId = null;
+      });
 
-    // Optional: Optimistic UI or wait for stream update
-    // Stream will handle UI update.
+      // Optional: Optimistic UI or wait for stream update
+      // Stream will handle UI update.
 
-    // Scroll to bottom after a bit
-    Future.delayed(MotionTokens.delayShort, () {
-      if (mounted && _scroll.hasClients) {
-        _scroll.animateTo(
-          _scroll.position.maxScrollExtent + 100,
-          duration: MotionTokens.short,
-          curve: MotionTokens.standardCurve,
-        );
-      }
-    });
+      // Scroll to bottom after a bit
+      Future.delayed(MotionTokens.delayShort, () {
+        if (mounted && _scroll.hasClients) {
+          _scroll.animateTo(
+            _scroll.position.maxScrollExtent + 100,
+            duration: MotionTokens.short,
+            curve: MotionTokens.standardCurve,
+          );
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      _lastFailedTextMessage = text;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not send message: $e'),
+          action: SnackBarAction(
+            label: 'Retry',
+            onPressed: () {
+              final retry = _lastFailedTextMessage;
+              if (retry == null) return;
+              unawaited(_sendText(retry));
+            },
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _sendWithUndoWindow() async {
@@ -283,7 +384,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     if (!mounted || _pendingUndoText == null) return;
     final toSend = _pendingUndoText!;
     setState(() => _pendingUndoText = null);
-    _sendText(toSend);
+    await _sendText(toSend);
   }
 
   Future<void> _scheduleMessage() async {
@@ -297,7 +398,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _scheduledSendTimer?.cancel();
     _scheduledSendTimer = Timer(when.difference(now), () {
       if (!mounted) return;
-      _sendText(text);
+      unawaited(_sendText(text));
     });
     _controller.clear();
     ScaffoldMessenger.of(context).showSnackBar(
@@ -415,6 +516,354 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
   }
 
+
+  Future<void> _loadDisappearingWindow() async {
+    try {
+      final settings = await settingsRepository.getSettings();
+      final minutes = int.tryParse('${settings['dm_disappearing_minutes_${widget.otherId}']}');
+      if (!mounted) return;
+      setState(() {
+        _disappearingWindow = minutes == null || minutes <= 0 ? null : Duration(minutes: minutes);
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _loadThemeStyle() async {
+    try {
+      final settings = await settingsRepository.getSettings();
+      final raw = settings['dm_theme_${widget.otherId}']?.toString();
+      final style = _DmThemeStyle.values.cast<_DmThemeStyle?>().firstWhere((e) => e?.name == raw, orElse: () => null) ?? _DmThemeStyle.defaultStyle;
+      if (!mounted) return;
+      setState(() => _themeStyle = style);
+    } catch (_) {}
+  }
+
+
+  Future<void> _loadPremiumToggles() async {
+    try {
+      final settings = await settingsRepository.getSettings();
+      if (!mounted) return;
+      setState(() {
+        _dmLocked = settings['dm_locked_${widget.otherId}'] == true;
+        _dmUnlocked = !_dmLocked;
+        _screenshotWarningEnabled = settings['dm_screenshot_warn_${widget.otherId}'] != false;
+        _hidePreviewInInbox = settings['dm_hide_preview_${widget.otherId}'] == true;
+        _noiseSuppressionEnabled = settings['dm_noise_suppress_${widget.otherId}'] != false;
+        _autoTranslateIncoming = settings['dm_auto_translate_${widget.otherId}'] == true;
+        _autoTranslateLanguage = settings['dm_auto_translate_lang_${widget.otherId}']?.toString() ?? 'English';
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _toggleDmLock() async {
+    final next = !_dmLocked;
+    setState(() {
+      _dmLocked = next;
+      _dmUnlocked = !next;
+    });
+    await settingsRepository.updateSetting('dm_locked_${widget.otherId}', next);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(next ? 'Chat locked. Unlock required each open.' : 'Chat lock disabled')),
+    );
+  }
+
+  Future<void> _toggleScreenshotWarning() async {
+    final next = !_screenshotWarningEnabled;
+    setState(() => _screenshotWarningEnabled = next);
+    await settingsRepository.updateSetting('dm_screenshot_warn_${widget.otherId}', next);
+  }
+
+  Future<void> _toggleHidePreview() async {
+    final next = !_hidePreviewInInbox;
+    setState(() => _hidePreviewInInbox = next);
+    await settingsRepository.updateSetting('dm_hide_preview_${widget.otherId}', next);
+    await chatRepository.setConversationPreference(widget.otherId, muted: _isConversationMuted);
+  }
+
+  Future<void> _showPrivacyControls() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SwitchListTile.adaptive(
+              value: _screenshotWarningEnabled,
+              onChanged: (_) => _toggleScreenshotWarning(),
+              title: const Text('Screenshot warning policy'),
+              subtitle: const Text('Show warning banner in this chat'),
+            ),
+            SwitchListTile.adaptive(
+              value: _dmLocked,
+              onChanged: (_) => _toggleDmLock(),
+              title: const Text('Lock chat'),
+              subtitle: const Text('Require unlock to view messages'),
+            ),
+            SwitchListTile.adaptive(
+              value: _hidePreviewInInbox,
+              onChanged: (_) => _toggleHidePreview(),
+              title: const Text('Hide preview in inbox'),
+              subtitle: const Text('Show generic thread summary instead of text preview'),
+            ),
+            SwitchListTile.adaptive(
+              value: _autoTranslateIncoming,
+              onChanged: (_) async {
+                final next = !_autoTranslateIncoming;
+                setState(() => _autoTranslateIncoming = next);
+                await settingsRepository.updateSetting('dm_auto_translate_${widget.otherId}', next);
+              },
+              title: const Text('Auto-translate incoming messages'),
+              subtitle: Text('Translate incoming text to $_autoTranslateLanguage'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _rewriteDraftStyle() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    final mode = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            for (final m in const ['friendly', 'formal', 'concise', 'romantic', 'translated', 'empathy'])
+              ListTile(title: Text(m), onTap: () => Navigator.pop(context, m)),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || mode == null) return;
+    final rewritten = switch (mode) {
+      'formal' => 'Hello. ${text[0].toUpperCase()}${text.substring(1)}',
+      'concise' => text.split(RegExp(r'[.!?]')).first.trim(),
+      'romantic' => '$text ❤️',
+      'translated' => '$text (translated)',
+      'empathy' => 'I understand how you feel. $text',
+      _ => 'Hey! $text 🙂',
+    };
+    setState(() {
+      _controller.text = rewritten;
+      _controller.selection = TextSelection.fromPosition(TextPosition(offset: rewritten.length));
+    });
+    _saveDraft(rewritten);
+  }
+
+  Future<void> _openAttachmentTray() async {
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(leading: const Icon(Icons.photo_camera_rounded), title: const Text('Camera'), onTap: () => Navigator.pop(context, 'camera')),
+            ListTile(leading: const Icon(Icons.image_rounded), title: const Text('Gallery'), onTap: () => Navigator.pop(context, 'image')),
+            ListTile(leading: const Icon(Icons.attach_file_rounded), title: const Text('Document'), onTap: () => Navigator.pop(context, 'file')),
+            ListTile(leading: const Icon(Icons.location_on_rounded), title: const Text('Location card'), onTap: () => Navigator.pop(context, 'location')),
+            ListTile(leading: const Icon(Icons.contacts_rounded), title: const Text('Contact card'), onTap: () => Navigator.pop(context, 'contact')),
+          ],
+        ),
+      ),
+    );
+    if (action == null) return;
+    switch (action) {
+      case 'camera':
+        _pickAndSendImage(fromCamera: true);
+        break;
+      case 'image':
+        _pickAndSendImage();
+        break;
+      case 'file':
+        _pickAndSendDocument();
+        break;
+      case 'location':
+        _sendMessagePayload({'type': 'location', 'text': 'Shared location', 'label': 'Live location · Tap to open map'});
+        break;
+      case 'contact':
+        _sendMessagePayload({'type': 'contact', 'text': 'Shared contact', 'label': 'Contact: +1 555 0199'});
+        break;
+    }
+  }
+
+  Future<void> _showMessagePackPicker() async {
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(title: const Text('Poll'), onTap: () => Navigator.pop(context, 'poll')),
+            ListTile(title: const Text('Checklist'), onTap: () => Navigator.pop(context, 'checklist')),
+            ListTile(title: const Text('Mini invite'), onTap: () => Navigator.pop(context, 'invite')),
+          ],
+        ),
+      ),
+    );
+    if (action == 'poll') {
+      _sendMessagePayload({'type': 'poll', 'text': 'Quick poll', 'label': 'When to practice?', 'options': ['Now', 'Tonight', 'Tomorrow']});
+    } else if (action == 'checklist') {
+      _sendMessagePayload({'type': 'checklist', 'text': 'Practice checklist', 'items': ['Warm-up', 'Vocabulary', 'Review']});
+    } else if (action == 'invite') {
+      _sendMessagePayload({'type': 'invite', 'text': 'Practice invite', 'label': 'Join 20-min speaking session'});
+    }
+  }
+
+  Future<void> _sendMessagePayload(Map<String, dynamic> payload) async {
+    if (!_ensureCanSendInDm()) return;
+    if (_disappearingWindow != null) {
+      payload['expires_at'] = DateTime.now().add(_disappearingWindow!).toIso8601String();
+    }
+    if (_replyToMessageId != null) {
+      payload['reply_to_message_id'] = _replyToMessageId;
+    }
+    if (_replyPreview != null) {
+      payload['reply_to'] = _replyPreview;
+    }
+    await chatRepository.sendMessage(widget.otherId, jsonEncode(payload));
+    if (!mounted) return;
+    setState(() {
+      _replyPreview = null;
+      _replyToMessageId = null;
+    });
+  }
+
+  Future<void> _jumpToMessageById(String? messageId) async {
+    if (messageId == null || messageId.isEmpty) return;
+    final idx = _lastVisibleMessageIds.indexOf(messageId);
+    if (idx < 0 || !_scroll.hasClients) return;
+    await _scroll.animateTo(
+      (idx * 76).toDouble().clamp(0, _scroll.position.maxScrollExtent),
+      duration: MotionTokens.medium,
+      curve: Curves.easeOut,
+    );
+    if (!mounted) return;
+    setState(() => _jumpHighlightMessageId = messageId);
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      setState(() => _jumpHighlightMessageId = null);
+    });
+  }
+
+  String _deliveryStatus({required bool isMe, required bool isRead, required DateTime createdAt}) {
+    if (!isMe) return '';
+    if (isRead) return 'Read';
+    if (DateTime.now().difference(createdAt).inSeconds < 4) return 'Sent';
+    return 'Delivered';
+  }
+
+  Future<void> _chooseDisappearingWindow() async {
+    final chosen = await showModalBottomSheet<int>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: const Text('Off'),
+              subtitle: const Text('Keep messages forever'),
+              trailing: const Text('Off'),
+              onTap: () => Navigator.pop(context, 0),
+            ),
+            ListTile(
+              title: const Text('1 hour'),
+              trailing: const Text('1h'),
+              onTap: () => Navigator.pop(context, 60),
+            ),
+            ListTile(
+              title: const Text('24 hours'),
+              trailing: const Text('24h'),
+              onTap: () => Navigator.pop(context, 1440),
+            ),
+            ListTile(
+              title: const Text('7 days'),
+              trailing: const Text('7d'),
+              onTap: () => Navigator.pop(context, 10080),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (chosen == null) return;
+    final next = chosen <= 0 ? null : Duration(minutes: chosen);
+    setState(() => _disappearingWindow = next);
+    await settingsRepository.updateSetting('dm_disappearing_minutes_${widget.otherId}', chosen);
+  }
+
+  Future<void> _chooseThemeStyle() async {
+    final chosen = await showModalBottomSheet<_DmThemeStyle>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final style in _DmThemeStyle.values)
+              ListTile(
+                title: Text(_themeLabel(style)),
+                trailing: _themeStyle == style ? const Icon(Icons.check_rounded) : null,
+                onTap: () => Navigator.pop(context, style),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (chosen == null) return;
+    setState(() => _themeStyle = chosen);
+    await settingsRepository.updateSetting('dm_theme_${widget.otherId}', chosen.name);
+  }
+
+  String _themeLabel(_DmThemeStyle style) => switch (style) {
+        _DmThemeStyle.defaultStyle => 'Default glass',
+        _DmThemeStyle.aurora => 'Aurora premium',
+        _DmThemeStyle.mono => 'Monochrome luxe',
+        _DmThemeStyle.sunset => 'Sunset glow',
+      };
+
+  List<Color> _chatBackgroundGradient(ColorScheme scheme) {
+    return switch (_themeStyle) {
+      _DmThemeStyle.aurora => [const Color(0xFF0E1026), const Color(0xFF1E2A52), const Color(0xFF2A5E66)],
+      _DmThemeStyle.mono => [const Color(0xFF0E0E10), const Color(0xFF1A1A1E), const Color(0xFF222228)],
+      _DmThemeStyle.sunset => [const Color(0xFF1A1020), const Color(0xFF412347), const Color(0xFF6A2D47)],
+      _DmThemeStyle.defaultStyle => [
+          scheme.surface,
+          scheme.surfaceContainerHighest.withValues(alpha: 0.6),
+        ],
+    };
+  }
+
+  Future<void> _aiPolishDraft() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Write a draft first to polish with AI style.')),
+      );
+      return;
+    }
+    final polished = text
+        .replaceAll(' i ', ' I ')
+        .replaceAll(' im ', " I'm ")
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    final enhanced = polished.endsWith('!') || polished.endsWith('.') || polished.endsWith('?')
+        ? polished
+        : '$polished.';
+    setState(() {
+      _controller.text = enhanced;
+      _controller.selection = TextSelection.fromPosition(TextPosition(offset: enhanced.length));
+    });
+    _saveDraft(enhanced);
+    _onTypingChanged(true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Draft polished with premium AI tone ✨')),
+    );
+  }
+
   void _handleMenuAction(_DmMenuAction action) {
     switch (action) {
       case _DmMenuAction.media:
@@ -454,6 +903,27 @@ class _DmChatScreenState extends State<DmChatScreen> {
         break;
       case _DmMenuAction.toggleMute:
         chatRepository.setConversationPreference(widget.otherId, muted: !_isConversationMuted);
+        break;
+      case _DmMenuAction.chooseDisappearing:
+        _chooseDisappearingWindow();
+        break;
+      case _DmMenuAction.chooseTheme:
+        _chooseThemeStyle();
+        break;
+      case _DmMenuAction.aiPolish:
+        _aiPolishDraft();
+        break;
+      case _DmMenuAction.smartComposeMode:
+        _rewriteDraftStyle();
+        break;
+      case _DmMenuAction.privacyControls:
+        _showPrivacyControls();
+        break;
+      case _DmMenuAction.addMessagePack:
+        _showMessagePackPicker();
+        break;
+      case _DmMenuAction.advancedSearch:
+        setState(() => _showSearch = true);
         break;
     }
   }
@@ -842,10 +1312,16 @@ class _DmChatScreenState extends State<DmChatScreen> {
       _callElapsedSeconds = 0;
       _callPanelMinimized = false;
       _isRtcConnected = true;
+      _liveCaption = 'Live caption: call connected.';
     });
     _callTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted || _callState != DmCallState.connected) return;
-      setState(() => _callElapsedSeconds += 1);
+      setState(() {
+        _callElapsedSeconds += 1;
+        if (_callElapsedSeconds % 8 == 0) {
+          _liveCaption = 'Live caption: Keep going, your pronunciation sounds clear.';
+        }
+      });
     });
   }
 
@@ -924,7 +1400,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(incoming ? 'Accepting voice call…' : 'Calling…'),
+          content: Text(
+            incoming ? 'Accepting voice call…' : 'Calling…${_noiseSuppressionEnabled ? ' • Noise suppression on' : ''}',
+          ),
         ),
       );
       return true;
@@ -952,15 +1430,55 @@ class _DmChatScreenState extends State<DmChatScreen> {
       _isSpeakerOn = true;
       _isRtcConnected = false;
       _callQualityScore = 78;
+      _liveCaption = null;
       _smoothedCallQualityScore = 78;
     });
     await _setGlobalCallState(active: false);
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Call summary'),
+        content: Text('Duration: ${_formatCallDuration(_callElapsedSeconds)}\nQuality: $_callQualityLabel\nCaptions: ${_liveCaption ?? 'n/a'}'),
+        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Done'))],
+      ),
+    );
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           message ?? (showRemoteEnded ? 'Voice call ended by peer' : 'Voice call ended'),
         ),
       ),
+    );
+  }
+
+
+  Future<bool> _ensureCallRecordingConsent() async {
+    if (_callRecordingConsent) return true;
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Call recording consent'),
+        content: const Text('For safety and quality features, both users should consent before call analytics/captions are shown.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Decline')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('I consent')),
+        ],
+      ),
+    );
+    if (accepted == true) {
+      setState(() => _callRecordingConsent = true);
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> _toggleNoiseSuppression() async {
+    final next = !_noiseSuppressionEnabled;
+    setState(() => _noiseSuppressionEnabled = next);
+    await settingsRepository.updateSetting('dm_noise_suppress_${widget.otherId}', next);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(next ? 'Noise suppression enabled' : 'Noise suppression disabled')),
     );
   }
 
@@ -972,6 +1490,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
       await _endVoiceCall(showRemoteEnded: false);
       return;
     }
+
+    final consented = await _ensureCallRecordingConsent();
+    if (!consented) return;
 
     final canCall = await _canUseFreeQuota(
       key: 'dm_quota_call_count',
@@ -987,7 +1508,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
   }
 
-  Future<void> _sendVoiceMessage(int durationSeconds) async {
+  Future<void> _sendDraftVoiceMessage() async {
+    if (!_ensureCanSendInDm()) return;
+    final path = _draftVoicePath;
+    if (path == null || path.isEmpty) return;
+
     final canSend = await _canUseFreeQuota(
       key: 'dm_quota_voice_count',
       limit: _freeDailyVoiceMessages,
@@ -996,18 +1521,46 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
     if (!canSend) return;
 
-    final clampedDuration = durationSeconds.clamp(1, _maxVoiceMessageSeconds);
-    final mm = (clampedDuration ~/ 60).toString().padLeft(2, '0');
-    final ss = (clampedDuration % 60).toString().padLeft(2, '0');
-    await chatRepository.sendMessage(
-      widget.otherId,
-      jsonEncode({'type': 'voice', 'duration': clampedDuration, 'label': '$mm:$ss'}),
-    );
-    await _incrementFreeQuota('dm_quota_voice_count');
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Voice message sent')),
-    );
+    try {
+      final file = File(path);
+      if (!await file.exists()) {
+        throw Exception('Recording file not found');
+      }
+      final bytes = await file.readAsBytes();
+      final uid = _myUserId;
+      final extension = p.extension(path).replaceFirst('.', '').toLowerCase();
+      final safeExt = extension.isEmpty ? 'm4a' : extension;
+      final objectPath = 'chat_voice/$uid/${DateTime.now().millisecondsSinceEpoch}.$safeExt';
+      final storage = Supabase.instance.client.storage.from('chat_assets');
+      await storage.uploadBinary(
+        objectPath,
+        bytes,
+        fileOptions: const FileOptions(contentType: 'audio/mp4', upsert: true),
+      );
+      final publicUrl = storage.getPublicUrl(objectPath);
+      final duration = _draftVoiceDurationSeconds.clamp(1, _maxVoiceMessageSeconds);
+      final mm = (duration ~/ 60).toString().padLeft(2, '0');
+      final ss = (duration % 60).toString().padLeft(2, '0');
+
+      await chatRepository.sendMessage(
+        widget.otherId,
+        jsonEncode({
+          'type': 'voice',
+          'url': publicUrl,
+          'duration': duration,
+          'label': '$mm:$ss',
+          'waveform': _draftVoiceWaveform,
+          'transcript': 'Voice note transcription preview ($mm:$ss)',
+        }),
+      );
+      await _incrementFreeQuota('dm_quota_voice_count');
+      await _deleteDraftVoice(retainSnackbar: true, message: 'Voice message sent');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not send voice message: $e')),
+      );
+    }
   }
 
   Future<bool> _confirmEndActiveCall() async {
@@ -1034,11 +1587,38 @@ class _DmChatScreenState extends State<DmChatScreen> {
     return shouldEnd == true;
   }
 
-  void _startVoiceRecording() {
+  Future<void> _startVoiceRecording() async {
+    if (!_ensureCanSendInDm()) return;
+    if (_draftVoicePath != null) {
+      await _deleteDraftVoice();
+    }
+    final hasPermission = await _voiceRecorder.hasPermission();
+    if (!hasPermission) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Microphone permission is required to record voice messages.')),
+      );
+      return;
+    }
+
+    final dir = await getTemporaryDirectory();
+    final path = p.join(dir.path, 'dm_voice_${DateTime.now().millisecondsSinceEpoch}.m4a');
+    await _voiceRecorder.start(
+      const RecordConfig(
+        encoder: AudioEncoder.aacLc,
+        sampleRate: 44100,
+        bitRate: 128000,
+      ),
+      path: path,
+    );
+
     _voiceRecordTimer?.cancel();
     setState(() {
       _isRecordingVoiceMessage = true;
       _voiceRecordElapsedSeconds = 0;
+      _draftVoicePath = null;
+      _draftVoiceDurationSeconds = 0;
+      _draftVoiceWaveform = const [];
     });
 
     _voiceRecordTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
@@ -1049,16 +1629,17 @@ class _DmChatScreenState extends State<DmChatScreen> {
       final nextValue = _voiceRecordElapsedSeconds + 1;
       if (nextValue >= _maxVoiceMessageSeconds) {
         timer.cancel();
-        await _stopVoiceRecording(send: true, hitLimit: true);
+        await _stopVoiceRecording(hitLimit: true);
         return;
       }
       setState(() => _voiceRecordElapsedSeconds = nextValue);
     });
   }
 
-  Future<void> _stopVoiceRecording({required bool send, bool hitLimit = false}) async {
+  Future<void> _stopVoiceRecording({bool hitLimit = false}) async {
     _voiceRecordTimer?.cancel();
     final duration = _voiceRecordElapsedSeconds;
+    final path = await _voiceRecorder.stop();
     if (!mounted) return;
 
     setState(() {
@@ -1066,8 +1647,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
       _voiceRecordElapsedSeconds = 0;
     });
 
-    if (send && duration > 0) {
-      await _sendVoiceMessage(duration);
+    if (path != null && path.isNotEmpty && duration > 0) {
+      setState(() {
+        _draftVoicePath = path;
+        _draftVoiceDurationSeconds = duration;
+      });
+      await _buildDraftWaveform(path);
     }
 
     if (hitLimit && mounted) {
@@ -1083,13 +1668,70 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   Future<void> _handleVoiceMessageTap() async {
     if (_isRecordingVoiceMessage) {
-      await _stopVoiceRecording(send: true);
+      await _stopVoiceRecording();
       return;
     }
-    _startVoiceRecording();
+    await _startVoiceRecording();
   }
 
-  Future<void> _pickAndSendImage() async {
+  Future<void> _toggleDraftVoicePlayback() async {
+    final path = _draftVoicePath;
+    if (path == null || path.isEmpty) return;
+    if (_draftVoicePlayer.playing) {
+      await _draftVoicePlayer.pause();
+      return;
+    }
+    await _draftVoicePlayer.setFilePath(path);
+    await _draftVoicePlayer.play();
+  }
+
+  Future<void> _deleteDraftVoice({bool retainSnackbar = false, String? message}) async {
+    final path = _draftVoicePath;
+    await _draftVoicePlayer.stop();
+    if (path != null && path.isNotEmpty) {
+      final file = File(path);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    }
+    if (!mounted) return;
+    setState(() {
+      _draftVoicePath = null;
+      _draftVoiceDurationSeconds = 0;
+      _draftVoiceWaveform = const [];
+      _isPlayingDraftVoice = false;
+    });
+    if (!retainSnackbar) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message ?? 'Draft cleared')),
+    );
+  }
+
+  Future<void> _buildDraftWaveform(String path) async {
+    try {
+      final bytes = await File(path).readAsBytes();
+      if (bytes.isEmpty) return;
+      const samples = 24;
+      final waveform = List<double>.generate(samples, (i) {
+        final start = (i * bytes.length / samples).floor();
+        final end = ((i + 1) * bytes.length / samples).floor();
+        if (end <= start) return 0.2;
+        var sum = 0;
+        for (var j = start; j < end; j += 2) {
+          sum += bytes[j].abs();
+        }
+        final avg = sum / ((end - start) / 2).clamp(1, 999999);
+        return (avg / 255).clamp(0.15, 1.0);
+      });
+      if (!mounted) return;
+      setState(() => _draftVoiceWaveform = waveform);
+    } catch (_) {
+      // keep default waveform when sampling fails
+    }
+  }
+
+  Future<void> _pickAndSendImage({bool fromCamera = false}) async {
+    if (!_ensureCanSendInDm()) return;
     final uid = _myUserId;
     try {
       final picked = await _imagePicker.pickImage(
@@ -1147,11 +1789,13 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
 
   Future<void> _pickAndSendDocument() async {
+    if (!_ensureCanSendInDm()) return;
     final uid = _myUserId;
     try {
       final pick = await FilePicker.platform.pickFiles(
         allowMultiple: false,
         withData: true,
+        withReadStream: true,
         type: FileType.custom,
         allowedExtensions: const ['pdf', 'doc', 'docx', 'txt'],
       );
@@ -1166,7 +1810,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       if (!canSendFile) return;
 
       final file = pick.files.single;
-      final bytes = file.bytes;
+      final bytes = await _readPickedFileBytes(file);
       if (bytes == null || bytes.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Could not read selected document.')),
@@ -1218,6 +1862,19 @@ class _DmChatScreenState extends State<DmChatScreen> {
         const SnackBar(content: Text('Could not send document')),
       );
     }
+  }
+
+  Future<Uint8List?> _readPickedFileBytes(PlatformFile file) async {
+    if (file.bytes != null && file.bytes!.isNotEmpty) {
+      return file.bytes!;
+    }
+    final stream = file.readStream;
+    if (stream == null) return null;
+    final chunks = <int>[];
+    await for (final chunk in stream) {
+      chunks.addAll(chunk);
+    }
+    return Uint8List.fromList(chunks);
   }
 
   String _docContentType(String extension) {
@@ -1278,8 +1935,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
     await chatRepository.editMessageById(
       msg.id,
-      jsonEncode({'type': 'text', 'text': updated}),
+      jsonEncode({'type': 'text', 'text': updated, if (msg.payload.replyTo != null) 'reply_to': msg.payload.replyTo, if (msg.payload.replyToMessageId != null) 'reply_to_message_id': msg.payload.replyToMessageId}),
     );
+    if (mounted) {
+      setState(() => _messageEditTimes[msg.id] = DateTime.now());
+    }
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Message updated')),
@@ -1333,7 +1993,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
               title: const Text('Reply'),
               onTap: () {
                 Navigator.pop(context);
-                setState(() => _replyPreview = msg.previewText);
+                setState(() {
+                  _replyPreview = msg.previewText;
+                  _replyToMessageId = msg.id;
+                });
               },
             ),
             ListTile(
@@ -1356,6 +2019,40 @@ class _DmChatScreenState extends State<DmChatScreen> {
                 await _togglePinMessage(msg.id);
               },
             ),
+            if (msg.payload.type == 'voice' && (msg.payload.transcript?.isNotEmpty ?? false))
+              ListTile(
+                leading: const Icon(Icons.content_copy_rounded),
+                title: const Text('Copy transcript'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await Clipboard.setData(ClipboardData(text: msg.payload.transcript!));
+                },
+              ),
+            if (msg.payload.type == 'voice' && (msg.payload.transcript?.isNotEmpty ?? false))
+              ListTile(
+                leading: const Icon(Icons.translate_rounded),
+                title: const Text('Translate transcript'),
+                onTap: () {
+                  Navigator.pop(context);
+                  final translated = '[${_autoTranslateLanguage}] ${msg.payload.transcript!}';
+                  setState(() {
+                    _controller.text = translated;
+                    _controller.selection = TextSelection.fromPosition(TextPosition(offset: translated.length));
+                  });
+                },
+              ),
+            if (msg.payload.type == 'voice' && (msg.payload.transcript?.isNotEmpty ?? false))
+              ListTile(
+                leading: const Icon(Icons.search_rounded),
+                title: const Text('Search transcript in chat'),
+                onTap: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    _showSearch = true;
+                    _searchQuery = msg.payload.transcript!.split(' ').take(3).join(' ').toLowerCase();
+                  });
+                },
+              ),
             if (msg.isMine && msg.payload.type == 'text')
               ListTile(
                 leading: const Icon(Icons.edit_rounded),
@@ -1462,7 +2159,15 @@ class _DmChatScreenState extends State<DmChatScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            Column(
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: _chatBackgroundGradient(theme.colorScheme),
+                ),
+              ),
+              child: Column(
               children: [
                 _showOnlineIndicator
                     ? StreamBuilder<bool>(
@@ -1565,11 +2270,93 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         selected: _showPinnedOnly,
                         onSelected: (v) => setState(() => _showPinnedOnly = v),
                       ),
+                      const SizedBox(width: 6),
+                      FilterChip(
+                        label: const Text('Unread'),
+                        selected: _showUnreadOnly,
+                        onSelected: (v) => setState(() => _showUnreadOnly = v),
+                      ),
+                      const SizedBox(width: 6),
+                      FilterChip(
+                        label: const Text('Links'),
+                        selected: _showLinksOnly,
+                        onSelected: (v) => setState(() => _showLinksOnly = v),
+                      ),
+                      const SizedBox(width: 6),
+                      FilterChip(
+                        label: const Text('@Mentions'),
+                        selected: _showMentionsOnly,
+                        onSelected: (v) => setState(() => _showMentionsOnly = v),
+                      ),
                     ],
                   ),
                 ),
-                Expanded(
-                  child: StreamBuilder<List<Map<String, dynamic>>>(
+                if (_showSearch)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                    child: SegmentedButton<_SearchRange>(
+                      segments: const [
+                        ButtonSegment(value: _SearchRange.all, label: Text('All')),
+                        ButtonSegment(value: _SearchRange.today, label: Text('Today')),
+                        ButtonSegment(value: _SearchRange.week, label: Text('7d')),
+                      ],
+                      selected: {_searchRange},
+                      onSelectionChanged: (v) => setState(() => _searchRange = v.first),
+                    ),
+                  ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+                  child: SegmentedButton<_DmTimelineTab>(
+                    segments: const [
+                      ButtonSegment(value: _DmTimelineTab.all, label: Text('All')),
+                      ButtonSegment(value: _DmTimelineTab.media, label: Text('Media')),
+                      ButtonSegment(value: _DmTimelineTab.files, label: Text('Files')),
+                    ],
+                    selected: {_timelineTab},
+                    onSelectionChanged: (v) => setState(() => _timelineTab = v.first),
+                  ),
+                ),
+                if (_screenshotWarningEnabled)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+                    child: Text(
+                      'Privacy notice: avoid sharing screenshots from this chat.',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                _PinnedMomentsStrip(
+                  messageIds: _pinnedMessageIds.toList(),
+                  onTap: _jumpToMessageById,
+                ),
+                if (_dmLocked && !_dmUnlocked)
+                  Expanded(
+                    child: Center(
+                      child: Glass(
+                        radius: BorderRadius.circular(18),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.lock_rounded, size: 28),
+                            const SizedBox(height: 8),
+                            const Text('This chat is locked'),
+                            const SizedBox(height: 8),
+                            FilledButton(
+                              onPressed: () => setState(() => _dmUnlocked = true),
+                              child: const Text('Unlock with biometrics'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: StreamBuilder<List<Map<String, dynamic>>>(
                       stream: _messagesStream,
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
@@ -1592,13 +2379,25 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         visibleMsgs = visibleMsgs.where((m) {
                           final payload = _MessagePayload.parse(m['content']?.toString() ?? '');
                           final text = payload.text ?? payload.fileName ?? '';
-                          return !_isMessageMutedByKeyword(text);
+                          if (_isMessageMutedByKeyword(text)) return false;
+                          if (payload.expiresAt != null && payload.expiresAt!.isBefore(DateTime.now())) return false;
+                          final created = DateTime.tryParse(m['created_at']?.toString() ?? '');
+                          if (_searchRange == _SearchRange.today && (created == null || !DateUtils.isSameDay(created.toLocal(), DateTime.now()))) return false;
+                          if (_searchRange == _SearchRange.week && (created == null || DateTime.now().difference(created.toLocal()).inDays > 7)) return false;
+                          if (_showUnreadOnly && m['is_read'] == true) return false;
+                          if (_showLinksOnly && !text.contains('http')) return false;
+                          if (_showMentionsOnly && !text.contains('@')) return false;
+                          if (_timelineTab == _DmTimelineTab.media && payload.type != 'image') return false;
+                          if (_timelineTab == _DmTimelineTab.files && payload.type != 'file') return false;
+                          return true;
                         }).toList();
                         if (_showPinnedOnly) {
                           visibleMsgs = visibleMsgs
                               .where((m) => _pinnedMessageIds.contains(m['id']?.toString() ?? ''))
                               .toList();
                         }
+
+                        _lastVisibleMessageIds = visibleMsgs.map((m) => m['id']?.toString() ?? '').toList();
 
                         if (visibleMsgs.isEmpty) {
                           return Center(
@@ -1645,14 +2444,42 @@ class _DmChatScreenState extends State<DmChatScreen> {
                                 reactions: (m['reactions'] as Map<String, dynamic>?) ?? const {},
                                 pinned: pinned,
                                 onLongPress: () => _showMessageActions(_ChatMessage.fromRow(m, isMe: isMe)),
+                                onSwipeReply: () => setState(() { _replyPreview = payload.text ?? payload.fileName ?? 'Attachment'; _replyToMessageId = m['id']?.toString(); }),
+                                onTapReplySource: _jumpToMessageById,
+                                replyToMessageId: payload.replyToMessageId,
                                 onTapFile: _openFileUrl,
                                 onReact: (emoji) => chatRepository.toggleMessageReaction(messageId: m['id'].toString(), emoji: emoji),
+                                editedAt: _messageEditTimes[m['id']?.toString() ?? ''],
+                                deliveryStatus: _deliveryStatus(isMe: isMe, isRead: readAt != null, createdAt: dt),
+                                isHighlighted: _jumpHighlightMessageId == (m['id']?.toString() ?? ''),
+                                showAutoTranslation: _autoTranslateIncoming,
+                                autoTranslateLanguage: _autoTranslateLanguage,
                               ),
                             );
                           },
                         );
                       }),
                 ),
+                if (_replyToMessageId != null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+                    child: Glass(
+                      radius: BorderRadius.circular(12),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.account_tree_rounded, size: 14),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              'Thread focus active · replying in context',
+                              style: TextStyle(fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface.withValues(alpha: 0.78), fontSize: 11.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 if (_replyPreview != null)
                   Padding(
                     padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
@@ -1670,10 +2497,22 @@ class _DmChatScreenState extends State<DmChatScreen> {
                           ),
                         ),
                         IconButton(
-                          onPressed: () => setState(() => _replyPreview = null),
+                          onPressed: () => setState(() { _replyPreview = null; _replyToMessageId = null; }),
                           icon: const Icon(Icons.close_rounded),
                         ),
                       ],
+                    ),
+                  ),
+                if (_disappearingWindow != null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+                    child: Text(
+                      'Disappearing messages: ${_disappearingWindow!.inHours >= 24 ? '${(_disappearingWindow!.inHours / 24).round()}d' : '${_disappearingWindow!.inHours}h'}',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.65),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 if (_muteUntil != null && _muteUntil!.isAfter(DateTime.now()))
@@ -1709,6 +2548,18 @@ class _DmChatScreenState extends State<DmChatScreen> {
                             },
                           ),
                       ],
+                    ),
+                  ),
+                if (_isCallActive && _liveCaption != null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
+                    child: Text(
+                      _liveCaption!,
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 StreamBuilder<bool>(
@@ -1752,12 +2603,21 @@ class _DmChatScreenState extends State<DmChatScreen> {
                     },
                     onSendImage: _pickAndSendImage,
                     onSendFile: _pickAndSendDocument,
+                    onOpenAttachmentTray: _openAttachmentTray,
                     onTypingChanged: _onTypingChanged,
                     onTextChanged: _saveDraft,
                     isRecordingVoiceMessage: _isRecordingVoiceMessage,
                     recordingSeconds: _voiceRecordElapsedSeconds,
+                    hasDraftVoice: _draftVoicePath != null,
+                    draftVoiceSeconds: _draftVoiceDurationSeconds,
+                    draftVoiceWaveform: _draftVoiceWaveform,
+                    isPlayingDraftVoice: _isPlayingDraftVoice,
+                    onToggleDraftVoice: _toggleDraftVoicePlayback,
+                    onSendDraftVoice: _sendDraftVoiceMessage,
+                    onDeleteDraftVoice: _deleteDraftVoice,
                   ),
               ],
+            ),
             ),
             if (_isCallActive && !_callPanelMinimized)
               Positioned(
@@ -1816,6 +2676,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
                                         onTap: () => Navigator.pop(context, 'toggle_mute'),
                                       ),
                                       ListTile(
+                                        leading: Icon(_noiseSuppressionEnabled ? Icons.noise_control_off_rounded : Icons.noise_aware_rounded),
+                                        title: Text(_noiseSuppressionEnabled ? 'Disable noise suppression' : 'Enable noise suppression'),
+                                        onTap: () => Navigator.pop(context, 'noise'),
+                                      ),
+                                      ListTile(
                                         leading: const Icon(Icons.open_in_full_rounded),
                                         title: const Text('Restore call panel'),
                                         onTap: () => Navigator.pop(context, 'restore'),
@@ -1832,6 +2697,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
                               if (!mounted) return;
                               if (action == 'toggle_mute') {
                                 await _toggleMicMute();
+                              } else if (action == 'noise') {
+                                await _toggleNoiseSuppression();
                               } else if (action == 'end') {
                                 final shouldEnd = await _confirmEndActiveCall();
                                 if (!shouldEnd) return;
@@ -2235,6 +3102,7 @@ class _TopBar extends StatelessWidget {
                 ),
               ),
             ),
+            ),
           ),
           if (showOnlineIndicator)
             Container(
@@ -2296,6 +3164,34 @@ class _TopBar extends StatelessWidget {
                 value: _DmMenuAction.toggleMute,
                 child: Text(isConversationMuted ? 'Unmute thread' : 'Mute thread'),
               ),
+              const PopupMenuItem(
+                value: _DmMenuAction.chooseDisappearing,
+                child: Text('Disappearing messages'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.chooseTheme,
+                child: Text('Chat theme'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.aiPolish,
+                child: Text('AI polish draft'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.smartComposeMode,
+                child: Text('Smart compose mode'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.addMessagePack,
+                child: Text('Send message pack'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.advancedSearch,
+                child: Text('Advanced filters'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.privacyControls,
+                child: Text('Privacy controls'),
+              ),
             ],
             child: Glass(
               radius: BorderRadius.circular(16),
@@ -2324,7 +3220,7 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-class _Bubble extends StatelessWidget {
+class _Bubble extends StatefulWidget {
   final String text;
   final String rawContent;
   final String time;
@@ -2337,6 +3233,14 @@ class _Bubble extends StatelessWidget {
   final ValueChanged<String>? onTapFile;
   final ValueChanged<String>? onReact;
   final bool pinned;
+  final VoidCallback? onSwipeReply;
+  final DateTime? editedAt;
+  final String? replyToMessageId;
+  final ValueChanged<String?>? onTapReplySource;
+  final String deliveryStatus;
+  final bool isHighlighted;
+  final bool showAutoTranslation;
+  final String autoTranslateLanguage;
 
   const _Bubble({
     required this.text,
@@ -2351,176 +3255,264 @@ class _Bubble extends StatelessWidget {
     this.onTapFile,
     this.onReact,
     this.pinned = false,
+    this.onSwipeReply,
+    this.editedAt,
+    this.replyToMessageId,
+    this.onTapReplySource,
+    this.deliveryStatus = '',
+    this.isHighlighted = false,
+    this.showAutoTranslation = false,
+    this.autoTranslateLanguage = 'English',
   });
 
   @override
+  State<_Bubble> createState() => _BubbleState();
+}
+
+class _BubbleState extends State<_Bubble> {
+  late final AudioPlayer _voicePlayer;
+  bool _isPlayingVoice = false;
+  double _voiceSpeed = 1.0;
+  Duration _voicePosition = Duration.zero;
+  Duration _voiceDuration = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _voicePlayer = AudioPlayer();
+    _voicePlayer.positionStream.listen((p) {
+      if (!mounted) return;
+      setState(() => _voicePosition = p);
+    });
+    _voicePlayer.durationStream.listen((d) {
+      if (!mounted || d == null) return;
+      setState(() => _voiceDuration = d);
+    });
+    _voicePlayer.playerStateStream.listen((state) {
+      if (!mounted) return;
+      final playing = state.playing;
+      if (_isPlayingVoice != playing) {
+        setState(() => _isPlayingVoice = playing);
+      }
+      if (state.processingState == ProcessingState.completed) {
+        _voicePlayer.seek(Duration.zero);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    unawaited(_voicePlayer.dispose());
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final align = isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
+    final align = widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     final radius = BorderRadius.only(
       topLeft: const Radius.circular(18),
       topRight: const Radius.circular(18),
-      bottomLeft: Radius.circular(isMe ? 18 : 6),
-      bottomRight: Radius.circular(isMe ? 6 : 18),
+      bottomLeft: Radius.circular(widget.isMe ? 18 : 6),
+      bottomRight: Radius.circular(widget.isMe ? 6 : 18),
     );
 
     final scheme = Theme.of(context).colorScheme;
-    final parsed = _MessagePayload.parse(rawContent);
+    final parsed = _MessagePayload.parse(widget.rawContent);
     final isImage = parsed.type == 'image';
     final imageUrl = parsed.url;
     final isVoice = parsed.type == 'voice';
     final isFile = parsed.type == 'file';
-
+    final isPack = parsed.type == 'poll' || parsed.type == 'checklist' || parsed.type == 'invite' || parsed.type == 'location' || parsed.type == 'contact';
 
     return Column(
       crossAxisAlignment: align,
       children: [
-        if (replyTo != null)
+        if (widget.replyTo != null)
           Padding(
             padding: EdgeInsets.only(
               bottom: 4,
-              right: isMe ? 4 : 0,
-              left: isMe ? 0 : 4,
+              right: widget.isMe ? 4 : 0,
+              left: widget.isMe ? 0 : 4,
             ),
-            child: Text(
-              'Replying to: $replyTo',
-              style: TextStyle(
-                color: scheme.onSurface.withValues(alpha: 0.6),
-                fontSize: 11,
-                fontStyle: FontStyle.italic,
+            child: InkWell(
+              onTap: () => widget.onTapReplySource?.call(widget.replyToMessageId),
+              child: Text(
+                'Replying to: ${widget.replyTo}',
+                style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.6),
+                  fontSize: 11,
+                  fontStyle: FontStyle.italic,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         GestureDetector(
-          onLongPress: onLongPress,
-          onTap: isFile && parsed.url != null ? () => onTapFile?.call(parsed.url!) : null,
+          onLongPress: widget.onLongPress,
+          onHorizontalDragEnd: (details) {
+            final v = details.primaryVelocity ?? 0;
+            if ((widget.isMe && v < -180) || (!widget.isMe && v > 180)) {
+              widget.onSwipeReply?.call();
+            }
+          },
+          onTap: isFile && parsed.url != null ? () => widget.onTapFile?.call(parsed.url!) : null,
           child: Container(
-          constraints: const BoxConstraints(maxWidth: 320),
-          padding: EdgeInsets.symmetric(
-            horizontal: isImage ? 6 : 14,
-            vertical: isImage ? 6 : 12,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: radius,
-            color: isMe
-                ? scheme.primary.withValues(alpha: 0.12)
-                : scheme.onSurface.withValues(alpha: 0.07),
-            border: Border.all(
-              color: isMe
-                  ? scheme.primary.withValues(alpha: 0.24)
-                  : scheme.onSurface.withValues(alpha: 0.12),
+            constraints: const BoxConstraints(maxWidth: 320),
+            padding: EdgeInsets.symmetric(
+              horizontal: isImage ? 6 : 14,
+              vertical: isImage ? 6 : 12,
             ),
-          ),
-          child: isImage
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    imageUrl ?? '',
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Text(
-                        'Image unavailable',
-                        style: TextStyle(
-                          color: scheme.onSurface.withValues(alpha: 0.75),
-                          fontWeight: FontWeight.w700,
+            decoration: BoxDecoration(
+              borderRadius: radius,
+              color: widget.isMe
+                  ? scheme.primary.withValues(alpha: 0.12)
+                  : scheme.onSurface.withValues(alpha: 0.07),
+              border: Border.all(
+                color: widget.isHighlighted
+                    ? scheme.tertiary.withValues(alpha: 0.9)
+                    : (widget.isMe
+                        ? scheme.primary.withValues(alpha: 0.24)
+                        : scheme.onSurface.withValues(alpha: 0.12)),
+                width: widget.isHighlighted ? 1.6 : 1,
+              ),
+            ),
+            child: isImage
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      imageUrl ?? '',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Text(
+                          'Image unavailable',
+                          style: TextStyle(
+                            color: scheme.onSurface.withValues(alpha: 0.75),
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                )
-              : isVoice
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.play_arrow_rounded, color: scheme.primary),
-                        const SizedBox(width: 6),
-                        Text(
-                          text,
-                          style: TextStyle(
-                            color: scheme.onSurface.withValues(alpha: 0.92),
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ],
-                    )
-                  : isFile
-                      ? Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.description_rounded, color: scheme.primary),
-                            const SizedBox(width: 8),
-                            Flexible(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    parsed.fileName ?? 'Document',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: scheme.onSurface.withValues(alpha: 0.92),
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
-                                  if (parsed.sizeBytes != null)
+                  )
+                : isVoice
+                    ? _PremiumVoiceBubbleContent(
+                        durationLabel: parsed.text ?? widget.text,
+                        isPlaying: _isPlayingVoice,
+                        waveform: parsed.waveform,
+                        onPlayPause: () => _toggleVoicePlayback(parsed.url),
+                        isMine: widget.isMe,
+                        speed: _voiceSpeed,
+                        onToggleSpeed: _toggleVoiceSpeed,
+                        progressMs: _voicePosition.inMilliseconds,
+                        durationMs: (_voiceDuration.inMilliseconds <= 0 ? (parsed.duration ?? 0) * 1000 : _voiceDuration.inMilliseconds),
+                        onSeek: (ms) => _voicePlayer.seek(Duration(milliseconds: ms.round())),
+                        transcript: parsed.transcript,
+                      )
+                    : isFile
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.description_rounded, color: scheme.primary),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
                                     Text(
-                                      _formatBytes(parsed.sizeBytes!),
+                                      parsed.fileName ?? 'Document',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
-                                        color: scheme.onSurface.withValues(alpha: 0.66),
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 12,
+                                        color: scheme.onSurface.withValues(alpha: 0.92),
+                                        fontWeight: FontWeight.w800,
                                       ),
                                     ),
-                                ],
+                                    if (parsed.sizeBytes != null)
+                                      Text(
+                                        _formatBytes(parsed.sizeBytes!),
+                                        style: TextStyle(
+                                          color: scheme.onSurface.withValues(alpha: 0.66),
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ),
+                            ],
+                          )
+                        : isPack
+                        ? _PackMessageCard(payload: parsed)
+                        : Text(
+                            widget.showAutoTranslation && !widget.isMe ? '${widget.text}\n↳ ${widget.autoTranslateLanguage}: ${widget.text}' : widget.text,
+                            style: TextStyle(
+                              color: scheme.onSurface.withValues(alpha: 0.92),
+                              fontWeight: FontWeight.w700,
+                              height: 1.25,
+                              fontSize: 14.5,
                             ),
-                          ],
-                        )
-                      : Text(
-                          text,
-                          style: TextStyle(
-                            color: scheme.onSurface.withValues(alpha: 0.92),
-                            fontWeight: FontWeight.w700,
-                            height: 1.25,
-                            fontSize: 14.5,
                           ),
-                        ),
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: 4, right: isMe ? 4 : 0, left: isMe ? 0 : 4),
+          padding: EdgeInsets.only(top: 4, right: widget.isMe ? 4 : 0, left: widget.isMe ? 0 : 4),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (pinned)
+              if (widget.pinned)
                 Padding(
                   padding: const EdgeInsets.only(right: 4),
                   child: Icon(Icons.push_pin_rounded, size: 12, color: scheme.primary),
                 ),
               Text(
-                time,
+                widget.time,
                 style: TextStyle(
                   color: scheme.onSurface.withValues(alpha: 0.55),
                   fontSize: 10.5,
                   fontWeight: FontWeight.w700,
                 ),
               ),
+              if (widget.editedAt != null)
+                Text(
+                  ' · edited',
+                  style: TextStyle(
+                    color: scheme.onSurface.withValues(alpha: 0.45),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              if (widget.isMe)
+                Text(
+                  ' · ${widget.deliveryStatus}',
+                  style: TextStyle(
+                    color: scheme.onSurface.withValues(alpha: 0.45),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              if (widget.isMe && widget.readAt != null)
+                Text(
+                  ' · seen ${widget.readAt!.substring(11, 16)}',
+                  style: TextStyle(
+                    color: scheme.onSurface.withValues(alpha: 0.45),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
             ],
           ),
         ),
-
-        if (reactions.isNotEmpty)
+        if (widget.reactions.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 4),
             child: Wrap(
               spacing: 6,
-              children: reactions.entries.map((entry) {
+              children: widget.reactions.entries.map((entry) {
                 final count = (entry.value as List?)?.length ?? 0;
                 return GestureDetector(
-                  onTap: () => onReact?.call(entry.key),
+                  onTap: () => widget.onReact?.call(entry.key),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
@@ -2533,25 +3525,318 @@ class _Bubble extends StatelessWidget {
               }).toList(),
             ),
           ),
-        if (isMe)
+        if (widget.isMe)
           Padding(
             padding: const EdgeInsets.only(top: 2, right: 4),
             child: Icon(
-              isRead ? Icons.done_all_rounded : Icons.done_rounded,
+              widget.isRead ? Icons.done_all_rounded : Icons.done_rounded,
               size: 14,
-              color: isRead ? const Color(0xFF58F7B6) : scheme.onSurface.withValues(alpha: 0.5),
+              color: widget.isRead ? const Color(0xFF58F7B6) : scheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
       ],
     );
   }
 
+  void _toggleVoiceSpeed() {
+    const speeds = [1.0, 1.5, 2.0];
+    final idx = speeds.indexOf(_voiceSpeed);
+    final next = speeds[(idx + 1) % speeds.length];
+    setState(() => _voiceSpeed = next);
+    _voicePlayer.setSpeed(next);
+  }
+
+  Future<void> _toggleVoicePlayback(String? url) async {
+    if (url == null || url.isEmpty) return;
+    try {
+      if (_voicePlayer.playing) {
+        await _voicePlayer.pause();
+        return;
+      }
+      await _voicePlayer.setUrl(url);
+      await _voicePlayer.setSpeed(_voiceSpeed);
+      await _voicePlayer.play();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Unable to play voice message')),
+      );
+    }
+  }
 
   String _formatBytes(int bytes) {
     if (bytes < 1024) return '$bytes B';
     final kb = bytes / 1024;
     if (kb < 1024) return '${kb.toStringAsFixed(1)} KB';
     return '${(kb / 1024).toStringAsFixed(1)} MB';
+  }
+}
+
+class _PremiumVoiceBubbleContent extends StatelessWidget {
+  final String durationLabel;
+  final bool isPlaying;
+  final List<double> waveform;
+  final VoidCallback onPlayPause;
+  final bool isMine;
+  final double speed;
+  final VoidCallback onToggleSpeed;
+  final int progressMs;
+  final int durationMs;
+  final ValueChanged<double> onSeek;
+  final String? transcript;
+
+  const _PremiumVoiceBubbleContent({
+    required this.durationLabel,
+    required this.isPlaying,
+    required this.waveform,
+    required this.onPlayPause,
+    required this.isMine,
+    required this.speed,
+    required this.onToggleSpeed,
+    required this.progressMs,
+    required this.durationMs,
+    required this.onSeek,
+    this.transcript,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        InkWell(
+          borderRadius: BorderRadius.circular(999),
+          onTap: onPlayPause,
+          child: Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isMine ? scheme.primary.withValues(alpha: 0.24) : scheme.primary.withValues(alpha: 0.18),
+            ),
+            child: Icon(isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded, color: scheme.primary),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _Waveform(
+                bars: waveform,
+                color: scheme.primary,
+                dimColor: scheme.onSurface.withValues(alpha: 0.26),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                durationLabel,
+                style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.9),
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 4),
+              InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: onToggleSpeed,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    color: scheme.onSurface.withValues(alpha: 0.08),
+                  ),
+                  child: Text(
+                    '${speed.toStringAsFixed(speed.truncateToDouble()==speed ? 0 : 1)}x',
+                    style: TextStyle(
+                      color: scheme.onSurface.withValues(alpha: 0.8),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11,
+                    ),
+                  ),
+                ),
+              ),
+              SliderTheme(
+                data: SliderTheme.of(context).copyWith(trackHeight: 2.4, thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5)),
+                child: Slider(
+                  min: 0,
+                  max: durationMs <= 0 ? 1 : durationMs.toDouble(),
+                  value: progressMs.clamp(0, durationMs <= 0 ? 1 : durationMs).toDouble(),
+                  onChanged: onSeek,
+                ),
+              ),
+              if (transcript != null && transcript!.isNotEmpty)
+                Text(
+                  transcript!,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: scheme.onSurface.withValues(alpha: 0.72),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11.5,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _Waveform extends StatelessWidget {
+  final List<double> bars;
+  final Color color;
+  final Color dimColor;
+
+  const _Waveform({
+    required this.bars,
+    required this.color,
+    required this.dimColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final data = bars.isEmpty
+        ? const [0.35, 0.5, 0.75, 0.42, 0.6, 0.88, 0.48, 0.7, 0.56, 0.8, 0.38, 0.62]
+        : bars;
+    return SizedBox(
+      height: 20,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          for (final value in data)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 1),
+              child: Container(
+                width: 3,
+                height: 6 + (14 * value.clamp(0.0, 1.0)),
+                decoration: BoxDecoration(
+                  color: Color.lerp(dimColor, color, value.clamp(0.0, 1.0)),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+class _PackMessageCard extends StatefulWidget {
+  final _MessagePayload payload;
+
+  const _PackMessageCard({required this.payload});
+
+  @override
+  State<_PackMessageCard> createState() => _PackMessageCardState();
+}
+
+class _PackMessageCardState extends State<_PackMessageCard> {
+  final Set<int> _checkedItems = <int>{};
+  int? _pollVoteIndex;
+  bool _rsvpAccepted = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final payload = widget.payload;
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: scheme.primary.withValues(alpha: 0.08),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            payload.label ?? payload.text ?? payload.type.toUpperCase(),
+            style: TextStyle(
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          if (payload.type == 'poll' && payload.items.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            for (var i = 0; i < payload.items.length; i++)
+              ListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(_pollVoteIndex == i ? Icons.radio_button_checked_rounded : Icons.radio_button_unchecked_rounded, size: 18),
+                title: Text(payload.items[i], style: TextStyle(fontSize: 12, color: scheme.onSurface.withValues(alpha: 0.82))),
+                onTap: () => setState(() => _pollVoteIndex = i),
+              ),
+          ] else if (payload.type == 'checklist' && payload.items.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            for (var i = 0; i < payload.items.length; i++)
+              CheckboxListTile(
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+                value: _checkedItems.contains(i),
+                onChanged: (_) => setState(() {
+                  if (_checkedItems.contains(i)) {
+                    _checkedItems.remove(i);
+                  } else {
+                    _checkedItems.add(i);
+                  }
+                }),
+                title: Text(payload.items[i], style: TextStyle(fontSize: 12, color: scheme.onSurface.withValues(alpha: 0.82))),
+              ),
+          ] else if (payload.type == 'invite') ...[
+            const SizedBox(height: 8),
+            FilledButton.icon(
+              onPressed: () => setState(() => _rsvpAccepted = !_rsvpAccepted),
+              icon: Icon(_rsvpAccepted ? Icons.check_rounded : Icons.event_available_rounded, size: 16),
+              label: Text(_rsvpAccepted ? 'RSVP: Going' : 'RSVP'),
+            ),
+          ] else if (payload.items.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            for (final item in payload.items.take(4))
+              Padding(
+                padding: const EdgeInsets.only(bottom: 2),
+                child: Text('• $item', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82))),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PinnedMomentsStrip extends StatelessWidget {
+  final List<String> messageIds;
+  final ValueChanged<String?> onTap;
+
+  const _PinnedMomentsStrip({required this.messageIds, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    if (messageIds.isEmpty) return const SizedBox.shrink();
+    final theme = Theme.of(context);
+    return SizedBox(
+      height: 42,
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, i) {
+          final id = messageIds[i];
+          return ActionChip(
+            avatar: const Icon(Icons.auto_awesome_rounded, size: 14),
+            label: Text('Moment ${i + 1}'),
+            labelStyle: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w700),
+            onPressed: () => onTap(id),
+          );
+        },
+        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        itemCount: messageIds.length,
+      ),
+    );
   }
 }
 
@@ -2564,6 +3849,12 @@ class _MessagePayload {
   final String? fileName;
   final int? sizeBytes;
   final String? replyTo;
+  final List<double> waveform;
+  final DateTime? expiresAt;
+  final String? replyToMessageId;
+  final String? transcript;
+  final String? label;
+  final List<String> items;
 
   const _MessagePayload({
     required this.type,
@@ -2574,6 +3865,12 @@ class _MessagePayload {
     this.fileName,
     this.sizeBytes,
     this.replyTo,
+    this.waveform = const [],
+    this.expiresAt,
+    this.replyToMessageId,
+    this.transcript,
+    this.label,
+    this.items = const [],
   });
 
   static _MessagePayload parse(String raw) {
@@ -2590,6 +3887,12 @@ class _MessagePayload {
 
           sizeBytes: map['size'] is int ? map['size'] as int : int.tryParse('${map['size']}'),
           replyTo: map['reply_to']?.toString(),
+          replyToMessageId: map['reply_to_message_id']?.toString(),
+          transcript: map['transcript']?.toString(),
+          label: map['label']?.toString(),
+          items: ((map['items'] as List?) ?? (map['options'] as List?) ?? const []).map((e) => e.toString()).toList(),
+          waveform: (map['waveform'] as List?)?.map((e) => double.tryParse('$e') ?? 0.3).toList() ?? const [],
+          expiresAt: DateTime.tryParse(map['expires_at']?.toString() ?? ''),
         );
       }
     } catch (_) {
@@ -2624,6 +3927,11 @@ class _ChatMessage {
       'image' => 'Photo',
       'voice' => 'Voice message ${payload.text ?? ''}'.trim(),
       'file' => payload.fileName?.isNotEmpty == true ? 'Document: ${payload.fileName}' : 'Document',
+      'poll' => 'Poll: ${payload.label ?? payload.text ?? ''}',
+      'checklist' => 'Checklist',
+      'invite' => payload.label ?? 'Invite',
+      'location' => 'Location',
+      'contact' => 'Contact card',
       _ => payload.text ?? raw,
     };
 
@@ -2646,10 +3954,18 @@ class _InputBar extends StatelessWidget {
   final VoidCallback onVoiceMessage;
   final VoidCallback onSendImage;
   final VoidCallback onSendFile;
+  final VoidCallback onOpenAttachmentTray;
   final ValueChanged<bool> onTypingChanged;
   final ValueChanged<String> onTextChanged;
   final bool isRecordingVoiceMessage;
   final int recordingSeconds;
+  final bool hasDraftVoice;
+  final int draftVoiceSeconds;
+  final List<double> draftVoiceWaveform;
+  final bool isPlayingDraftVoice;
+  final VoidCallback onToggleDraftVoice;
+  final VoidCallback onSendDraftVoice;
+  final VoidCallback onDeleteDraftVoice;
 
   const _InputBar({
     required this.controller,
@@ -2659,10 +3975,18 @@ class _InputBar extends StatelessWidget {
     required this.onVoiceMessage,
     required this.onSendImage,
     required this.onSendFile,
+    required this.onOpenAttachmentTray,
     required this.onTypingChanged,
     required this.onTextChanged,
     required this.isRecordingVoiceMessage,
     required this.recordingSeconds,
+    required this.hasDraftVoice,
+    required this.draftVoiceSeconds,
+    required this.draftVoiceWaveform,
+    required this.isPlayingDraftVoice,
+    required this.onToggleDraftVoice,
+    required this.onSendDraftVoice,
+    required this.onDeleteDraftVoice,
   });
 
   @override
@@ -2670,6 +3994,8 @@ class _InputBar extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final recordMm = (recordingSeconds ~/ 60).toString().padLeft(2, '0');
     final recordSs = (recordingSeconds % 60).toString().padLeft(2, '0');
+    final draftMm = (draftVoiceSeconds ~/ 60).toString().padLeft(2, '0');
+    final draftSs = (draftVoiceSeconds % 60).toString().padLeft(2, '0');
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
@@ -2699,6 +4025,68 @@ class _InputBar extends StatelessWidget {
                 ),
               ),
             ),
+          if (hasDraftVoice && !isRecordingVoiceMessage)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Glass(
+                radius: BorderRadius.circular(16),
+                padding: const EdgeInsets.fromLTRB(10, 8, 8, 8),
+                child: Row(
+                  children: [
+                    InkWell(
+                      borderRadius: BorderRadius.circular(999),
+                      onTap: onToggleDraftVoice,
+                      child: Container(
+                        width: 36,
+                        height: 36,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: scheme.primary.withValues(alpha: 0.16),
+                        ),
+                        child: Icon(
+                          isPlayingDraftVoice ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                          color: scheme.primary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Voice draft $draftMm:$draftSs',
+                            style: TextStyle(
+                              color: scheme.onSurface.withValues(alpha: 0.9),
+                              fontWeight: FontWeight.w800,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          _Waveform(
+                            bars: draftVoiceWaveform,
+                            color: scheme.primary,
+                            dimColor: scheme.onSurface.withValues(alpha: 0.25),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      tooltip: 'Delete',
+                      onPressed: onDeleteDraftVoice,
+                      icon: Icon(Icons.delete_outline_rounded, color: scheme.error),
+                    ),
+                    FilledButton.icon(
+                      onPressed: onSendDraftVoice,
+                      icon: const Icon(Icons.send_rounded, size: 16),
+                      label: const Text('Send'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           Glass(
             radius: BorderRadius.circular(22),
             padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),
@@ -2708,8 +4096,7 @@ class _InputBar extends StatelessWidget {
                   child: TextField(
                     controller: controller,
                     focusNode: focusNode,
-                    style: TextStyle(
-                        color: scheme.onSurface, fontWeight: FontWeight.w700),
+                    style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
                     cursorColor: scheme.primary,
                     minLines: 1,
                     maxLines: isComposerFocused ? 6 : 4,
@@ -2744,7 +4131,7 @@ class _InputBar extends StatelessWidget {
                       ? InkWell(
                           key: const ValueKey('expand-attachments'),
                           borderRadius: BorderRadius.circular(18),
-                          onTap: () => focusNode.unfocus(),
+                          onTap: onOpenAttachmentTray,
                           child: Container(
                             width: 44,
                             height: 44,
@@ -2753,8 +4140,7 @@ class _InputBar extends StatelessWidget {
                               color: scheme.onSurface.withValues(alpha: 0.10),
                               border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
                             ),
-                            child: Icon(Icons.more_horiz_rounded,
-                                color: scheme.onSurface.withValues(alpha: 0.92)),
+                            child: Icon(Icons.more_horiz_rounded, color: scheme.onSurface.withValues(alpha: 0.92)),
                           ),
                         )
                       : Row(
@@ -2799,18 +4185,24 @@ class _InputBar extends StatelessWidget {
                                 height: 44,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16),
-                                  color: isRecordingVoiceMessage
-                                      ? const Color(0xFFFF6B6B).withValues(alpha: 0.18)
-                                      : scheme.primary.withValues(alpha: 0.12),
-                                  border: Border.all(
-                                    color: isRecordingVoiceMessage
-                                        ? const Color(0xFFFF6B6B)
-                                        : scheme.primary.withValues(alpha: 0.22),
+                                  gradient: LinearGradient(
+                                    colors: isRecordingVoiceMessage
+                                        ? [const Color(0xFFFF8A8A), const Color(0xFFFF4D6D)]
+                                        : [scheme.primary.withValues(alpha: 0.85), scheme.tertiary.withValues(alpha: 0.75)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
                                   ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: scheme.primary.withValues(alpha: 0.35),
+                                      blurRadius: 14,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
                                 ),
                                 child: Icon(
                                   isRecordingVoiceMessage ? Icons.stop_rounded : Icons.mic_rounded,
-                                  color: isRecordingVoiceMessage ? const Color(0xFFFF6B6B) : scheme.primary,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
@@ -2829,8 +4221,7 @@ class _InputBar extends StatelessWidget {
                       color: scheme.onSurface.withValues(alpha: 0.10),
                       border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
                     ),
-                    child: Icon(Icons.send_rounded,
-                        color: scheme.onSurface.withValues(alpha: 0.92)),
+                    child: Icon(Icons.send_rounded, color: scheme.onSurface.withValues(alpha: 0.92)),
                   ),
                 ),
               ],
