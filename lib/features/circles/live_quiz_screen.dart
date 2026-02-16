@@ -1152,15 +1152,15 @@ class _CompactLeaderChip extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: leader.isMe ? const Color(0xFF33D6FF) : Colors.white.withValues(alpha: 0.9),
+                color: leader.isMe ? const Color(0xFF33D6FF) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
                 fontWeight: leader.isMe ? FontWeight.w800 : FontWeight.w600,
                 fontSize: 9,
               ),
             ),
              Text(
                 '${leader.score}',
-                style: const TextStyle(
-                  color: Colors.white70,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   fontWeight: FontWeight.w700,
                   fontSize: 8,
                 ),
@@ -1308,8 +1308,8 @@ class _AvatarBubble extends StatelessWidget {
                     errorBuilder: (_, __, ___) => Center(
                       child: Text(
                         initial,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w900,
                           fontSize: 14,
                         ),
@@ -1319,8 +1319,8 @@ class _AvatarBubble extends StatelessWidget {
                 : Center(
                     child: Text(
                       initial,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w900,
                         fontSize: 14,
                       ),
@@ -1388,12 +1388,12 @@ class _RolePill extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(icon, color: Colors.white.withValues(alpha: 0.92), size: 18),
+        Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92), size: 18),
         const SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.w900,
           ),
         ),
@@ -1412,13 +1412,13 @@ class _SpectatorFooter extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       child: Row(
         children: [
-          Icon(Icons.visibility_rounded, color: Colors.white.withValues(alpha: 0.9), size: 20),
+          Icon(Icons.visibility_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               AppLocalizations.of(context).liveQuizSpectatorFooter,
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.75),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
                 fontWeight: FontWeight.w700,
                 fontSize: 12.5,
               ),
@@ -1440,8 +1440,8 @@ class _QuizProgressBar extends StatelessWidget {
       height: 10,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(999),
@@ -1537,7 +1537,7 @@ class _TtsControls extends StatelessWidget {
                 padding: const EdgeInsets.all(4),
                 child: Icon(
                   Icons.volume_up_rounded, 
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
                   size: 18,
                 ),
               ),
@@ -1570,13 +1570,19 @@ class _SpeedChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 7),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: selected ? Colors.white.withValues(alpha: 0.16) : Colors.white.withValues(alpha: 0.08),
-          border: Border.all(color: selected ? Colors.white.withValues(alpha: 0.32) : Colors.white.withValues(alpha: 0.16)),
+          color: selected
+              ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)
+              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+          border: Border.all(
+            color: selected
+                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.32)
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16),
+          ),
         ),
         alignment: Alignment.center,
         child: Text(
           label,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 10),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w800, fontSize: 10),
         ),
       ),
     );
@@ -1623,8 +1629,8 @@ class _VocabPromptLine extends StatelessWidget {
                     ),
                     TextSpan(
                       text: safeWord,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w900,
                         fontSize: 18,
                         height: 1.2,
@@ -1634,8 +1640,8 @@ class _VocabPromptLine extends StatelessWidget {
                 : [
                     TextSpan(
                       text: safeWord,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w900,
                         fontSize: 18,
                         height: 1.2,
@@ -1668,13 +1674,13 @@ class _GenderChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.20)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.20)),
       ),
       child: Text(
         display,
-        style: const TextStyle(
-          color: Colors.white,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
           fontWeight: FontWeight.w800,
           fontSize: 11.5,
           letterSpacing: 0.4,

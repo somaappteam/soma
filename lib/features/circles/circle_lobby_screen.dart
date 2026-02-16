@@ -2381,12 +2381,12 @@ class _LobbyActionTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Colors.black.withValues(alpha: 0.12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 20),
+            Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -2394,8 +2394,8 @@ class _LobbyActionTile extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w900,
                       fontSize: 14,
                     ),
@@ -2404,7 +2404,7 @@ class _LobbyActionTile extends StatelessWidget {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.65),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
                     ),
@@ -2413,7 +2413,7 @@ class _LobbyActionTile extends StatelessWidget {
               ),
             ),
             Icon(Icons.chevron_right_rounded,
-                color: Colors.white.withValues(alpha: 0.6)),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
           ],
         ),
       ),
@@ -2448,8 +2448,8 @@ class _HostSettingRow extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w800,
               ),
             ),
@@ -2459,14 +2459,14 @@ class _HostSettingRow extends StatelessWidget {
             icon: Icon(
               Icons.remove_circle_outline_rounded,
               color: onMinus == null
-                  ? Colors.white.withValues(alpha: 0.3)
-                  : Colors.white,
+                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
+                  : Theme.of(context).colorScheme.onSurface,
             ),
           ),
           Text(
             value,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontWeight: FontWeight.w900,
               fontSize: 14,
             ),
@@ -2476,8 +2476,8 @@ class _HostSettingRow extends StatelessWidget {
             icon: Icon(
               Icons.add_circle_outline_rounded,
               color: onPlus == null
-                  ? Colors.white.withValues(alpha: 0.3)
-                  : Colors.white,
+                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
+                  : Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
@@ -2577,7 +2577,7 @@ class _PlayerTip extends StatelessWidget {
             child: Text(
               "Tap Ready when you’re set. Host will start the match.",
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.80),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -2601,13 +2601,13 @@ class _SpectatorTip extends StatelessWidget {
       child: Row(
         children: [
           Icon(Icons.visibility_rounded,
-              color: Colors.white.withValues(alpha: 0.85), size: 20),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85), size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               "You're spectating. Watch live once the host starts.",
               style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.80),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w700,
               ),
             ),

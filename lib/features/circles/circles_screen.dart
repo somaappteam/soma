@@ -40,8 +40,6 @@ class _CirclesScreenState extends State<CirclesScreen> {
 
   List<SoloCourse> _courses = [];
   int _coursesRevision = 0;
-  bool _isOpeningExchangeCoursePicker = false;
-  bool _hasAutoOpenedExchangeCoursePicker = false;
   late final Stream<List<Map<String, dynamic>>> _openCirclesStream;
 
   @override
@@ -149,59 +147,6 @@ class _CirclesScreenState extends State<CirclesScreen> {
     return fromLabel == option.fromName.toLowerCase() && toLabel == option.toName.toLowerCase();
   }
 
-  List<_ExchangeUser> _buildExchangeUsers() {
-    for (final course in _courses) {
-      final option = _CourseOption.fromCourse(course);
-      if (option.fromName.isEmpty || option.toName.isEmpty) continue;
-      return [
-        _ExchangeUser(
-          userId: 'self',
-          name: 'You',
-          speaks: option.fromName,
-          learns: option.toName,
-          level: 'B1',
-          compatibility: 100,
-          isCurrentUser: true,
-          isOnline: true,
-        ),
-      ];
-    }
-
-    return const [];
-  }
-
-  Future<void> _openExchangeCoursePicker() async {
-    if (_isOpeningExchangeCoursePicker) return;
-    _isOpeningExchangeCoursePicker = true;
-    try {
-      final created = await Navigator.push<SoloCourse>(
-        context,
-        MaterialPageRoute(builder: (_) => const AddCourseScreen()),
-      );
-
-      if (created != null) {
-        await coursesRepository.addCustomCourse(created);
-        await _loadCourses(selectCourseId: created.id);
-      }
-
-      if (mounted && created != null) {
-        setState(() => _selectedTab = _CirclesHomeTab.exchangeChat);
-      }
-    } finally {
-      _isOpeningExchangeCoursePicker = false;
-    }
-  }
-
-  void _maybeAutoOpenCoursePickerForExchange() {
-    if (_selectedTab != _CirclesHomeTab.exchangeChat) return;
-    if (_courses.isNotEmpty || _isOpeningExchangeCoursePicker || _hasAutoOpenedExchangeCoursePicker) return;
-    _hasAutoOpenedExchangeCoursePicker = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || _selectedTab != _CirclesHomeTab.exchangeChat) return;
-      _openExchangeCoursePicker();
-    });
-  }
-
   Future<void> _selectCourseFilter(List<_CourseOption> options) async {
     final l10n = AppLocalizations.of(context);
     final items = <_FilterOption>[
@@ -276,7 +221,6 @@ class _CirclesScreenState extends State<CirclesScreen> {
     final l10n = AppLocalizations.of(context);
     final isCompactWidth = MediaQuery.sizeOf(context).width < 380;
     _syncCoursesIfNeeded();
-    _maybeAutoOpenCoursePickerForExchange();
     final courseOptions = _buildCourseOptions();
     _CourseOption? selectedCourseOption;
     if (_selectedCourseId != _courseAll) {
@@ -490,15 +434,8 @@ class _CirclesScreenState extends State<CirclesScreen> {
               ),
 
               ] else ...[
-                Expanded(
-                  child: _courses.isEmpty
-                      ? _ExchangeCourseRequired(onSelectCourse: _openExchangeCoursePicker)
-                      : _LanguageExchangePanel(
-                          users: _buildExchangeUsers(),
-                          selectedCourse: selectedCourseOption,
-                          selectedCourseLabel: _courseLabel(courseOptions, l10n),
-                          onSelectCourse: () => _selectCourseFilter(courseOptions),
-                        ),
+                const Expanded(
+                  child: _LanguageExchangePanel(),
                 ),
               ],
 
@@ -626,69 +563,479 @@ class _ExchangeUser {
   });
 }
 
+class _ExchangeLanguageOption {
+  final String name;
+  final String code;
 
-class _ExchangeCourseRequired extends StatelessWidget {
-  final Future<void> Function() onSelectCourse;
+  const _ExchangeLanguageOption({required this.name, required this.code});
+}
 
-  const _ExchangeCourseRequired({required this.onSelectCourse});
+class _LearnLanguagePref {
+  final _ExchangeLanguageOption language;
+  final String level;
 
-  @override
-  Widget build(BuildContext context) {
-    return Glass(
-      radius: BorderRadius.circular(16),
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Select a course to start Social Exchange',
-            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'We use your selected course to match people by speaks/learns language.',
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.78),
-            ),
-          ),
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: NeonButton(
-              label: 'Select course',
-              onTap: onSelectCourse,
-            ),
-          ),
-        ],
-      ),
-    );
+  const _LearnLanguagePref({required this.language, required this.level});
+
+  _LearnLanguagePref copyWith({String? level}) {
+    return _LearnLanguagePref(language: language, level: level ?? this.level);
   }
 }
 
-class _LanguageExchangePanel extends StatefulWidget {
-  final List<_ExchangeUser> users;
-  final _CourseOption? selectedCourse;
-  final String selectedCourseLabel;
-  final Future<void> Function() onSelectCourse;
 
-  const _LanguageExchangePanel({
-    required this.users,
-    required this.selectedCourse,
-    required this.selectedCourseLabel,
-    required this.onSelectCourse,
-  });
+class _LanguageExchangePanel extends StatefulWidget {
+  const _LanguageExchangePanel();
 
   @override
   State<_LanguageExchangePanel> createState() => _LanguageExchangePanelState();
 }
 
 class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
+  static const List<_ExchangeLanguageOption> _exchangeLanguages = [
+    _ExchangeLanguageOption(name: 'Afar', code: 'aa'),
+    _ExchangeLanguageOption(name: 'Afrikaans', code: 'af'),
+    _ExchangeLanguageOption(name: 'Akan', code: 'ak'),
+    _ExchangeLanguageOption(name: 'Albanian', code: 'sq'),
+    _ExchangeLanguageOption(name: 'Amharic', code: 'am'),
+    _ExchangeLanguageOption(name: 'Arabic (Egyptian)', code: 'ar-EG'),
+    _ExchangeLanguageOption(name: 'Arabic (Gulf)', code: 'ar-AE'),
+    _ExchangeLanguageOption(name: 'Arabic (Iraqi)', code: 'ar-IQ'),
+    _ExchangeLanguageOption(name: 'Arabic (Levantine)', code: 'ar-LB'),
+    _ExchangeLanguageOption(name: 'Arabic (Maghrebi)', code: 'ar-MA'),
+    _ExchangeLanguageOption(name: 'Arabic (Modern Standard)', code: 'ar'),
+    _ExchangeLanguageOption(name: 'Aramaic (Syriac)', code: 'syr'),
+    _ExchangeLanguageOption(name: 'Armenian', code: 'hy'),
+    _ExchangeLanguageOption(name: 'Assyrian (Syriac)', code: 'syr'),
+    _ExchangeLanguageOption(name: 'Asturian', code: 'ast'),
+    _ExchangeLanguageOption(name: 'Awadhi', code: 'awa'),
+    _ExchangeLanguageOption(name: 'Aymara', code: 'ay'),
+    _ExchangeLanguageOption(name: 'Azerbaijani', code: 'az'),
+    _ExchangeLanguageOption(name: 'Balinese', code: 'ban'),
+    _ExchangeLanguageOption(name: 'Balochi', code: 'bal'),
+    _ExchangeLanguageOption(name: 'Bambara', code: 'bm'),
+    _ExchangeLanguageOption(name: 'Basque', code: 'eu'),
+    _ExchangeLanguageOption(name: 'Belarusian', code: 'be'),
+    _ExchangeLanguageOption(name: 'Bemba', code: 'bem'),
+    _ExchangeLanguageOption(name: 'Bengali', code: 'bn'),
+    _ExchangeLanguageOption(name: 'Bhojpuri', code: 'bho'),
+    _ExchangeLanguageOption(name: 'Bosnian', code: 'bs'),
+    _ExchangeLanguageOption(name: 'Braj Bhasha', code: 'bra'),
+    _ExchangeLanguageOption(name: 'Breton', code: 'br'),
+    _ExchangeLanguageOption(name: 'Bulgarian', code: 'bg'),
+    _ExchangeLanguageOption(name: 'Buginese', code: 'bug'),
+    _ExchangeLanguageOption(name: 'Burmese (Myanmar)', code: 'my'),
+    _ExchangeLanguageOption(name: 'Cantonese (Hong Kong)', code: 'zh-HK'),
+    _ExchangeLanguageOption(name: 'Catalan', code: 'ca'),
+    _ExchangeLanguageOption(name: 'Cebuano', code: 'ceb'),
+    _ExchangeLanguageOption(name: 'Chamorro', code: 'ch'),
+    _ExchangeLanguageOption(name: 'Chechen', code: 'ce'),
+    _ExchangeLanguageOption(name: 'Chhattisgarhi', code: 'hne'),
+    _ExchangeLanguageOption(name: 'Chichewa (Nyanja)', code: 'ny'),
+    _ExchangeLanguageOption(name: 'Corsican', code: 'co'),
+    _ExchangeLanguageOption(name: 'Croatian', code: 'hr'),
+    _ExchangeLanguageOption(name: 'Czech', code: 'cs'),
+    _ExchangeLanguageOption(name: 'Danish', code: 'da'),
+    _ExchangeLanguageOption(name: 'Dari (Afghan Persian)', code: 'fa-AF'),
+    _ExchangeLanguageOption(name: 'Dogri', code: 'doi'),
+    _ExchangeLanguageOption(name: 'Dutch', code: 'nl'),
+    _ExchangeLanguageOption(name: 'English', code: 'en'),
+    _ExchangeLanguageOption(name: 'Esperanto', code: 'eo'),
+    _ExchangeLanguageOption(name: 'Estonian', code: 'et'),
+    _ExchangeLanguageOption(name: 'Ewe', code: 'ee'),
+    _ExchangeLanguageOption(name: 'Fang', code: 'fan'),
+    _ExchangeLanguageOption(name: 'Faroese', code: 'fo'),
+    _ExchangeLanguageOption(name: 'Fijian', code: 'fj'),
+    _ExchangeLanguageOption(name: 'Filipino / Tagalog', code: 'fil'),
+    _ExchangeLanguageOption(name: 'Finnish', code: 'fi'),
+    _ExchangeLanguageOption(name: 'French', code: 'fr'),
+    _ExchangeLanguageOption(name: 'Frisian', code: 'fy'),
+    _ExchangeLanguageOption(name: 'Fulani / Fulfulde', code: 'ff'),
+    _ExchangeLanguageOption(name: 'Galician', code: 'gl'),
+    _ExchangeLanguageOption(name: 'Gan Chinese', code: 'gan'),
+    _ExchangeLanguageOption(name: 'Ganda (Luganda)', code: 'lg'),
+    _ExchangeLanguageOption(name: 'Georgian', code: 'ka'),
+    _ExchangeLanguageOption(name: 'German', code: 'de'),
+    _ExchangeLanguageOption(name: 'Greek', code: 'el'),
+    _ExchangeLanguageOption(name: 'Greenlandic (Kalaallisut)', code: 'kl'),
+    _ExchangeLanguageOption(name: 'Guarani', code: 'gn'),
+    _ExchangeLanguageOption(name: 'Gujarati', code: 'gu'),
+    _ExchangeLanguageOption(name: 'Haitian Creole', code: 'ht'),
+    _ExchangeLanguageOption(name: 'Hakka', code: 'hak'),
+    _ExchangeLanguageOption(name: 'Hausa', code: 'ha'),
+    _ExchangeLanguageOption(name: 'Hebrew', code: 'he'),
+    _ExchangeLanguageOption(name: 'Hindi', code: 'hi'),
+    _ExchangeLanguageOption(name: 'Hindko', code: 'hno'),
+    _ExchangeLanguageOption(name: 'Hiri Motu', code: 'ho'),
+    _ExchangeLanguageOption(name: 'Hungarian', code: 'hu'),
+    _ExchangeLanguageOption(name: 'Iban', code: 'iba'),
+    _ExchangeLanguageOption(name: 'Icelandic', code: 'is'),
+    _ExchangeLanguageOption(name: 'Igbo', code: 'ig'),
+    _ExchangeLanguageOption(name: 'Ilocano', code: 'ilo'),
+    _ExchangeLanguageOption(name: 'Indonesian', code: 'id'),
+    _ExchangeLanguageOption(name: 'Inuktitut', code: 'iu'),
+    _ExchangeLanguageOption(name: 'Irish (Gaeilge)', code: 'ga'),
+    _ExchangeLanguageOption(name: 'isiXhosa', code: 'xh'),
+    _ExchangeLanguageOption(name: 'Italian', code: 'it'),
+    _ExchangeLanguageOption(name: 'Japanese', code: 'ja'),
+    _ExchangeLanguageOption(name: 'Javanese', code: 'jv'),
+    _ExchangeLanguageOption(name: 'Kannada', code: 'kn'),
+    _ExchangeLanguageOption(name: 'Kanuri', code: 'kr'),
+    _ExchangeLanguageOption(name: 'Kashmiri', code: 'ks'),
+    _ExchangeLanguageOption(name: 'Kazakh', code: 'kk'),
+    _ExchangeLanguageOption(name: 'Khandeshi', code: 'khn'),
+    _ExchangeLanguageOption(name: 'Khmer', code: 'km'),
+    _ExchangeLanguageOption(name: 'Kikongo', code: 'kg'),
+    _ExchangeLanguageOption(name: 'Kikuyu', code: 'ki'),
+    _ExchangeLanguageOption(name: 'Kinyarwanda', code: 'rw'),
+    _ExchangeLanguageOption(name: 'Kirundi', code: 'rn'),
+    _ExchangeLanguageOption(name: 'Konkani', code: 'kok'),
+    _ExchangeLanguageOption(name: 'Korean', code: 'ko'),
+    _ExchangeLanguageOption(name: 'Kurdish', code: 'ku'),
+    _ExchangeLanguageOption(name: 'Kurmanji (Northern Kurdish)', code: 'kmr'),
+    _ExchangeLanguageOption(name: 'Ladin', code: 'lld'),
+    _ExchangeLanguageOption(name: 'Lao', code: 'lo'),
+    _ExchangeLanguageOption(name: 'Latin', code: 'la'),
+    _ExchangeLanguageOption(name: 'Latvian', code: 'lv'),
+    _ExchangeLanguageOption(name: 'Lingala', code: 'ln'),
+    _ExchangeLanguageOption(name: 'Lithuanian', code: 'lt'),
+    _ExchangeLanguageOption(name: 'Luxembourgish', code: 'lb'),
+    _ExchangeLanguageOption(name: 'Luo', code: 'luo'),
+    _ExchangeLanguageOption(name: 'Macedonian', code: 'mk'),
+    _ExchangeLanguageOption(name: 'Magahi', code: 'mag'),
+    _ExchangeLanguageOption(name: 'Malagasy', code: 'mg'),
+    _ExchangeLanguageOption(name: 'Maithili', code: 'mai'),
+    _ExchangeLanguageOption(name: 'Malay', code: 'ms'),
+    _ExchangeLanguageOption(name: 'Malayalam', code: 'ml'),
+    _ExchangeLanguageOption(name: 'Maltese', code: 'mt'),
+    _ExchangeLanguageOption(name: 'Manx', code: 'gv'),
+    _ExchangeLanguageOption(name: 'Mandarin (Simplified, China)', code: 'zh-CN'),
+    _ExchangeLanguageOption(name: 'Mandarin (Traditional, Taiwan)', code: 'zh-TW'),
+    _ExchangeLanguageOption(name: 'Marathi', code: 'mr'),
+    _ExchangeLanguageOption(name: 'Marshallese', code: 'mh'),
+    _ExchangeLanguageOption(name: 'Māori', code: 'mi'),
+    _ExchangeLanguageOption(name: 'Mayan (Macro)', code: 'myn'),
+    _ExchangeLanguageOption(name: 'Meitei / Manipuri', code: 'mni'),
+    _ExchangeLanguageOption(name: 'Min Nan / Hokkien', code: 'nan'),
+    _ExchangeLanguageOption(name: 'Mixtec (Macro)', code: 'mix'),
+    _ExchangeLanguageOption(name: 'Mongolian', code: 'mn'),
+    _ExchangeLanguageOption(name: 'Montenegrin', code: 'sr-ME'),
+    _ExchangeLanguageOption(name: 'Nahuatl', code: 'nah'),
+    _ExchangeLanguageOption(name: 'Navajo', code: 'nv'),
+    _ExchangeLanguageOption(name: 'Ndebele (Southern)', code: 'nd'),
+    _ExchangeLanguageOption(name: 'Nepali', code: 'ne'),
+    _ExchangeLanguageOption(name: 'Northern Sami', code: 'se'),
+    _ExchangeLanguageOption(name: 'Norwegian Bokmål', code: 'nb-NO'),
+    _ExchangeLanguageOption(name: 'Norwegian Nynorsk', code: 'nn-NO'),
+    _ExchangeLanguageOption(name: 'Occitan', code: 'oc'),
+    _ExchangeLanguageOption(name: 'Odia (Oriya)', code: 'or'),
+    _ExchangeLanguageOption(name: 'Oromo', code: 'om'),
+    _ExchangeLanguageOption(name: 'Palauan', code: 'pau'),
+    _ExchangeLanguageOption(name: 'Pashto', code: 'ps'),
+    _ExchangeLanguageOption(name: 'Persian / Farsi', code: 'fa'),
+    _ExchangeLanguageOption(name: 'Portuguese (Brazil)', code: 'pt-BR'),
+    _ExchangeLanguageOption(name: 'Portuguese (Portugal)', code: 'pt-PT'),
+    _ExchangeLanguageOption(name: 'Punjabi', code: 'pa'),
+    _ExchangeLanguageOption(name: 'Quechua', code: 'qu'),
+    _ExchangeLanguageOption(name: 'Rajasthani', code: 'raj'),
+    _ExchangeLanguageOption(name: 'Romanian', code: 'ro'),
+    _ExchangeLanguageOption(name: 'Romansh', code: 'rm'),
+    _ExchangeLanguageOption(name: 'Russian', code: 'ru'),
+    _ExchangeLanguageOption(name: 'Samoan', code: 'sm'),
+    _ExchangeLanguageOption(name: 'Sango', code: 'sg'),
+    _ExchangeLanguageOption(name: 'Sanskrit', code: 'sa'),
+    _ExchangeLanguageOption(name: 'Santhali', code: 'sat'),
+    _ExchangeLanguageOption(name: 'Sardinian', code: 'sc'),
+    _ExchangeLanguageOption(name: 'Scottish Gaelic', code: 'gd'),
+    _ExchangeLanguageOption(name: 'Serbian', code: 'sr'),
+    _ExchangeLanguageOption(name: 'Sesotho', code: 'st'),
+    _ExchangeLanguageOption(name: 'Setswana', code: 'tn'),
+    _ExchangeLanguageOption(name: 'Shan', code: 'shn'),
+    _ExchangeLanguageOption(name: 'Shona', code: 'sn'),
+    _ExchangeLanguageOption(name: 'Sicilian', code: 'scn'),
+    _ExchangeLanguageOption(name: 'Sindhi', code: 'sd'),
+    _ExchangeLanguageOption(name: 'Sinhala', code: 'si'),
+    _ExchangeLanguageOption(name: 'Sidamo', code: 'sid'),
+    _ExchangeLanguageOption(name: 'Slovak', code: 'sk'),
+    _ExchangeLanguageOption(name: 'Slovenian', code: 'sl'),
+    _ExchangeLanguageOption(name: 'Somali', code: 'so'),
+    _ExchangeLanguageOption(name: 'Songhai', code: 'son'),
+    _ExchangeLanguageOption(name: 'Sorani (Central Kurdish)', code: 'ckb'),
+    _ExchangeLanguageOption(name: 'Spanish', code: 'es'),
+    _ExchangeLanguageOption(name: 'Sukuma', code: 'suk'),
+    _ExchangeLanguageOption(name: 'Sundanese', code: 'su'),
+    _ExchangeLanguageOption(name: 'Swahili', code: 'sw'),
+    _ExchangeLanguageOption(name: 'Swedish', code: 'sv'),
+    _ExchangeLanguageOption(name: 'Tajik', code: 'tg'),
+    _ExchangeLanguageOption(name: 'Tamil', code: 'ta'),
+    _ExchangeLanguageOption(name: 'Tatar', code: 'tt'),
+    _ExchangeLanguageOption(name: 'Telugu', code: 'te'),
+    _ExchangeLanguageOption(name: 'Thai', code: 'th'),
+    _ExchangeLanguageOption(name: 'Tibetan', code: 'bo'),
+    _ExchangeLanguageOption(name: 'Tigrinya', code: 'ti'),
+    _ExchangeLanguageOption(name: 'Tok Pisin', code: 'tpi'),
+    _ExchangeLanguageOption(name: 'Tongan', code: 'to'),
+    _ExchangeLanguageOption(name: 'Tshivenda', code: 've'),
+    _ExchangeLanguageOption(name: 'Tulu', code: 'tcy'),
+    _ExchangeLanguageOption(name: 'Turkish', code: 'tr'),
+    _ExchangeLanguageOption(name: 'Twi', code: 'twi'),
+    _ExchangeLanguageOption(name: 'Ukrainian', code: 'uk'),
+    _ExchangeLanguageOption(name: 'Urdu', code: 'ur'),
+    _ExchangeLanguageOption(name: 'Uyghur', code: 'ug'),
+    _ExchangeLanguageOption(name: 'Uzbek', code: 'uz'),
+    _ExchangeLanguageOption(name: 'Venetian', code: 'vec'),
+    _ExchangeLanguageOption(name: 'Vietnamese', code: 'vi'),
+    _ExchangeLanguageOption(name: 'Walloon', code: 'wa'),
+    _ExchangeLanguageOption(name: 'Welsh', code: 'cy'),
+    _ExchangeLanguageOption(name: 'Wolof', code: 'wo'),
+    _ExchangeLanguageOption(name: 'Wu / Shanghainese', code: 'wuu'),
+    _ExchangeLanguageOption(name: 'Xiang Chinese', code: 'hsn'),
+    _ExchangeLanguageOption(name: 'Xitsonga', code: 'ts'),
+    _ExchangeLanguageOption(name: 'Yiddish', code: 'yi'),
+    _ExchangeLanguageOption(name: 'Yoruba', code: 'yo'),
+    _ExchangeLanguageOption(name: 'Zapotec', code: 'zap'),
+    _ExchangeLanguageOption(name: 'Zulu', code: 'zu'),
+    _ExchangeLanguageOption(name: 'Tamazight (Standard Moroccan Berber)', code: 'zgh'),
+  ];
+
   int _retryNonce = 0;
   final List<Map<String, dynamic>> _extraProfiles = [];
   DateTime? _cursorBefore;
   bool _loadingMore = false;
+  bool _didPromptExchangeSetup = false;
+  List<String> _speaksLanguageCodes = const [];
+  List<_LearnLanguagePref> _learnLanguagePrefs = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadExchangeLanguageSettings();
+  }
+
+  _ExchangeLanguageOption _languageByCode(String code) {
+    for (final lang in _exchangeLanguages) {
+      if (lang.code.toLowerCase() == code.toLowerCase()) return lang;
+    }
+    return _exchangeLanguages.first;
+  }
+
+  _ExchangeLanguageOption? _languageByLegacyName(String name) {
+    for (final lang in _exchangeLanguages) {
+      if (lang.name.toLowerCase() == name.toLowerCase()) return lang;
+    }
+    return null;
+  }
+
+  static const List<String> _learnLevels = ['Beginner', 'Intermediate', 'Advanced'];
+
+  List<_ExchangeLanguageOption> get _speaksLanguages =>
+      _speaksLanguageCodes.map(_languageByCode).toList();
+
+  bool get _exchangePrefsReady =>
+      _speaksLanguageCodes.isNotEmpty && _learnLanguagePrefs.isNotEmpty;
+
+  String _speaksSummary() => _speaksLanguages.isEmpty ? 'Not set' : _speaksLanguages.map((e) => e.name).join(', ');
+
+  String _learnsSummary() =>
+      _learnLanguagePrefs.isEmpty ? 'Not set' : _learnLanguagePrefs.map((e) => '${e.language.name} (${e.level})').join(', ');
+
+  Future<void> _loadExchangeLanguageSettings() async {
+    final settings = await settingsRepository.getSettings();
+    if (!mounted) return;
+    final speaksCodesRaw = (settings['exchange_speaks_languages'] as List?)?.map((e) => e.toString()).toList();
+    final learnsRaw = settings['exchange_learns_languages'];
+    final parsedLearns = <_LearnLanguagePref>[];
+    if (learnsRaw is List) {
+      for (final item in learnsRaw) {
+        if (item is! Map) continue;
+        final map = Map<String, dynamic>.from(item);
+        final code = map['code']?.toString();
+        final level = map['level']?.toString();
+        if (code == null || !_learnLevels.contains(level)) continue;
+        final lang = _languageByCode(code);
+        parsedLearns.add(_LearnLanguagePref(language: lang, level: level!));
+      }
+    }
+
+    final speaksCode = settings['exchange_speaks_language']?.toString();
+    final learnsCode = settings['exchange_learns_language']?.toString();
+    final speaksLegacyName = settings['exchange_speaks_language_name']?.toString();
+    final learnsLegacyName = settings['exchange_learns_language_name']?.toString();
+    setState(() {
+      if (speaksCodesRaw != null && speaksCodesRaw.isNotEmpty) {
+        _speaksLanguageCodes = speaksCodesRaw
+            .where((c) => _exchangeLanguages.any((l) => l.code.toLowerCase() == c.toLowerCase()))
+            .take(3)
+            .toList();
+      } else if (speaksCode != null && _exchangeLanguages.any((l) => l.code.toLowerCase() == speaksCode.toLowerCase())) {
+        _speaksLanguageCodes = [speaksCode];
+      } else if (speaksLegacyName != null) {
+        final legacy = _languageByLegacyName(speaksLegacyName);
+        if (legacy != null) _speaksLanguageCodes = [legacy.code];
+      }
+
+      if (parsedLearns.isNotEmpty) {
+        _learnLanguagePrefs = parsedLearns.take(5).toList();
+      } else if (learnsCode != null && _exchangeLanguages.any((l) => l.code.toLowerCase() == learnsCode.toLowerCase())) {
+        _learnLanguagePrefs = [
+          _LearnLanguagePref(language: _languageByCode(learnsCode), level: 'Beginner'),
+        ];
+      } else if (learnsLegacyName != null) {
+        final legacy = _languageByLegacyName(learnsLegacyName);
+        if (legacy != null) {
+          _learnLanguagePrefs = [_LearnLanguagePref(language: legacy, level: 'Beginner')];
+        }
+      }
+    });
+
+    if (!_didPromptExchangeSetup && !_exchangePrefsReady) {
+      _didPromptExchangeSetup = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _editExchangePrefs();
+      });
+    }
+  }
+
+  Future<void> _saveExchangePrefs() async {
+    await settingsRepository.updateSetting('exchange_speaks_languages', _speaksLanguageCodes);
+    await settingsRepository.updateSetting(
+      'exchange_speaks_languages_names',
+      [for (final c in _speaksLanguageCodes) _languageByCode(c).name],
+    );
+    await settingsRepository.updateSetting(
+      'exchange_learns_languages',
+      [
+        for (final l in _learnLanguagePrefs)
+          {
+            'code': l.language.code,
+            'name': l.language.name,
+            'level': l.level,
+          },
+      ],
+    );
+
+    if (_speaksLanguageCodes.isNotEmpty) {
+      final first = _languageByCode(_speaksLanguageCodes.first);
+      await settingsRepository.updateSetting('exchange_speaks_language', first.code);
+      await settingsRepository.updateSetting('exchange_speaks_language_name', first.name);
+    }
+    if (_learnLanguagePrefs.isNotEmpty) {
+      final first = _learnLanguagePrefs.first.language;
+      await settingsRepository.updateSetting('exchange_learns_language', first.code);
+      await settingsRepository.updateSetting('exchange_learns_language_name', first.name);
+    }
+  }
+
+  Future<List<String>?> _pickMultiLanguages({
+    required String title,
+    required List<String> initialCodes,
+    required int max,
+  }) async {
+    final selected = await showModalBottomSheet<List<String>>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        final local = [...initialCodes];
+        return StatefulBuilder(
+          builder: (context, setModalState) => SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text('$title (${local.length}/$max)', style: const TextStyle(fontWeight: FontWeight.w900)),
+                      ),
+                      TextButton(onPressed: () => Navigator.pop(context, local), child: const Text('Done')),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      for (final lang in _exchangeLanguages)
+                        CheckboxListTile(
+                          value: local.contains(lang.code),
+                          title: Text(lang.name),
+                          subtitle: Text(lang.code),
+                          onChanged: (v) {
+                            setModalState(() {
+                              if (v == true) {
+                                if (local.length >= max || local.contains(lang.code)) return;
+                                local.add(lang.code);
+                              } else {
+                                local.remove(lang.code);
+                              }
+                            });
+                          },
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+    return selected;
+  }
+
+  Future<void> _editExchangePrefs() async {
+    final speaks = await _pickMultiLanguages(
+      title: 'Languages you speak',
+      initialCodes: _speaksLanguageCodes,
+      max: 3,
+    );
+    if (!mounted || speaks == null || speaks.isEmpty) return;
+
+    final learnsCodes = await _pickMultiLanguages(
+      title: 'Languages you want to learn',
+      initialCodes: _learnLanguagePrefs.map((e) => e.language.code).toList(),
+      max: 5,
+    );
+    if (!mounted || learnsCodes == null || learnsCodes.isEmpty) return;
+
+    final nextLearns = <_LearnLanguagePref>[];
+    for (final code in learnsCodes) {
+      final existing = _learnLanguagePrefs.where((e) => e.language.code == code).toList();
+      if (existing.isNotEmpty) {
+        nextLearns.add(existing.first);
+      } else {
+        nextLearns.add(_LearnLanguagePref(language: _languageByCode(code), level: 'Beginner'));
+      }
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _speaksLanguageCodes = speaks.take(3).toList();
+      _learnLanguagePrefs = nextLearns.take(5).toList();
+    });
+    await _saveExchangePrefs();
+  }
+
+  Future<void> _changeLearnLevel(int index) async {
+    final selected = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            for (final level in _learnLevels)
+              ListTile(title: Text(level), onTap: () => Navigator.pop(context, level)),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || selected == null) return;
+    setState(() {
+      _learnLanguagePrefs = [
+        for (var i = 0; i < _learnLanguagePrefs.length; i++)
+          i == index ? _learnLanguagePrefs[i].copyWith(level: selected) : _learnLanguagePrefs[i],
+      ];
+    });
+    await _saveExchangePrefs();
+  }
 
   Set<String> _toLangSet(dynamic raw) {
     if (raw is List) {
@@ -722,11 +1069,13 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
     return first.isEmpty ? fallback : '${first[0].toUpperCase()}${first.substring(1)}';
   }
 
-  bool _matchesDirection(Map<String, dynamic> profile, _CourseOption base) {
+  bool _matchesDirection(Map<String, dynamic> profile) {
     final native = _toLangSet(profile['native_languages']);
-    final learning = _toLangSet(profile['learning_languages']);
-    if (native.isEmpty && learning.isEmpty) return true;
-    return native.contains(base.toName.toLowerCase()) && learning.contains(base.fromName.toLowerCase());
+    if (native.isEmpty) return true;
+    final learnsSet = <String>{
+      for (final l in _learnLanguagePrefs) ...{l.language.name.toLowerCase(), l.language.code.toLowerCase()},
+    };
+    return native.any(learnsSet.contains);
   }
 
   String _levelFromXp(int totalXp) {
@@ -769,9 +1118,6 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
     Map<String, bool> onlineMap,
     List<String> blockedIds,
   ) {
-    final base = widget.selectedCourse;
-    if (base == null) return [];
-
     final result = <_ExchangeUser>[];
     for (var i = 0; i < profiles.length; i++) {
       final profile = profiles[i];
@@ -783,7 +1129,7 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
       final showOnlineStatus = settings['show_online_status'] != false;
       final exchangeActive = settings['exchange_active'] == true;
       if (!showOnlineStatus || !exchangeActive) continue;
-      if (!_matchesDirection(profile, base)) continue;
+      if (!_matchesDirection(profile)) continue;
 
       final isOnline = onlineMap[id] ?? false;
       if (!isOnline) continue;
@@ -806,8 +1152,10 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
 
       final native = _toLangSet(profile['native_languages']);
       final learning = _toLangSet(profile['learning_languages']);
-      final speaksLabel = _firstLangLabel(native, base.toName);
-      final learnsLabel = _firstLangLabel(learning, base.fromName);
+      final fallbackSpeak = _learnLanguagePrefs.isNotEmpty ? _learnLanguagePrefs.first.language.name : 'Unknown';
+      final fallbackLearn = _speaksLanguages.isNotEmpty ? _speaksLanguages.first.name : 'Unknown';
+      final speaksLabel = _firstLangLabel(native, fallbackSpeak);
+      final learnsLabel = _firstLangLabel(learning, fallbackLearn);
 
       result.add(
         _ExchangeUser(
@@ -833,9 +1181,7 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
     final l10n = AppLocalizations.of(context);
-    final myUser = widget.users.where((u) => u.isCurrentUser).toList();
 
     return Column(
       children: [
@@ -865,36 +1211,12 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                       style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
                     ),
                   ),
-                  InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: widget.onSelectCourse,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.translate_rounded, size: 15),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Courses',
-                            style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w800),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  _ToolChip(label: 'Language exchange only'),
                 ],
               ),
               const SizedBox(height: 6),
               Text(
-                'Smart matching. Cleaner discovery.',
+                'Choose exchange languages used only for partner chats (separate from course languages).',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 12,
@@ -906,24 +1228,25 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _ToolChip(label: widget.selectedCourseLabel),
-                  if (myUser.isNotEmpty)
-                    _ToolChip(label: 'You ${myUser.first.speaks} → ${myUser.first.learns}'),
+                  _ToolChip(label: 'Speaks (max 3): ${_speaksSummary()}'),
+                  _ToolChip(label: 'Learns (max 5): ${_learnsSummary()}'),
+                  _FilterActionChip(
+                    label: 'Edit exchange languages',
+                    icon: Icons.tune_rounded,
+                    onTap: _editExchangePrefs,
+                  ),
                   const _ModernBadge(icon: Icons.bolt_rounded, label: 'Fast rounds'),
                   const _ModernBadge(icon: Icons.insights_rounded, label: 'Session summary'),
                 ],
               ),
               const SizedBox(height: 10),
-              _RoundFlowPreview(
-                fromLang: widget.selectedCourse?.fromName ?? 'Speaks',
-                toLang: widget.selectedCourse?.toName ?? 'Learns',
-              ),
+              if (_exchangePrefsReady)
+                _RoundFlowPreview(
+                  fromLang: _speaksLanguages.first.name,
+                  toLang: _learnLanguagePrefs.first.language.name,
+                ),
               const SizedBox(height: 8),
-              _FilterActionChip(
-                label: 'Speaking Rooms (premium)',
-                icon: Icons.groups_rounded,
-                onTap: _showSpeakingRoomsPreview,
-              ),
+              _SpeakingRoomsPremiumCard(onTap: _showSpeakingRoomsPreview),
             ],
           ),
         ),
@@ -985,6 +1308,12 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                         );
                       }
 
+                      if (!_exchangePrefsReady) {
+                        return _ExchangePrefsRequiredCard(
+                          onSetup: _editExchangePrefs,
+                        );
+                      }
+
                       if (partners.isEmpty) {
                         return _ExchangeNoCompatibleState(
                           onOpenInbox: () => Navigator.push(
@@ -1007,9 +1336,14 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                                 crossAxisAlignment: WrapCrossAlignment.center,
                                 children: [
                                   _FilterActionChip(
-                                    label: widget.selectedCourseLabel,
+                                    label: _learnLanguagePrefs.map((e) => e.language.name).join(', '),
                                     icon: Icons.translate_rounded,
-                                    onTap: widget.onSelectCourse,
+                                    onTap: _editExchangePrefs,
+                                  ),
+                                  _FilterActionChip(
+                                    label: 'Speaks: ${_speaksSummary()}',
+                                    icon: Icons.record_voice_over_rounded,
+                                    onTap: _editExchangePrefs,
                                   ),
                                   _FilterActionChip(
                                     label: 'Open inbox',
@@ -1023,6 +1357,26 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                               ),
                             ),
                           ),
+                          if (_learnLanguagePrefs.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Glass(
+                                radius: BorderRadius.circular(14),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                child: Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: [
+                                    for (var i = 0; i < _learnLanguagePrefs.length; i++)
+                                      _FilterActionChip(
+                                        label: '${_learnLanguagePrefs[i].language.name}: ${_learnLanguagePrefs[i].level}',
+                                        icon: Icons.school_rounded,
+                                        onTap: () => _changeLearnLevel(i),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           Expanded(
                             child: ListView.separated(
                               physics: const BouncingScrollPhysics(),
@@ -1129,16 +1483,142 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
   }
 
   Future<void> _showSpeakingRoomsPreview() async {
-    await showDialog<void>(
+    await showModalBottomSheet<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Speaking Rooms (Premium)'),
-        content: const Text('• Timed speaking rounds\n• Live pronunciation overlays\n• Group challenge packs\n• Post-session scoreboards'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
-          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Coming soon')),
-        ],
-      ),
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (context) {
+        final scheme = Theme.of(context).colorScheme;
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 6, 16, 18),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          T.accent.withValues(alpha: 0.24),
+                          scheme.primary.withValues(alpha: 0.18),
+                        ],
+                      ),
+                      border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 34,
+                              height: 34,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: scheme.surface.withValues(alpha: 0.52),
+                              ),
+                              child: Icon(Icons.groups_rounded, color: scheme.onSurface),
+                            ),
+                            const SizedBox(width: 10),
+                            const Expanded(
+                              child: Text(
+                                'Speaking Rooms Premium',
+                                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
+                              ),
+                            ),
+                            const _ToolChip(label: 'Coming soon'),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'An immersive voice-first room experience designed for daily speaking practice, coaching insights, and premium group challenges.',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: scheme.onSurface.withValues(alpha: 0.78),
+                            height: 1.35,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        const Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _ModernBadge(icon: Icons.timer_rounded, label: '60/90/120s rounds'),
+                            _ModernBadge(icon: Icons.multitrack_audio_rounded, label: 'Realtime pronunciation hints'),
+                            _ModernBadge(icon: Icons.workspace_premium_rounded, label: 'Ranked challenge packs'),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  const _SpeakingRoomFeatureTile(
+                    icon: Icons.mic_external_on_rounded,
+                    title: 'Smart speaking rounds',
+                    subtitle: 'Auto-rotating turns with host controls, participation balance, and gentle pace guidance.',
+                  ),
+                  const SizedBox(height: 8),
+                  const _SpeakingRoomFeatureTile(
+                    icon: Icons.equalizer_rounded,
+                    title: 'Live coaching overlays',
+                    subtitle: 'Instant feedback for pronunciation clarity, filler-word usage, and pace confidence.',
+                  ),
+                  const SizedBox(height: 8),
+                  const _SpeakingRoomFeatureTile(
+                    icon: Icons.flag_circle_rounded,
+                    title: 'Battle & mission modes',
+                    subtitle: 'Team missions, topic cards, timed debates, and streak rewards to keep sessions exciting.',
+                  ),
+                  const SizedBox(height: 8),
+                  const _SpeakingRoomFeatureTile(
+                    icon: Icons.analytics_rounded,
+                    title: 'Post-session performance board',
+                    subtitle: 'Personal scorecards with speaking minutes, mistakes to review, and next-session focus.',
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(this.context).showSnackBar(
+                              const SnackBar(content: Text('Speaking Rooms waitlist opened. You will be notified before launch.')),
+                            );
+                          },
+                          icon: const Icon(Icons.notifications_active_rounded),
+                          label: const Text('Join waitlist'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(this.context).showSnackBar(
+                              const SnackBar(content: Text('Preview mode is coming soon with the first premium rooms release.')),
+                            );
+                          },
+                          icon: const Icon(Icons.rocket_launch_rounded),
+                          label: const Text('Preview roadmap'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -1313,6 +1793,43 @@ class _ExchangeErrorState extends StatelessWidget {
   }
 }
 
+class _ExchangePrefsRequiredCard extends StatelessWidget {
+  final Future<void> Function() onSetup;
+
+  const _ExchangePrefsRequiredCard({required this.onSetup});
+
+  @override
+  Widget build(BuildContext context) {
+    return Glass(
+      radius: BorderRadius.circular(16),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Set your exchange languages first',
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Choose up to 3 languages you speak (native + 2 more) and up to 5 languages you want to learn with levels.',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.78),
+            ),
+          ),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: NeonButton(label: 'Set exchange languages', onTap: onSetup),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _RoundFlowPreview extends StatelessWidget {
   final String fromLang;
   final String toLang;
@@ -1403,7 +1920,6 @@ class _ToolChip extends StatelessWidget {
   }
 }
 
-
 class _ModernBadge extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -1429,6 +1945,132 @@ class _ModernBadge extends StatelessWidget {
               fontWeight: FontWeight.w700,
               fontSize: 11,
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+class _SpeakingRoomsPremiumCard extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _SpeakingRoomsPremiumCard({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Ink(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              T.accent.withValues(alpha: 0.18),
+              scheme.primary.withValues(alpha: 0.14),
+            ],
+          ),
+          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.groups_rounded, size: 18),
+                const SizedBox(width: 6),
+                Text(
+                  'Speaking Rooms (Premium)',
+                  style: TextStyle(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 13,
+                  ),
+                ),
+                const Spacer(),
+                Icon(Icons.arrow_forward_rounded, size: 16, color: scheme.onSurface.withValues(alpha: 0.74)),
+              ],
+            ),
+            const SizedBox(height: 7),
+            Text(
+              'Voice-first rooms with live coaching overlays, team challenges, and premium scoreboards.',
+              style: TextStyle(
+                color: scheme.onSurface.withValues(alpha: 0.78),
+                fontWeight: FontWeight.w600,
+                fontSize: 11.5,
+                height: 1.3,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SpeakingRoomFeatureTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  const _SpeakingRoomFeatureTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+      decoration: BoxDecoration(
+        color: scheme.onSurface.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(top: 1),
+            width: 28,
+            height: 28,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(9),
+              color: T.accent.withValues(alpha: 0.18),
+            ),
+            child: Icon(icon, size: 16, color: scheme.onSurface),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(
+                    color: scheme.onSurface.withValues(alpha: 0.74),
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11.8,
+                    height: 1.32,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

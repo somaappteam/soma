@@ -47,6 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<UserStats>? _statsFuture;
   Future<List<Map<String, dynamic>>>? _friendsFuture;
   Future<List<Achievement>>? _achievementsFuture;
+  Future<Map<String, dynamic>>? _exchangePrefsFuture;
 
   bool get _isGuest => authRepository.currentUser == null;
   String? get _viewerId => authRepository.currentUser?.id;
@@ -63,6 +64,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _statsFuture = statsRepository.getStats(userId: _viewedUserId);
       _friendsFuture = _isVisitorView ? null : socialRepository.getFriends();
       _achievementsFuture = achievementsRepository.getAchievements();
+      _exchangePrefsFuture = _isVisitorView ? null : settingsRepository.getSettings();
     }
   }
 
@@ -356,8 +358,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
       dailyGoalMinutes: 15,
     );
 
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
-      body: SafeArea(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              scheme.surface,
+              scheme.surfaceContainerLowest.withValues(alpha: 0.96),
+              scheme.primary.withValues(alpha: 0.06),
+            ],
+          ),
+        ),
+        child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
             child: Column(
@@ -391,71 +406,100 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ListView(
                     physics: const BouncingScrollPhysics(),
                     children: [
-                      profile.showOnlineStatus && profile.id != null && profile.id!.isNotEmpty
-                          ? StreamBuilder<bool>(
-                              stream: presenceRepository.streamOnlineStatus(profile.id!),
-                              builder: (context, snapshot) => _HeaderCard(
-                                profile: profile,
-                                showOnlineIndicator: snapshot.data == true,
-                              ),
-                            )
-                          : _HeaderCard(profile: profile, showOnlineIndicator: false),
+                      _ProfileSectionLabel(label: 'Identity'),
+                      const SizedBox(height: 6),
+                      _PremiumSectionShell(
+                        child: profile.showOnlineStatus && profile.id != null && profile.id!.isNotEmpty
+                            ? StreamBuilder<bool>(
+                                stream: presenceRepository.streamOnlineStatus(profile.id!),
+                                builder: (context, snapshot) => _HeaderCard(
+                                  profile: profile,
+                                  showOnlineIndicator: snapshot.data == true,
+                                ),
+                              )
+                            : _HeaderCard(profile: profile, showOnlineIndicator: false),
+                      ),
                       const SizedBox(height: S.sm),
-                      _ProfileSpotlightCard(profile: profile),
+                      _PremiumSectionShell(child: _ProfileSpotlightCard(profile: profile)),
                       const SizedBox(height: S.sm),
                       if (_isVisitorView) ...[
-                        _VisitorOverviewCard(
-                          profile: profile,
-                          isBlocked: _isBlocked,
-                          isReported: _isReported,
+                        _ProfileSectionLabel(label: 'Overview'),
+                        const SizedBox(height: 6),
+                        _PremiumSectionShell(
+                          child: _VisitorOverviewCard(
+                            profile: profile,
+                            isBlocked: _isBlocked,
+                            isReported: _isReported,
+                          ),
                         ),
                         const SizedBox(height: S.sm),
-                        _VisitorActionsCard(
-                          isSending: _isRequestSending,
-                          requestSent: _requestSent,
-                          isBlocked: _isBlocked,
-                          isReported: _isReported,
-                          isReportSubmitting: _isReportSubmitting,
-                          onMessage: () => _openMessage(profile),
-                          onAddFriend: () => _requestSent
-                              ? _cancelFriendRequest(profile)
-                              : _sendFriendRequest(profile),
-                          onToggleBlocked: () => _toggleBlocked(profile),
-                          onToggleReported: () => _toggleReported(profile),
+                        _PremiumSectionShell(
+                          child: _VisitorActionsCard(
+                            isSending: _isRequestSending,
+                            requestSent: _requestSent,
+                            isBlocked: _isBlocked,
+                            isReported: _isReported,
+                            isReportSubmitting: _isReportSubmitting,
+                            onMessage: () => _openMessage(profile),
+                            onAddFriend: () => _requestSent
+                                ? _cancelFriendRequest(profile)
+                                : _sendFriendRequest(profile),
+                            onToggleBlocked: () => _toggleBlocked(profile),
+                            onToggleReported: () => _toggleReported(profile),
+                          ),
                         ),
                       ] else ...[
+                        _ProfileSectionLabel(label: 'Progress'),
+                        const SizedBox(height: 6),
                         FutureBuilder<UserStats>(
                           future: _statsFuture,
                           builder: (context, snapshot) {
                             return AnimatedSwitcher(
                               duration: MotionTokens.short,
                               child: snapshot.connectionState == ConnectionState.waiting
-                                  ? const _StatsSkeleton()
-                                  : _StatsRow(
+                                  ? const _PremiumSectionShell(child: _StatsSkeleton())
+                                  : _PremiumSectionShell(child: _StatsRow(
                                       wins: (snapshot.data ?? UserStats.empty()).totalWins,
                                       streak: (snapshot.data ?? UserStats.empty()).streakDays,
-                                    ),
+                                    )),
                             );
                           },
                         ),
                         const SizedBox(height: S.sm),
-                        FutureBuilder<List<Map<String, dynamic>>>(
-                          future: _friendsFuture,
+                        _ProfileSectionLabel(label: 'Exchange'),
+                        const SizedBox(height: 6),
+                        FutureBuilder<Map<String, dynamic>>(
+                          future: _exchangePrefsFuture,
                           builder: (context, snapshot) {
-                            return _FriendsCard(friends: snapshot.data ?? const <Map<String, dynamic>>[]);
+                            return _PremiumSectionShell(
+                              child: _ExchangeLanguagesProfileCard(settings: snapshot.data ?? const <String, dynamic>{}),
+                            );
                           },
                         ),
                         const SizedBox(height: S.sm),
+                        _ProfileSectionLabel(label: 'Social'),
+                        const SizedBox(height: 6),
+                        FutureBuilder<List<Map<String, dynamic>>>(
+                          future: _friendsFuture,
+                          builder: (context, snapshot) {
+                            return _PremiumSectionShell(
+                              child: _FriendsCard(friends: snapshot.data ?? const <Map<String, dynamic>>[]),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: S.sm),
+                        _ProfileSectionLabel(label: 'Achievements'),
+                        const SizedBox(height: 6),
                         FutureBuilder<List<Achievement>>(
                           future: _achievementsFuture,
                           builder: (context, snapshot) {
                             return AnimatedSwitcher(
                               duration: MotionTokens.short,
                               child: snapshot.connectionState == ConnectionState.waiting
-                                  ? const _AchievementsSkeleton()
-                                  : _AchievementsCard(
+                                  ? const _PremiumSectionShell(child: _AchievementsSkeleton())
+                                  : _PremiumSectionShell(child: _AchievementsCard(
                                       achievements: snapshot.data ?? const <Achievement>[],
-                                    ),
+                                    )),
                             );
                           },
                         ),
@@ -469,6 +513,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
+      ),
       );
   }
 }
@@ -523,6 +568,63 @@ class _TopBar extends StatelessWidget {
   }
 }
 
+class _ProfileSectionLabel extends StatelessWidget {
+  final String label;
+
+  const _ProfileSectionLabel({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Row(
+      children: [
+        Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: scheme.primary,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label.toUpperCase(),
+          style: TextStyle(
+            color: scheme.onSurface.withValues(alpha: 0.72),
+            fontSize: 11,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.0,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PremiumSectionShell extends StatelessWidget {
+  final Widget child;
+
+  const _PremiumSectionShell({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(26),
+        gradient: LinearGradient(
+          colors: [
+            scheme.primary.withValues(alpha: 0.10),
+            scheme.secondary.withValues(alpha: 0.04),
+          ],
+        ),
+      ),
+      padding: const EdgeInsets.all(1),
+      child: child,
+    );
+  }
+}
+
 class _GuestProfileView extends StatelessWidget {
   final UserProfile profile;
   final VoidCallback onSettings;
@@ -544,165 +646,167 @@ class _GuestProfileView extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
-          child: Column(
-            children: [
-              _TopBar(
-                onSettings: onSettings,
-                title: l10n.profileTitle,
-              ),
-              const SizedBox(height: S.sm),
-              Expanded(
-                child: ListView(
-                  physics: const BouncingScrollPhysics(),
-                  children: [
-                    Glass(
-                      radius: BorderRadius.circular(22),
-                      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              scheme.surface,
+              scheme.surfaceContainerLowest.withValues(alpha: 0.96),
+              scheme.primary.withValues(alpha: 0.06),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
+            child: Column(
+              children: [
+                _TopBar(
+                  onSettings: onSettings,
+                  title: l10n.profileTitle,
+                ),
+                const SizedBox(height: S.sm),
+                Expanded(
+                  child: ListView(
+                    physics: const BouncingScrollPhysics(),
+                    children: [
+                      const _ProfileSectionLabel(label: 'Welcome'),
+                      const SizedBox(height: 6),
+                      Glass(
+                        radius: BorderRadius.circular(22),
+                        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _AvatarGlow(
+                              size: 72,
+                              image: const AssetImage("assets/avatar/avatar_1.png"),
+                              showOnlineIndicator: false,
+                            ),
+                            const SizedBox(width: S.sm),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.guestSessionLabel,
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: scheme.onSurface.withValues(alpha: 0.62),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '@$username',
+                                    style: textTheme.titleLarge?.copyWith(
+                                      color: scheme.onSurface,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                  const SizedBox(height: S.xs),
+                                  Text(
+                                    profile.bio.isNotEmpty ? profile.bio : l10n.profileDefaultBio,
+                                    style: textTheme.bodyMedium?.copyWith(
+                                      color: scheme.onSurface.withValues(alpha: 0.68),
+                                      fontWeight: FontWeight.w600,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: S.sm),
+                      Row(
                         children: [
-                          _AvatarGlow(
-                            size: 72,
-                            image: const AssetImage("assets/avatar/avatar_1.png"),
-                            showOnlineIndicator: false,
+                          Expanded(
+                            child: _GuestMiniStatCard(
+                              icon: Icons.local_fire_department_rounded,
+                              label: l10n.profileXpProgress,
+                              value: l10n.profileXpValue(profile.totalXp),
+                            ),
                           ),
                           const SizedBox(width: S.sm),
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.guestSessionLabel,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: scheme.onSurface.withValues(alpha: 0.62),
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  '@$username',
-                                  style: textTheme.titleLarge?.copyWith(
-                                    color: scheme.onSurface,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                                const SizedBox(height: S.xs),
-                                Text(
-                                  profile.bio.isNotEmpty ? profile.bio : l10n.profileDefaultBio,
-                                  style: textTheme.bodyMedium?.copyWith(
-                                    color: scheme.onSurface.withValues(alpha: 0.68),
-                                    fontWeight: FontWeight.w600,
-                                    height: 1.2,
-                                  ),
-                                ),
-                              ],
+                            child: _GuestMiniStatCard(
+                              icon: Icons.timer_rounded,
+                              label: l10n.profileGoalLabel(profile.dailyGoalMinutes),
+                              value: l10n.minutesShort(profile.dailyGoalMinutes),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: S.sm),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _GuestMiniStatCard(
-                            icon: Icons.local_fire_department_rounded,
-                            label: l10n.profileXpProgress,
-                            value: l10n.profileXpValue(profile.totalXp),
-                          ),
-                        ),
-                        const SizedBox(width: S.sm),
-                        Expanded(
-                          child: _GuestMiniStatCard(
-                            icon: Icons.timer_rounded,
-                            label: l10n.profileGoalLabel(profile.dailyGoalMinutes),
-                            value: l10n.minutesShort(profile.dailyGoalMinutes),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: S.sm),
-                    Glass(
-                      radius: BorderRadius.circular(22),
-                      padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.unlockFullProfile,
-                            style: textTheme.titleMedium?.copyWith(
-                              color: scheme.onSurface,
-                              fontWeight: FontWeight.w900,
+                      const SizedBox(height: S.sm),
+                      Glass(
+                        radius: BorderRadius.circular(22),
+                        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.unlockFullProfile,
+                              style: textTheme.titleMedium?.copyWith(
+                                color: scheme.onSurface,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: S.xs),
-                          _GuestInfoRow(
-                            icon: Icons.cloud_done_rounded,
-                            text: l10n.guestBenefitSync,
-                          ),
-                          const SizedBox(height: S.xs),
-                          _GuestInfoRow(
-                            icon: Icons.public_rounded,
-                            text: l10n.guestBenefitCircles,
-                          ),
-                          const SizedBox(height: S.xs),
-                          _GuestInfoRow(
-                            icon: Icons.notifications_active_rounded,
-                            text: l10n.guestBenefitNotifications,
-                          ),
-                        ],
+                            const SizedBox(height: S.xs),
+                            _GuestInfoRow(icon: Icons.cloud_done_rounded, text: l10n.guestBenefitSync),
+                            const SizedBox(height: S.xs),
+                            _GuestInfoRow(icon: Icons.public_rounded, text: l10n.guestBenefitCircles),
+                            const SizedBox(height: S.xs),
+                            _GuestInfoRow(icon: Icons.notifications_active_rounded, text: l10n.guestBenefitNotifications),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: S.md),
-              NeonButton(
-                label: l10n.authCreateAccount,
-                onTap: onSignUp,
-              ),
-              const SizedBox(height: S.sm),
-              Glass(
-                radius: BorderRadius.circular(999),
-                padding: EdgeInsets.zero,
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(999),
-                  onTap: onSignIn,
-                  child: SizedBox(
-                    height: 56,
-                    child: Center(
-                      child: Text(
-                        l10n.signIn,
-                        style: textTheme.titleMedium?.copyWith(
-                          color: scheme.onSurface,
-                          fontWeight: FontWeight.w800,
+                const SizedBox(height: S.md),
+                NeonButton(label: l10n.authCreateAccount, onTap: onSignUp),
+                const SizedBox(height: S.sm),
+                Glass(
+                  radius: BorderRadius.circular(999),
+                  padding: EdgeInsets.zero,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(999),
+                    onTap: onSignIn,
+                    child: SizedBox(
+                      height: 56,
+                      child: Center(
+                        child: Text(
+                          l10n.signIn,
+                          style: textTheme.titleMedium?.copyWith(
+                            color: scheme.onSurface,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              const SizedBox(height: S.xs),
-              Center(
-                child: Text(
-                  l10n.progressStaysOnDevice,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: scheme.onSurface.withValues(alpha: 0.55),
-                    fontWeight: FontWeight.w600,
+                const SizedBox(height: S.xs),
+                Center(
+                  child: Text(
+                    l10n.progressStaysOnDevice,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: scheme.onSurface.withValues(alpha: 0.55),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
 class _GuestMiniStatCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -2046,6 +2150,104 @@ class _NeonProgressBar extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _ExchangeLanguagesProfileCard extends StatelessWidget {
+  final Map<String, dynamic> settings;
+
+  const _ExchangeLanguagesProfileCard({required this.settings});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final speaksCodes = ((settings['exchange_speaks_languages'] as List?) ?? const [])
+        .map((e) => e.toString())
+        .where((e) => e.isNotEmpty)
+        .toList();
+    final speaksNames = ((settings['exchange_speaks_languages_names'] as List?) ?? const [])
+        .map((e) => e.toString())
+        .where((e) => e.isNotEmpty)
+        .toList();
+    final learns = ((settings['exchange_learns_languages'] as List?) ?? const [])
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
+
+    if (speaksCodes.isEmpty && learns.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return Glass(
+      radius: BorderRadius.circular(16),
+      padding: const EdgeInsets.all(14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.translate_rounded, size: 16, color: scheme.primary),
+              const SizedBox(width: 8),
+              Text(
+                '2-language exchange profile',
+                style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          if (speaksCodes.isNotEmpty) ...[
+            Text('Speaks (max 3)', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75), fontWeight: FontWeight.w700, fontSize: 12)),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+                children: [
+                  for (var i = 0; i < speaksCodes.length; i++)
+                    _TinyExchangeChip(label: i < speaksNames.length ? speaksNames[i] : speaksCodes[i]),
+                ],
+              ),
+            const SizedBox(height: 10),
+          ],
+          if (learns.isNotEmpty) ...[
+            Text('Learning goals (max 5)', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75), fontWeight: FontWeight.w700, fontSize: 12)),
+            const SizedBox(height: 6),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final item in learns)
+                  _TinyExchangeChip(
+                    label: '${item['name'] ?? item['code'] ?? ''} · ${item['level'] ?? 'Beginner'}',
+                  ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TinyExchangeChip extends StatelessWidget {
+  final String label;
+
+  const _TinyExchangeChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: scheme.onSurface.withValues(alpha: 0.08),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.9), fontWeight: FontWeight.w700, fontSize: 11),
       ),
     );
   }
