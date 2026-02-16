@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/premium_dialog.dart';
@@ -134,7 +135,10 @@ class _InboxScreenState extends State<InboxScreen> {
     final isPinned = _pinnedThreadIds.contains(t['otherId']?.toString() ?? '');
     final time = t['time'] is DateTime ? t['time'] as DateTime : DateTime.now();
     final recent = DateTime.now().difference(time).inHours <= 48;
-    return unread > 0 || isPinned || (isFriend && recent);
+    final learningSignal = t['hasChallengePending'] == true ||
+        t['hasCorrectionUnread'] == true ||
+        t['hasVoiceFeedback'] == true;
+    return unread > 0 || isPinned || learningSignal || (isFriend && recent);
   }
 
   bool _isGroupThread(Map<String, dynamic> t) {
@@ -146,6 +150,23 @@ class _InboxScreenState extends State<InboxScreen> {
     await chatRepository.getInboxThreads();
     if (!mounted) return;
     setState(() => _refreshNonce++);
+  }
+
+
+  Future<void> _openThread(Map<String, dynamic> t) async {
+    final otherId = t['otherId']?.toString() ?? '';
+    if (otherId.isEmpty) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DmChatScreen(
+          meId: authRepository.currentUser?.id ?? 'me',
+          otherId: otherId,
+          otherName: t['otherName']?.toString() ?? 'Unknown',
+        ),
+      ),
+    );
+    if (mounted) setState(() => _refreshNonce++);
   }
 
   Stream<List<Map<String, dynamic>>> _inboxThreadsStream() async* {
@@ -724,6 +745,30 @@ class _InboxScreenState extends State<InboxScreen> {
                                 minutes: weeklyPracticeMinutes,
                                 voiceNotes: weeklyVoiceNotes,
                               ),
+                              _WeeklyReportShareCard(
+                                minutes: weeklyPracticeMinutes,
+                                voiceNotes: weeklyVoiceNotes,
+                                cefrHint: visibleThreads.where((t) => t['hasCorrectionUnread'] == true).isNotEmpty ? 'B2' : 'B1',
+                              ),
+                              _AdaptiveChallengesRow(
+                                challenges: [
+                                  if (visibleThreads.where((t) => t['hasCorrectionUnread'] == true).isNotEmpty)
+                                    _AdaptiveChallenge(
+                                      label: '${visibleThreads.where((t) => t['hasCorrectionUnread'] == true).length} corrections unread — do now',
+                                      onTap: () => _openThread(visibleThreads.firstWhere((t) => t['hasCorrectionUnread'] == true)),
+                                    ),
+                                  if (visibleThreads.where((t) => t['practiceStreakAtRisk'] == true).isNotEmpty)
+                                    _AdaptiveChallenge(
+                                      label: 'Streak at risk — send one voice note',
+                                      onTap: () => _openThread(visibleThreads.firstWhere((t) => t['practiceStreakAtRisk'] == true)),
+                                    ),
+                                  if (visibleThreads.isNotEmpty)
+                                    _AdaptiveChallenge(
+                                      label: 'Use 3 B2 connectors today',
+                                      onTap: () => _openThread(visibleThreads.first),
+                                    ),
+                                ],
+                              ),
                               if (vipThreads.isNotEmpty)
                                 _VipPinnedRow(
                                   threads: vipThreads,
@@ -778,6 +823,15 @@ class _InboxScreenState extends State<InboxScreen> {
                                 hasIncomingRequest: t['hasIncomingRequest'] == true,
                                 hasOutgoingRequest: t['hasOutgoingRequest'] == true,
                                 trustScore: trustScore,
+                                practiceStreakAtRisk: t['practiceStreakAtRisk'] == true,
+                                hasChallengePending: t['hasChallengePending'] == true,
+                                hasCorrectionUnread: t['hasCorrectionUnread'] == true,
+                                hasVoiceFeedback: t['hasVoiceFeedback'] == true,
+                                partnerQuality: (t['partnerQuality'] as num?)?.toInt() ?? trustScore,
+                                reliabilityScore: (t['reliabilityScore'] as num?)?.toInt() ?? 72,
+                                correctionHelpfulnessScore: (t['correctionHelpfulnessScore'] as num?)?.toInt() ?? 68,
+                                voiceFeedbackScore: (t['voiceFeedbackScore'] as num?)?.toInt() ?? 70,
+                                verifiedSeriousLearner: t['verifiedSeriousLearner'] == true,
                                 selected: selected,
                                 selectionMode: _selectionMode,
                                 onTap: () async {
@@ -1075,6 +1129,83 @@ class _SwipeActionBackground extends StatelessWidget {
   }
 }
 
+class _AdaptiveChallenge {
+  final String label;
+  final VoidCallback onTap;
+
+  const _AdaptiveChallenge({required this.label, required this.onTap});
+}
+
+class _AdaptiveChallengesRow extends StatelessWidget {
+  final List<_AdaptiveChallenge> challenges;
+
+  const _AdaptiveChallengesRow({required this.challenges});
+
+  @override
+  Widget build(BuildContext context) {
+    if (challenges.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 6),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (final c in challenges)
+              Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: ActionChip(
+                  avatar: const Icon(Icons.flash_on_rounded, size: 14),
+                  label: Text(c.label),
+                  onPressed: c.onTap,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WeeklyReportShareCard extends StatelessWidget {
+  final int minutes;
+  final int voiceNotes;
+  final String cefrHint;
+
+  const _WeeklyReportShareCard({required this.minutes, required this.voiceNotes, required this.cefrHint});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final report = 'Weekly Learning Report\n• Voice minutes: $minutes\n• Voice notes: $voiceNotes\n• CEFR confidence: $cefrHint\n• Best partner: Keep your top streak thread active.';
+    return Padding(
+      padding: const EdgeInsets.only(top: 6, bottom: 6),
+      child: Glass(
+        radius: BorderRadius.circular(14),
+        padding: const EdgeInsets.all(10),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                report,
+                style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.w700, fontSize: 11.5),
+              ),
+            ),
+            const SizedBox(width: 8),
+            IconButton(
+              tooltip: 'Copy report',
+              onPressed: () async {
+                await Clipboard.setData(ClipboardData(text: report));
+              },
+              icon: const Icon(Icons.ios_share_rounded),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
 class _IconGlass extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -1109,6 +1240,15 @@ class _ThreadRow extends StatelessWidget {
   final bool hasIncomingRequest;
   final bool hasOutgoingRequest;
   final int trustScore;
+  final bool practiceStreakAtRisk;
+  final bool hasChallengePending;
+  final bool hasCorrectionUnread;
+  final bool hasVoiceFeedback;
+  final int partnerQuality;
+  final int reliabilityScore;
+  final int correctionHelpfulnessScore;
+  final int voiceFeedbackScore;
+  final bool verifiedSeriousLearner;
   final bool selectionMode;
   final bool selected;
   final VoidCallback onTap;
@@ -1128,6 +1268,15 @@ class _ThreadRow extends StatelessWidget {
     required this.hasIncomingRequest,
     required this.hasOutgoingRequest,
     required this.trustScore,
+    required this.practiceStreakAtRisk,
+    required this.hasChallengePending,
+    required this.hasCorrectionUnread,
+    required this.hasVoiceFeedback,
+    required this.partnerQuality,
+    required this.reliabilityScore,
+    required this.correctionHelpfulnessScore,
+    required this.voiceFeedbackScore,
+    required this.verifiedSeriousLearner,
     required this.selectionMode,
     required this.selected,
     required this.onTap,
@@ -1242,6 +1391,42 @@ class _ThreadRow extends StatelessWidget {
                                 ),
                               ),
                             ),
+                          if (practiceStreakAtRisk || hasChallengePending || hasCorrectionUnread || hasVoiceFeedback)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Wrap(
+                                spacing: 6,
+                                runSpacing: 4,
+                                children: [
+                                  if (practiceStreakAtRisk)
+                                    _MiniBadge(label: '⚠️ Streak at risk', color: Colors.orange),
+                                  if (hasChallengePending)
+                                    _MiniBadge(label: 'Challenge pending', color: scheme.primary),
+                                  if (hasCorrectionUnread)
+                                    _MiniBadge(label: 'Correction unread', color: scheme.tertiary),
+                                  if (hasVoiceFeedback)
+                                    _MiniBadge(label: 'Voice feedback', color: Colors.deepPurple),
+                                ],
+                              ),
+                            ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Wrap(
+                              spacing: 6,
+                              runSpacing: 4,
+                              children: [
+                                _MiniBadge(
+                                  label: 'Partner quality $partnerQuality%',
+                                  color: partnerQuality >= 75 ? Colors.green : scheme.onSurface,
+                                ),
+                                _MiniBadge(label: 'Reliability $reliabilityScore%', color: scheme.primary),
+                                _MiniBadge(label: 'Correction helpfulness $correctionHelpfulnessScore%', color: scheme.tertiary),
+                                _MiniBadge(label: 'Voice feedback $voiceFeedbackScore%', color: Colors.deepPurple),
+                                if (verifiedSeriousLearner)
+                                  _MiniBadge(label: 'Verified serious learner', color: Colors.green),
+                              ],
+                            ),
+                          ),
                           if (hasIncomingRequest || hasOutgoingRequest)
                             Padding(
                               padding: const EdgeInsets.only(top: 4),
@@ -1331,6 +1516,34 @@ class _ThreadRow extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class _MiniBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _MiniBadge({required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: color.withValues(alpha: 0.14),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+          color: color,
         ),
       ),
     );

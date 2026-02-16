@@ -9,7 +9,7 @@ import '../../data/user_report_repository.dart';
 import '../../data/settings_repository.dart';
 import '../../data/profile_repository.dart';
 import '../../data/exchange_analytics_repository.dart';
-import 'exchange_session_screen.dart';
+import '../social/dm_chat_screen.dart';
 import 'create_circle_screen.dart';
 import 'circle_lobby_screen.dart';
 import '../../core/theme/tokens.dart';
@@ -686,10 +686,6 @@ class _LanguageExchangePanel extends StatefulWidget {
 
 class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
   int _retryNonce = 0;
-  bool _onlineOnly = true;
-  bool _strictDirection = true;
-  String _levelFilter = 'all';
-  bool _filtersHydrated = false;
   final List<Map<String, dynamic>> _extraProfiles = [];
   DateTime? _cursorBefore;
   bool _loadingMore = false;
@@ -727,7 +723,6 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
   }
 
   bool _matchesDirection(Map<String, dynamic> profile, _CourseOption base) {
-    if (!_strictDirection) return true;
     final native = _toLangSet(profile['native_languages']);
     final learning = _toLangSet(profile['learning_languages']);
     if (native.isEmpty && learning.isEmpty) return true;
@@ -791,14 +786,13 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
       if (!_matchesDirection(profile, base)) continue;
 
       final isOnline = onlineMap[id] ?? false;
-      if (_onlineOnly && !isOnline) continue;
+      if (!isOnline) continue;
 
       final username = profile['username']?.toString();
       final name = (username == null || username.trim().isEmpty) ? 'Learner ${i + 1}' : username;
       final dailyGoal = (profile['daily_goal_minutes'] as num?)?.toInt() ?? 10;
       final totalXp = (profile['total_xp'] as num?)?.toInt() ?? 0;
       final level = _levelFromXp(totalXp);
-      if (_levelFilter != 'all' && level != _levelFilter) continue;
       final trust = _trustScore(profile);
       if (trust < 25) continue;
       final timezone = profile['timezone']?.toString() ?? '';
@@ -924,6 +918,12 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                 fromLang: widget.selectedCourse?.fromName ?? 'Speaks',
                 toLang: widget.selectedCourse?.toName ?? 'Learns',
               ),
+              const SizedBox(height: 8),
+              _FilterActionChip(
+                label: 'Speaking Rooms (premium)',
+                icon: Icons.groups_rounded,
+                onTap: _showSpeakingRoomsPreview,
+              ),
             ],
           ),
         ),
@@ -936,19 +936,6 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
               final blockedIds = ((settingsData['blocked_user_ids'] as List?) ?? const [])
                   .map((e) => e.toString())
                   .toList();
-
-              if (!_filtersHydrated) {
-                _filtersHydrated = true;
-                _onlineOnly = settingsData['exchange_filter_online_only'] != false;
-                _strictDirection = settingsData['exchange_filter_strict_direction'] != false;
-                _levelFilter = (settingsData['exchange_filter_level']?.toString() ?? 'all');
-              }
-
-              Future<void> persistFilters() => settingsRepository.updateSettings({
-                    'exchange_filter_online_only': _onlineOnly,
-                    'exchange_filter_strict_direction': _strictDirection,
-                    'exchange_filter_level': _levelFilter,
-                  });
 
               return StreamBuilder<List<Map<String, dynamic>>>(
                 stream: profileRepository.streamExchangeCandidateProfiles(limit: 120),
@@ -993,20 +980,18 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                           'exchange_discovery_results',
                           metadata: {
                             'visible_users': partners.length,
-                            'online_only': _onlineOnly,
-                            'strict_direction': _strictDirection,
-                            'level_filter': _levelFilter,
+                            'active_only': true,
                           },
                         );
                       }
 
                       if (partners.isEmpty) {
-                        return _ExchangeNoCompatibleState(onOpenFriends: () {
-                          setState(() {
-                            _onlineOnly = false;
-                            _strictDirection = false;
-                          });
-                        });
+                        return _ExchangeNoCompatibleState(
+                          onOpenInbox: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const InboxScreen()),
+                          ),
+                        );
                       }
 
                       return Column(
@@ -1026,46 +1011,13 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                                     icon: Icons.translate_rounded,
                                     onTap: widget.onSelectCourse,
                                   ),
-                                  ChoiceChip(
-                                    label: const Text('Online'),
-                                    selected: _onlineOnly,
-                                    onSelected: (_) {
-                                      setState(() => _onlineOnly = true);
-                                      persistFilters();
-                                    },
-                                  ),
-                                  ChoiceChip(
-                                    label: const Text('All users'),
-                                    selected: !_onlineOnly,
-                                    onSelected: (_) {
-                                      setState(() => _onlineOnly = false);
-                                      persistFilters();
-                                    },
-                                  ),
-                                  ChoiceChip(
-                                    label: const Text('Strict'),
-                                    selected: _strictDirection,
-                                    onSelected: (_) {
-                                      setState(() => _strictDirection = !_strictDirection);
-                                      persistFilters();
-                                    },
-                                  ),
-                                  DropdownButton<String>(
-                                    value: _levelFilter,
-                                    borderRadius: BorderRadius.circular(12),
-                                    underline: const SizedBox.shrink(),
-                                    items: const [
-                                      DropdownMenuItem(value: 'all', child: Text('All levels')),
-                                      DropdownMenuItem(value: 'A2', child: Text('A2')),
-                                      DropdownMenuItem(value: 'B1', child: Text('B1')),
-                                      DropdownMenuItem(value: 'B2', child: Text('B2')),
-                                      DropdownMenuItem(value: 'C1', child: Text('C1')),
-                                    ],
-                                    onChanged: (v) {
-                                      if (v == null) return;
-                                      setState(() => _levelFilter = v);
-                                      persistFilters();
-                                    },
+                                  _FilterActionChip(
+                                    label: 'Open inbox',
+                                    icon: Icons.inbox_rounded,
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (_) => const InboxScreen()),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -1122,6 +1074,74 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
     );
   }
 
+  Future<void> _openExchangeGoalSheet(_ExchangeUser user) async {
+    final goal = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            for (final g in const ['Fluency', 'Grammar', 'Speaking confidence'])
+              ListTile(title: Text(g), onTap: () => Navigator.pop(context, g)),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || goal == null) return;
+    final duration = await showModalBottomSheet<int>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [10, 20, 30]
+              .map((d) => ListTile(title: Text('$d minutes'), onTap: () => Navigator.pop(context, d)))
+              .toList(),
+        ),
+      ),
+    );
+    if (!mounted || duration == null) return;
+    final focus = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            for (final f in const ['Past tense', 'Conditionals', 'Question forms'])
+              ListTile(title: Text(f), onTap: () => Navigator.pop(context, f)),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || focus == null) return;
+
+    final plan = 'Session goal: $goal • Duration: ${duration}m • Grammar focus: $focus';
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DmChatScreen(
+          meId: profileRepository.currentUserId ?? 'me',
+          otherId: user.userId,
+          otherName: user.name,
+          initialDraftText: plan,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _showSpeakingRoomsPreview() async {
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Speaking Rooms (Premium)'),
+        content: const Text('• Timed speaking rounds\n• Live pronunciation overlays\n• Group challenge packs\n• Post-session scoreboards'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close')),
+          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Coming soon')),
+        ],
+      ),
+    );
+  }
+
   Widget _buildExchangeUserCard(
     BuildContext context,
     TextTheme textTheme,
@@ -1129,10 +1149,20 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
     _ExchangeUser user,
   ) {
     final colors = Theme.of(context).colorScheme;
+    Future<void> openDm() async {
+      if (!mounted || user.isCurrentUser) return;
+      await _openExchangeGoalSheet(user);
+    }
+
     return Glass(
       radius: BorderRadius.circular(16),
-      padding: const EdgeInsets.all(12),
-      child: Row(
+      padding: const EdgeInsets.all(0),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: user.isCurrentUser ? null : openDm,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
         children: [
           Container(
             width: 52,
@@ -1193,20 +1223,7 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
           if (!user.isCurrentUser)
             _SmallIconButton(
               icon: Icons.chat_bubble_outline_rounded,
-              onTap: () async {
-                if (!mounted) return;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ExchangeSessionScreen(
-                      partnerUserId: user.userId,
-                      partnerName: user.name,
-                      myLearningLanguage: widget.selectedCourse?.toName ?? user.learns,
-                      partnerLearningLanguage: widget.selectedCourse?.fromName ?? user.speaks,
-                    ),
-                  ),
-                );
-              },
+              onTap: openDm,
             ),
           if (!user.isCurrentUser) ...[
             const SizedBox(width: 8),
@@ -1216,6 +1233,8 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
             ),
           ],
         ],
+          ),
+        ),
       ),
     );
   }
@@ -1486,18 +1505,18 @@ class _SessionProgressPreview extends StatelessWidget {
 
 
 class _ExchangeNoCompatibleState extends StatelessWidget {
-  final VoidCallback onOpenFriends;
+  final VoidCallback onOpenInbox;
 
-  const _ExchangeNoCompatibleState({required this.onOpenFriends});
+  const _ExchangeNoCompatibleState({required this.onOpenInbox});
 
   @override
   Widget build(BuildContext context) {
     return _ExchangeEmptyBase(
       icon: Icons.filter_alt_off_rounded,
-      title: 'No active users for this filter',
-      subtitle: 'Try switching filters to show all available exchange users.',
-      ctaLabel: 'Show all users',
-      onTap: onOpenFriends,
+      title: 'No active exchange users right now',
+      subtitle: 'Check your inbox or come back soon when more users are active.',
+      ctaLabel: 'Open inbox',
+      onTap: onOpenInbox,
     );
   }
 }
