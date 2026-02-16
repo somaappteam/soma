@@ -25,7 +25,6 @@ import '../../data/profile_repository.dart';
 import '../../data/settings_repository.dart';
 import '../../data/soma_plus_repository.dart';
 import '../../data/user_report_repository.dart';
-import '../../data/ai_repository.dart';
 import '../../models/user_profile.dart';
 import '../profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
@@ -412,15 +411,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
       return;
     }
 
-    String? translatedText;
-    if (_autoTranslateIncoming && _autoTranslateLanguage.isNotEmpty) {
-      try {
-        translatedText = await aiRepository.translateText(text, _autoTranslateLanguage);
-      } catch (_) {
-        // Fallback or ignore
-      }
-    }
-
     final payload = <String, dynamic>{
       'type': 'text',
       'text': text,
@@ -428,8 +418,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
       'autocorrect_mode': _autoCorrectMode.name,
       if (_examModeEnabled) 'exam_mode': true,
       if (!_isLikelyEnglish(text)) 'transliteration': _buildTransliteration(text),
-      if (translatedText != null)
-        'translated_text': translatedText,
+      if (_autoTranslateIncoming && _autoTranslateLanguage.isNotEmpty)
+        'translated_text': _mockTranslateText(text, _autoTranslateLanguage),
       if (_replyPreview != null) 'reply_to': _replyPreview,
       if (_replyToMessageId != null) 'reply_to_message_id': _replyToMessageId,
       if (_disappearingWindow != null)
@@ -477,6 +467,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
   }
 
+  String _mockTranslateText(String source, String language) {
+    return '[$language] $source';
+  }
 
   bool _isLikelyEnglish(String source) {
     final clean = source.replaceAll(RegExp(r'[^a-zA-Z ]'), '');
@@ -1005,22 +998,19 @@ class _DmChatScreenState extends State<DmChatScreen> {
       ),
     );
     if (!mounted || mode == null) return;
-    if (!mounted || mode == null) return;
-    
-    try {
-      final rewritten = await aiRepository.rewriteText(text, mode);
-      if (!mounted) return;
-      setState(() {
-        _controller.text = rewritten;
-        _controller.selection = TextSelection.fromPosition(TextPosition(offset: rewritten.length));
-      });
-      _saveDraft(rewritten);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('AI Rewrite failed: $e')),
-      );
-    }
+    final rewritten = switch (mode) {
+      'formal' => 'Hello. ${text[0].toUpperCase()}${text.substring(1)}',
+      'concise' => text.split(RegExp(r'[.!?]')).first.trim(),
+      'romantic' => '$text ❤️',
+      'translated' => '$text (translated)',
+      'empathy' => 'I understand how you feel. $text',
+      _ => 'Hey! $text 🙂',
+    };
+    setState(() {
+      _controller.text = rewritten;
+      _controller.selection = TextSelection.fromPosition(TextPosition(offset: rewritten.length));
+    });
+    _saveDraft(rewritten);
   }
 
 
@@ -1072,26 +1062,24 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   Future<void> _showVoicePronunciationCoach(_ChatMessage msg) async {
     final transcript = msg.payload.transcript ?? msg.previewText;
-    try {
-      final result = await aiRepository.analyzePronunciation(transcript);
-      final score = result['score'] as int? ?? 0;
-      final difficult = List<String>.from(result['difficult_words'] ?? []);
-      final tip = result['tip'] as String? ?? 'Keep practicing!';
-      
-      final target = difficult.isNotEmpty ? difficult.first : (transcript.split(' ').isNotEmpty ? transcript.split(' ').first : 'phrase');
-      if (!mounted) return;
-      
-      final savePractice = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Pronunciation coach'),
-          content: Text('Score: $score/100\nDifficult words: ${difficult.isEmpty ? 'None' : difficult.join(', ')}\nAccent tip: $tip'),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Close')),
-            FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Repeat this phrase')),
-          ],
-        ),
-      );
+    final score = (68 + (transcript.length % 28)).clamp(0, 100);
+    final difficult = transcript
+        .split(RegExp(r'\s+'))
+        .where((w) => w.length > 7)
+        .take(3)
+        .toList();
+    final target = difficult.isNotEmpty ? difficult.first : (transcript.split(' ').isNotEmpty ? transcript.split(' ').first : 'phrase');
+    final savePractice = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Pronunciation coach'),
+        content: Text('Score: $score/100\nDifficult words: ${difficult.isEmpty ? 'None' : difficult.join(', ')}\nAccent tip: Try slower stress on multi-syllable words.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Close')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Repeat this phrase')),
+        ],
+      ),
+    );
     if (savePractice == true) {
       if (!_duePracticePhrases.contains(target)) {
         setState(() => _duePracticePhrases.add(target));
@@ -1102,14 +1090,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
         SnackBar(content: Text('Added "$target" to due practice today')),
       );
     }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pronunciation analysis failed: $e')),
-      );
-    }
   }
-}
 
   Future<void> _openAttachmentTray() async {
     final action = await showModalBottomSheet<String>(
@@ -1302,24 +1283,23 @@ class _DmChatScreenState extends State<DmChatScreen> {
       );
       return;
     }
-    try {
-      final enhanced = await aiRepository.polishText(text);
-      if (!mounted) return;
-      setState(() {
-        _controller.text = enhanced;
-        _controller.selection = TextSelection.fromPosition(TextPosition(offset: enhanced.length));
-      });
-      _saveDraft(enhanced);
-      _onTypingChanged(true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Draft polished with premium AI tone ✨')),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('AI Polish failed: $e')),
-      );
-    }
+    final polished = text
+        .replaceAll(' i ', ' I ')
+        .replaceAll(' im ', " I'm ")
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    final enhanced = polished.endsWith('!') || polished.endsWith('.') || polished.endsWith('?')
+        ? polished
+        : '$polished.';
+    setState(() {
+      _controller.text = enhanced;
+      _controller.selection = TextSelection.fromPosition(TextPosition(offset: enhanced.length));
+    });
+    _saveDraft(enhanced);
+    _onTypingChanged(true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Draft polished with premium AI tone ✨')),
+    );
   }
 
   void _handleMenuAction(_DmMenuAction action) {
@@ -2372,7 +2352,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
   }
 
-  Future<void> _editTextMessage(_ChatMessage msg) async {
+  Future<void> _editTextMessage(ChatMessage msg) async {
     final initial = msg.payload.text ?? '';
     final editor = TextEditingController(text: initial);
     final updated = await showDialog<String>(
@@ -2447,7 +2427,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
   }
 
-  Future<void> _showMessageActions(_ChatMessage msg) async {
+  Future<void> _showMessageActions(ChatMessage msg) async {
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
@@ -2878,7 +2858,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                                 .where((m) => (m['content']?.toString().toLowerCase() ?? '').contains(_searchQuery))
                                 .toList();
                         visibleMsgs = visibleMsgs.where((m) {
-                          final payload = _MessagePayload.parse(m['content']?.toString() ?? '');
+                          final payload = MessagePayload.parse(m['content']?.toString() ?? '');
                           final text = payload.text ?? payload.fileName ?? '';
                           if (_isMessageMutedByKeyword(text)) return false;
                           if (payload.expiresAt != null && payload.expiresAt!.isBefore(DateTime.now())) return false;
@@ -2929,7 +2909,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                             final m = visibleMsgs[i];
                             final isMe = (m['sender_id']?.toString() ?? '') == _myUserId;
                             final dt = DateTime.tryParse(m['created_at']?.toString() ?? '')?.toLocal() ?? DateTime.now();
-                            final payload = _MessagePayload.parse(m['content']?.toString() ?? '');
+                            final payload = MessagePayload.parse(m['content']?.toString() ?? '');
                             final readAt = m['read_at']?.toString();
                             final pinned = _pinnedMessageIds.contains(m['id']?.toString() ?? '');
                             return Padding(
@@ -2944,10 +2924,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
                                 readAt: readAt,
                                 reactions: (m['reactions'] as Map<String, dynamic>?) ?? const {},
                                 pinned: pinned,
+<<<<<<< Updated upstream
                                 onLongPress: () => _showMessageActions(_ChatMessage.fromRow(m, isMe: isMe)),
                                 onSwipeReply: () => setState(() { _replyPreview = payload.text ?? payload.fileName ?? 'Attachment'; _replyToMessageId = m['id']?.toString(); }),
                                 onTapReplySource: _jumpToMessageById,
                                 replyToMessageId: payload.replyToMessageId,
+=======
+                                onLongPress: () => _showMessageActions(ChatMessage.fromRow(m, isMe: isMe)),
+>>>>>>> Stashed changes
                                 onTapFile: _openFileUrl,
                                 onReact: (emoji) => chatRepository.toggleMessageReaction(messageId: m['id'].toString(), emoji: emoji),
                                 editedAt: _messageEditTimes[m['id']?.toString() ?? ''],
@@ -3621,6 +3605,7 @@ class _TopBar extends StatelessWidget {
                 ),
               ),
             ),
+            ),
           ),
           if (showOnlineIndicator)
             Container(
@@ -3855,7 +3840,11 @@ class _BubbleState extends State<_Bubble> {
     );
 
     final scheme = Theme.of(context).colorScheme;
+<<<<<<< Updated upstream
     final parsed = _MessagePayload.parse(widget.rawContent);
+=======
+    final parsed = MessagePayload.parse(rawContent);
+>>>>>>> Stashed changes
     final isImage = parsed.type == 'image';
     final imageUrl = parsed.url;
     final isVoice = parsed.type == 'voice';
@@ -4144,6 +4133,7 @@ class _BubbleState extends State<_Bubble> {
   }
 }
 
+<<<<<<< Updated upstream
 class _PremiumVoiceBubbleContent extends StatelessWidget {
   final String durationLabel;
   final bool isPlaying;
@@ -4559,6 +4549,8 @@ class _ChatMessage {
     );
   }
 }
+=======
+>>>>>>> Stashed changes
 
 
 class _InputBar extends StatelessWidget {

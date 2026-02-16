@@ -1,0 +1,80 @@
+﻿Analyzing lib...                                                
+
+   info - Don't invoke 'print' in production code - lib\data\content_sync_service.dart:267:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\data\content_sync_service.dart:269:5 - avoid_print
+   info - Don't invoke 'print' in production code - lib\data\content_sync_service.dart:274:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\data\content_sync_service.dart:275:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\data\content_sync_service.dart:278:11 - avoid_print
+   info - Don't invoke 'print' in production code - lib\data\content_sync_service.dart:295:9 - avoid_print
+warning - Unnecessary type check; the result is always 'true' - lib\data\privacy_repository.dart:80:11 - unnecessary_type_check
+warning - Unnecessary type check; the result is always 'true' - lib\data\privacy_repository.dart:81:11 - unnecessary_type_check
+warning - This default clause is covered by the previous cases - lib\data\soma_plus_repository.dart:293:7 - unreachable_switch_default
+warning - This default clause is covered by the previous cases - lib\data\soma_plus_repository.dart:338:7 - unreachable_switch_default
+warning - The declaration '_showBlockDialog' isn't referenced - lib\features\circles\circles_screen.dart:1261:16 - unused_element
+warning - The declaration '_SessionProgressPreview' isn't referenced - lib\features\circles\circles_screen.dart:1485:7 - unused_element
+warning - The declaration '_ExchangeBlockedAllState' isn't referenced - lib\features\circles\circles_screen.dart:1524:7 - unused_element
+warning - The declaration '_ExchangeNoPartnersState' isn't referenced - lib\features\circles\circles_screen.dart:1594:7 - unused_element
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\circles\exchange_session_screen.dart:130:28 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\circles\exchange_session_screen.dart:190:28 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\circles\exchange_session_screen.dart:277:36 - use_build_context_synchronously
+warning - Unused import: '../../data/circle_chat_repository.dart' - lib\features\circles\live_quiz_screen.dart:20:8 - unused_import
+warning - The value of the local variable 'totalQuestions' isn't used - lib\features\circles\live_quiz_screen.dart:670:11 - unused_local_variable
+warning - The declaration '_TinyGlass' isn't referenced - lib\features\circles\live_quiz_screen.dart:990:7 - unused_element
+warning - A value for optional parameter 'onTap' isn't ever given - lib\features\circles\live_quiz_screen.dart:994:47 - unused_element_parameter
+warning - The declaration '_RolePill' isn't referenced - lib\features\circles\live_quiz_screen.dart:1380:7 - unused_element
+warning - The declaration '_QuizProgressBar' isn't referenced - lib\features\circles\live_quiz_screen.dart:1433:7 - unused_element
+warning - The declaration '_AnswerState' isn't referenced - lib\features\circles\live_quiz_screen.dart:1464:6 - unused_element
+warning - The value of the field 'normal' isn't used - lib\features\circles\live_quiz_screen.dart:1464:21 - unused_field
+warning - The value of the field 'correct' isn't used - lib\features\circles\live_quiz_screen.dart:1464:29 - unused_field
+warning - The value of the field 'wrong' isn't used - lib\features\circles\live_quiz_screen.dart:1464:38 - unused_field
+warning - Unused import: '../../data/profile_repository.dart' - lib\features\home\home_screen.dart:20:8 - unused_import
+warning - The value of the field '_isFirstVisit' isn't used - lib\features\home\home_screen.dart:41:8 - unused_field
+warning - The value of the local variable 'userId' isn't used - lib\features\home\home_screen.dart:315:35 - unused_local_variable
+warning - The value of the local variable 'scheme' isn't used - lib\features\home\home_screen.dart:792:11 - unused_local_variable
+warning - The value of the local variable 'l10n' isn't used - lib\features\home\home_screen.dart:902:11 - unused_local_variable
+warning - The declaration '_showInfo' isn't referenced - lib\features\profile\privacy_settings_screen.dart:262:8 - unused_element
+   info - Don't use 'BuildContext's across async gaps - lib\features\profile\privacy_settings_screen.dart:282:22 - use_build_context_synchronously
+   info - The import of 'dart:typed_data' is unnecessary because all of the used elements are also provided by the import of 'package:flutter/services.dart' - lib\features\social\dm_chat_screen.dart:4:8 - unnecessary_import
+warning - Unused import: '../../core/widgets/staggered_in.dart' - lib\features\social\dm_chat_screen.dart:19:8 - unused_import
+warning - The value of the field '_draftText' isn't used - lib\features\social\dm_chat_screen.dart:122:10 - unused_field
+warning - The value of the field '_callQualityScore' isn't used - lib\features\social\dm_chat_screen.dart:129:7 - unused_field
+warning - The value of the field '_isConversationArchived' isn't used - lib\features\social\dm_chat_screen.dart:187:8 - unused_field
+warning - The operand can't be 'null', so the condition is always 'false' - lib\features\social\dm_chat_screen.dart:1008:26 - unnecessary_null_comparison
+   info - Don't use 'BuildContext's across async gaps - lib\features\social\dm_chat_screen.dart:1875:28 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\social\dm_chat_screen.dart:1912:7 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\social\dm_chat_screen.dart:1919:26 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\social\dm_chat_screen.dart:2289:30 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\social\dm_chat_screen.dart:2298:30 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\social\dm_chat_screen.dart:2483:38 - use_build_context_synchronously
+   info - Unnecessary braces in a string interpolation - lib\features\social\dm_chat_screen.dart:2529:40 - unnecessary_brace_in_string_interps
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\social\dm_chat_screen.dart:2613:46 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\social\dm_chat_screen.dart:2618:46 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\social\dm_chat_screen.dart:2643:44 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\social\dm_chat_screen.dart:3298:26 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\features\social\dm_chat_screen.dart:3310:26 - use_build_context_synchronously
+warning - The declaration '_fmtCallDuration' isn't referenced - lib\features\social\dm_chat_screen.dart:3754:10 - unused_element
+warning - The value of the local variable 'scheme' isn't used - lib\features\social\friends_screen.dart:637:11 - unused_local_variable
+warning - Unused import: '../../core/widgets/premium_dialog.dart' - lib\features\social\inbox_screen.dart:5:8 - unused_import
+warning - The declaration '_deleteThread' isn't referenced - lib\features\social\inbox_screen.dart:225:16 - unused_element
+warning - The declaration '_archiveThread' isn't referenced - lib\features\social\inbox_screen.dart:241:16 - unused_element
+warning - The declaration '_toggleMutedThread' isn't referenced - lib\features\social\inbox_screen.dart:287:16 - unused_element
+warning - The value of the local variable 'scheme' isn't used - lib\features\social\inbox_screen.dart:1586:11 - unused_local_variable
+warning - Unused import: '../../core/theme/tokens.dart' - lib\features\solo\add_course_screen.dart:4:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\sentences_fill_blank_screen.dart:104:31 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\solo\sentences_fill_blank_screen.dart:108:29 - deprecated_member_use
+   info - Unnecessary braces in a string interpolation - lib\features\solo\solo_result_screen.dart:116:45 - unnecessary_brace_in_string_interps
+
+flutter : 63 issues found. (ran 
+in 6.4s)
+At line:1 char:1
++ flutter analyze lib > 
+analyze_lib.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~
+    + CategoryInfo          : No 
+   tSpecified: (63 issues found  
+  . (ran in 6.4s):String) [],    
+ RemoteException
+    + FullyQualifiedErrorId : Na 
+   tiveCommandError
+ 
