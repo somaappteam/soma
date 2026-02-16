@@ -696,6 +696,7 @@ class _StatTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(18),
       padding: const EdgeInsets.all(12),
