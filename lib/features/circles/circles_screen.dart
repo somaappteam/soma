@@ -866,7 +866,10 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                 ),
               ],
               const SizedBox(height: 10),
-              const _RoundFlowPreview(),
+              _RoundFlowPreview(
+                fromLang: widget.selectedCourse?.fromName ?? 'Speaks',
+                toLang: widget.selectedCourse?.toName ?? 'Learns',
+              ),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
@@ -1145,8 +1148,8 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                     builder: (_) => ExchangeSessionScreen(
                       partnerUserId: user.userId,
                       partnerName: user.name,
-                      myLearningLanguage: widget.selectedCourse?.toName ?? 'English',
-                      partnerLearningLanguage: widget.selectedCourse?.fromName ?? 'French',
+                      myLearningLanguage: widget.selectedCourse?.toName ?? user.learns,
+                      partnerLearningLanguage: widget.selectedCourse?.fromName ?? user.speaks,
                     ),
                   ),
                 );
@@ -1239,20 +1242,26 @@ class _ExchangeErrorState extends StatelessWidget {
 }
 
 class _RoundFlowPreview extends StatelessWidget {
-  const _RoundFlowPreview();
+  final String fromLang;
+  final String toLang;
+
+  const _RoundFlowPreview({
+    required this.fromLang,
+    required this.toLang,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: const [
+      children: [
         _RoundRuleRow(
-          roundLabel: 'Round 1 • French',
-          detail: 'Both users write in French. English is blocked.',
+          roundLabel: 'Round 1 • $fromLang',
+          detail: 'Both users write in $fromLang. $toLang is blocked.',
         ),
-        SizedBox(height: 8),
+        const SizedBox(height: 8),
         _RoundRuleRow(
-          roundLabel: 'Round 2 • English',
-          detail: 'Both users write in English. French is blocked.',
+          roundLabel: 'Round 2 • $toLang',
+          detail: 'Both users write in $toLang. $fromLang is blocked.',
         ),
       ],
     );

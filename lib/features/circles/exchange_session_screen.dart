@@ -5,6 +5,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../data/exchange_analytics_repository.dart';
+import '../../data/languages.dart';
 import 'exchange_session_controller.dart';
 import '../../data/presence_repository.dart';
 
@@ -55,12 +56,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
   }
 
   String _normalizeCode(String raw) {
-    final v = raw.toLowerCase();
-    if (v.startsWith('en') || v.contains('english')) return 'en';
-    if (v.startsWith('fr') || v.contains('french')) return 'fr';
-    if (v.startsWith('es') || v.contains('spanish')) return 'es';
-    if (v.startsWith('de') || v.contains('german')) return 'de';
-    return v.split(RegExp(r'[^a-z]')).firstWhere((e) => e.isNotEmpty, orElse: () => 'en');
+    return langCodeFromValue(raw) ?? 'en';
   }
 
 
@@ -161,7 +157,9 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
         ? ['Salut! Comment ça va ?', 'Je vais bien, merci.', 'Parlons de notre week-end.']
         : lang == 'es'
             ? ['Hola, ¿cómo estás?', 'Estoy bien, gracias.', '¿Qué hiciste hoy?']
-            : ['Hi! How are you?', 'I am doing well, thanks.', 'What did you do today?'];
+            : lang == 'de'
+                ? ['Hallo! Wie geht es dir?', 'Mir geht es gut, danke.', 'Was hast du heute gemacht?']
+                : ['Hi! How are you?', 'I am doing well, thanks.', 'What did you do today?'];
     final selected = await showModalBottomSheet<String>(
       context: context,
       builder: (ctx) => SafeArea(
@@ -222,19 +220,12 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
   Future<void> _translateDraft() async {
     final text = _input.text.trim();
     if (text.isEmpty) return;
-    const frToEn = {'bonjour': 'hello', 'merci': 'thanks', 'salut': 'hi'};
-    const enToFr = {'hello': 'bonjour', 'thanks': 'merci', 'hi': 'salut'};
-    const esToEn = {'hola': 'hello', 'gracias': 'thanks'};
 
-    final words = text.toLowerCase().split(' ');
-    final dict = switch (_controller.activeLanguageCode) {
-      'fr' => frToEn,
-      'es' => esToEn,
-      _ => enToFr,
-    };
-    final translated = words.map((w) => dict[w] ?? w).join(' ');
-    _input.text = translated;
-    await _track('helper_translate');
+    // TODO: Integrate with a real translation service. 
+    // For now, removing the hardcoded dictionary that only supported 3 words.
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Translation service is temporarily unavailable for this language.')),
+    );
   }
 
   Future<void> _nextRound() async {

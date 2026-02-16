@@ -78,3 +78,12 @@ const List<LangOption> kLanguages = [
   LangOption("cy", "Welsh"),
   LangOption("yo", "Yoruba"),
 ];
+
+String? langCodeFromValue(String value) {
+  final v = value.trim().toLowerCase();
+  if (v.isEmpty) return null;
+  for (final l in kLanguages) {
+    if (l.code == v || l.name.toLowerCase() == v) return l.code;
+  }
+  return null;
+}
