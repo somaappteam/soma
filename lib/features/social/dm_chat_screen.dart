@@ -109,6 +109,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
   Timer? _callTimer;
   Timer? _callSetupTimeoutTimer;
   Timer? _outgoingRingTimer;
+  Timer? _incomingRingTimer;
   int _callElapsedSeconds = 0;
   RealtimeChannel? _dmCallChannel;
   StreamSubscription<bool>? _rtcConnectionSub;
@@ -288,6 +289,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _callTimer?.cancel();
     _callSetupTimeoutTimer?.cancel();
     _outgoingRingTimer?.cancel();
+    _incomingRingTimer?.cancel();
     _rtcConnectionSub?.cancel();
     _rtcTelemetrySub?.cancel();
     _conversationSub?.cancel();
@@ -1165,12 +1167,157 @@ class _DmChatScreenState extends State<DmChatScreen> {
         _pickAndSendDocument();
         break;
       case 'location':
-        _sendMessagePayload({'type': 'location', 'text': 'Shared location', 'label': 'Live location · Tap to open map'});
+        _composeLocationCard();
         break;
       case 'contact':
-        _sendMessagePayload({'type': 'contact', 'text': 'Shared contact', 'label': 'Contact: +1 555 0199'});
+        _composeContactCard();
         break;
     }
+  }
+
+  Future<void> _composeLocationCard() async {
+    final placeController = TextEditingController();
+    final addressController = TextEditingController();
+    final latController = TextEditingController();
+    final lngController = TextEditingController();
+
+    final payload = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Send location card'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: placeController,
+                decoration: const InputDecoration(labelText: 'Place name', hintText: 'Coffee Lab'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: addressController,
+                decoration: const InputDecoration(labelText: 'Address', hintText: 'City, street'),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: latController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                      decoration: const InputDecoration(labelText: 'Latitude'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: lngController,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                      decoration: const InputDecoration(labelText: 'Longitude'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () {
+              final place = placeController.text.trim();
+              final address = addressController.text.trim();
+              final lat = double.tryParse(latController.text.trim());
+              final lng = double.tryParse(lngController.text.trim());
+              if (place.isEmpty && address.isEmpty && (lat == null || lng == null)) {
+                Navigator.pop(context);
+                return;
+              }
+              final mapUrl = (lat != null && lng != null)
+                  ? 'https://maps.google.com/?q=$lat,$lng'
+                  : (address.isNotEmpty
+                        ? 'https://maps.google.com/?q=${Uri.encodeComponent(address)}'
+                        : null);
+              Navigator.pop(context, {
+                'type': 'location',
+                'text': place.isNotEmpty ? place : (address.isNotEmpty ? address : 'Shared location'),
+                'label': place.isNotEmpty ? place : 'Location card',
+                'items': [
+                  if (address.isNotEmpty) address,
+                  if (lat != null && lng != null) 'Lat/Lng: ${lat.toStringAsFixed(5)}, ${lng.toStringAsFixed(5)}',
+                ],
+                if (mapUrl != null) 'url': mapUrl,
+              });
+            },
+            child: const Text('Send'),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted || payload == null) return;
+    await _sendMessagePayload(payload);
+  }
+
+  Future<void> _composeContactCard() async {
+    final nameController = TextEditingController();
+    final phoneController = TextEditingController();
+    final noteController = TextEditingController();
+
+    final payload = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Send contact card'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name', hintText: 'Jane Doe'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(labelText: 'Phone number', hintText: '+1 555 0199'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: noteController,
+                decoration: const InputDecoration(labelText: 'Note (optional)', hintText: 'Tutor partner'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          FilledButton(
+            onPressed: () {
+              final name = nameController.text.trim();
+              final phone = phoneController.text.trim();
+              final note = noteController.text.trim();
+              if (name.isEmpty || phone.isEmpty) {
+                Navigator.pop(context);
+                return;
+              }
+              final tel = phone.replaceAll(RegExp(r'\s+'), '');
+              Navigator.pop(context, {
+                'type': 'contact',
+                'text': name,
+                'label': 'Contact: $name',
+                'items': [phone, if (note.isNotEmpty) note],
+                'url': 'tel:$tel',
+              });
+            },
+            child: const Text('Send'),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted || payload == null) return;
+    await _sendMessagePayload(payload);
   }
 
   Future<void> _showMessagePackPicker() async {
@@ -1626,15 +1773,37 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   void _startOutgoingRing() {
     _outgoingRingTimer?.cancel();
-    _outgoingRingTimer = Timer.periodic(const Duration(seconds: 2), (_) {
-      if (!mounted || !_isOutgoingDialing) return;
+    SystemSound.play(SystemSoundType.alert);
+    hapticsService.selectionClick();
+    _outgoingRingTimer = Timer.periodic(const Duration(milliseconds: 1600), (timer) {
+      if (!mounted || !_isOutgoingDialing) {
+        timer.cancel();
+        return;
+      }
       SystemSound.play(SystemSoundType.alert);
+      hapticsService.selectionClick();
     });
   }
 
   void _stopOutgoingRing() {
     _outgoingRingTimer?.cancel();
     _outgoingRingTimer = null;
+  }
+
+  void _startIncomingRing() {
+    _incomingRingTimer?.cancel();
+    SystemSound.play(SystemSoundType.alert);
+    hapticsService.mediumImpact();
+    _incomingRingTimer = Timer.periodic(const Duration(milliseconds: 1600), (_) {
+      if (!mounted || _callState != DmCallState.ringingIncoming) return;
+      SystemSound.play(SystemSoundType.alert);
+      hapticsService.mediumImpact();
+    });
+  }
+
+  void _stopIncomingRing() {
+    _incomingRingTimer?.cancel();
+    _incomingRingTimer = null;
   }
 
   Future<void> _toggleMicMute() async {
@@ -1771,14 +1940,18 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final type = data['type']?.toString();
 
     if (type == 'call_invite') {
-      if (!_canTransition('invite')) return;
-      if (_isCallActive) return;
+      if (_isCallActive || !_canTransition('invite')) {
+        await _emitDmCallSignal('call_busy');
+        return;
+      }
       if (!mounted) return;
       setState(() {
         _callState = DmCallState.ringingIncoming;
         _callPanelMinimized = false;
       });
+      _startIncomingRing();
       final accepted = await _showIncomingCallDialog();
+      _stopIncomingRing();
       if (!mounted || _callState != DmCallState.ringingIncoming) return;
 
       if (accepted) {
@@ -1786,7 +1959,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
         await _startVoiceCall(sendInvite: false, incoming: true);
       } else {
         setState(() => _callState = DmCallState.idle);
-        _stopOutgoingRing();
         await _emitDmCallSignal('call_decline');
       }
       return;
@@ -1810,19 +1982,28 @@ class _DmChatScreenState extends State<DmChatScreen> {
     if (type == 'call_decline') {
       if (!_canTransition('decline')) return;
       if (!_isCallActive) return;
+      _stopIncomingRing();
       await _endVoiceCall(showRemoteEnded: true, message: 'Voice call declined');
+      return;
+    }
+
+    if (type == 'call_busy') {
+      if (!_isCallActive) return;
+      _stopIncomingRing();
+      await _endVoiceCall(showRemoteEnded: true, message: '${widget.otherName} is busy on another call');
       return;
     }
 
     if (type == 'call_end') {
       if (!_canTransition('end')) return;
       if (!_isCallActive) return;
+      _stopIncomingRing();
       await _endVoiceCall(showRemoteEnded: true);
     }
   }
 
   Future<bool> _showIncomingCallDialog() async {
-    final response = await showDialog<bool>(
+    final responseFuture = showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (context) => Dialog(
@@ -1835,17 +2016,41 @@ class _DmChatScreenState extends State<DmChatScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Incoming voice call',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: T.accent.withValues(alpha: 0.18),
+                    child: const Icon(Icons.person_rounded),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Incoming voice call',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w900,
+                              ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          widget.otherName,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w800,
+                              ),
+                        ),
+                      ],
                     ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 10),
               Text(
-                '${widget.otherName} is calling you.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
+                'Your phone will keep ringing until you accept or decline. The request expires in 30 seconds.',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.w600,
                     ),
               ),
               const SizedBox(height: 14),
@@ -1874,6 +2079,16 @@ class _DmChatScreenState extends State<DmChatScreen> {
       ),
     );
 
+    unawaited(Future<void>.delayed(const Duration(seconds: 30), () {
+      if (!mounted) return;
+      if (_callState != DmCallState.ringingIncoming) return;
+      final nav = Navigator.of(context, rootNavigator: true);
+      if (nav.canPop()) {
+        nav.pop(false);
+      }
+    }));
+
+    final response = await responseFuture;
     return response == true;
   }
 
@@ -1894,6 +2109,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _callSetupTimeoutTimer?.cancel();
     _callTimer?.cancel();
     _stopOutgoingRing();
+    _stopIncomingRing();
     setState(() {
       _callState = DmCallState.connected;
       _callElapsedSeconds = 0;
@@ -1996,6 +2212,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     } catch (_) {
       if (!mounted) return false;
       _stopOutgoingRing();
+      _stopIncomingRing();
       setState(() => _callState = DmCallState.idle);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.chatCallLater)),
@@ -2010,6 +2227,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _callTimer?.cancel();
     _callSetupTimeoutTimer?.cancel();
     _stopOutgoingRing();
+    _stopIncomingRing();
     setState(() {
       _callState = DmCallState.idle;
       _callPanelMinimized = false;
@@ -2322,7 +2540,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final uid = _myUserId;
     try {
       final picked = await _imagePicker.pickImage(
-        source: ImageSource.gallery,
+        source: fromCamera ? ImageSource.camera : ImageSource.gallery,
         imageQuality: 85,
         maxWidth: _planTier == SomaSubscriptionTier.pro ? 1920 : 1280,
       );
@@ -4525,6 +4743,64 @@ class _PackMessageCardState extends State<_PackMessageCard> {
               onPressed: () => setState(() => _rsvpAccepted = !_rsvpAccepted),
               icon: Icon(_rsvpAccepted ? Icons.check_rounded : Icons.event_available_rounded, size: 16),
               label: Text(_rsvpAccepted ? 'RSVP: Going' : 'RSVP'),
+            ),
+          ] else if (payload.type == 'location') ...[
+            if (payload.items.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              for (final item in payload.items.take(3))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Text('• $item', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82))),
+                ),
+            ],
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () async {
+                final uri = Uri.tryParse(payload.url ?? '');
+                if (uri == null) return;
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              },
+              icon: const Icon(Icons.map_rounded, size: 16),
+              label: const Text('Open map'),
+            ),
+          ] else if (payload.type == 'contact') ...[
+            if (payload.items.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              for (final item in payload.items.take(3))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Text('• $item', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.82))),
+                ),
+            ],
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final uri = Uri.tryParse(payload.url ?? '');
+                    if (uri == null) return;
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  },
+                  icon: const Icon(Icons.call_rounded, size: 16),
+                  label: const Text('Call'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final phone = payload.items.isNotEmpty ? payload.items.first : '';
+                    if (phone.isEmpty) return;
+                    await Clipboard.setData(ClipboardData(text: phone));
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Contact number copied')),
+                      );
+                    }
+                  },
+                  icon: const Icon(Icons.copy_rounded, size: 16),
+                  label: const Text('Copy number'),
+                ),
+              ],
             ),
           ] else if (payload.items.isNotEmpty) ...[
             const SizedBox(height: 6),
