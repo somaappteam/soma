@@ -213,8 +213,21 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final panelColor = isDark ? const Color(0xFF0E0F1A) : scheme.surface;
+    final mainTextColor = isDark ? Colors.white : scheme.onSurface;
+    final secondaryTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.65)
+        : scheme.onSurface.withValues(alpha: 0.62);
+    final fieldBg = isDark
+        ? T.fieldFill
+        : scheme.surfaceContainerHighest.withValues(alpha: 0.65);
+    final fieldBorder = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : scheme.onSurface.withValues(alpha: 0.14);
     return Material(
-      color: const Color(0xFF0E0F1A),
+      color: panelColor,
       child: SafeArea(
         child: StreamBuilder<Map<String, dynamic>?>(
           stream: _chatConfigStream,
@@ -240,8 +253,8 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                       Expanded(
                         child: Text(
                           l10n.circlesLiveChatTitle,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: mainTextColor,
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
                           ),
@@ -249,7 +262,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                       ),
                       if (isHost)
                         PopupMenuButton<int>(
-                          icon: const Icon(Icons.tune_rounded, color: Colors.white),
+                          icon: Icon(Icons.tune_rounded, color: mainTextColor),
                           onSelected: (value) async {
                             await circleChatRepository.setSlowMode(
                               circleId: widget.circleId,
@@ -264,7 +277,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                         ),
                       IconButton(
                         onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.close_rounded, color: Colors.white),
+                        icon: Icon(Icons.close_rounded, color: mainTextColor),
                       ),
                     ],
                   ),
@@ -277,21 +290,21 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       child: Row(
                         children: [
-                          const Icon(Icons.push_pin_rounded, size: 16, color: Colors.white),
+                          Icon(Icons.push_pin_rounded, size: 16, color: mainTextColor),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               highlighted,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                              style: TextStyle(color: mainTextColor, fontWeight: FontWeight.w700),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                const Divider(height: 1, color: Color(0x1AFFFFFF)),
+                Divider(height: 1, color: scheme.onSurface.withValues(alpha: isDark ? 0.10 : 0.12)),
                 Expanded(
                   child: StreamBuilder<List<Map<String, dynamic>>>(
                     stream: _messagesStream,
@@ -300,7 +313,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                         return Center(
                           child: Text(
                             snapshot.error.toString(),
-                            style: const TextStyle(color: Colors.white70),
+                            style: TextStyle(color: secondaryTextColor),
                           ),
                         );
                       }
@@ -322,7 +335,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                           child: Text(
                             l10n.circlesLiveChatEmpty,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.6),
+                              color: secondaryTextColor,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -364,7 +377,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                                           Text(
                                             senderName,
                                             style: TextStyle(
-                                              color: Colors.white.withValues(alpha: 0.6),
+                                              color: secondaryTextColor,
                                               fontSize: 12,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -418,10 +431,15 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                                             child: Container(
                                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                               decoration: BoxDecoration(
-                                                color: Colors.white.withValues(alpha: 0.1),
+                                                color: isDark
+                                                    ? Colors.white.withValues(alpha: 0.1)
+                                                    : scheme.onSurface.withValues(alpha: 0.07),
                                                 borderRadius: BorderRadius.circular(12),
                                               ),
-                                              child: Text('${entry.key} $count', style: const TextStyle(color: Colors.white)),
+                                              child: Text(
+                                                '${entry.key} $count',
+                                                style: TextStyle(color: mainTextColor),
+                                              ),
                                             ),
                                           );
                                         }).toList(),
@@ -441,7 +459,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Text(
                       'Slow mode is on (${slowModeSeconds}s)',
-                      style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
+                      style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600),
                     ),
                   ),
                 Padding(
@@ -453,20 +471,20 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                           height: 48,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
-                            color: T.fieldFill,
+                            color: fieldBg,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                            border: Border.all(color: fieldBorder),
                           ),
                           child: TextField(
                             controller: _controller,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: mainTextColor,
                               fontWeight: FontWeight.w600,
                             ),
-                            cursorColor: Colors.white,
+                            cursorColor: scheme.primary,
                             decoration: InputDecoration(
                               hintText: l10n.circlesLiveChatPlaceholder,
-                              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.5)),
+                              hintStyle: TextStyle(color: secondaryTextColor),
                               border: InputBorder.none,
                             ),
                             textInputAction: TextInputAction.send,
@@ -488,8 +506,8 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                           padding: const EdgeInsets.all(12),
                           child: Text(
                             l10n.send,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: mainTextColor,
                               fontWeight: FontWeight.w800,
                             ),
                           ),
@@ -521,6 +539,8 @@ class CircleChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final radius = BorderRadius.only(
       topLeft: const Radius.circular(18),
       topRight: const Radius.circular(18),
@@ -532,10 +552,18 @@ class CircleChatBubble extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
       constraints: const BoxConstraints(maxWidth: 280),
       decoration: BoxDecoration(
-        color: isMe ? const Color(0xFF5A67FF) : Colors.white.withValues(alpha: 0.12),
+        color: isMe
+            ? (isDark ? const Color(0xFF5A67FF) : scheme.primary.withValues(alpha: 0.86))
+            : (isDark
+                ? Colors.white.withValues(alpha: 0.12)
+                : scheme.surfaceContainerHighest.withValues(alpha: 0.72)),
         borderRadius: radius,
         border: Border.all(
-          color: isMe ? Colors.white.withValues(alpha: 0.0) : Colors.white.withValues(alpha: 0.1),
+          color: isMe
+              ? Colors.transparent
+              : (isDark
+                  ? Colors.white.withValues(alpha: 0.10)
+                  : scheme.onSurface.withValues(alpha: 0.12)),
         ),
       ),
       child: Column(
@@ -545,7 +573,7 @@ class CircleChatBubble extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              color: isMe ? Colors.white : Colors.white.withValues(alpha: 0.95),
+              color: isMe ? Colors.white : (isDark ? Colors.white.withValues(alpha: 0.95) : scheme.onSurface),
               fontWeight: FontWeight.w500,
               fontSize: 15,
               height: 1.3,
@@ -556,7 +584,7 @@ class CircleChatBubble extends StatelessWidget {
             Icon(
               isRead ? Icons.done_all_rounded : Icons.check_rounded,
               size: 16,
-              color: isRead ? const Color(0xFF4DE1F8) : Colors.white.withValues(alpha: 0.6),
+              color: isRead ? const Color(0xFF4DE1F8) : (isDark ? Colors.white.withValues(alpha: 0.6) : scheme.onSurface.withValues(alpha: 0.45)),
             ),
           ],
         ],

@@ -340,9 +340,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
     if (_isLoading) {
       final scheme = Theme.of(context).colorScheme;
-      return Scaffold(
-        backgroundColor: scheme.surface,
-        body: Center(
+      return SafeArea(
+        child: Center(
           child: CircularProgressIndicator(color: scheme.primary),
         ),
       );
@@ -358,25 +357,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       dailyGoalMinutes: 15,
     );
 
-    final scheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              scheme.surface,
-              scheme.surfaceContainerLowest.withValues(alpha: 0.96),
-              scheme.primary.withValues(alpha: 0.06),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
-            child: Column(
-              children: [
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
+        child: Column(
+          children: [
                 _TopBar(
                   title: l10n.profileTitle,
                   onBack: _isVisitorView && Navigator.canPop(context)
@@ -512,8 +497,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ),
-        ),
-      ),
       );
   }
 }
@@ -645,24 +628,11 @@ class _GuestProfileView extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              scheme.surface,
-              scheme.surfaceContainerLowest.withValues(alpha: 0.96),
-              scheme.primary.withValues(alpha: 0.06),
-            ],
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
-            child: Column(
-              children: [
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
+        child: Column(
+          children: [
                 _TopBar(
                   onSettings: onSettings,
                   title: l10n.profileTitle,
@@ -802,9 +772,7 @@ class _GuestProfileView extends StatelessWidget {
               ],
             ),
           ),
-        ),
-      ),
-    );
+      );
   }
 }
 class _GuestMiniStatCard extends StatelessWidget {

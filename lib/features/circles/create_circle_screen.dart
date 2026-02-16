@@ -115,7 +115,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 12),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(16),
-                                  color: T.fieldFill,
+                                  color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.55),
                                   border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
                                 ),
                                 child: TextField(
@@ -856,7 +856,7 @@ Future<LangOption?> _pickFrom(
       noMatchesText: 'No matches',
       items: items,
       current: current,
-      darkModeStyle: true,
+      darkModeStyle: Theme.of(ctx).brightness == Brightness.dark,
     ),
   );
 }

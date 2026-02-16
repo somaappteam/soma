@@ -40,6 +40,8 @@ class _InboxScreenState extends State<InboxScreen> {
   final Set<String> _hiddenPreviewThreadIds = <String>{};
   bool _scheduledDigestEnabled = false;
   bool _digestCardExpanded = false;
+  bool _showSearchBar = false;
+  bool _showInboxInsights = false;
 
   @override
   void initState() {
@@ -87,6 +89,8 @@ class _InboxScreenState extends State<InboxScreen> {
           ..addAll(hidden);
         _scheduledDigestEnabled = settings['inbox_digest_enabled'] == true;
         _digestCardExpanded = settings['inbox_digest_card_expanded'] == true;
+        _showSearchBar = settings['inbox_search_expanded'] == true;
+        _showInboxInsights = settings['inbox_insights_expanded'] == true;
       });
     } catch (_) {}
   }
@@ -136,6 +140,23 @@ class _InboxScreenState extends State<InboxScreen> {
     HapticFeedback.selectionClick();
     setState(() => _digestCardExpanded = expanded);
     await settingsRepository.updateSetting('inbox_digest_card_expanded', expanded);
+  }
+
+  Future<void> _toggleSearchBar() async {
+    HapticFeedback.selectionClick();
+    final next = !_showSearchBar;
+    setState(() {
+      _showSearchBar = next;
+      if (!next) query = '';
+    });
+    await settingsRepository.updateSetting('inbox_search_expanded', next);
+  }
+
+  Future<void> _toggleInboxInsights() async {
+    HapticFeedback.selectionClick();
+    final next = !_showInboxInsights;
+    setState(() => _showInboxInsights = next);
+    await settingsRepository.updateSetting('inbox_insights_expanded', next);
   }
 
   int get _activeViewOptionCount {
@@ -597,6 +618,11 @@ class _InboxScreenState extends State<InboxScreen> {
                   ),
                   const SizedBox(width: 8),
                   _IconGlass(
+                    icon: _showSearchBar ? Icons.search_off_rounded : Icons.search_rounded,
+                    onTap: _toggleSearchBar,
+                  ),
+                  const SizedBox(width: 8),
+                  _IconGlass(
                     icon: _scheduledDigestEnabled ? Icons.notifications_active_rounded : Icons.notifications_none_rounded,
                     onTap: _toggleScheduledDigest,
                   ),
@@ -676,33 +702,48 @@ class _InboxScreenState extends State<InboxScreen> {
                 ),
                 const SizedBox(height: 10),
               ],
-              Glass(
-                radius: BorderRadius.circular(20),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                child: Row(
-                  children: [
-                    Icon(Icons.search_rounded, color: scheme.onSurface.withValues(alpha: 0.7)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: TextField(
-                        onChanged: (v) => setState(() => query = v),
-                        style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
-                        cursorColor: scheme.onSurface,
-                        decoration: InputDecoration(
-                          hintText: l10n.searchChatsHint,
-                          hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
-                          border: InputBorder.none,
-                          isDense: true,
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                child: _showSearchBar
+                    ? Glass(
+                        key: const ValueKey('search-open'),
+                        radius: BorderRadius.circular(20),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        child: Row(
+                          children: [
+                            Icon(Icons.search_rounded, color: scheme.onSurface.withValues(alpha: 0.7)),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                autofocus: true,
+                                onChanged: (v) => setState(() => query = v),
+                                style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
+                                cursorColor: scheme.onSurface,
+                                decoration: InputDecoration(
+                                  hintText: l10n.searchChatsHint,
+                                  hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                ),
+                              ),
+                            ),
+                            if (query.isNotEmpty)
+                              GestureDetector(
+                                onTap: () => setState(() => query = ''),
+                                child: Icon(Icons.close_rounded, color: scheme.onSurface.withValues(alpha: 0.7)),
+                              ),
+                          ],
+                        ),
+                      )
+                    : Align(
+                        key: const ValueKey('search-closed'),
+                        alignment: Alignment.centerLeft,
+                        child: OutlinedButton.icon(
+                          onPressed: _toggleSearchBar,
+                          icon: const Icon(Icons.search_rounded),
+                          label: const Text('Search chats'),
                         ),
                       ),
-                    ),
-                    if (query.isNotEmpty)
-                      GestureDetector(
-                        onTap: () => setState(() => query = ""),
-                        child: Icon(Icons.close_rounded, color: scheme.onSurface.withValues(alpha: 0.7)),
-                      ),
-                  ],
-                ),
               ),
               const SizedBox(height: 12),
               Expanded(
@@ -850,42 +891,53 @@ class _InboxScreenState extends State<InboxScreen> {
                                 unreadThreads: unreadThreads,
                                 requestCount: requestCount,
                                 archivedMentions: archivedMentions,
+                                expanded: _showInboxInsights,
+                                onToggle: _toggleInboxInsights,
                               ),
-                              _ConversationMemoryCard(
-                                unreadThreads: unreadThreads,
-                                voiceNoteThreads: voiceNoteThreads,
-                                correctionUnreadCount: correctionUnreadCount,
-                              ),
-                              _WeeklyReportShareCard(
-                                unreadTotal: unreadTotal,
-                                unreadThreads: unreadThreads,
-                                requestCount: requestCount,
-                                voiceNoteThreads: voiceNoteThreads,
-                                correctionUnreadCount: correctionUnreadCount,
-                              ),
-                              _AdaptiveChallengesRow(
-                                challenges: [
-                                  if (correctionUnreadCount > 0)
-                                    _AdaptiveChallenge(
-                                      label: '$correctionUnreadCount corrections unread — review now',
-                                      onTap: () => _openThread(visibleThreads.firstWhere((t) => t['hasCorrectionUnread'] == true)),
+                              AnimatedCrossFade(
+                                firstChild: const SizedBox.shrink(),
+                                secondChild: Column(
+                                  children: [
+                                    _ConversationMemoryCard(
+                                      unreadThreads: unreadThreads,
+                                      voiceNoteThreads: voiceNoteThreads,
+                                      correctionUnreadCount: correctionUnreadCount,
                                     ),
-                                  if (visibleThreads.where((t) => t['practiceStreakAtRisk'] == true).isNotEmpty)
-                                    _AdaptiveChallenge(
-                                      label: 'Streak at risk — send one message',
-                                      onTap: () => _openThread(visibleThreads.firstWhere((t) => t['practiceStreakAtRisk'] == true)),
+                                    _WeeklyReportShareCard(
+                                      unreadTotal: unreadTotal,
+                                      unreadThreads: unreadThreads,
+                                      requestCount: requestCount,
+                                      voiceNoteThreads: voiceNoteThreads,
+                                      correctionUnreadCount: correctionUnreadCount,
                                     ),
-                                  if (challengePendingCount > 0)
-                                    _AdaptiveChallenge(
-                                      label: '$challengePendingCount challenge threads need attention',
-                                      onTap: () => _openThread(visibleThreads.firstWhere((t) => t['hasChallengePending'] == true)),
+                                    _AdaptiveChallengesRow(
+                                      challenges: [
+                                        if (correctionUnreadCount > 0)
+                                          _AdaptiveChallenge(
+                                            label: '$correctionUnreadCount corrections unread — review now',
+                                            onTap: () => _openThread(visibleThreads.firstWhere((t) => t['hasCorrectionUnread'] == true)),
+                                          ),
+                                        if (visibleThreads.where((t) => t['practiceStreakAtRisk'] == true).isNotEmpty)
+                                          _AdaptiveChallenge(
+                                            label: 'Streak at risk — send one message',
+                                            onTap: () => _openThread(visibleThreads.firstWhere((t) => t['practiceStreakAtRisk'] == true)),
+                                          ),
+                                        if (challengePendingCount > 0)
+                                          _AdaptiveChallenge(
+                                            label: '$challengePendingCount challenge threads need attention',
+                                            onTap: () => _openThread(visibleThreads.firstWhere((t) => t['hasChallengePending'] == true)),
+                                          ),
+                                      ],
                                     ),
-                                ],
-                              ),
-                              if (vipThreads.isNotEmpty)
-                                _VipPinnedRow(
-                                  threads: vipThreads,
+                                    if (vipThreads.isNotEmpty)
+                                      _VipPinnedRow(
+                                        threads: vipThreads,
+                                      ),
+                                  ],
                                 ),
+                                crossFadeState: _showInboxInsights ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                                duration: const Duration(milliseconds: 180),
+                              ),
                               Expanded(
                                 child: AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 160),
@@ -1050,12 +1102,16 @@ class _CatchUpSummaryCard extends StatelessWidget {
   final int unreadThreads;
   final int requestCount;
   final int archivedMentions;
+  final bool expanded;
+  final VoidCallback onToggle;
 
   const _CatchUpSummaryCard({
     required this.unreadTotal,
     required this.unreadThreads,
     required this.requestCount,
     required this.archivedMentions,
+    required this.expanded,
+    required this.onToggle,
   });
 
   @override
@@ -1078,6 +1134,15 @@ class _CatchUpSummaryCard extends StatelessWidget {
                   fontWeight: FontWeight.w700,
                   fontSize: 11.5,
                 ),
+              ),
+            ),
+            IconButton(
+              tooltip: expanded ? 'Hide insights' : 'Show insights',
+              onPressed: onToggle,
+              icon: Icon(
+                expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                size: 18,
+                color: scheme.primary,
               ),
             ),
           ],

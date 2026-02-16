@@ -518,8 +518,11 @@ class _TabPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final selectedBg = isDark ? T.accent : colors.primary.withValues(alpha: 0.18);
+    final selectedText = isDark ? Colors.black : colors.onSurface;
     return Material(
-      color: selected ? T.accent : Colors.transparent,
+      color: selected ? selectedBg : Colors.transparent,
       borderRadius: BorderRadius.circular(12),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -530,7 +533,7 @@ class _TabPill extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: selected ? Colors.black : colors.onSurface.withValues(alpha: 0.88),
+              color: selected ? selectedText : colors.onSurface.withValues(alpha: 0.88),
               fontWeight: FontWeight.w800,
               fontSize: 13,
             ),
@@ -1181,76 +1184,19 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    final textTheme = Theme.of(context).textTheme;
-
     return Column(
       children: [
-        Glass(
-          radius: BorderRadius.circular(18),
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 34,
-                    height: 34,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: T.accent.withValues(alpha: 0.16),
-                    ),
-                    child: Icon(Icons.auto_awesome_rounded,
-                        size: 18,
-                        color: Theme.of(context).colorScheme.onSurface),
-                  ),
-                  const SizedBox(width: 10),
-                  const Expanded(
-                    child: Text(
-                      '2-Language Exchange',
-                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
-                    ),
-                  ),
-                  _ToolChip(label: 'Language exchange only'),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Choose exchange languages used only for partner chats (separate from course languages).',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.74),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _ToolChip(label: 'Speaks (max 3): ${_speaksSummary()}'),
-                  _ToolChip(label: 'Learns (max 5): ${_learnsSummary()}'),
-                  _FilterActionChip(
-                    label: 'Edit exchange languages',
-                    icon: Icons.tune_rounded,
-                    onTap: _editExchangePrefs,
-                  ),
-                  const _ModernBadge(icon: Icons.bolt_rounded, label: 'Fast rounds'),
-                  const _ModernBadge(icon: Icons.insights_rounded, label: 'Session summary'),
-                ],
-              ),
-              const SizedBox(height: 10),
-              if (_exchangePrefsReady)
-                _RoundFlowPreview(
-                  fromLang: _speaksLanguages.first.name,
-                  toLang: _learnLanguagePrefs.first.language.name,
-                ),
-              const SizedBox(height: 8),
-              _SpeakingRoomsPremiumCard(onTap: _showSpeakingRoomsPreview),
-            ],
-          ),
+        Row(
+          children: [
+            _FilterActionChip(
+              label: 'Edit exchange languages',
+              icon: Icons.tune_rounded,
+              onTap: _editExchangePrefs,
+            ),
+          ],
         ),
+        const SizedBox(height: 8),
+        _SpeakingRoomsPremiumCard(onTap: _showSpeakingRoomsPreview),
         const SizedBox(height: 12),
         Expanded(
           child: FutureBuilder<Map<String, dynamic>>(
@@ -1555,32 +1501,126 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                             _ModernBadge(icon: Icons.workspace_premium_rounded, label: 'Ranked challenge packs'),
                           ],
                         ),
+                        const SizedBox(height: 12),
+                        const Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            _SpeakingRoomStatChip(label: 'Target size', value: '4-12 speakers'),
+                            _SpeakingRoomStatChip(label: 'Warmup', value: '5 min'),
+                            _SpeakingRoomStatChip(label: 'Focus', value: 'Pronunciation + Fluency'),
+                          ],
+                        ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 14),
+                  Text(
+                    'How it works',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 15,
+                      color: scheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   const _SpeakingRoomFeatureTile(
+                    icon: Icons.playlist_play_rounded,
+                    title: 'Session blueprint',
+                    subtitle: 'Warm-up check-in, timed round flow, live coaching moments, and a focused wrap-up summary.',
+                  ),
+                  const SizedBox(height: 8),
+                  const _SpeakingRoomFeatureTile(
+                    icon: Icons.admin_panel_settings_rounded,
+                    title: 'Host toolkit',
+                    subtitle: 'Hosts can rotate turns, pin prompts, invite quiet members, and rebalance speaking time in one tap.',
+                  ),
+                  const SizedBox(height: 8),
+                  const _SpeakingRoomFeatureTile(
+                    icon: Icons.verified_user_rounded,
+                    title: 'Trust & safety layer',
+                    subtitle: 'Smart moderation alerts, one-tap report flow, and auto de-escalation prompts keep rooms safe.',
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Premium feature stack',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 15,
+                      color: scheme.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const _SpeakingRoomOptionTile(
                     icon: Icons.mic_external_on_rounded,
                     title: 'Smart speaking rounds',
-                    subtitle: 'Auto-rotating turns with host controls, participation balance, and gentle pace guidance.',
+                    badge: 'Launch',
+                    summary: 'Auto-rotating turns with host controls, participation balance, and gentle pace guidance.',
+                    bullets: [
+                      'Dynamic timer packs: 60 / 90 / 120 seconds',
+                      'Equal airtime nudges for quieter learners',
+                      'Host override for debate and freestyle moments',
+                    ],
+                    designedFlow: [
+                      'Round queue auto-builds from speaker confidence and recent airtime',
+                      'Soft chime + visual turn baton signals next speaker in 2 seconds',
+                      'Mid-round assist nudges keep answers concise and on-topic',
+                    ],
+                    proSignals: ['Turn fairness index', 'Pace stability', 'Participation balance'],
                   ),
                   const SizedBox(height: 8),
-                  const _SpeakingRoomFeatureTile(
+                  const _SpeakingRoomOptionTile(
                     icon: Icons.equalizer_rounded,
                     title: 'Live coaching overlays',
-                    subtitle: 'Instant feedback for pronunciation clarity, filler-word usage, and pace confidence.',
+                    badge: 'Premium AI',
+                    summary: 'Instant feedback for pronunciation clarity, filler-word usage, and pace confidence.',
+                    bullets: [
+                      'Color-coded clarity indicators while you speak',
+                      'Keyword and filler-word spotting in context',
+                      'Post-turn coaching tip cards in your target language',
+                    ],
+                    designedFlow: [
+                      'Overlay reads tone, pacing, and pronunciation with low-latency hints',
+                      'Hints prioritize one correction at a time to avoid overload',
+                      'End-of-turn recap stores your top fix + instant retry prompt',
+                    ],
+                    proSignals: ['Clarity score', 'Filler ratio', 'Confidence trend'],
                   ),
                   const SizedBox(height: 8),
-                  const _SpeakingRoomFeatureTile(
+                  const _SpeakingRoomOptionTile(
                     icon: Icons.flag_circle_rounded,
                     title: 'Battle & mission modes',
-                    subtitle: 'Team missions, topic cards, timed debates, and streak rewards to keep sessions exciting.',
+                    badge: 'Ranked',
+                    summary: 'Team missions, topic cards, timed debates, and streak rewards to keep sessions exciting.',
+                    bullets: [
+                      'Weekly challenge ladders by CEFR level',
+                      'Topic roulette and duo challenge prompts',
+                      'Season streak rewards and collectible badges',
+                    ],
+                    designedFlow: [
+                      'Rooms launch with mission draft: warmup, challenge core, final duel',
+                      'Adaptive scoring rewards accuracy, bravery, and collaboration',
+                      'Post-match highlights drive rematch loops and streak retention',
+                    ],
+                    proSignals: ['Mission completion', 'Rank momentum', 'Team synergy'],
                   ),
                   const SizedBox(height: 8),
-                  const _SpeakingRoomFeatureTile(
+                  const _SpeakingRoomOptionTile(
                     icon: Icons.analytics_rounded,
                     title: 'Post-session performance board',
-                    subtitle: 'Personal scorecards with speaking minutes, mistakes to review, and next-session focus.',
+                    badge: 'Insight Pro',
+                    summary: 'Personal scorecards with speaking minutes, mistakes to review, and next-session focus.',
+                    bullets: [
+                      'Personal fluency trend line over 7/30 days',
+                      'Pronunciation hotspots with retry practice list',
+                      'Auto-generated focus plan for your next session',
+                    ],
+                    designedFlow: [
+                      'Session telemetry compiles into learner + host scoreboards in seconds',
+                      'Board highlights biggest gains, blockers, and coaching priorities',
+                      'Next-session brief converts insights into a practical speaking mission',
+                    ],
+                    proSignals: ['Speaking minutes', 'Mistake recovery', 'Next-step readiness'],
                   ),
                   const SizedBox(height: 14),
                   Row(
@@ -1605,7 +1645,7 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                             Navigator.pop(context);
                             if (!mounted) return;
                             ScaffoldMessenger.of(this.context).showSnackBar(
-                              const SnackBar(content: Text('Preview mode is coming soon with the first premium rooms release.')),
+                              const SnackBar(content: Text('Roadmap preview unlocked: smart rounds, coaching overlays, ranked seasons, and host toolkit release phases.')),
                             );
                           },
                           icon: const Icon(Icons.rocket_launch_rounded),
@@ -1831,71 +1871,6 @@ class _ExchangePrefsRequiredCard extends StatelessWidget {
   }
 }
 
-class _RoundFlowPreview extends StatelessWidget {
-  final String fromLang;
-  final String toLang;
-
-  const _RoundFlowPreview({
-    required this.fromLang,
-    required this.toLang,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        _RoundRuleRow(
-          roundLabel: 'Round 1 • $fromLang',
-          detail: 'Write only in $fromLang',
-        ),
-        const SizedBox(height: 8),
-        _RoundRuleRow(
-          roundLabel: 'Round 2 • $toLang',
-          detail: 'Switch and write in $toLang',
-        ),
-      ],
-    );
-  }
-}
-
-class _RoundRuleRow extends StatelessWidget {
-  final String roundLabel;
-  final String detail;
-
-  const _RoundRuleRow({required this.roundLabel, required this.detail});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            roundLabel,
-            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            detail,
-            style: TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 11.5,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _ToolChip extends StatelessWidget {
   final String label;
   const _ToolChip({required this.label});
@@ -2073,6 +2048,224 @@ class _SpeakingRoomFeatureTile extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SpeakingRoomStatChip extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _SpeakingRoomStatChip({
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: scheme.surface.withValues(alpha: 0.5),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+      ),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(
+            color: scheme.onSurface,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+          children: [
+            TextSpan(
+              text: '$label: ',
+              style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.68)),
+            ),
+            TextSpan(text: value),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SpeakingRoomOptionTile extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String badge;
+  final String summary;
+  final List<String> bullets;
+  final List<String> designedFlow;
+  final List<String> proSignals;
+
+  const _SpeakingRoomOptionTile({
+    required this.icon,
+    required this.title,
+    required this.badge,
+    required this.summary,
+    required this.bullets,
+    required this.designedFlow,
+    required this.proSignals,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(12, 11, 12, 11),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: scheme.onSurface.withValues(alpha: 0.06),
+        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 1),
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(9),
+                  color: T.accent.withValues(alpha: 0.18),
+                ),
+                child: Icon(icon, size: 16, color: scheme.onSurface),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(999),
+                            color: T.accent.withValues(alpha: 0.18),
+                            border: Border.all(color: T.accent.withValues(alpha: 0.3)),
+                          ),
+                          child: Text(
+                            badge,
+                            style: TextStyle(
+                              color: scheme.onSurface,
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      summary,
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.74),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 11.8,
+                        height: 1.32,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          for (final bullet in bullets) ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Icon(Icons.check_circle_rounded, size: 14, color: T.accent),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    bullet,
+                    style: TextStyle(
+                      fontSize: 11.4,
+                      fontWeight: FontWeight.w600,
+                      color: scheme.onSurface.withValues(alpha: 0.82),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (bullet != bullets.last) const SizedBox(height: 4),
+          ],
+          const SizedBox(height: 10),
+          Text(
+            'Designed flow',
+            style: TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 11.5,
+              color: scheme.onSurface.withValues(alpha: 0.9),
+            ),
+          ),
+          const SizedBox(height: 6),
+          for (final step in designedFlow) ...[
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Icon(Icons.auto_awesome_rounded, size: 13, color: scheme.primary),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    step,
+                    style: TextStyle(
+                      fontSize: 11.2,
+                      fontWeight: FontWeight.w600,
+                      color: scheme.onSurface.withValues(alpha: 0.77),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            if (step != designedFlow.last) const SizedBox(height: 4),
+          ],
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final signal in proSignals)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    color: scheme.surface.withValues(alpha: 0.6),
+                    border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+                  ),
+                  child: Text(
+                    signal,
+                    style: TextStyle(
+                      fontSize: 10.3,
+                      fontWeight: FontWeight.w700,
+                      color: scheme.onSurface.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ],
       ),
