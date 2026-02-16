@@ -99,8 +99,8 @@ class AppTheme {
     const scheme = ColorScheme.dark(
       primary: T.neonA,
       secondary: T.neonB,
-      surface: Color(0xFF15162C),
-      surfaceContainerHighest: Color(0xFF1E1E3A),
+      surface: Color(0xFF06070F),
+      surfaceContainerHighest: Color(0xFF0D1020),
       onPrimary: Colors.white,
       onSecondary: Colors.black,
       onSurface: Color(0xFFF6F5FF),
@@ -113,7 +113,7 @@ class AppTheme {
     );
     const background = AppBackgroundTheme(
       gradient: LinearGradient(
-        colors: [Color(0xFF0B0B2D), Color(0xFF0B0B2D)],
+        colors: [Color(0xFF030408), Color(0xFF070A14)],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),

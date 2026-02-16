@@ -496,6 +496,8 @@ class _CirclesScreenState extends State<CirclesScreen> {
                       : _LanguageExchangePanel(
                           users: _buildExchangeUsers(),
                           selectedCourse: selectedCourseOption,
+                          selectedCourseLabel: _courseLabel(courseOptions, l10n),
+                          onSelectCourse: () => _selectCourseFilter(courseOptions),
                         ),
                 ),
               ],
@@ -668,10 +670,14 @@ class _ExchangeCourseRequired extends StatelessWidget {
 class _LanguageExchangePanel extends StatefulWidget {
   final List<_ExchangeUser> users;
   final _CourseOption? selectedCourse;
+  final String selectedCourseLabel;
+  final Future<void> Function() onSelectCourse;
 
   const _LanguageExchangePanel({
     required this.users,
     required this.selectedCourse,
+    required this.selectedCourseLabel,
+    required this.onSelectCourse,
   });
 
   @override
@@ -840,49 +846,84 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
     return Column(
       children: [
         Glass(
-          radius: BorderRadius.circular(16),
+          radius: BorderRadius.circular(18),
           padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Two-Language Exchange Chat',
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+              Row(
+                children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: T.accent.withValues(alpha: 0.16),
+                    ),
+                    child: Icon(Icons.auto_awesome_rounded,
+                        size: 18,
+                        color: Theme.of(context).colorScheme.onSurface),
+                  ),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Text(
+                      '2-Language Exchange',
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16),
+                    ),
+                  ),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: widget.onSelectCourse,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.translate_rounded, size: 15),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Courses',
+                            style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w800),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 6),
               Text(
-                'Global discovery + filter controls. Enable exchange visibility in Privacy settings to appear.',
+                'Smart matching. Cleaner discovery.',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.82),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.74),
                 ),
-              ),
-              if (myUser.isNotEmpty) ...[
-                const SizedBox(height: 10),
-                Text(
-                  'You: ${myUser.first.speaks} → ${myUser.first.learns} (${myUser.first.level})',
-                  style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
-                ),
-              ],
-              const SizedBox(height: 10),
-              _RoundFlowPreview(
-                fromLang: widget.selectedCourse?.fromName ?? 'Speaks',
-                toLang: widget.selectedCourse?.toName ?? 'Learns',
               ),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: const [
-                  _ToolChip(label: 'Conversation requests'),
-                  _ToolChip(label: 'Rate limits'),
-                  _ToolChip(label: 'Turn timer + skip'),
-                  _ToolChip(label: 'Session insights'),
+                children: [
+                  _ToolChip(label: widget.selectedCourseLabel),
+                  if (myUser.isNotEmpty)
+                    _ToolChip(label: 'You ${myUser.first.speaks} → ${myUser.first.learns}'),
+                  const _ModernBadge(icon: Icons.bolt_rounded, label: 'Fast rounds'),
+                  const _ModernBadge(icon: Icons.insights_rounded, label: 'Session summary'),
                 ],
               ),
               const SizedBox(height: 10),
-              const _SessionProgressPreview(),
+              _RoundFlowPreview(
+                fromLang: widget.selectedCourse?.fromName ?? 'Speaks',
+                toLang: widget.selectedCourse?.toName ?? 'Learns',
+              ),
             ],
           ),
         ),
@@ -972,50 +1013,62 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
                         children: [
                           Padding(
                             padding: const EdgeInsets.only(bottom: 10),
-                            child: Wrap(
-                              spacing: 8,
-                              runSpacing: 4,
-                              children: [
-                                ChoiceChip(
-                                  label: const Text('Online only'),
-                                  selected: _onlineOnly,
-                                  onSelected: (_) {
-                                    setState(() => _onlineOnly = true);
-                                    persistFilters();
-                                  },
-                                ),
-                                ChoiceChip(
-                                  label: const Text('All available'),
-                                  selected: !_onlineOnly,
-                                  onSelected: (_) {
-                                    setState(() => _onlineOnly = false);
-                                    persistFilters();
-                                  },
-                                ),
-                                ChoiceChip(
-                                  label: const Text('Strict direction'),
-                                  selected: _strictDirection,
-                                  onSelected: (_) {
-                                    setState(() => _strictDirection = !_strictDirection);
-                                    persistFilters();
-                                  },
-                                ),
-                                DropdownButton<String>(
-                                  value: _levelFilter,
-                                  items: const [
-                                    DropdownMenuItem(value: 'all', child: Text('All levels')),
-                                    DropdownMenuItem(value: 'A2', child: Text('A2')),
-                                    DropdownMenuItem(value: 'B1', child: Text('B1')),
-                                    DropdownMenuItem(value: 'B2', child: Text('B2')),
-                                    DropdownMenuItem(value: 'C1', child: Text('C1')),
-                                  ],
-                                  onChanged: (v) {
-                                    if (v == null) return;
-                                    setState(() => _levelFilter = v);
-                                    persistFilters();
-                                  },
-                                ),
-                              ],
+                            child: Glass(
+                              radius: BorderRadius.circular(16),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                              child: Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  _FilterActionChip(
+                                    label: widget.selectedCourseLabel,
+                                    icon: Icons.translate_rounded,
+                                    onTap: widget.onSelectCourse,
+                                  ),
+                                  ChoiceChip(
+                                    label: const Text('Online'),
+                                    selected: _onlineOnly,
+                                    onSelected: (_) {
+                                      setState(() => _onlineOnly = true);
+                                      persistFilters();
+                                    },
+                                  ),
+                                  ChoiceChip(
+                                    label: const Text('All users'),
+                                    selected: !_onlineOnly,
+                                    onSelected: (_) {
+                                      setState(() => _onlineOnly = false);
+                                      persistFilters();
+                                    },
+                                  ),
+                                  ChoiceChip(
+                                    label: const Text('Strict'),
+                                    selected: _strictDirection,
+                                    onSelected: (_) {
+                                      setState(() => _strictDirection = !_strictDirection);
+                                      persistFilters();
+                                    },
+                                  ),
+                                  DropdownButton<String>(
+                                    value: _levelFilter,
+                                    borderRadius: BorderRadius.circular(12),
+                                    underline: const SizedBox.shrink(),
+                                    items: const [
+                                      DropdownMenuItem(value: 'all', child: Text('All levels')),
+                                      DropdownMenuItem(value: 'A2', child: Text('A2')),
+                                      DropdownMenuItem(value: 'B1', child: Text('B1')),
+                                      DropdownMenuItem(value: 'B2', child: Text('B2')),
+                                      DropdownMenuItem(value: 'C1', child: Text('C1')),
+                                    ],
+                                    onChanged: (v) {
+                                      if (v == null) return;
+                                      setState(() => _levelFilter = v);
+                                      persistFilters();
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           Expanded(
@@ -1256,12 +1309,12 @@ class _RoundFlowPreview extends StatelessWidget {
       children: [
         _RoundRuleRow(
           roundLabel: 'Round 1 • $fromLang',
-          detail: 'Both users write in $fromLang. $toLang is blocked.',
+          detail: 'Write only in $fromLang',
         ),
         const SizedBox(height: 8),
         _RoundRuleRow(
           roundLabel: 'Round 2 • $toLang',
-          detail: 'Both users write in $toLang. $fromLang is blocked.',
+          detail: 'Switch and write in $toLang',
         ),
       ],
     );
@@ -1325,6 +1378,85 @@ class _ToolChip extends StatelessWidget {
           fontWeight: FontWeight.w700,
           fontSize: 11,
           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
+        ),
+      ),
+    );
+  }
+}
+
+
+class _ModernBadge extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _ModernBadge({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9)),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 11,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterActionChip extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _FilterActionChip({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(999),
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 240),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(999),
+          color: T.accent.withValues(alpha: 0.16),
+          border: Border.all(color: T.accent.withValues(alpha: 0.28)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14),
+            const SizedBox(width: 6),
+            Flexible(
+              child: Text(
+                label,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11.5),
+              ),
+            ),
+            const SizedBox(width: 2),
+            const Icon(Icons.expand_more_rounded, size: 14),
+          ],
         ),
       ),
     );

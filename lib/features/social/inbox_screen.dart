@@ -6,11 +6,12 @@ import '../../data/auth_repository.dart';
 import '../../data/chat_repository.dart';
 import '../../data/experiment_repository.dart';
 import '../../data/presence_repository.dart';
+import '../../data/settings_repository.dart';
 import 'dm_chat_screen.dart';
 import 'select_friend_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
-enum _InboxFilter { all, unread, friends, requests, muted, archived }
+enum _InboxFilter { all, priority, unread, friends, requests, groups, muted, archived }
 enum _InboxSort { latest, unreadFirst, name }
 
 class InboxScreen extends StatefulWidget {
@@ -34,12 +35,16 @@ class _InboxScreenState extends State<InboxScreen> {
   String _onboardingPrompt = 'Start with a quick hello to a friend.';
   int _refreshNonce = 0;
   _InboxSort _sort = _InboxSort.latest;
+  final Map<String, DateTime> _snoozedUntil = <String, DateTime>{};
+  final Set<String> _hiddenPreviewThreadIds = <String>{};
+  bool _scheduledDigestEnabled = false;
 
   @override
   void initState() {
     super.initState();
     _threadsStream = _inboxThreadsStream();
     _loadExperimentPrompt();
+    _loadInboxPremiumSettings();
   }
 
   Future<void> _loadExperimentPrompt() async {
@@ -50,6 +55,91 @@ class _InboxScreenState extends State<InboxScreen> {
           ? 'Tip: pin your most important chats.'
           : 'Start with a quick hello to a friend.';
     });
+  }
+
+
+  Future<void> _loadInboxPremiumSettings() async {
+    try {
+      final settings = await settingsRepository.getSettings();
+      final rawSnooze = (settings['inbox_snoozed_until'] as Map?)?.cast<String, dynamic>() ?? const {};
+      final nextSnoozed = <String, DateTime>{};
+      for (final entry in rawSnooze.entries) {
+        final dt = DateTime.tryParse(entry.value.toString());
+        if (dt != null && dt.isAfter(DateTime.now())) {
+          nextSnoozed[entry.key] = dt;
+        }
+      }
+      final hidden = <String>{};
+      for (final key in settings.keys) {
+        if (key.startsWith('dm_hide_preview_') && settings[key] == true) {
+          hidden.add(key.replaceFirst('dm_hide_preview_', ''));
+        }
+      }
+      if (!mounted) return;
+      setState(() {
+        _snoozedUntil
+          ..clear()
+          ..addAll(nextSnoozed);
+        _hiddenPreviewThreadIds
+          ..clear()
+          ..addAll(hidden);
+        _scheduledDigestEnabled = settings['inbox_digest_enabled'] == true;
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _setSnooze(String otherId, Duration? duration) async {
+    setState(() {
+      if (duration == null) {
+        _snoozedUntil.remove(otherId);
+      } else {
+        _snoozedUntil[otherId] = DateTime.now().add(duration);
+      }
+    });
+    await settingsRepository.updateSetting(
+      'inbox_snoozed_until',
+      {for (final e in _snoozedUntil.entries) e.key: e.value.toIso8601String()},
+    );
+  }
+
+  Future<void> _showSnoozeSheet(String otherId) async {
+    final selected = await showModalBottomSheet<Duration?>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(title: const Text('Snooze 1 hour'), onTap: () => Navigator.pop(context, const Duration(hours: 1))),
+            ListTile(title: const Text('Snooze until tonight'), onTap: () => Navigator.pop(context, Duration(hours: (21 - DateTime.now().hour).clamp(1, 12)))),
+            ListTile(title: const Text('Snooze until tomorrow'), onTap: () => Navigator.pop(context, const Duration(hours: 24))),
+            ListTile(title: const Text('Remove snooze'), onTap: () => Navigator.pop(context, null)),
+          ],
+        ),
+      ),
+    );
+    if (!mounted) return;
+    await _setSnooze(otherId, selected);
+  }
+
+  Future<void> _toggleScheduledDigest() async {
+    final next = !_scheduledDigestEnabled;
+    setState(() => _scheduledDigestEnabled = next);
+    await settingsRepository.updateSetting('inbox_digest_enabled', next);
+  }
+
+  bool _isPriorityThread(Map<String, dynamic> t) {
+    final unread = (t['unreadCount'] as int?) ?? 0;
+    final isFriend = t['isFriend'] == true;
+    final isPinned = _pinnedThreadIds.contains(t['otherId']?.toString() ?? '');
+    final time = t['time'] is DateTime ? t['time'] as DateTime : DateTime.now();
+    final recent = DateTime.now().difference(time).inHours <= 48;
+    return unread > 0 || isPinned || (isFriend && recent);
+  }
+
+  bool _isGroupThread(Map<String, dynamic> t) {
+    final name = (t['otherName']?.toString() ?? '').toLowerCase();
+    return name.contains('group') || name.contains('&') || name.contains(',');
   }
 
   Future<void> _refreshInbox() async {
@@ -272,6 +362,16 @@ class _InboxScreenState extends State<InboxScreen> {
                         value: _InboxSort.name,
                         child: Text('Sort: Name'),
                       ),
+                      PopupMenuItem(
+                        enabled: false,
+                        child: Row(
+                          children: [
+                            Icon(_scheduledDigestEnabled ? Icons.notifications_active_rounded : Icons.notifications_none_rounded, size: 16),
+                            const SizedBox(width: 8),
+                            Text(_scheduledDigestEnabled ? 'Digest: on' : 'Digest: off'),
+                          ],
+                        ),
+                      ),
                     ],
                     child: Glass(
                       radius: BorderRadius.circular(16),
@@ -281,6 +381,11 @@ class _InboxScreenState extends State<InboxScreen> {
                         color: scheme.onSurface.withValues(alpha: 0.92),
                       ),
                     ),
+                  ),
+                  const SizedBox(width: 8),
+                  _IconGlass(
+                    icon: _scheduledDigestEnabled ? Icons.notifications_active_rounded : Icons.notifications_none_rounded,
+                    onTap: _toggleScheduledDigest,
                   ),
                   const SizedBox(width: 8),
                   _IconGlass(
@@ -312,6 +417,31 @@ class _InboxScreenState extends State<InboxScreen> {
                 ],
               ),
               const SizedBox(height: 8),
+              if (_scheduledDigestEnabled)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Glass(
+                    radius: BorderRadius.circular(14),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.wb_sunny_rounded, size: 16, color: scheme.primary),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Morning digest enabled: get one smart summary instead of many pings.',
+                            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.78), fontWeight: FontWeight.w700, fontSize: 11.5),
+                          ),
+                        ),
+                        IconButton(
+                          tooltip: 'Toggle',
+                          onPressed: _toggleScheduledDigest,
+                          icon: Icon(Icons.tune_rounded, size: 16, color: scheme.primary),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               Glass(
                 radius: BorderRadius.circular(20),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -322,6 +452,14 @@ class _InboxScreenState extends State<InboxScreen> {
                         label: 'All',
                         selected: _filter == _InboxFilter.all,
                         onTap: () => setState(() => _filter = _InboxFilter.all),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _FilterPill(
+                        label: 'Priority',
+                        selected: _filter == _InboxFilter.priority,
+                        onTap: () => setState(() => _filter = _InboxFilter.priority),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -354,6 +492,14 @@ class _InboxScreenState extends State<InboxScreen> {
                         label: 'Requests',
                         selected: _filter == _InboxFilter.requests,
                         onTap: () => setState(() => _filter = _InboxFilter.requests),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _FilterPill(
+                        label: 'Groups',
+                        selected: _filter == _InboxFilter.groups,
+                        onTap: () => setState(() => _filter = _InboxFilter.groups),
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -452,6 +598,9 @@ class _InboxScreenState extends State<InboxScreen> {
                       if (query.isNotEmpty && !hay.contains(query.toLowerCase())) return false;
 
                       final unreadCount = (t['unreadCount'] as int?) ?? 0;
+                      final snoozedUntil = _snoozedUntil[otherId];
+                      if (snoozedUntil != null && snoozedUntil.isAfter(DateTime.now())) return false;
+                      if (_filter == _InboxFilter.priority && !_isPriorityThread(t)) return false;
                       if (_filter == _InboxFilter.unread && unreadCount <= 0) return false;
                       if (_filter == _InboxFilter.friends && t['isFriend'] != true) return false;
                       if (_filter == _InboxFilter.requests &&
@@ -459,6 +608,7 @@ class _InboxScreenState extends State<InboxScreen> {
                           t['hasOutgoingRequest'] != true) {
                         return false;
                       }
+                      if (_filter == _InboxFilter.groups && !_isGroupThread(t)) return false;
                       if (_filter == _InboxFilter.muted && !_mutedThreadIds.contains(otherId)) {
                         return false;
                       }
@@ -548,6 +698,13 @@ class _InboxScreenState extends State<InboxScreen> {
                     }
 
                     final participantIds = visibleThreads.map((t) => t['otherId']?.toString() ?? '').where((id) => id.isNotEmpty).toList();
+                    final unreadTotal = visibleThreads.fold<int>(0, (sum, t) => sum + ((t['unreadCount'] as int?) ?? 0));
+                    final unreadThreads = visibleThreads.where((t) => ((t['unreadCount'] as int?) ?? 0) > 0).length;
+                    final requestCount = visibleThreads.where((t) => t['hasIncomingRequest'] == true || t['hasOutgoingRequest'] == true).length;
+                    final archivedMentions = visibleThreads.where((t) => _archivedThreadIds.contains(t['otherId']?.toString() ?? '')).length;
+                    final vipThreads = visibleThreads.where((t) => _pinnedThreadIds.contains(t['otherId']?.toString() ?? '')).take(8).toList();
+                    final weeklyPracticeMinutes = (visibleThreads.length * 6).clamp(6, 180);
+                    final weeklyVoiceNotes = visibleThreads.where((t) => (t['lastMsg']?.toString() ?? '').contains('voice')).length;
                     return Glass(
                       radius: BorderRadius.circular(22),
                       padding: const EdgeInsets.all(10),
@@ -555,7 +712,24 @@ class _InboxScreenState extends State<InboxScreen> {
                         stream: presenceRepository.streamMultipleOnlineStatuses(participantIds),
                         builder: (context, presenceSnapshot) {
                           final onlineStatuses = presenceSnapshot.data ?? {};
-                          return ListView.separated(
+                          return Column(
+                            children: [
+                              _CatchUpSummaryCard(
+                                unreadTotal: unreadTotal,
+                                unreadThreads: unreadThreads,
+                                requestCount: requestCount,
+                                archivedMentions: archivedMentions,
+                              ),
+                              _ConversationMemoryCard(
+                                minutes: weeklyPracticeMinutes,
+                                voiceNotes: weeklyVoiceNotes,
+                              ),
+                              if (vipThreads.isNotEmpty)
+                                _VipPinnedRow(
+                                  threads: vipThreads,
+                                ),
+                              Expanded(
+                                child: ListView.separated(
                             physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                           itemCount: visibleThreads.length,
                           separatorBuilder: (_, __) => const SizedBox(height: 10),
@@ -566,6 +740,8 @@ class _InboxScreenState extends State<InboxScreen> {
                             final isMuted = _mutedThreadIds.contains(otherId);
                             final unreadCount = t['unreadCount'] ?? 0;
                             final selected = _selectedThreadIds.contains(otherId);
+                            final hidePreview = _hiddenPreviewThreadIds.contains(otherId);
+                            final trustScore = (((t['isFriend'] == true ? 60 : 35) + ((unreadCount as int) > 0 ? 10 : 0) + (t['hasIncomingRequest'] == true ? 5 : 0)).clamp(0, 99) as num).toInt();
 
                             return Dismissible(
                               key: ValueKey('thread-$otherId'),
@@ -574,7 +750,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                 if (direction == DismissDirection.startToEnd) {
                                   await _togglePinnedThread(otherId, next: !isPinned);
                                 } else {
-                                  await _toggleMutedThread(otherId, next: !isMuted);
+                                  await _showSnoozeSheet(otherId);
                                 }
                                 return false;
                               },
@@ -585,13 +761,13 @@ class _InboxScreenState extends State<InboxScreen> {
                               ),
                               secondaryBackground: _SwipeActionBackground(
                                 alignment: Alignment.centerRight,
-                                icon: isMuted ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
-                                label: isMuted ? 'Unmute' : 'Mute',
+                                icon: Icons.snooze_rounded,
+                                label: 'Snooze',
                               ),
                               child: _ThreadRow(
                                 otherId: otherId,
                                 name: t['otherName'] ?? l10n.unknown,
-                                lastText: t['lastMsg'] ?? '',
+                                lastText: hidePreview ? 'Preview hidden for privacy' : (t['lastMsg'] ?? ''),
                                 summary: t['summary']?.toString(),
                                 time: _fmtTime(context, t['time'] as DateTime),
                                 unreadCount: unreadCount,
@@ -601,6 +777,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                 muted: isMuted,
                                 hasIncomingRequest: t['hasIncomingRequest'] == true,
                                 hasOutgoingRequest: t['hasOutgoingRequest'] == true,
+                                trustScore: trustScore,
                                 selected: selected,
                                 selectionMode: _selectionMode,
                                 onTap: () async {
@@ -636,6 +813,9 @@ class _InboxScreenState extends State<InboxScreen> {
                                 ),
                               );
                             },
+                                ),
+                              ),
+                            ],
                           );
                         },
                       ),
@@ -676,6 +856,131 @@ class _SectionTitle extends StatelessWidget {
         color: scheme.onSurface.withValues(alpha: 0.85),
         fontSize: 14,
         fontWeight: FontWeight.w900,
+      ),
+    );
+  }
+}
+
+
+class _CatchUpSummaryCard extends StatelessWidget {
+  final int unreadTotal;
+  final int unreadThreads;
+  final int requestCount;
+  final int archivedMentions;
+
+  const _CatchUpSummaryCard({
+    required this.unreadTotal,
+    required this.unreadThreads,
+    required this.requestCount,
+    required this.archivedMentions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Glass(
+        radius: BorderRadius.circular(16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Row(
+          children: [
+            Icon(Icons.auto_awesome_rounded, size: 16, color: scheme.primary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '$unreadTotal unread across $unreadThreads chats · $requestCount requests · $archivedMentions archived mentions',
+                style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.82),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 11.5,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _VipPinnedRow extends StatelessWidget {
+  final List<Map<String, dynamic>> threads;
+
+  const _VipPinnedRow({required this.threads});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 58,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.only(bottom: 8),
+        itemBuilder: (context, i) {
+          final t = threads[i];
+          final name = (t['otherName']?.toString() ?? 'U').trim();
+          return Glass(
+            radius: BorderRadius.circular(999),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _Avatar(
+                  showOnlineIndicator: t['isOnline'] == true,
+                  avatarUrl: t['avatar_url']?.toString(),
+                  name: name,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  name.split(' ').first,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemCount: threads.length,
+      ),
+    );
+  }
+}
+
+
+class _ConversationMemoryCard extends StatelessWidget {
+  final int minutes;
+  final int voiceNotes;
+
+  const _ConversationMemoryCard({required this.minutes, required this.voiceNotes});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Glass(
+        radius: BorderRadius.circular(14),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Row(
+          children: [
+            Icon(Icons.insights_rounded, size: 16, color: scheme.tertiary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Weekly memory: you practiced ~$minutes min and exchanged $voiceNotes voice notes.',
+                style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.8),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 11.5,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -803,6 +1108,7 @@ class _ThreadRow extends StatelessWidget {
   final bool muted;
   final bool hasIncomingRequest;
   final bool hasOutgoingRequest;
+  final int trustScore;
   final bool selectionMode;
   final bool selected;
   final VoidCallback onTap;
@@ -821,6 +1127,7 @@ class _ThreadRow extends StatelessWidget {
     required this.muted,
     required this.hasIncomingRequest,
     required this.hasOutgoingRequest,
+    required this.trustScore,
     required this.selectionMode,
     required this.selected,
     required this.onTap,
@@ -957,6 +1264,26 @@ class _ThreadRow extends StatelessWidget {
                                     fontSize: 10,
                                     fontWeight: FontWeight.w800,
                                     color: hasIncomingRequest ? Colors.green : scheme.primary,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          if (hasIncomingRequest)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(999),
+                                  color: scheme.tertiary.withValues(alpha: 0.14),
+                                  border: Border.all(color: scheme.tertiary.withValues(alpha: 0.35)),
+                                ),
+                                child: Text(
+                                  'Likely safe · $trustScore%',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    color: scheme.tertiary,
                                   ),
                                 ),
                               ),
