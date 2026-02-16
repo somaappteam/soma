@@ -599,8 +599,7 @@ class _InboxScreenState extends State<InboxScreen> {
                 child: RefreshIndicator(
                   onRefresh: _refreshInbox,
                   child: StreamBuilder<List<Map<String, dynamic>>>(
-                  key: ValueKey('inbox-stream-$_refreshNonce'),
-                  stream: _threadsStream,
+                    stream: _threadsStream,
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());

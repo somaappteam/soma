@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'presence_repository.dart';
@@ -58,18 +60,9 @@ class ChatRepository {
         'receiver_id': receiverId,
         'content': content,
       });
-      await _upsertConversationMirror(
-        userId: uid,
-        otherUserId: receiverId,
-        lastMessage: content,
-        incrementUnread: false,
-      );
-      await _upsertConversationMirror(
-        userId: receiverId,
-        otherUserId: uid,
-        lastMessage: content,
-        incrementUnread: true,
-      );
+      // Conversation synchronization is now handled by a database trigger 
+      // (update_conversations_on_message) to avoid RLS issues.
+      
       await recordLatencyEvent(
         metric: 'send_to_insert_ms',
         valueMs: DateTime.now().difference(startedAt).inMilliseconds,
@@ -85,45 +78,21 @@ class ChatRepository {
   }
 
 
-  Future<void> _upsertConversationMirror({
-    required String userId,
-    required String otherUserId,
-    required String lastMessage,
-    required bool incrementUnread,
-  }) async {
-    final nowIso = DateTime.now().toIso8601String();
-    int unreadCount = 0;
-
-    if (incrementUnread) {
-      try {
-        final existing = await _supabase
-            .from('conversations')
-            .select('unread_count')
-            .eq('user_id', userId)
-            .eq('other_user_id', otherUserId)
-            .maybeSingle();
-        final current = existing?['unread_count'];
-        final currentCount = current is int
-            ? current
-            : int.tryParse(current?.toString() ?? '0') ?? 0;
-        unreadCount = currentCount + 1;
-      } catch (_) {
-        unreadCount = 1;
+  String _parseMessagePreview(String? content) {
+    if (content == null || content.isEmpty) return '';
+    if (!content.startsWith('{')) return content;
+    try {
+      final data = jsonDecode(content);
+      if (data is Map<String, dynamic>) {
+        if (data['type'] == 'text') return data['text']?.toString() ?? '';
+        if (data['type'] == 'image') return 'Photo';
+        if (data['type'] == 'document') return 'Document';
+        if (data['type'] == 'voice') return 'Voice Message';
       }
+    } catch (_) {
+      // Fallback to raw content if not JSON
     }
-
-    final payload = <String, dynamic>{
-      'user_id': userId,
-      'other_user_id': otherUserId,
-      'last_message': lastMessage,
-      'last_message_at': nowIso,
-      'updated_at': nowIso,
-      if (incrementUnread) 'unread_count': unreadCount,
-    };
-
-    await _supabase
-        .from('conversations')
-        .upsert(payload, onConflict: 'user_id,other_user_id');
+    return content;
   }
 
   Future<void> _enforceDmRateLimit(String receiverId) async {
@@ -233,7 +202,7 @@ class ChatRepository {
 
   Future<Map<String, dynamic>> getDmGateState(String otherUserId) async {
     final uid = currentUserId;
-    if (uid == null) return {'canChat': false, 'reason': 'not_logged_in'};
+    if (uid == null) return {'can_chat': false, 'reason': 'not_logged_in'};
 
     try {
       final rpc = await _supabase.rpc('get_dm_gate_state', params: {
@@ -241,15 +210,15 @@ class ChatRepository {
       });
       if (rpc is Map<String, dynamic>) {
         return {
-          'canChat': rpc['can_chat'] == true,
+          'can_chat': rpc['can_chat'] == true,
           'reason': rpc['reason']?.toString(),
-          'sentRequestStatus': rpc['sent_request_status']?.toString(),
-          'incomingRequestStatus': rpc['incoming_request_status']?.toString(),
+          'sent_request_status': rpc['sent_request_status']?.toString(),
+          'incoming_request_status': rpc['incoming_request_status']?.toString(),
         };
       }
     } catch (_) {}
 
-    return {'canChat': true, 'reason': null};
+    return {'can_chat': true, 'reason': null};
   }
 
   Future<void> sendMessageRequest(String otherUserId) async {
@@ -349,6 +318,13 @@ class ChatRepository {
         .eq('sender_id', otherUserId)
         .eq('receiver_id', uid)
         .eq('is_read', false);
+
+    await _supabase
+        .from('conversations')
+        .update({'unread_count': 0})
+        .eq('user_id', uid)
+        .eq('other_user_id', otherUserId);
+
     await recordLatencyEvent(
       metric: 'mark_read_ms',
       valueMs: DateTime.now().difference(started).inMilliseconds,
@@ -452,60 +428,72 @@ class ChatRepository {
     final uid = currentUserId;
     if (uid == null) return [];
 
-    final conversationRows = await _supabase
-        .from('conversations')
-        .select(
-            'other_user_id,is_pinned,is_muted,is_archived,unread_count,last_message,last_message_at')
-        .eq('user_id', uid)
-        .order('last_message_at', ascending: false)
-        .limit(200);
+    List<Map<String, dynamic>> normalizedRows = [];
 
-    final normalizedRows = <Map<String, dynamic>>[];
-    if (conversationRows.isNotEmpty) {
-      normalizedRows.addAll(
-        conversationRows.map((row) => Map<String, dynamic>.from(row)),
-      );
-    } else {
-      final messageRows = await _supabase
-          .from('messages')
-          .select('sender_id,receiver_id,content,created_at,is_read')
-          .or('sender_id.eq.$uid,receiver_id.eq.$uid')
-          .order('created_at', ascending: false)
-          .limit(500);
-      final derived = <String, Map<String, dynamic>>{};
-      for (final row in messageRows) {
-        final sender = row['sender_id']?.toString();
-        final receiver = row['receiver_id']?.toString();
-        if (sender == null || receiver == null) continue;
-        final otherId = sender == uid ? receiver : sender;
-        if (otherId == uid) continue;
+    // 1. Fetch Conversations
+    try {
+      final conversationRows = await _supabase
+          .from('conversations')
+          .select(
+              'other_user_id,is_pinned,is_muted,is_archived,unread_count,last_message,last_message_at')
+          .eq('user_id', uid)
+          .order('last_message_at', ascending: false)
+          .limit(200);
 
-        final current = derived[otherId];
-        final createdAt = row['created_at'];
-        if (current == null) {
-          derived[otherId] = {
-            'other_user_id': otherId,
-            'is_pinned': false,
-            'is_muted': false,
-            'is_archived': false,
-            'unread_count': 0,
-            'last_message': row['content']?.toString() ?? '',
-            'last_message_at': createdAt,
-          };
-        }
-        final isUnreadIncoming = receiver == uid && row['is_read'] != true;
-        if (isUnreadIncoming) {
-          final prev = derived[otherId]?['unread_count'];
-          final count = prev is int ? prev : int.tryParse('${prev ?? 0}') ?? 0;
-          derived[otherId]!['unread_count'] = count + 1;
-        }
+      if (conversationRows.isNotEmpty) {
+        normalizedRows.addAll(
+          conversationRows.map((row) => Map<String, dynamic>.from(row)),
+        );
       }
-      normalizedRows.addAll(derived.values);
-      normalizedRows.sort((a, b) {
-        final aTime = DateTime.tryParse(a['last_message_at']?.toString() ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final bTime = DateTime.tryParse(b['last_message_at']?.toString() ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
-        return bTime.compareTo(aTime);
-      });
+    } catch (e) {
+      debugPrint('ChatRepository: Error fetching conversations: $e');
+    }
+
+    // 2. Fallback to Messages if no conversations found
+    if (normalizedRows.isEmpty) {
+      try {
+        final messageRows = await _supabase
+            .from('messages')
+            .select('sender_id,receiver_id,content,created_at,is_read')
+            .or('sender_id.eq.$uid,receiver_id.eq.$uid')
+            .order('created_at', ascending: false)
+            .limit(500);
+
+        final derived = <String, Map<String, dynamic>>{};
+        for (final row in messageRows) {
+          final sender = row['sender_id']?.toString();
+          final receiver = row['receiver_id']?.toString();
+          if (sender == null || receiver == null) continue;
+          final otherId = sender == uid ? receiver : sender;
+          if (otherId == uid) continue;
+
+          if (!derived.containsKey(otherId)) {
+            derived[otherId] = {
+              'other_user_id': otherId,
+              'is_pinned': false,
+              'is_muted': false,
+              'is_archived': false,
+              'unread_count': 0,
+              'last_message': row['content']?.toString() ?? '',
+              'last_message_at': row['created_at'],
+            };
+          }
+          if (receiver == uid && row['is_read'] != true) {
+            final count = derived[otherId]!['unread_count'] as int;
+            derived[otherId]!['unread_count'] = count + 1;
+          }
+        }
+        normalizedRows.addAll(derived.values);
+        normalizedRows.sort((a, b) {
+          final aTime = DateTime.tryParse(a['last_message_at']?.toString() ?? '') ??
+              DateTime.fromMillisecondsSinceEpoch(0);
+          final bTime = DateTime.tryParse(b['last_message_at']?.toString() ?? '') ??
+              DateTime.fromMillisecondsSinceEpoch(0);
+          return bTime.compareTo(aTime);
+        });
+      } catch (e) {
+        debugPrint('ChatRepository: Error deriving threads from messages: $e');
+      }
     }
 
     if (normalizedRows.isEmpty) return [];
@@ -518,80 +506,126 @@ class ChatRepository {
 
     if (otherIds.isEmpty) return [];
 
-    final friendshipRows = await _supabase
-        .from('friendships')
-        .select('requester_id,addressee_id,status')
-        .or('requester_id.eq.$uid,addressee_id.eq.$uid')
-        .eq('status', 'accepted');
+    // Supplemental data holders
     final friendIds = <String>{};
-    for (final row in friendshipRows) {
-      final requester = row['requester_id']?.toString();
-      final addressee = row['addressee_id']?.toString();
-      if (requester == uid && addressee != null) friendIds.add(addressee);
-      if (addressee == uid && requester != null) friendIds.add(requester);
-    }
-
-    final requestRows = await _supabase
-        .from('message_requests')
-        .select('requester_id,recipient_id,status,updated_at')
-        .or('requester_id.eq.$uid,recipient_id.eq.$uid')
-        .inFilter('status', ['pending', 'accepted']);
     final incomingPendingIds = <String>{};
     final outgoingPendingIds = <String>{};
-    for (final row in requestRows) {
-      final requester = row['requester_id']?.toString();
-      final recipient = row['recipient_id']?.toString();
-      final status = row['status']?.toString();
-      if (status != 'pending') continue;
-      if (requester == uid && recipient != null) {
-        outgoingPendingIds.add(recipient);
-      }
-      if (recipient == uid && requester != null) {
-        incomingPendingIds.add(requester);
-      }
-    }
+    Map<String, dynamic> profileMap = {};
+    Map<String, bool> onlineStatuses = {};
 
-    final profiles = await _supabase
-        .from('profiles')
-        .select('id, username, avatar_url, settings')
-        .inFilter('id', otherIds);
-    final profileMap = {for (var p in profiles) p['id'].toString(): p};
-    final onlineStatuses = await presenceRepository.fetchOnlineStatuses(otherIds);
+    // 3. Parallel fetch of supplemental data
+    await Future.wait([
+      // Fetch Friends
+      () async {
+        try {
+          final friendshipRows = await _supabase
+              .from('friendships')
+              .select('requester_id,addressee_id,status')
+              .or('requester_id.eq.$uid,addressee_id.eq.$uid')
+              .eq('status', 'accepted');
+          for (final row in friendshipRows) {
+            final requester = row['requester_id']?.toString();
+            final addressee = row['addressee_id']?.toString();
+            if (requester == uid && addressee != null) friendIds.add(addressee);
+            if (addressee == uid && requester != null) friendIds.add(requester);
+          }
+        } catch (e) {
+          debugPrint('ChatRepository: Error fetching friendships: $e');
+        }
+      }(),
+      // Fetch Message Requests
+      () async {
+        try {
+          final requestRows = await _supabase
+              .from('message_requests')
+              .select('requester_id,recipient_id,status')
+              .or('requester_id.eq.$uid,recipient_id.eq.$uid')
+              .inFilter('status', ['pending', 'accepted']);
+          for (final row in requestRows) {
+            final requester = row['requester_id']?.toString();
+            final recipient = row['recipient_id']?.toString();
+            final status = row['status']?.toString();
+            if (status == 'pending') {
+              if (requester == uid && recipient != null) outgoingPendingIds.add(recipient);
+              if (recipient == uid && requester != null) incomingPendingIds.add(requester);
+            }
+          }
+        } catch (e) {
+          debugPrint('ChatRepository: Error fetching message requests: $e');
+        }
+      }(),
+      // Fetch Profiles
+      () async {
+        try {
+          final profiles = await _supabase
+              .from('profiles')
+              .select('id, username, display_name, avatar_url, settings')
+              .inFilter('id', otherIds);
+          profileMap = {for (var p in profiles) p['id'].toString(): p};
+        } catch (e) {
+          debugPrint('ChatRepository: Error fetching profiles: $e');
+        }
+      }(),
+      // Fetch Online Status
+      () async {
+        try {
+          onlineStatuses = await presenceRepository.fetchOnlineStatuses(otherIds);
+        } catch (e) {
+          debugPrint('ChatRepository: Error fetching online statuses: $e');
+        }
+      }(),
+    ]);
 
+    // 4. Combine Results
     final result = <Map<String, dynamic>>[];
     for (final row in normalizedRows) {
       final otherId = row['other_user_id']?.toString();
       if (otherId == null) continue;
-      final profile = profileMap[otherId];
-      if (profile == null) continue;
 
-      final settings = (profile['settings'] as Map<String, dynamic>?) ?? {};
+      final profile = profileMap[otherId];
+      final settings = (profile?['settings'] as Map<String, dynamic>?) ?? {};
       final showOnlineStatus = settings['show_online_status'] ?? true;
       final isOnline = onlineStatuses[otherId] ?? false;
-      final reliabilityScore = ((settings['reply_consistency_score'] as num?)?.toInt() ?? 72).clamp(0, 100);
-      final correctionHelpfulnessScore = ((settings['correction_helpfulness_score'] as num?)?.toInt() ?? 68).clamp(0, 100);
-      final voiceFeedbackScore = ((settings['voice_feedback_quality_score'] as num?)?.toInt() ?? 70).clamp(0, 100);
+
+      // Fallback display name info
+      final displayName = profile?['display_name']?.toString().isNotEmpty == true
+          ? profile!['display_name'].toString()
+          : (profile?['username']?.toString().isNotEmpty == true
+              ? profile!['username'].toString()
+              : 'User ${otherId.substring(0, 4)}');
+
+      final reliabilityScore =
+          ((settings['reply_consistency_score'] as num?)?.toInt() ?? 72).clamp(0, 100);
+      final correctionHelpfulnessScore =
+          ((settings['correction_helpfulness_score'] as num?)?.toInt() ?? 68).clamp(0, 100);
+      final voiceFeedbackScore =
+          ((settings['voice_feedback_quality_score'] as num?)?.toInt() ?? 70).clamp(0, 100);
       final verifiedSeriousLearner = settings['verified_serious_learner'] == true;
 
-      final lastMessageText = row['last_message']?.toString() ?? '';
+      final lastMessageRaw = row['last_message']?.toString() ?? '';
+      final lastMessageText = _parseMessagePreview(lastMessageRaw);
       final normalizedLastMessage = lastMessageText.toLowerCase();
-      final hasChallengePending = normalizedLastMessage.contains('challenge') || normalizedLastMessage.contains('[challenge]');
-      final hasCorrectionUnread = normalizedLastMessage.contains('correction') || normalizedLastMessage.contains('correct this');
-      final hasVoiceFeedback = normalizedLastMessage.contains('voice') || normalizedLastMessage.contains('transcript');
+      final hasChallengePending =
+          normalizedLastMessage.contains('challenge') || normalizedLastMessage.contains('[challenge]');
+      final hasCorrectionUnread =
+          normalizedLastMessage.contains('correction') || normalizedLastMessage.contains('correct this');
+      final hasVoiceFeedback =
+          normalizedLastMessage.contains('voice') || normalizedLastMessage.contains('transcript');
       final practiceStreakAtRisk = DateTime.now().difference(
             DateTime.tryParse(row['last_message_at']?.toString() ?? '') ?? DateTime.now(),
           ).inHours >= 24;
 
+      final unreadCount = row['unread_count'] is int
+          ? row['unread_count'] as int
+          : int.tryParse(row['unread_count']?.toString() ?? '0') ?? 0;
+
       result.add({
         'otherId': otherId,
-        'otherName': profile['username'] ?? 'User',
-        'avatar_url': profile['avatar_url'],
+        'otherName': displayName,
+        'avatar_url': profile?['avatar_url'],
         'lastMsg': lastMessageText,
-        'time': DateTime.tryParse(row['last_message_at']?.toString() ?? '') ??
-            DateTime.now(),
-        'unreadCount': row['unread_count'] is int
-            ? row['unread_count'] as int
-            : int.tryParse(row['unread_count']?.toString() ?? '0') ?? 0,
+        'time': DateTime.tryParse(row['last_message_at']?.toString() ?? '') ?? DateTime.now(),
+        'unreadCount': unreadCount,
         'isPinned': row['is_pinned'] == true,
         'isMuted': row['is_muted'] == true,
         'isArchived': row['is_archived'] == true,
@@ -603,19 +637,19 @@ class ChatRepository {
         'hasCorrectionUnread': hasCorrectionUnread,
         'hasVoiceFeedback': hasVoiceFeedback,
         'practiceStreakAtRisk': practiceStreakAtRisk,
-        'partnerQuality': ((friendIds.contains(otherId) ? 80 : 55) + (incomingPendingIds.contains(otherId) ? 5 : 0)).clamp(0, 99),
+        'partnerQuality':
+            ((friendIds.contains(otherId) ? 80 : 55) + (incomingPendingIds.contains(otherId) ? 5 : 0))
+                .clamp(0, 99),
         'reliabilityScore': reliabilityScore,
         'correctionHelpfulnessScore': correctionHelpfulnessScore,
         'voiceFeedbackScore': voiceFeedbackScore,
         'verifiedSeriousLearner': verifiedSeriousLearner,
         'summary': _threadSummary(
-          unreadCount: row['unread_count'] is int
-              ? row['unread_count'] as int
-              : int.tryParse(row['unread_count']?.toString() ?? '0') ?? 0,
+          unreadCount: unreadCount,
           isFriend: friendIds.contains(otherId),
           incomingRequest: incomingPendingIds.contains(otherId),
           outgoingRequest: outgoingPendingIds.contains(otherId),
-          lastMessage: row['last_message']?.toString() ?? '',
+          lastMessage: lastMessageText,
         ),
       });
     }
