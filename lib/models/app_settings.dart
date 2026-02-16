@@ -15,6 +15,7 @@ class AppSettings {
   final String languageUi;
   final bool plusEnabled;
   final String plusPlan;
+  final Map<String, dynamic> dmActiveCall;
 
   const AppSettings({
     required this.showTranslation,
@@ -30,6 +31,7 @@ class AppSettings {
     required this.languageUi,
     required this.plusEnabled,
     required this.plusPlan,
+    required this.dmActiveCall,
   });
 
   factory AppSettings.defaults() => const AppSettings(
@@ -46,6 +48,7 @@ class AppSettings {
         languageUi: 'en',
         plusEnabled: false,
         plusPlan: 'free',
+        dmActiveCall: {'active': false},
       );
 
   factory AppSettings.fromMap(Map<String, dynamic>? source) {
@@ -73,6 +76,9 @@ class AppSettings {
       languageUi: normalizedLanguage,
       plusEnabled: merged['plus_enabled'] == true,
       plusPlan: normalizedPlan,
+      dmActiveCall: merged['dm_active_call'] is Map
+          ? Map<String, dynamic>.from(merged['dm_active_call'] as Map)
+          : {'active': false},
     );
   }
 
@@ -90,6 +96,7 @@ class AppSettings {
         'language_ui': languageUi,
         'plus_enabled': plusEnabled,
         'plus_plan': plusPlan,
+        'dm_active_call': dmActiveCall,
         'exchange_active': false,
         'exchange_filter_online_only': true,
         'exchange_filter_strict_direction': true,

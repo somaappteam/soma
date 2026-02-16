@@ -26,7 +26,11 @@ class ChatRepository {
         .from('conversations')
         .stream(primaryKey: ['user_id', 'other_user_id'])
         .eq('user_id', uid)
-        .map((_) {});
+        .order('last_message_at', ascending: false)
+        .limit(50)
+        .map((_) {
+          debugPrint('ChatRepository: inbox refresh stream event');
+        });
   }
 
   Future<void> sendMessage(String receiverId, String content) async {
@@ -319,15 +323,20 @@ class ChatRepository {
     return _supabase
         .from('messages')
         .stream(primaryKey: ['id'])
-        .order('created_at', ascending: true)
+        .order('created_at', ascending: false) // Listen to NEWEST messages
+        .limit(100)
+        // Note: Real-time filtering by complex OR is not supported in the current stream builder.
+        // We listen to the tail and rely on client-side filtering or conversation_id if available.
         .map((rows) {
-      return rows.where((row) {
-        final s = row['sender_id'];
-        final r = row['receiver_id'];
-        return (s == uid && r == otherUserId) ||
-            (s == otherUserId && r == uid);
-      }).toList();
-    });
+          final filtered = rows.where((row) {
+            final sId = row['sender_id'];
+            final rId = row['receiver_id'];
+            return (sId == uid && rId == otherUserId) || (sId == otherUserId && rId == uid);
+          }).toList();
+          // We fetched DESC (newest first) to get the latest updates/edits.
+          // The UI expects ASC (oldest first) so we reverse the list.
+          return filtered.reversed.toList();
+        });
   }
 
   Future<void> markConversationAsRead(String otherUserId) async {
@@ -391,22 +400,26 @@ class ChatRepository {
     final uid = currentUserId;
     if (uid == null) return;
 
+    debugPrint('ChatRepository: deleting message $messageId');
     await _supabase
         .from('messages')
         .delete()
         .eq('id', messageId)
         .eq('sender_id', uid);
+    debugPrint('ChatRepository: deleted message $messageId');
   }
 
   Future<void> editMessageById(String messageId, String content) async {
     final uid = currentUserId;
     if (uid == null) return;
 
+    debugPrint('ChatRepository: editing message $messageId');
     await _supabase
         .from('messages')
         .update({'content': content})
         .eq('id', messageId)
         .eq('sender_id', uid);
+    debugPrint('ChatRepository: edited message $messageId');
   }
 
   Future<void> setConversationPreference(
@@ -445,6 +458,11 @@ class ChatRepository {
       final matches = event.where((e) => e['other_user_id'] == otherUserId);
       return matches.isNotEmpty ? matches.first : null;
     });
+  }
+
+  Stream<List<Map<String, dynamic>>> getInboxThreadsStream() async* {
+    yield await getInboxThreads();
+    yield* inboxRefreshStream().asyncMap((_) => getInboxThreads());
   }
 
   Future<List<Map<String, dynamic>>> getInboxThreads() async {

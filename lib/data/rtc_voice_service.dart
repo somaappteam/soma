@@ -55,17 +55,17 @@ class RtcVoiceService {
   bool get isMuted => _muted;
   bool get isSpeakerEnabled => _asSpeaker;
 
-  Future<void> connect({
+  Future<bool> connect({
     required String circleId,
     required bool asSpeaker,
     bool prioritySpeaker = false,
   }) async {
-    if (!await _ensurePermissions()) return;
+    if (!await _ensurePermissions()) return false;
 
     final uid = authRepository.currentUser?.id;
-    if (uid == null) return;
+    if (uid == null) return false;
 
-    if (_joined && _circleId == circleId && _asSpeaker == asSpeaker) return;
+    if (_joined && _circleId == circleId && _asSpeaker == asSpeaker) return true;
 
     await disconnectIfCircle(_circleId);
 
@@ -97,7 +97,11 @@ class RtcVoiceService {
     _startMicLevelSampling();
     _emitConnectionState();
 
+
     _announceJoin();
+    // Default to speakerphone for circles
+    await setSpeakerphone(true);
+    return true;
   }
 
   void _announceJoin() {
@@ -445,10 +449,15 @@ class RtcVoiceService {
   Future<void> setSpeakerEnabled(bool enabled) async {
     _asSpeaker = enabled;
     _applyMutedToTrack();
+    // Note: We no longer force audio routing here.
+    // Audio output (speaker/earpiece) should be controlled separately via setSpeakerphone.
+  }
+
+  Future<void> setSpeakerphone(bool enabled) async {
     try {
       await Helper.setSpeakerphoneOn(enabled);
-    } catch (_) {
-      // best-effort audio routing
+    } catch (e) {
+      debugPrint('Failed to set speakerphone: $e');
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:async';
 import '../models/solo_course.dart';
 
 import '../core/database/database_helper.dart';
@@ -96,6 +97,38 @@ class CoursesRepository {
     }
 
     _revision++;
+  }
+
+  Stream<List<SoloCourse>> getUserCoursesStream() {
+    final uid = currentUserId;
+    if (uid == null) {
+      return Stream.fromFuture(getUserCourses());
+    }
+
+    final controller = StreamController<List<SoloCourse>>();
+
+    // Initial fetch
+    getUserCourses().then((c) {
+      if (!controller.isClosed) controller.add(c);
+    });
+
+    // Listen to user_courses (progress) AND profiles (settings/custom courses)
+    final s1 = _supabase.from('user_courses').stream(primaryKey: ['id']).eq('user_id', uid);
+    final s2 = _supabase.from('profiles').stream(primaryKey: ['id']).eq('id', uid);
+
+    final sub1 = s1.listen((_) async {
+      if (!controller.isClosed) controller.add(await getUserCourses());
+    });
+    final sub2 = s2.listen((_) async {
+      if (!controller.isClosed) controller.add(await getUserCourses());
+    });
+
+    controller.onCancel = () async {
+      await sub1.cancel();
+      await sub2.cancel();
+    };
+
+    return controller.stream;
   }
 
   /// Fetches available courses merged with user progress

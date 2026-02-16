@@ -34,10 +34,9 @@ class HomeScreen extends StatefulWidget {
 
 
 class _HomeScreenState extends State<HomeScreen> {
-  // We'll load courses via FutureBuilder instead of local list
-  late Future<List<SoloCourse>> _coursesFuture;
+  // We'll load courses via StreamBuilder
+  late Stream<List<SoloCourse>> _coursesStream;
   bool _isEditingCourses = false;
-  int _coursesRevision = 0;
   bool _isFirstVisit = false;
 
   @override
@@ -46,13 +45,17 @@ class _HomeScreenState extends State<HomeScreen> {
     // Load profile data
     profileStore.load();
     _loadWelcomeState();
-    _coursesRevision = coursesRepository.revision;
-    _reloadCourses();
+    _initCoursesStream();
+  }
+
+  void _initCoursesStream() {
+    _coursesStream = coursesRepository.getUserCoursesStream();
   }
 
   void _reloadCourses() {
+    // No-op or force refresh if needed, but stream covers most cases
     setState(() {
-      _coursesFuture = coursesRepository.getUserCourses();
+       _coursesStream = coursesRepository.getUserCoursesStream();
     });
   }
 
@@ -67,15 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _syncCoursesIfNeeded() {
-    final rev = coursesRepository.revision;
-    if (rev == _coursesRevision) return;
-    _coursesRevision = rev;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _reloadCourses();
-    });
-  }
+  // _syncCoursesIfNeeded removed as stream handles updates
 
   Future<void> _confirmDeleteCourse(SoloCourse course) async {
     final l10n = AppLocalizations.of(context);
@@ -290,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isGuest = authRepository.currentUser == null;
-    _syncCoursesIfNeeded();
+    
     return SafeArea(
         child: ResponsiveFrame(
           child: Padding(
@@ -431,8 +426,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 // Course list
                 Expanded(
-                  child: FutureBuilder<List<SoloCourse>>(
-                    future: _coursesFuture,
+                  child: StreamBuilder<List<SoloCourse>>(
+                    stream: _coursesStream,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const _CoursesSkeleton();

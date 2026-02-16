@@ -199,9 +199,11 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
   Future<void> _refreshInbox() async {
-    await chatRepository.getInboxThreads();
-    if (!mounted) return;
-    setState(() => _refreshNonce++);
+    // Force restart the stream to fetch fresh data
+    setState(() {
+      _threadsStream = _inboxThreadsStream();
+      _refreshNonce++;
+    });
   }
 
 
@@ -218,14 +220,12 @@ class _InboxScreenState extends State<InboxScreen> {
         ),
       ),
     );
-    if (mounted) setState(() => _refreshNonce++);
+    // Force refresh when returning from chat to clear unread count immediately
+    if (mounted) _refreshInbox();
   }
 
-  Stream<List<Map<String, dynamic>>> _inboxThreadsStream() async* {
-    yield await chatRepository.getInboxThreads();
-    yield* chatRepository.inboxRefreshStream().asyncMap(
-      (_) => chatRepository.getInboxThreads(),
-    );
+  Stream<List<Map<String, dynamic>>> _inboxThreadsStream() {
+    return chatRepository.getInboxThreadsStream();
   }
 
   void _syncServerPrefs(List<Map<String, dynamic>> threads) {

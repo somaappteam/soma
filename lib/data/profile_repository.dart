@@ -56,6 +56,31 @@ class ProfileRepository {
     }
   }
 
+  Stream<UserProfile?> getProfileStream() {
+    final uid = currentUserId;
+    if (uid == null) return const Stream.empty();
+
+    return _supabase.from('profiles').stream(primaryKey: ['id']).eq('id', uid).map((event) {
+      if (event.isEmpty) return null;
+      final data = event.first;
+      
+      // Update local mirror asynchronously
+      DatabaseHelper.instance.upsertProfile(data);
+
+      return UserProfile(
+        id: data['id'] ?? uid,
+        displayName: data['display_name'] ?? 'User',
+        username: data['username'] ?? 'learner',
+        bio: data['bio'] ?? '',
+        location: data['location'] ?? '',
+        dailyGoalMinutes: data['daily_goal_minutes'] ?? 10,
+        totalXp: data['total_xp'] ?? 0,
+        avatarUrl: data['avatar_url'],
+        showOnlineStatus: (data['settings'] as Map<String, dynamic>?)?['show_online_status'] ?? true,
+      );
+    });
+  }
+
   Future<void> updateProfile(UserProfile profile) async {
     final uid = currentUserId;
     if (uid == null) return;

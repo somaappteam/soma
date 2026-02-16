@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
@@ -39,42 +40,31 @@ class _CirclesScreenState extends State<CirclesScreen> {
   _CirclesHomeTab _selectedTab = _CirclesHomeTab.activeCircles;
 
   List<SoloCourse> _courses = [];
-  int _coursesRevision = 0;
   late final Stream<List<Map<String, dynamic>>> _openCirclesStream;
+  StreamSubscription<List<SoloCourse>>? _coursesSub;
 
   @override
   void initState() {
     super.initState();
     _openCirclesStream = circlesRepository.getOpenCircles();
 
-    _coursesRevision = coursesRepository.revision;
-    _loadCourses();
-    // _cleanupGhostCircles(); // Disable heavy client-side cleanup
-  }
-
-  Future<void> _loadCourses({String? selectCourseId}) async {
-    final courses = await coursesRepository.getUserCourses();
-    if (!mounted) return;
-
-    final selectedExists = _selectedCourseId == _courseAll || courses.any((c) => c.id == _selectedCourseId);
-    setState(() {
-      _courses = courses;
-      if (selectCourseId != null) {
-        _selectedCourseId = selectCourseId;
-      } else if (!selectedExists) {
-        _selectedCourseId = _courseAll;
-      }
+    // Subscribe to course changes for the filter
+    _coursesSub = coursesRepository.getUserCoursesStream().listen((courses) {
+       if (!mounted) return;
+       final selectedExists = _selectedCourseId == _courseAll || courses.any((c) => c.id == _selectedCourseId);
+       setState(() {
+         _courses = courses;
+         if (!selectedExists) {
+           _selectedCourseId = _courseAll;
+         }
+       });
     });
   }
 
-  void _syncCoursesIfNeeded() {
-    final rev = coursesRepository.revision;
-    if (rev == _coursesRevision) return;
-    _coursesRevision = rev;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      _loadCourses();
-    });
+  @override
+  void dispose() {
+    _coursesSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _openAddCourse() async {
@@ -85,7 +75,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
 
     if (created != null) {
       await coursesRepository.addCustomCourse(created);
-      await _loadCourses(selectCourseId: created.id);
+      // Stream will update UI automatically
     }
   }
 
@@ -220,7 +210,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
     debugPrint("CirclesScreen.build called");
     final l10n = AppLocalizations.of(context);
     final isCompactWidth = MediaQuery.sizeOf(context).width < 380;
-    _syncCoursesIfNeeded();
+    
     final courseOptions = _buildCourseOptions();
     _CourseOption? selectedCourseOption;
     if (_selectedCourseId != _courseAll) {
@@ -1184,6 +1174,8 @@ class _LanguageExchangePanelState extends State<_LanguageExchangePanel> {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
     return Column(
       children: [
         Row(

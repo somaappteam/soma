@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../data/settings_repository.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
@@ -12,6 +13,8 @@ import '../social/dm_chat_screen.dart';
 import '../../core/theme/motion.dart';
 import '../../core/widgets/pressable_scale.dart';
 import '../../core/widgets/responsive.dart';
+import '../../data/call_signaling_service.dart';
+import '../../data/profile_repository.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -22,6 +25,7 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _index = 0;
+  StreamSubscription<CallSignalEvent>? _signalSub;
 
   bool get _isGuest => authRepository.currentUser == null;
 
@@ -31,6 +35,112 @@ class _AppShellState extends State<AppShell> {
       return;
     }
     setState(() => _index = nextIndex);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initGlobalSignaling();
+  }
+
+  void _initGlobalSignaling() {
+    if (_isGuest) return;
+    callSignalingService.initialize();
+    _signalSub = callSignalingService.events.listen((event) {
+      if (event.type == CallSignalType.invite) {
+        _handleGlobalInvite(event);
+      }
+    });
+  }
+
+  Future<void> _handleGlobalInvite(CallSignalEvent event) async {
+    // If we are already in DmChatScreen, it will handle it (or we can let AppShell handle it globally)
+    // For now, let's show a global dialog if we aren't in a call.
+    final settings = await settingsRepository.getTypedSettings();
+    if (settings.dmActiveCall['active'] == true) {
+      await callSignalingService.sendSignal(
+        toUserId: event.fromUserId,
+        type: CallSignalType.busy,
+      );
+      return;
+    }
+
+    if (!mounted) return;
+    
+    final fromProfile = await profileRepository.fetchProfile(userId: event.fromUserId);
+    final fromName = fromProfile?.displayName ?? fromProfile?.username ?? 'Someone';
+
+    final accepted = await _showGlobalIncomingCallDialog(fromName);
+    if (accepted == true) {
+      // Navigate to DM chat screen with this user
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DmChatScreen(
+            meId: authRepository.currentUser?.id ?? '',
+            otherId: event.fromUserId,
+            otherName: fromName,
+            initialIncomingCall: true,
+          ),
+        ),
+      );
+    } else {
+      await callSignalingService.sendSignal(
+        toUserId: event.fromUserId,
+        type: CallSignalType.decline,
+      );
+    }
+  }
+
+  Future<bool?> _showGlobalIncomingCallDialog(String name) async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Glass(
+          radius: BorderRadius.circular(24),
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.call_rounded, size: 48, color: Colors.blue),
+              const SizedBox(height: 16),
+              Text(
+                'Incoming call from $name',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Decline'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Accept'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _signalSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _openAuthFlow(Widget screen) async {

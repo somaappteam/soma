@@ -13,6 +13,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../core/theme/tokens.dart';
 import '../../core/theme/motion.dart';
 
 import '../../core/widgets/glass.dart';
@@ -26,9 +27,12 @@ import '../../data/settings_repository.dart';
 import '../../data/soma_plus_repository.dart';
 import '../../data/user_report_repository.dart';
 import '../../data/ai_repository.dart';
+import '../../data/stats_repository.dart';
+import '../../models/user_stats.dart';
 import '../../models/user_profile.dart';
 import '../profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
+import '../../data/call_signaling_service.dart';
 
 enum DmCallState { idle, ringingOutgoing, ringingIncoming, connecting, connected }
 enum _DmMenuAction {
@@ -71,12 +75,14 @@ class DmChatScreen extends StatefulWidget {
     required this.otherId,
     required this.otherName,
     this.initialDraftText,
+    this.initialIncomingCall = false,
   });
 
   final String meId;
   final String otherId;
   final String otherName;
   final String? initialDraftText;
+  final bool initialIncomingCall;
 
   @override
   State<DmChatScreen> createState() => _DmChatScreenState();
@@ -104,14 +110,15 @@ class _DmChatScreenState extends State<DmChatScreen> {
   int _voiceRecordElapsedSeconds = 0;
   int _draftVoiceDurationSeconds = 0;
   String? _draftVoicePath;
-  List<double> _draftVoiceWaveform = const [];
+  List<double> _draftVoiceWaveform = [];
+  StreamSubscription<Amplitude>? _amplitudeSub;
   Timer? _voiceRecordTimer;
   Timer? _callTimer;
   Timer? _callSetupTimeoutTimer;
   Timer? _outgoingRingTimer;
   Timer? _incomingRingTimer;
   int _callElapsedSeconds = 0;
-  RealtimeChannel? _dmCallChannel;
+  StreamSubscription<CallSignalEvent>? _signalSub;
   StreamSubscription<bool>? _rtcConnectionSub;
   StreamSubscription<Map<String, dynamic>>? _rtcTelemetrySub;
   String? _replyPreview;
@@ -227,6 +234,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _loadPremiumToggles();
     _loadLearningPracticeState();
     _initDmCallSignaling();
+    
+    if (widget.initialIncomingCall) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _startVoiceCall(sendInvite: false, incoming: true);
+      });
+    }
     if ((widget.initialDraftText ?? '').trim().isNotEmpty) {
       final initial = widget.initialDraftText!.trim();
       _controller.text = initial;
@@ -245,6 +258,19 @@ class _DmChatScreenState extends State<DmChatScreen> {
         _isConversationArchived = conv['is_archived'] == true;
       });
     });
+
+    // NEW: Mark as read when new messages arrive
+    // NEW: Mark as read when new messages arrive
+    _messagesStream.listen((messages) {
+      if (!mounted || messages.isEmpty) return;
+      final recent = messages.last;
+      debugPrint('DmChatScreen: checking unread. Last msg sender: ${recent['sender_id']}, is_read: ${recent['is_read']}');
+      if (recent['sender_id'] != _myUserId && recent['is_read'] == false) {
+        // debounce slightly to avoid duplicate calls
+        _markConversationAsRead();
+      }
+    });
+
     
     // NEW: Listen to settings for block updates
     _settingsSub = settingsRepository.getSettingsStream().listen((settings) {
@@ -278,12 +304,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
     if (_isCallActive) {
       rtcVoiceService.disconnect();
     }
-    final callChannel = _dmCallChannel;
-    if (callChannel != null) {
-      Supabase.instance.client.removeChannel(callChannel);
-      _dmCallChannel = null;
-    }
+    _signalSub?.cancel();
     _voiceRecordTimer?.cancel();
+    _amplitudeSub?.cancel();
     unawaited(_voiceRecorder.dispose());
     unawaited(_draftVoicePlayer.dispose());
     _callTimer?.cancel();
@@ -499,6 +522,191 @@ class _DmChatScreenState extends State<DmChatScreen> {
         ),
       );
     }
+  }
+
+
+
+  Future<void> _aiPolishDraft() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Type something to polish.')),
+      );
+      return;
+    }
+
+    try {
+      final polished = await aiRepository.polishText(text);
+      if (!mounted) {
+        return;
+      }
+
+      
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('AI Polish'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Original:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                Text(text, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8))),
+                const SizedBox(height: 12),
+                const Text('Polished:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                Text(polished, style: const TextStyle(fontWeight: FontWeight.w600)),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Replace'),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmed == true) {
+        _controller.text = polished;
+      }
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to polish: $e')),
+      );
+    }
+  }
+
+  Future<void> _rewriteDraftStyle() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Type something to rewrite.')),
+      );
+      return;
+    }
+
+    final style = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.business_center_outlined),
+              title: const Text('Formal'), 
+              onTap: () => Navigator.pop(context, 'formal')
+            ),
+            ListTile(
+              leading: const Icon(Icons.coffee_outlined),
+              title: const Text('Casual'), 
+              onTap: () => Navigator.pop(context, 'casual')
+            ),
+            ListTile(
+               leading: const Icon(Icons.translate_rounded),
+               title: const Text('Native Speaker'), 
+               onTap: () => Navigator.pop(context, 'native')
+            ),
+            ListTile(
+               leading: const Icon(Icons.favorite_border_rounded),
+               title: const Text('Romantic'), 
+               onTap: () => Navigator.pop(context, 'romantic')
+            ),
+             ListTile(
+               leading: const Icon(Icons.emoji_emotions_outlined),
+               title: const Text('Fun & Witty'), 
+               onTap: () => Navigator.pop(context, 'witty')
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (style == null) {
+      return;
+    }
+
+    try {
+      final rewritten = await aiRepository.rewriteText(text, style);
+      if (!mounted) {
+        return;
+      }
+
+      _controller.text = rewritten;
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to rewrite: $e')),
+      );
+    }
+  }
+
+  Future<void> _openConversationReplayMode() async {
+    final stream = chatRepository.getMessagesStream(widget.otherId);
+    final messages = await stream.first;
+    final recent = messages.length > 20 ? messages.sublist(messages.length - 20) : messages;
+
+    if (!mounted) {
+      return;
+    }
+    if (recent.isEmpty) {
+         ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No messages to replay.')),
+      );
+      return;
+    }
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) => _ReplaySheet(
+        messages: recent, 
+        otherName: _otherProfile?.username ?? 'User',
+      ),
+    );
+  }
+
+  Future<void> _showWeeklyLearningReportCard() async {
+    final uid = Supabase.instance.client.auth.currentUser?.id;
+    if (uid == null) {
+      return;
+    }
+
+    final stats = await statsRepository.getStats();
+
+    final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7)).toIso8601String();
+    final res = await Supabase.instance.client
+        .from('messages')
+        .select('id')
+        .eq('sender_id', uid)
+        .gte('created_at', sevenDaysAgo)
+        .count(CountOption.exact);
+    final msgsCount = res.count;
+
+    if (!mounted) {
+      return;
+    }
+
+    await showDialog(
+      context: context,
+      builder: (context) => _WeeklyReportCard(
+        stats: stats,
+        messagesSent: msgsCount,
+      ),
+    );
   }
 
 
@@ -1013,86 +1221,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
   }
 
-  Future<void> _rewriteDraftStyle() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-    final mode = await showModalBottomSheet<String>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            for (final m in const ['friendly', 'formal', 'concise', 'romantic', 'translated', 'empathy'])
-              ListTile(title: Text(m), onTap: () => Navigator.pop(context, m)),
-          ],
-        ),
-      ),
-    );
-    if (!mounted || mode == null) return;
-    if (!mounted || mode == null) return;
-    
-    try {
-      final rewritten = await aiRepository.rewriteText(text, mode);
-      if (!mounted) return;
-      setState(() {
-        _controller.text = rewritten;
-        _controller.selection = TextSelection.fromPosition(TextPosition(offset: rewritten.length));
-      });
-      _saveDraft(rewritten);
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('AI Rewrite failed: $e')),
-      );
-    }
-  }
 
 
-  Future<void> _openConversationReplayMode() async {
-    final focus = await showModalBottomSheet<String>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            for (final item in const ['Raise CEFR level', 'Improve clarity', 'Exam-style rewrite'])
-              ListTile(
-                title: Text(item),
-                onTap: () => Navigator.pop(context, item),
-              ),
-          ],
-        ),
-      ),
-    );
-    if (!mounted || focus == null) return;
-    final prompt = 'Replay challenge: $focus. Rewrite your next message with stronger grammar and vocabulary.';
-    setState(() {
-      _controller.text = prompt;
-      _controller.selection = TextSelection.fromPosition(TextPosition(offset: prompt.length));
-    });
-  }
 
-  Future<void> _showWeeklyLearningReportCard() async {
-    final report = 'Weekly report\n• New words: ${_duePracticePhrases.length + 8}\n• Grammar focus: ${_examModeEnabled ? 'Exam rubric' : 'General fluency'}\n• Tutor persona: ${_tutorPersonaLabel(_tutorPersona)}\n• CEFR target: ${_targetCefrLevel.name.toUpperCase()}';
-    await showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Learning report card'),
-        content: Text(report),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              await Clipboard.setData(ClipboardData(text: report));
-              if (!context.mounted) return;
-              Navigator.pop(context);
-            },
-            child: const Text('Copy'),
-          ),
-          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Done')),
-        ],
-      ),
-    );
-  }
 
   Future<void> _showVoicePronunciationCoach(_ChatMessage msg) async {
     final transcript = msg.payload.transcript ?? msg.previewText;
@@ -1551,33 +1682,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     };
   }
 
-  Future<void> _aiPolishDraft() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Write a draft first to polish with AI style.')),
-      );
-      return;
-    }
-    try {
-      final enhanced = await aiRepository.polishText(text);
-      if (!mounted) return;
-      setState(() {
-        _controller.text = enhanced;
-        _controller.selection = TextSelection.fromPosition(TextPosition(offset: enhanced.length));
-      });
-      _saveDraft(enhanced);
-      _onTypingChanged(true);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Draft polished with premium AI tone ✨')),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('AI Polish failed: $e')),
-      );
-    }
-  }
+
 
   void _handleMenuAction(_DmMenuAction action) {
     switch (action) {
@@ -1912,36 +2017,19 @@ class _DmChatScreenState extends State<DmChatScreen> {
   }
 
   void _initDmCallSignaling() {
-    final channelId = _dmVoiceChannelId();
-    final channel = Supabase.instance.client.channel(
-      'dm_call:$channelId',
-      opts: const RealtimeChannelConfig(enabled: true),
-    );
-
-    channel
-        .onBroadcast(event: 'voice_call', callback: (payload) {
-          _handleDmCallSignal(payload);
-        })
-        .subscribe();
-
-    _dmCallChannel = channel;
+    _signalSub = callSignalingService.events.listen((event) {
+      if (event.fromUserId != widget.otherId) return;
+      _handleDmCallSignal(event);
+    });
   }
 
-  Future<void> _handleDmCallSignal(dynamic payload) async {
-    final map = payload is Map ? Map<String, dynamic>.from(payload) : null;
-    if (map == null) return;
+  Future<void> _handleDmCallSignal(CallSignalEvent event) async {
+    final type = event.type;
+    final data = event.rawData;
 
-    final data = map['payload'] is Map
-        ? Map<String, dynamic>.from(map['payload'] as Map)
-        : map;
-
-    final from = data['from']?.toString();
-    if (from == null || from == _myUserId) return;
-    final type = data['type']?.toString();
-
-    if (type == 'call_invite') {
+    if (type == CallSignalType.invite) {
       if (_isCallActive || !_canTransition('invite')) {
-        await _emitDmCallSignal('call_busy');
+        await _emitDmCallSignal(CallSignalType.busy);
         return;
       }
       if (!mounted) return;
@@ -1955,16 +2043,16 @@ class _DmChatScreenState extends State<DmChatScreen> {
       if (!mounted || _callState != DmCallState.ringingIncoming) return;
 
       if (accepted) {
-        await _emitDmCallSignal('call_accept');
+        await _emitDmCallSignal(CallSignalType.accept);
         await _startVoiceCall(sendInvite: false, incoming: true);
       } else {
         setState(() => _callState = DmCallState.idle);
-        await _emitDmCallSignal('call_decline');
+        await _emitDmCallSignal(CallSignalType.decline);
       }
       return;
     }
 
-    if (type == 'call_accept') {
+    if (type == CallSignalType.accept) {
       if (!_canTransition('accept')) return;
       if (_callState == DmCallState.ringingOutgoing) {
         setState(() => _callState = DmCallState.connecting);
@@ -1973,13 +2061,13 @@ class _DmChatScreenState extends State<DmChatScreen> {
       return;
     }
 
-    if (type == 'call_connected') {
+    if (type == CallSignalType.connected) {
       if (!_canTransition('connected')) return;
       _markCallConnected();
       return;
     }
 
-    if (type == 'call_decline') {
+    if (type == CallSignalType.decline) {
       if (!_canTransition('decline')) return;
       if (!_isCallActive) return;
       _stopIncomingRing();
@@ -1987,14 +2075,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
       return;
     }
 
-    if (type == 'call_busy') {
+    if (type == CallSignalType.busy) {
       if (!_isCallActive) return;
       _stopIncomingRing();
       await _endVoiceCall(showRemoteEnded: true, message: '${widget.otherName} is busy on another call');
       return;
     }
 
-    if (type == 'call_end') {
+    if (type == CallSignalType.end) {
       if (!_canTransition('end')) return;
       if (!_isCallActive) return;
       _stopIncomingRing();
@@ -2099,7 +2187,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     if (!_isCallActive) return;
 
     _markCallConnected();
-    _emitDmCallSignal('call_connected');
+    _emitDmCallSignal(CallSignalType.connected);
   }
 
   void _markCallConnected() {
@@ -2156,29 +2244,30 @@ class _DmChatScreenState extends State<DmChatScreen> {
         await rtcVoiceService.forceTurnRelay();
         _startCallSetupTimeout();
       } else {
-        await _emitDmCallSignal('call_end');
+        await _emitDmCallSignal(CallSignalType.end);
         await _endVoiceCall(showRemoteEnded: false, message: 'Voice call failed to connect');
       }
     });
   }
 
-  Future<void> _emitDmCallSignal(String type) async {
-    final channel = _dmCallChannel;
-    if (channel == null) return;
-
-    await channel.sendBroadcastMessage(
-      event: 'voice_call',
-      payload: {
-        'type': type,
-        'from': _myUserId,
-      },
+  Future<void> _emitDmCallSignal(CallSignalType type) async {
+    await callSignalingService.sendSignal(
+      toUserId: widget.otherId,
+      type: type,
     );
   }
 
   Future<bool> _startVoiceCall({required bool sendInvite, bool incoming = false}) async {
     final l10n = AppLocalizations.of(context);
     try {
-      await rtcVoiceService.connect(circleId: _dmVoiceChannelId(), asSpeaker: true, prioritySpeaker: true);
+      final success = await rtcVoiceService.connect(circleId: _dmVoiceChannelId(), asSpeaker: true, prioritySpeaker: true);
+      if (!success) {
+        if (!mounted) return false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Microphone permission is required to make calls.')),
+        );
+        return false;
+      }
       if (!mounted) return false;
 
       setState(() {
@@ -2193,7 +2282,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       });
 
       if (sendInvite) {
-        await _emitDmCallSignal('call_invite');
+        await _emitDmCallSignal(CallSignalType.invite);
         _startOutgoingRing();
       }
 
@@ -2291,7 +2380,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     if (_isCallActive) {
       final shouldEnd = await _confirmEndActiveCall();
       if (!shouldEnd) return;
-      await _emitDmCallSignal('call_end');
+      await _emitDmCallSignal(CallSignalType.end);
       await _endVoiceCall(showRemoteEnded: false);
       return;
     }
@@ -2423,7 +2512,22 @@ class _DmChatScreenState extends State<DmChatScreen> {
       _voiceRecordElapsedSeconds = 0;
       _draftVoicePath = null;
       _draftVoiceDurationSeconds = 0;
-      _draftVoiceWaveform = const [];
+      _draftVoiceWaveform = [];
+    });
+
+    // Start amplitude collection
+    _amplitudeSub?.cancel();
+    _amplitudeSub = _voiceRecorder
+        .onAmplitudeChanged(const Duration(milliseconds: 100))
+        .listen((amp) {
+      if (!mounted) return;
+      // Normalize dBFS (-160 to 0) to 0.0 - 1.0
+      // Typical speech might be around -30 to -10 dBFS
+      // Silence is usually -160 or lower
+      final norm = ((amp.current + 60) / 60).clamp(0.05, 1.0);
+      setState(() {
+        _draftVoiceWaveform.add(norm);
+      });
     });
 
     _voiceRecordTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
@@ -2443,6 +2547,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   Future<void> _stopVoiceRecording({bool hitLimit = false}) async {
     _voiceRecordTimer?.cancel();
+    _amplitudeSub?.cancel();
     final duration = _voiceRecordElapsedSeconds;
     final path = await _voiceRecorder.stop();
     if (!mounted) return;
@@ -2453,11 +2558,13 @@ class _DmChatScreenState extends State<DmChatScreen> {
     });
 
     if (path != null && path.isNotEmpty && duration > 0) {
+      // Resample waveform to fixed size (e.g. 30 bars) for consistent display
+      final resampled = _resampleWaveform(_draftVoiceWaveform, 30);
       setState(() {
         _draftVoicePath = path;
         _draftVoiceDurationSeconds = duration;
+        _draftVoiceWaveform = resampled;
       });
-      await _buildDraftWaveform(path);
     }
 
     if (hitLimit && mounted) {
@@ -2469,6 +2576,28 @@ class _DmChatScreenState extends State<DmChatScreen> {
         ),
       );
     }
+  }
+
+  List<double> _resampleWaveform(List<double> input, int targetSize) {
+    if (input.isEmpty) return List.filled(targetSize, 0.2);
+    if (input.length <= targetSize) return input; // Or pad if needed, but usually fine
+
+    final output = <double>[];
+    final chunkSize = input.length / targetSize;
+    for (var i = 0; i < targetSize; i++) {
+        final start = (i * chunkSize).floor();
+        final end = ((i + 1) * chunkSize).floor();
+        if (end <= start) {
+            output.add(input[start]);
+            continue;
+        }
+        var sum = 0.0;
+        for (var j = start; j < end; j++) {
+            sum += input[j];
+        }
+        output.add(sum / (end - start));
+    }
+    return output;
   }
 
   Future<void> _handleVoiceMessageTap() async {
@@ -2512,28 +2641,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
   }
 
-  Future<void> _buildDraftWaveform(String path) async {
-    try {
-      final bytes = await File(path).readAsBytes();
-      if (bytes.isEmpty) return;
-      const samples = 24;
-      final waveform = List<double>.generate(samples, (i) {
-        final start = (i * bytes.length / samples).floor();
-        final end = ((i + 1) * bytes.length / samples).floor();
-        if (end <= start) return 0.2;
-        var sum = 0;
-        for (var j = start; j < end; j += 2) {
-          sum += bytes[j].abs();
-        }
-        final avg = sum / ((end - start) / 2).clamp(1, 999999);
-        return (avg / 255).clamp(0.15, 1.0);
-      });
-      if (!mounted) return;
-      setState(() => _draftVoiceWaveform = waveform);
-    } catch (_) {
-      // keep default waveform when sampling fails
-    }
-  }
+
 
   Future<void> _pickAndSendImage({bool fromCamera = false}) async {
     if (!_ensureCanSendInDm()) return;
@@ -3484,7 +3592,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                   onHangup: () async {
                     final shouldEnd = await _confirmEndActiveCall();
                     if (!shouldEnd) return;
-                    await _emitDmCallSignal('call_end');
+                    await _emitDmCallSignal(CallSignalType.end);
                     await _endVoiceCall(showRemoteEnded: false);
                   },
                 ),
@@ -3546,7 +3654,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                               } else if (action == 'end') {
                                 final shouldEnd = await _confirmEndActiveCall();
                                 if (!shouldEnd) return;
-                                await _emitDmCallSignal('call_end');
+                                await _emitDmCallSignal(CallSignalType.end);
                                 await _endVoiceCall(showRemoteEnded: false);
                               } else {
                                 setState(() => _callPanelMinimized = false);
@@ -4389,9 +4497,13 @@ class _BubbleState extends State<_Bubble> {
           Padding(
             padding: const EdgeInsets.only(top: 2, right: 4),
             child: Icon(
-              widget.isRead ? Icons.done_all_rounded : Icons.done_rounded,
+              (widget.isRead || widget.deliveryStatus == 'Delivered')
+                  ? Icons.done_all_rounded
+                  : Icons.done_rounded,
               size: 14,
-              color: widget.isRead ? const Color(0xFF58F7B6) : scheme.onSurface.withValues(alpha: 0.5),
+              color: widget.isRead
+                  ? const Color(0xFF58F7B6)
+                  : scheme.onSurface.withValues(alpha: 0.5),
             ),
           ),
       ],
@@ -5544,6 +5656,158 @@ class _IconGlass extends StatelessWidget {
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
         child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92), size: 20),
+      ),
+    );
+  }
+}
+
+class _ReplaySheet extends StatefulWidget {
+  final List<Map<String, dynamic>> messages;
+  final String otherName;
+  const _ReplaySheet({super.key, required this.messages, required this.otherName});
+
+  @override
+  State<_ReplaySheet> createState() => _ReplaySheetState();
+}
+
+class _ReplaySheetState extends State<_ReplaySheet> {
+  int _currentIndex = 0;
+
+  void _next() {
+    if (_currentIndex < widget.messages.length - 1) {
+      setState(() => _currentIndex++);
+    }
+  }
+
+  void _prev() {
+    if (_currentIndex > 0) {
+      setState(() => _currentIndex--);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.messages.isEmpty) {
+      return const SizedBox.shrink();
+    }
+    final msg = widget.messages[_currentIndex];
+    final content = msg['content'] ?? '';
+    String text = content.toString();
+    try {
+        if (text.trim().startsWith('{')) {
+            final data = jsonDecode(text);
+            if (data is Map && data['text'] != null) {
+                text = data['text'];
+            }
+        }
+    } catch (_) {}
+
+    final senderId = msg['sender_id'];
+    final myId = Supabase.instance.client.auth.currentUser?.id;
+    final isMine = senderId == myId;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 24, 24, 48),
+      height: 450,
+      width: double.infinity,
+      child: Column(
+        children: [
+          Text('Conversation Replay', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 30),
+          Expanded(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Text(
+                      isMine ? 'You' : widget.otherName,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isMine ? Colors.blueAccent : Colors.purpleAccent,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      text,
+                      style: const TextStyle(fontSize: 22, height: 1.4),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton.filledTonal(onPressed: _prev, icon: const Icon(Icons.arrow_back_rounded)),
+              Text('${_currentIndex + 1} / ${widget.messages.length}', style: const TextStyle(fontWeight: FontWeight.bold)),
+              IconButton.filledTonal(onPressed: _next, icon: const Icon(Icons.arrow_forward_rounded)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WeeklyReportCard extends StatelessWidget {
+  final UserStats stats;
+  final int messagesSent;
+
+  const _WeeklyReportCard({super.key, required this.stats, required this.messagesSent});
+
+  @override
+  Widget build(BuildContext context) {
+    String grade = 'B';
+    if (messagesSent > 50 && stats.totalCorrect > 20) {
+      grade = 'A+';
+    } else if (messagesSent > 20) {
+      grade = 'A';
+    } else if (messagesSent < 5) {
+      grade = 'C';
+    }
+
+    return AlertDialog(
+      title: const Text('Weekly Learning Report'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Theme.of(context).colorScheme.primaryContainer,
+            ),
+            child: Text(grade, style: TextStyle(fontSize: 48, fontWeight: FontWeight.w900, color: Theme.of(context).colorScheme.onPrimaryContainer)),
+          ),
+          const SizedBox(height: 24),
+          _statRow(context, 'Messages Sent (7d)', '$messagesSent'),
+          const Divider(),
+          _statRow(context, 'Total Quizzes', '${stats.totalQuizzes}'),
+          const Divider(),
+          _statRow(context, 'Correct Answers', '${stats.totalCorrect}'),
+          const Divider(),
+          _statRow(context, 'Current Streak', '${stats.streakDays} days'),
+        ],
+      ),
+      actions: [
+        FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Keep it up!')),
+      ],
+    );
+  }
+
+  Widget _statRow(BuildContext context, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: Theme.of(context).textTheme.bodyMedium),
+          Text(value, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
+        ],
       ),
     );
   }
