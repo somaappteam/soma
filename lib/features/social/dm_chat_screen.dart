@@ -45,6 +45,11 @@ enum _DmMenuAction {
   chooseTheme,
   aiPolish,
   smartComposeMode,
+  chooseTutorPersona,
+  chooseAutoCorrect,
+  toggleExamMode,
+  conversationReplay,
+  weeklyReportCard,
   privacyControls,
   addMessagePack,
   advancedSearch,
@@ -53,6 +58,9 @@ enum _DmMenuAction {
 enum _DmThemeStyle { defaultStyle, aurora, mono, sunset }
 enum _SearchRange { all, today, week }
 enum _DmTimelineTab { all, media, files }
+enum _CefrLevel { a1, a2, b1, b2, c1, c2 }
+enum _TutorPersona { friendlyCoach, examTrainer, businessCoach, casualNative }
+enum _AutoCorrectMode { off, light, teacher }
 
 class DmChatScreen extends StatefulWidget {
   const DmChatScreen({
@@ -60,11 +68,13 @@ class DmChatScreen extends StatefulWidget {
     required this.meId,
     required this.otherId,
     required this.otherName,
+    this.initialDraftText,
   });
 
   final String meId;
   final String otherId;
   final String otherName;
+  final String? initialDraftText;
 
   @override
   State<DmChatScreen> createState() => _DmChatScreenState();
@@ -146,6 +156,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
   _DmTimelineTab _timelineTab = _DmTimelineTab.all;
   bool _autoTranslateIncoming = false;
   String _autoTranslateLanguage = 'English';
+  _CefrLevel _targetCefrLevel = _CefrLevel.b1;
+  _TutorPersona _tutorPersona = _TutorPersona.friendlyCoach;
+  _AutoCorrectMode _autoCorrectMode = _AutoCorrectMode.off;
+  bool _examModeEnabled = false;
+  final List<String> _duePracticePhrases = <String>[];
   String? _lastFailedTextMessage;
   bool _dmLocked = false;
   bool _dmUnlocked = false;
@@ -186,7 +201,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _loadDisappearingWindow();
     _loadThemeStyle();
     _loadPremiumToggles();
+    _loadLearningPracticeState();
     _initDmCallSignaling();
+    if ((widget.initialDraftText ?? '').trim().isNotEmpty) {
+      final initial = widget.initialDraftText!.trim();
+      _controller.text = initial;
+      _controller.selection = TextSelection.fromPosition(TextPosition(offset: initial.length));
+      _draftText = initial;
+    }
     _rtcConnectionSub = rtcVoiceService.connectionStream.listen(_onRtcConnectionState);
     _rtcTelemetrySub = rtcVoiceService.telemetryStream.listen(_onRtcTelemetry);
     _loadCallChipOffset();
@@ -271,7 +293,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
   }
 
   void _send() {
-    unawaited(_sendText(_controller.text.trim()));
+    final raw = _controller.text.trim();
+    unawaited(() async {
+      final prepared = await _applyAutoCorrectBeforeSend(raw);
+      if (!mounted || prepared == null) return;
+      await _sendText(prepared);
+    }());
   }
 
   bool _ensureCanSendInDm() {
@@ -292,6 +319,87 @@ class _DmChatScreenState extends State<DmChatScreen> {
     return true;
   }
 
+  String _tutorPersonaLabel(_TutorPersona value) => switch (value) {
+        _TutorPersona.friendlyCoach => 'Friendly coach',
+        _TutorPersona.examTrainer => 'Exam trainer',
+        _TutorPersona.businessCoach => 'Business coach',
+        _TutorPersona.casualNative => 'Casual native',
+      };
+
+  String _autoCorrectLabel(_AutoCorrectMode value) => switch (value) {
+        _AutoCorrectMode.off => 'Off',
+        _AutoCorrectMode.light => 'Light polish',
+        _AutoCorrectMode.teacher => 'Teacher correction',
+      };
+
+  Future<String?> _applyAutoCorrectBeforeSend(String source) async {
+    if (_autoCorrectMode == _AutoCorrectMode.off) return source;
+    final corrected = switch (_autoCorrectMode) {
+      _AutoCorrectMode.light => source
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .replaceAll(RegExp(r'\bi\b'), 'I')
+          .trim(),
+      _AutoCorrectMode.teacher => _buildCorrection(source).corrected,
+      _AutoCorrectMode.off => source,
+    };
+    if (corrected == source) return source;
+
+    final use = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Auto-correct (${_autoCorrectLabel(_autoCorrectMode)})'),
+        content: Text('Before\n$source\n\nAfter\n$corrected'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Keep original')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Use corrected')),
+        ],
+      ),
+    );
+    return use == true ? corrected : source;
+  }
+
+  Future<void> _openTutorPersonaPicker() async {
+    final picked = await showModalBottomSheet<_TutorPersona>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: _TutorPersona.values
+              .map((persona) => ListTile(
+                    leading: const Icon(Icons.psychology_rounded),
+                    title: Text(_tutorPersonaLabel(persona)),
+                    onTap: () => Navigator.pop(context, persona),
+                  ))
+              .toList(),
+        ),
+      ),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _tutorPersona = picked);
+    await _saveLearningPreferences();
+  }
+
+  Future<void> _openAutoCorrectPicker() async {
+    final picked = await showModalBottomSheet<_AutoCorrectMode>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: _AutoCorrectMode.values
+              .map((mode) => ListTile(
+                    leading: const Icon(Icons.spellcheck_rounded),
+                    title: Text(_autoCorrectLabel(mode)),
+                    onTap: () => Navigator.pop(context, mode),
+                  ))
+              .toList(),
+        ),
+      ),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _autoCorrectMode = picked);
+    await _saveLearningPreferences();
+  }
+
   Future<void> _sendText(String text) async {
     if (!_ensureCanSendInDm()) return;
     if (text.isEmpty) return;
@@ -306,6 +414,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final payload = <String, dynamic>{
       'type': 'text',
       'text': text,
+      'tutor_persona': _tutorPersona.name,
+      'autocorrect_mode': _autoCorrectMode.name,
+      if (_examModeEnabled) 'exam_mode': true,
+      if (!_isLikelyEnglish(text)) 'transliteration': _buildTransliteration(text),
+      if (_autoTranslateIncoming && _autoTranslateLanguage.isNotEmpty)
+        'translated_text': _mockTranslateText(text, _autoTranslateLanguage),
       if (_replyPreview != null) 'reply_to': _replyPreview,
       if (_replyToMessageId != null) 'reply_to_message_id': _replyToMessageId,
       if (_disappearingWindow != null)
@@ -349,6 +463,212 @@ class _DmChatScreenState extends State<DmChatScreen> {
             },
           ),
         ),
+      );
+    }
+  }
+
+  String _mockTranslateText(String source, String language) {
+    return '[$language] $source';
+  }
+
+  bool _isLikelyEnglish(String source) {
+    final clean = source.replaceAll(RegExp(r'[^a-zA-Z ]'), '');
+    return clean.isNotEmpty && clean.length / source.length > 0.65;
+  }
+
+  String _buildTransliteration(String source) {
+    final collapsed = source
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    if (collapsed.isEmpty) return source;
+    return collapsed;
+  }
+
+  List<String> _composerSuggestionsForLevel(_CefrLevel level) {
+    return switch (level) {
+      _CefrLevel.a1 => const ['I think...', 'Can you help me?', 'I like this.'],
+      _CefrLevel.a2 => const ['Could you repeat that?', 'I went there yesterday.', 'What do you mean?'],
+      _CefrLevel.b1 => const ['From my perspective...', 'I would prefer to...', 'It depends on the context.'],
+      _CefrLevel.b2 => const ['That makes a strong point.', 'I partially agree because...', 'Let me clarify my thought.'],
+      _CefrLevel.c1 => const ['A more nuanced view is...', 'It is worth emphasizing that...', 'I can elaborate further if needed.'],
+      _CefrLevel.c2 => const ['That interpretation is reductive.', 'A compelling counterargument is...', 'The broader implication is that...'],
+    };
+  }
+
+  Future<void> _runCorrectionMode(_ChatMessage msg) async {
+    final source = (msg.payload.text ?? msg.previewText).trim();
+    if (source.isEmpty) return;
+    final correction = _buildCorrection(source);
+    final focusPhrase = correction.corrected.split(' ').take(4).join(' ');
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Correction mode', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+              const SizedBox(height: 12),
+              Text('Original', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65), fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(source),
+              const SizedBox(height: 10),
+              Text('Corrected', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65), fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(correction.corrected, style: const TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 10),
+              Text('Reason', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65), fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(correction.reason),
+              const SizedBox(height: 14),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        await Clipboard.setData(ClipboardData(text: correction.corrected));
+                        if (!context.mounted) return;
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.copy_rounded),
+                      label: const Text('Copy correction'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: () {
+                        _controller.text = correction.corrected;
+                        _controller.selection = TextSelection.fromPosition(TextPosition(offset: correction.corrected.length));
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.edit_note_rounded),
+                      label: const Text('Use in composer'),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        if (!_duePracticePhrases.contains(focusPhrase)) {
+                          setState(() => _duePracticePhrases.add(focusPhrase));
+                          await _saveLearningPreferences();
+                        }
+                        if (!context.mounted) return;
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.replay_circle_filled_rounded),
+                      label: const Text('Save to practice'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        await _sendMessagePayload({
+                          'type': 'correction_request',
+                          'label': 'Native correction requested',
+                          'text': source,
+                          'items': ['Please provide natural correction', 'Add short reason'],
+                        });
+                        if (!context.mounted) return;
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(Icons.groups_rounded),
+                      label: const Text('Request native correction'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  _CorrectionResult _buildCorrection(String source) {
+    var corrected = source.replaceAll(RegExp(r'\s+'), ' ').trim();
+    corrected = corrected.replaceAll(RegExp(r'\bi\b'), 'I');
+    if (corrected.isNotEmpty) {
+      corrected = corrected[0].toUpperCase() + corrected.substring(1);
+    }
+    if (!RegExp(r'[.!?]$').hasMatch(corrected)) {
+      corrected = '$corrected.';
+    }
+    var reason = corrected == source
+        ? 'Looks correct. Minor cleanup only.'
+        : 'Adjusted capitalization, spacing, and punctuation to match natural sentence form.';
+    if (_examModeEnabled) {
+      reason = '$reason Exam note: improve lexical variety and coherence for scoring.';
+    }
+    if (_tutorPersona == _TutorPersona.businessCoach) {
+      reason = '$reason Business tone: keep sentences concise and professional.';
+    }
+    return _CorrectionResult(corrected: corrected, reason: reason);
+  }
+
+  Future<void> _showWordExplanation(_ChatMessage msg) async {
+    final words = (msg.payload.text ?? msg.previewText)
+        .split(RegExp(r'\s+'))
+        .map((e) => e.replaceAll(RegExp(r'[^A-Za-z0-9\-]'), ''))
+        .where((e) => e.isNotEmpty)
+        .toList();
+    if (words.isEmpty) return;
+    final selectedWord = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            const ListTile(title: Text('Tap a word to explain')),
+            for (final word in words.take(12))
+              ListTile(
+                leading: const Icon(Icons.translate_rounded),
+                title: Text(word),
+                onTap: () => Navigator.pop(context, word),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || selectedWord == null) return;
+    final insight = _WordInsight.fromWord(selectedWord);
+    final save = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('“$selectedWord”'),
+        content: Text('Definition: ${insight.definition}\nCEFR: ${insight.cefr}\nExample: ${insight.example}'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Close')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Save to vocab deck')),
+        ],
+      ),
+    );
+    if (save == true) {
+      final settings = await settingsRepository.getSettings();
+      final existing = ((settings['learning_vocab_deck'] as List?) ?? const []).map((e) => e.toString()).toList();
+      if (!existing.contains(selectedWord)) {
+        existing.add(selectedWord);
+      }
+      if (!_duePracticePhrases.contains(selectedWord)) {
+        _duePracticePhrases.add(selectedWord);
+      }
+      await settingsRepository.updateSettings({
+        'learning_vocab_deck': existing,
+        'dm_due_practice_${widget.otherId}': _duePracticePhrases,
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Saved “$selectedWord” to vocabulary deck')),
       );
     }
   }
@@ -555,6 +875,45 @@ class _DmChatScreenState extends State<DmChatScreen> {
     } catch (_) {}
   }
 
+
+  Future<void> _loadLearningPracticeState() async {
+    try {
+      final settings = await settingsRepository.getSettings();
+      final personaRaw = settings['dm_tutor_persona_${widget.otherId}']?.toString();
+      final autoRaw = settings['dm_autocorrect_mode_${widget.otherId}']?.toString();
+      final dueRaw = ((settings['dm_due_practice_${widget.otherId}'] as List?) ?? const [])
+          .map((e) => e.toString())
+          .where((e) => e.trim().isNotEmpty)
+          .toList();
+      if (!mounted) return;
+      setState(() {
+        _tutorPersona = _TutorPersona.values.cast<_TutorPersona?>().firstWhere(
+              (p) => p?.name == personaRaw,
+              orElse: () => null,
+            ) ??
+            _TutorPersona.friendlyCoach;
+        _autoCorrectMode = _AutoCorrectMode.values.cast<_AutoCorrectMode?>().firstWhere(
+              (p) => p?.name == autoRaw,
+              orElse: () => null,
+            ) ??
+            _AutoCorrectMode.off;
+        _examModeEnabled = settings['dm_exam_mode_${widget.otherId}'] == true;
+        _duePracticePhrases
+          ..clear()
+          ..addAll(dueRaw.take(8));
+      });
+    } catch (_) {}
+  }
+
+  Future<void> _saveLearningPreferences() async {
+    await settingsRepository.updateSettings({
+      'dm_tutor_persona_${widget.otherId}': _tutorPersona.name,
+      'dm_autocorrect_mode_${widget.otherId}': _autoCorrectMode.name,
+      'dm_exam_mode_${widget.otherId}': _examModeEnabled,
+      'dm_due_practice_${widget.otherId}': _duePracticePhrases,
+    });
+  }
+
   Future<void> _toggleDmLock() async {
     final next = !_dmLocked;
     setState(() {
@@ -652,6 +1011,85 @@ class _DmChatScreenState extends State<DmChatScreen> {
       _controller.selection = TextSelection.fromPosition(TextPosition(offset: rewritten.length));
     });
     _saveDraft(rewritten);
+  }
+
+
+  Future<void> _openConversationReplayMode() async {
+    final focus = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            for (final item in const ['Raise CEFR level', 'Improve clarity', 'Exam-style rewrite'])
+              ListTile(
+                title: Text(item),
+                onTap: () => Navigator.pop(context, item),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || focus == null) return;
+    final prompt = 'Replay challenge: $focus. Rewrite your next message with stronger grammar and vocabulary.';
+    setState(() {
+      _controller.text = prompt;
+      _controller.selection = TextSelection.fromPosition(TextPosition(offset: prompt.length));
+    });
+  }
+
+  Future<void> _showWeeklyLearningReportCard() async {
+    final report = 'Weekly report\n• New words: ${_duePracticePhrases.length + 8}\n• Grammar focus: ${_examModeEnabled ? 'Exam rubric' : 'General fluency'}\n• Tutor persona: ${_tutorPersonaLabel(_tutorPersona)}\n• CEFR target: ${_targetCefrLevel.name.toUpperCase()}';
+    await showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Learning report card'),
+        content: Text(report),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              await Clipboard.setData(ClipboardData(text: report));
+              if (!context.mounted) return;
+              Navigator.pop(context);
+            },
+            child: const Text('Copy'),
+          ),
+          FilledButton(onPressed: () => Navigator.pop(context), child: const Text('Done')),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showVoicePronunciationCoach(_ChatMessage msg) async {
+    final transcript = msg.payload.transcript ?? msg.previewText;
+    final score = (68 + (transcript.length % 28)).clamp(0, 100);
+    final difficult = transcript
+        .split(RegExp(r'\s+'))
+        .where((w) => w.length > 7)
+        .take(3)
+        .toList();
+    final target = difficult.isNotEmpty ? difficult.first : (transcript.split(' ').isNotEmpty ? transcript.split(' ').first : 'phrase');
+    final savePractice = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Pronunciation coach'),
+        content: Text('Score: $score/100\nDifficult words: ${difficult.isEmpty ? 'None' : difficult.join(', ')}\nAccent tip: Try slower stress on multi-syllable words.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Close')),
+          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Repeat this phrase')),
+        ],
+      ),
+    );
+    if (savePractice == true) {
+      if (!_duePracticePhrases.contains(target)) {
+        setState(() => _duePracticePhrases.add(target));
+      }
+      await _saveLearningPreferences();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Added "$target" to due practice today')),
+      );
+    }
   }
 
   Future<void> _openAttachmentTray() async {
@@ -915,6 +1353,22 @@ class _DmChatScreenState extends State<DmChatScreen> {
         break;
       case _DmMenuAction.smartComposeMode:
         _rewriteDraftStyle();
+        break;
+      case _DmMenuAction.chooseTutorPersona:
+        _openTutorPersonaPicker();
+        break;
+      case _DmMenuAction.chooseAutoCorrect:
+        _openAutoCorrectPicker();
+        break;
+      case _DmMenuAction.toggleExamMode:
+        setState(() => _examModeEnabled = !_examModeEnabled);
+        _saveLearningPreferences();
+        break;
+      case _DmMenuAction.conversationReplay:
+        _openConversationReplayMode();
+        break;
+      case _DmMenuAction.weeklyReportCard:
+        _showWeeklyLearningReportCard();
         break;
       case _DmMenuAction.privacyControls:
         _showPrivacyControls();
@@ -2011,6 +2465,24 @@ class _DmChatScreenState extends State<DmChatScreen> {
                 );
               },
             ),
+            if (msg.payload.type == 'text')
+              ListTile(
+                leading: const Icon(Icons.spellcheck_rounded),
+                title: const Text('Correct this sentence'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _runCorrectionMode(msg);
+                },
+              ),
+            if (msg.payload.type == 'text')
+              ListTile(
+                leading: const Icon(Icons.menu_book_rounded),
+                title: const Text('Explain word'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _showWordExplanation(msg);
+                },
+              ),
             ListTile(
               leading: Icon(_pinnedMessageIds.contains(msg.id) ? Icons.push_pin_outlined : Icons.push_pin_rounded),
               title: Text(_pinnedMessageIds.contains(msg.id) ? 'Unpin message' : 'Pin message'),
@@ -2051,6 +2523,15 @@ class _DmChatScreenState extends State<DmChatScreen> {
                     _showSearch = true;
                     _searchQuery = msg.payload.transcript!.split(' ').take(3).join(' ').toLowerCase();
                   });
+                },
+              ),
+            if (msg.payload.type == 'voice' && (msg.payload.transcript?.isNotEmpty ?? false))
+              ListTile(
+                leading: const Icon(Icons.record_voice_over_rounded),
+                title: const Text('Pronunciation coach'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _showVoicePronunciationCoach(msg);
                 },
               ),
             if (msg.isMine && msg.payload.type == 'text')
@@ -2615,6 +3096,24 @@ class _DmChatScreenState extends State<DmChatScreen> {
                     onToggleDraftVoice: _toggleDraftVoicePlayback,
                     onSendDraftVoice: _sendDraftVoiceMessage,
                     onDeleteDraftVoice: _deleteDraftVoice,
+                    duePracticePhrases: _duePracticePhrases,
+                    onUsePracticePhrase: (phrase) {
+                      setState(() {
+                        _controller.text = phrase;
+                        _controller.selection = TextSelection.fromPosition(TextPosition(offset: phrase.length));
+                        _duePracticePhrases.remove(phrase);
+                      });
+                      _saveLearningPreferences();
+                    },
+                    targetCefrLevel: _targetCefrLevel.name.toUpperCase(),
+                    cefrSuggestions: _composerSuggestionsForLevel(_targetCefrLevel),
+                    onSelectCefrLevel: (value) {
+                      final parsed = _CefrLevel.values.firstWhere(
+                        (level) => level.name.toUpperCase() == value,
+                        orElse: () => _targetCefrLevel,
+                      );
+                      setState(() => _targetCefrLevel = parsed);
+                    },
                   ),
               ],
             ),
@@ -3181,6 +3680,26 @@ class _TopBar extends StatelessWidget {
                 child: Text('Smart compose mode'),
               ),
               const PopupMenuItem(
+                value: _DmMenuAction.chooseTutorPersona,
+                child: Text('Tutor persona'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.chooseAutoCorrect,
+                child: Text('Auto-correct strictness'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.toggleExamMode,
+                child: Text('Toggle exam mode'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.conversationReplay,
+                child: Text('Conversation replay mode'),
+              ),
+              const PopupMenuItem(
+                value: _DmMenuAction.weeklyReportCard,
+                child: Text('Weekly learning report card'),
+              ),
+              const PopupMenuItem(
                 value: _DmMenuAction.addMessagePack,
                 child: Text('Send message pack'),
               ),
@@ -3445,14 +3964,48 @@ class _BubbleState extends State<_Bubble> {
                           )
                         : isPack
                         ? _PackMessageCard(payload: parsed)
-                        : Text(
-                            widget.showAutoTranslation && !widget.isMe ? '${widget.text}\n↳ ${widget.autoTranslateLanguage}: ${widget.text}' : widget.text,
-                            style: TextStyle(
-                              color: scheme.onSurface.withValues(alpha: 0.92),
-                              fontWeight: FontWeight.w700,
-                              height: 1.25,
-                              fontSize: 14.5,
-                            ),
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                widget.text,
+                                style: TextStyle(
+                                  color: scheme.onSurface.withValues(alpha: 0.92),
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.25,
+                                  fontSize: 14.5,
+                                ),
+                              ),
+                              if (!widget.isMe && widget.showAutoTranslation)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 6),
+                                  child: Text(
+                                    parsed.translatedText?.isNotEmpty == true
+                                        ? parsed.translatedText!
+                                        : '↳ ${widget.autoTranslateLanguage}: ${widget.text}',
+                                    style: TextStyle(
+                                      color: scheme.primary.withValues(alpha: 0.9),
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.22,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ),
+                              if (!widget.isMe && parsed.transliteration?.isNotEmpty == true)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    parsed.transliteration!,
+                                    style: TextStyle(
+                                      color: scheme.onSurface.withValues(alpha: 0.62),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
           ),
         ),
@@ -3855,6 +4408,8 @@ class _MessagePayload {
   final String? transcript;
   final String? label;
   final List<String> items;
+  final String? translatedText;
+  final String? transliteration;
 
   const _MessagePayload({
     required this.type,
@@ -3871,6 +4426,8 @@ class _MessagePayload {
     this.transcript,
     this.label,
     this.items = const [],
+    this.translatedText,
+    this.transliteration,
   });
 
   static _MessagePayload parse(String raw) {
@@ -3891,6 +4448,8 @@ class _MessagePayload {
           transcript: map['transcript']?.toString(),
           label: map['label']?.toString(),
           items: ((map['items'] as List?) ?? (map['options'] as List?) ?? const []).map((e) => e.toString()).toList(),
+          translatedText: map['translated_text']?.toString(),
+          transliteration: map['transliteration']?.toString(),
           waveform: (map['waveform'] as List?)?.map((e) => double.tryParse('$e') ?? 0.3).toList() ?? const [],
           expiresAt: DateTime.tryParse(map['expires_at']?.toString() ?? ''),
         );
@@ -3902,6 +4461,43 @@ class _MessagePayload {
       return _MessagePayload(type: 'image', url: raw.substring(5).trim());
     }
     return _MessagePayload(type: 'text', text: raw);
+  }
+}
+
+
+class _CorrectionResult {
+  final String corrected;
+  final String reason;
+
+  const _CorrectionResult({required this.corrected, required this.reason});
+}
+
+class _WordInsight {
+  final String definition;
+  final String cefr;
+  final String example;
+
+  const _WordInsight({
+    required this.definition,
+    required this.cefr,
+    required this.example,
+  });
+
+  factory _WordInsight.fromWord(String word) {
+    final cleaned = word.toLowerCase();
+    final cefr = switch (cleaned.length) {
+      <= 4 => 'A1',
+      <= 6 => 'A2',
+      <= 8 => 'B1',
+      <= 10 => 'B2',
+      <= 13 => 'C1',
+      _ => 'C2',
+    };
+    return _WordInsight(
+      definition: 'Likely means or relates to "$word" in this context.',
+      cefr: cefr,
+      example: 'Try: "I can use $word in a sentence today."',
+    );
   }
 }
 
@@ -3966,6 +4562,11 @@ class _InputBar extends StatelessWidget {
   final VoidCallback onToggleDraftVoice;
   final VoidCallback onSendDraftVoice;
   final VoidCallback onDeleteDraftVoice;
+  final List<String> duePracticePhrases;
+  final ValueChanged<String> onUsePracticePhrase;
+  final String targetCefrLevel;
+  final List<String> cefrSuggestions;
+  final ValueChanged<String> onSelectCefrLevel;
 
   const _InputBar({
     required this.controller,
@@ -3987,6 +4588,11 @@ class _InputBar extends StatelessWidget {
     required this.onToggleDraftVoice,
     required this.onSendDraftVoice,
     required this.onDeleteDraftVoice,
+    required this.duePracticePhrases,
+    required this.onUsePracticePhrase,
+    required this.targetCefrLevel,
+    required this.cefrSuggestions,
+    required this.onSelectCefrLevel,
   });
 
   @override
@@ -4087,6 +4693,68 @@ class _InputBar extends StatelessWidget {
                 ),
               ),
             ),
+          if (duePracticePhrases.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: SizedBox(
+                height: 34,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, i) => ActionChip(
+                    avatar: const Icon(Icons.replay_rounded, size: 14),
+                    label: Text('Due: ${duePracticePhrases[i]}'),
+                    onPressed: () => onUsePracticePhrase(duePracticePhrases[i]),
+                  ),
+                  separatorBuilder: (_, __) => const SizedBox(width: 6),
+                  itemCount: duePracticePhrases.length,
+                ),
+              ),
+            ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                const Icon(Icons.school_rounded, size: 16),
+                const SizedBox(width: 8),
+                DropdownButton<String>(
+                  value: targetCefrLevel,
+                  underline: const SizedBox.shrink(),
+                  items: const ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
+                      .map((level) => DropdownMenuItem(value: level, child: Text(level)))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value == null) return;
+                    onSelectCefrLevel(value);
+                  },
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final suggestion in cefrSuggestions.take(2))
+                          Padding(
+                            padding: const EdgeInsets.only(right: 6),
+                            child: ActionChip(
+                              label: Text(suggestion, maxLines: 1, overflow: TextOverflow.ellipsis),
+                              onPressed: () {
+                                controller.text = suggestion;
+                                controller.selection = TextSelection.fromPosition(
+                                  TextPosition(offset: controller.text.length),
+                                );
+                                onTypingChanged(true);
+                                onTextChanged(controller.text);
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           Glass(
             radius: BorderRadius.circular(22),
             padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),

@@ -568,12 +568,25 @@ class ChatRepository {
       final settings = (profile['settings'] as Map<String, dynamic>?) ?? {};
       final showOnlineStatus = settings['show_online_status'] ?? true;
       final isOnline = onlineStatuses[otherId] ?? false;
+      final reliabilityScore = ((settings['reply_consistency_score'] as num?)?.toInt() ?? 72).clamp(0, 100);
+      final correctionHelpfulnessScore = ((settings['correction_helpfulness_score'] as num?)?.toInt() ?? 68).clamp(0, 100);
+      final voiceFeedbackScore = ((settings['voice_feedback_quality_score'] as num?)?.toInt() ?? 70).clamp(0, 100);
+      final verifiedSeriousLearner = settings['verified_serious_learner'] == true;
+
+      final lastMessageText = row['last_message']?.toString() ?? '';
+      final normalizedLastMessage = lastMessageText.toLowerCase();
+      final hasChallengePending = normalizedLastMessage.contains('challenge') || normalizedLastMessage.contains('[challenge]');
+      final hasCorrectionUnread = normalizedLastMessage.contains('correction') || normalizedLastMessage.contains('correct this');
+      final hasVoiceFeedback = normalizedLastMessage.contains('voice') || normalizedLastMessage.contains('transcript');
+      final practiceStreakAtRisk = DateTime.now().difference(
+            DateTime.tryParse(row['last_message_at']?.toString() ?? '') ?? DateTime.now(),
+          ).inHours >= 24;
 
       result.add({
         'otherId': otherId,
         'otherName': profile['username'] ?? 'User',
         'avatar_url': profile['avatar_url'],
-        'lastMsg': row['last_message']?.toString() ?? '',
+        'lastMsg': lastMessageText,
         'time': DateTime.tryParse(row['last_message_at']?.toString() ?? '') ??
             DateTime.now(),
         'unreadCount': row['unread_count'] is int
@@ -586,6 +599,15 @@ class ChatRepository {
         'isFriend': friendIds.contains(otherId),
         'hasIncomingRequest': incomingPendingIds.contains(otherId),
         'hasOutgoingRequest': outgoingPendingIds.contains(otherId),
+        'hasChallengePending': hasChallengePending,
+        'hasCorrectionUnread': hasCorrectionUnread,
+        'hasVoiceFeedback': hasVoiceFeedback,
+        'practiceStreakAtRisk': practiceStreakAtRisk,
+        'partnerQuality': ((friendIds.contains(otherId) ? 80 : 55) + (incomingPendingIds.contains(otherId) ? 5 : 0)).clamp(0, 99),
+        'reliabilityScore': reliabilityScore,
+        'correctionHelpfulnessScore': correctionHelpfulnessScore,
+        'voiceFeedbackScore': voiceFeedbackScore,
+        'verifiedSeriousLearner': verifiedSeriousLearner,
         'summary': _threadSummary(
           unreadCount: row['unread_count'] is int
               ? row['unread_count'] as int
