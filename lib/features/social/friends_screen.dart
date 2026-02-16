@@ -336,16 +336,6 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                     friendsCount: friends.length,
                                     onlineCount: friends.where((f) => _onlineStatuses[f.id] == true).length,
                                     requestsCount: totalRequests,
-                                    onAddFriend: () async {
-                                      _trackUiEvent('add_friend_cta');
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => const AddFriendScreen(),
-                                        ),
-                                      );
-                                    },
-                                    onShareInvite: _copyInviteLink,
                                   ),
                                   const SizedBox(height: 12),
                                   Row(
@@ -621,15 +611,11 @@ class _FriendsOverviewCard extends StatelessWidget {
   final int friendsCount;
   final int onlineCount;
   final int requestsCount;
-  final VoidCallback onAddFriend;
-  final VoidCallback onShareInvite;
 
   const _FriendsOverviewCard({
     required this.friendsCount,
     required this.onlineCount,
     required this.requestsCount,
-    required this.onAddFriend,
-    required this.onShareInvite,
   });
 
   @override
@@ -664,24 +650,6 @@ class _FriendsOverviewCard extends StatelessWidget {
                   value: '$requestsCount',
                   icon: Icons.mark_email_unread_rounded,
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: onAddFriend,
-                  icon: const Icon(Icons.person_add_alt_1_rounded),
-                  label: const Text('Find and add friends'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              IconButton(
-                onPressed: onShareInvite,
-                icon: const Icon(Icons.ios_share_rounded),
-                tooltip: 'Share invite',
               ),
             ],
           ),

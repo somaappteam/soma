@@ -53,6 +53,7 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
           child: ResponsiveFrame(
@@ -68,7 +69,7 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
                     Text(
                       l10n.circleCountdownTitle,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.92),
+                        color: scheme.onSurface.withValues(alpha: 0.92),
                         fontWeight: FontWeight.w900,
                         fontSize: 18,
                       ),
@@ -76,8 +77,8 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
                     const SizedBox(height: 14),
                     Text(
                       "$_t",
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: scheme.onSurface,
                         fontWeight: FontWeight.w900,
                         fontSize: 72,
                         height: 1.0,
@@ -88,7 +89,7 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
                     Text(
                       l10n.circleCountdownSubtitle,
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.70),
+                        color: scheme.onSurface.withValues(alpha: 0.72),
                         fontWeight: FontWeight.w800,
                         fontSize: 13,
                       ),
@@ -151,8 +152,8 @@ class _GlowBar extends StatelessWidget {
       width: 220,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        color: Colors.white.withValues(alpha: 0.12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(999),
@@ -194,7 +195,8 @@ class _MicToggleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final color = muted ? Colors.white.withValues(alpha: 0.6) : Colors.white;
+    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final color = muted ? onSurface.withValues(alpha: 0.6) : onSurface;
     final label = muted ? l10n.micOff : l10n.micOn;
 
     return InkWell(
@@ -204,8 +206,8 @@ class _MicToggleButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: Colors.white.withValues(alpha: muted ? 0.08 : 0.12),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+          color: onSurface.withValues(alpha: muted ? 0.08 : 0.12),
+          border: Border.all(color: onSurface.withValues(alpha: 0.16)),
           boxShadow: speaking
               ? [
                   BoxShadow(

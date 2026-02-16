@@ -69,9 +69,9 @@ class AppTheme {
     );
 
     const glass = GlassTheme(
-      fill: Color(0xE6FFFFFF), // ~90% opacity white
-      stroke: Color(0xFFFFFFFF), // Solid white stroke
-      shadow: Color(0x400E3E2A), // ~25% opacity shadow (darker green tint)
+      fill: Color(0xF0F4F7F4), // Slightly tinted, denser fill for better card separation in light mode
+      stroke: Color(0x2E0E3E2A), // Subtle dark stroke so glass boundaries remain visible on pale surfaces
+      shadow: Color(0x5C0E3E2A), // Stronger soft shadow for depth/contrast
     );
     const background = AppBackgroundTheme(
       gradient: LinearGradient(

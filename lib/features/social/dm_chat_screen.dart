@@ -53,6 +53,7 @@ enum _DmMenuAction {
   privacyControls,
   addMessagePack,
   advancedSearch,
+  moreTools,
 }
 
 enum _DmThemeStyle { defaultStyle, aurora, mono, sunset }
@@ -179,6 +180,27 @@ class _DmChatScreenState extends State<DmChatScreen> {
   int get _maxVoiceMessageSeconds => _dmLimits.maxVoiceMessageSeconds;
 
   String get _myUserId => chatRepository.currentUserId ?? widget.meId;
+
+  String _normalizeUsernameToken(String raw) {
+    final compact = raw.replaceAll(RegExp(r'\s+'), '').trim().toLowerCase();
+    final safe = compact.replaceAll(RegExp(r'[^a-z0-9_]'), '');
+    return safe;
+  }
+
+  String get _fallbackUsernameToken {
+    final fromName = _normalizeUsernameToken(widget.otherName);
+    if (fromName.length >= 3) return fromName;
+    final suffix = widget.otherId.length >= 6
+        ? widget.otherId.substring(widget.otherId.length - 6)
+        : widget.otherId;
+    return 'user_$suffix';
+  }
+
+  String get _displayUsernameToken {
+    final fromProfile = _normalizeUsernameToken(_otherProfile?.username ?? '');
+    if (fromProfile.length >= 3) return fromProfile;
+    return _fallbackUsernameToken;
+  }
 
   StreamSubscription<Map<String, dynamic>?>? _conversationSub;
   bool _isConversationPinned = false;
@@ -1099,6 +1121,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       builder: (context) => SafeArea(
         child: Wrap(
           children: [
+            ListTile(leading: const Icon(Icons.mic_rounded), title: const Text('Voice message'), onTap: () => Navigator.pop(context, 'voice')),
             ListTile(leading: const Icon(Icons.photo_camera_rounded), title: const Text('Camera'), onTap: () => Navigator.pop(context, 'camera')),
             ListTile(leading: const Icon(Icons.image_rounded), title: const Text('Gallery'), onTap: () => Navigator.pop(context, 'image')),
             ListTile(leading: const Icon(Icons.attach_file_rounded), title: const Text('Document'), onTap: () => Navigator.pop(context, 'file')),
@@ -1110,6 +1133,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
     if (action == null) return;
     switch (action) {
+      case 'voice':
+        _handleVoiceMessageTap();
+        break;
       case 'camera':
         _pickAndSendImage(fromCamera: true);
         break;
@@ -1149,6 +1175,90 @@ class _DmChatScreenState extends State<DmChatScreen> {
     } else if (action == 'invite') {
       _sendMessagePayload({'type': 'invite', 'text': 'Practice invite', 'label': 'Join 20-min speaking session'});
     }
+  }
+
+
+  Future<void> _openMoreDmToolsSheet() async {
+    final picked = await showModalBottomSheet<_DmMenuAction>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            _DmToolsSectionHeader(title: 'Filters & focus'),
+            ListTile(
+              leading: const Icon(Icons.push_pin_rounded),
+              title: Text(_showPinnedOnly ? 'Show all messages' : 'Show pinned only'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.togglePinnedOnly),
+            ),
+            ListTile(
+              leading: const Icon(Icons.tune_rounded),
+              title: const Text('Advanced filters'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.advancedSearch),
+            ),
+            const Divider(height: 1),
+            _DmToolsSectionHeader(title: 'Mute controls'),
+            ListTile(
+              leading: const Icon(Icons.notifications_paused_rounded),
+              title: const Text('Mute for 1 hour'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.muteOneHour),
+            ),
+            ListTile(
+              leading: const Icon(Icons.block_rounded),
+              title: const Text('Mute keyword'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.muteKeyword),
+            ),
+            const Divider(height: 1),
+            _DmToolsSectionHeader(title: 'Learning tools'),
+            ListTile(
+              leading: const Icon(Icons.auto_fix_high_rounded),
+              title: const Text('AI polish draft'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.aiPolish),
+            ),
+            ListTile(
+              leading: const Icon(Icons.lightbulb_rounded),
+              title: const Text('Smart compose mode'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.smartComposeMode),
+            ),
+            ListTile(
+              leading: const Icon(Icons.record_voice_over_rounded),
+              title: const Text('Tutor persona'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.chooseTutorPersona),
+            ),
+            ListTile(
+              leading: const Icon(Icons.spellcheck_rounded),
+              title: const Text('Auto-correct strictness'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.chooseAutoCorrect),
+            ),
+            ListTile(
+              leading: const Icon(Icons.school_rounded),
+              title: const Text('Toggle exam mode'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.toggleExamMode),
+            ),
+            ListTile(
+              leading: const Icon(Icons.replay_rounded),
+              title: const Text('Conversation replay mode'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.conversationReplay),
+            ),
+            ListTile(
+              leading: const Icon(Icons.insights_rounded),
+              title: const Text('Weekly learning report card'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.weeklyReportCard),
+            ),
+            const Divider(height: 1),
+            _DmToolsSectionHeader(title: 'Extras'),
+            ListTile(
+              leading: const Icon(Icons.add_box_rounded),
+              title: const Text('Send message pack'),
+              onTap: () => Navigator.pop(context, _DmMenuAction.addMessagePack),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (picked == null) return;
+    _handleMenuAction(picked);
   }
 
   Future<void> _sendMessagePayload(Map<String, dynamic> payload) async {
@@ -1378,6 +1488,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
         break;
       case _DmMenuAction.advancedSearch:
         setState(() => _showSearch = true);
+        break;
+      case _DmMenuAction.moreTools:
+        _openMoreDmToolsSheet();
         break;
     }
   }
@@ -2655,10 +2768,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         stream: _onlineStream,
                         builder: (context, snapshot) {
                           return _TopBar(
-                            title: _otherProfile?.displayName.isNotEmpty == true
-                                ? _otherProfile!.displayName
-                                : widget.otherName,
-                            username: _otherProfile?.username,
+                            title: _displayUsernameToken,
                             avatarUrl: _otherProfile?.avatarUrl,
                             showOnlineIndicator: snapshot.data == true,
                             onBack: () => Navigator.pop(context),
@@ -2683,10 +2793,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         },
                       )
                     : _TopBar(
-                        title: _otherProfile?.displayName.isNotEmpty == true
-                            ? _otherProfile!.displayName
-                            : widget.otherName,
-                        username: _otherProfile?.username,
+                        title: _displayUsernameToken,
                         avatarUrl: _otherProfile?.avatarUrl,
                         showOnlineIndicator: false,
                         onBack: () => Navigator.pop(context),
@@ -3500,7 +3607,6 @@ class _FloatingCallChip extends StatelessWidget {
 
 class _TopBar extends StatelessWidget {
   final String title;
-  final String? username;
   final String? avatarUrl;
   final bool showOnlineIndicator;
   final VoidCallback onBack;
@@ -3515,7 +3621,6 @@ class _TopBar extends StatelessWidget {
 
   const _TopBar({
     required this.title,
-    required this.username,
     required this.avatarUrl,
     required this.showOnlineIndicator,
     required this.onBack,
@@ -3569,7 +3674,7 @@ class _TopBar extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            title,
+                            "@$title",
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
@@ -3582,7 +3687,7 @@ class _TopBar extends StatelessWidget {
                                 ? callStatusText
                                 : showOnlineIndicator
                                     ? '● Active now'
-                                    : '@${(username == null || username!.isEmpty) ? title : username}',
+                                    : 'Offline',
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: isInCall
@@ -3631,14 +3736,7 @@ class _TopBar extends StatelessWidget {
                 value: _DmMenuAction.documents,
                 child: Text('Find documents'),
               ),
-              PopupMenuItem(
-                value: _DmMenuAction.togglePinnedOnly,
-                child: Text(showPinnedOnly ? 'Show all messages' : 'Show pinned only'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.clearDraft,
-                child: Text('Clear draft'),
-              ),
+              const PopupMenuDivider(),
               const PopupMenuItem(
                 value: _DmMenuAction.scheduleMessage,
                 child: Text('Schedule message'),
@@ -3648,13 +3746,10 @@ class _TopBar extends StatelessWidget {
                 child: Text('Send with 5s undo'),
               ),
               const PopupMenuItem(
-                value: _DmMenuAction.muteOneHour,
-                child: Text('Mute for 1 hour'),
+                value: _DmMenuAction.clearDraft,
+                child: Text('Clear draft'),
               ),
-              const PopupMenuItem(
-                value: _DmMenuAction.muteKeyword,
-                child: Text('Mute keyword'),
-              ),
+              const PopupMenuDivider(),
               PopupMenuItem(
                 value: _DmMenuAction.togglePin,
                 child: Text(isConversationPinned ? 'Unpin thread' : 'Pin thread'),
@@ -3672,44 +3767,13 @@ class _TopBar extends StatelessWidget {
                 child: Text('Chat theme'),
               ),
               const PopupMenuItem(
-                value: _DmMenuAction.aiPolish,
-                child: Text('AI polish draft'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.smartComposeMode,
-                child: Text('Smart compose mode'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.chooseTutorPersona,
-                child: Text('Tutor persona'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.chooseAutoCorrect,
-                child: Text('Auto-correct strictness'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.toggleExamMode,
-                child: Text('Toggle exam mode'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.conversationReplay,
-                child: Text('Conversation replay mode'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.weeklyReportCard,
-                child: Text('Weekly learning report card'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.addMessagePack,
-                child: Text('Send message pack'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.advancedSearch,
-                child: Text('Advanced filters'),
-              ),
-              const PopupMenuItem(
                 value: _DmMenuAction.privacyControls,
                 child: Text('Privacy controls'),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem(
+                value: _DmMenuAction.moreTools,
+                child: Text('More tools'),
               ),
             ],
             child: Glass(
@@ -3791,6 +3855,7 @@ class _Bubble extends StatefulWidget {
 class _BubbleState extends State<_Bubble> {
   late final AudioPlayer _voicePlayer;
   bool _isPlayingVoice = false;
+  bool _isVoiceExpanded = false;
   double _voiceSpeed = 1.0;
   Duration _voicePosition = Duration.zero;
   Duration _voiceDuration = Duration.zero;
@@ -3875,7 +3940,9 @@ class _BubbleState extends State<_Bubble> {
               widget.onSwipeReply?.call();
             }
           },
-          onTap: isFile && parsed.url != null ? () => widget.onTapFile?.call(parsed.url!) : null,
+          onTap: isVoice
+              ? () => _handleVoiceBubbleTap(parsed.url)
+              : (isFile && parsed.url != null ? () => widget.onTapFile?.call(parsed.url!) : null),
           child: Container(
             constraints: const BoxConstraints(maxWidth: 320),
             padding: EdgeInsets.symmetric(
@@ -3920,6 +3987,9 @@ class _BubbleState extends State<_Bubble> {
                         isPlaying: _isPlayingVoice,
                         waveform: parsed.waveform,
                         onPlayPause: () => _toggleVoicePlayback(parsed.url),
+                        onTapCompact: () => _handleVoiceBubbleTap(parsed.url),
+                        isExpanded: _isVoiceExpanded,
+                        onToggleExpanded: () => setState(() => _isVoiceExpanded = !_isVoiceExpanded),
                         isMine: widget.isMe,
                         speed: _voiceSpeed,
                         onToggleSpeed: _toggleVoiceSpeed,
@@ -4091,6 +4161,14 @@ class _BubbleState extends State<_Bubble> {
     );
   }
 
+
+  Future<void> _handleVoiceBubbleTap(String? url) async {
+    if (!_isVoiceExpanded) {
+      setState(() => _isVoiceExpanded = true);
+    }
+    await _toggleVoicePlayback(url);
+  }
+
   void _toggleVoiceSpeed() {
     const speeds = [1.0, 1.5, 2.0];
     final idx = speeds.indexOf(_voiceSpeed);
@@ -4130,6 +4208,9 @@ class _PremiumVoiceBubbleContent extends StatelessWidget {
   final bool isPlaying;
   final List<double> waveform;
   final VoidCallback onPlayPause;
+  final VoidCallback onTapCompact;
+  final bool isExpanded;
+  final VoidCallback onToggleExpanded;
   final bool isMine;
   final double speed;
   final VoidCallback onToggleSpeed;
@@ -4143,6 +4224,9 @@ class _PremiumVoiceBubbleContent extends StatelessWidget {
     required this.isPlaying,
     required this.waveform,
     required this.onPlayPause,
+    required this.onTapCompact,
+    required this.isExpanded,
+    required this.onToggleExpanded,
     required this.isMine,
     required this.speed,
     required this.onToggleSpeed,
@@ -4155,84 +4239,159 @@ class _PremiumVoiceBubbleContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        InkWell(
-          borderRadius: BorderRadius.circular(999),
-          onTap: onPlayPause,
-          child: Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isMine ? scheme.primary.withValues(alpha: 0.24) : scheme.primary.withValues(alpha: 0.18),
-            ),
-            child: Icon(isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded, color: scheme.primary),
+    if (!isExpanded) {
+      return InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: onTapCompact,
+        child: Container(
+          constraints: const BoxConstraints(minWidth: 138, maxWidth: 190),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            color: scheme.surface.withValues(alpha: 0.45),
+            border: Border.all(color: scheme.onSurface.withValues(alpha: 0.10)),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _Waveform(
-                bars: waveform,
-                color: scheme.primary,
-                dimColor: scheme.onSurface.withValues(alpha: 0.26),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                durationLabel,
-                style: TextStyle(
-                  color: scheme.onSurface.withValues(alpha: 0.9),
-                  fontWeight: FontWeight.w800,
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isMine ? scheme.primary.withValues(alpha: 0.24) : scheme.primary.withValues(alpha: 0.18),
+                ),
+                child: Icon(
+                  isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                  color: scheme.primary,
+                  size: 18,
                 ),
               ),
-              const SizedBox(height: 4),
-              InkWell(
-                borderRadius: BorderRadius.circular(999),
-                onTap: onToggleSpeed,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(999),
-                    color: scheme.onSurface.withValues(alpha: 0.08),
-                  ),
-                  child: Text(
-                    '${speed.toStringAsFixed(speed.truncateToDouble()==speed ? 0 : 1)}x',
-                    style: TextStyle(
-                      color: scheme.onSurface.withValues(alpha: 0.8),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 11,
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      durationLabel,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.88),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12.5,
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 3),
+                    Text(
+                      'Tap to expand',
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.58),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10.5,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              SliderTheme(
-                data: SliderTheme.of(context).copyWith(trackHeight: 2.4, thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5)),
-                child: Slider(
-                  min: 0,
-                  max: durationMs <= 0 ? 1 : durationMs.toDouble(),
-                  value: progressMs.clamp(0, durationMs <= 0 ? 1 : durationMs).toDouble(),
-                  onChanged: onSeek,
-                ),
-              ),
-              if (transcript != null && transcript!.isNotEmpty)
-                Text(
-                  transcript!,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: scheme.onSurface.withValues(alpha: 0.72),
-                    fontWeight: FontWeight.w600,
-                    fontSize: 11.5,
-                  ),
-                ),
+              const SizedBox(width: 4),
+              Icon(Icons.open_in_full_rounded, size: 16, color: scheme.onSurface.withValues(alpha: 0.55)),
             ],
           ),
         ),
+      );
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: onPlayPause,
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isMine ? scheme.primary.withValues(alpha: 0.24) : scheme.primary.withValues(alpha: 0.18),
+                ),
+                child: Icon(isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded, color: scheme.primary),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              durationLabel,
+              style: TextStyle(
+                color: scheme.onSurface.withValues(alpha: 0.9),
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(width: 8),
+            InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: onToggleSpeed,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(999),
+                  color: scheme.onSurface.withValues(alpha: 0.08),
+                ),
+                child: Text(
+                  '${speed.toStringAsFixed(speed.truncateToDouble() == speed ? 0 : 1)}x',
+                  style: TextStyle(
+                    color: scheme.onSurface.withValues(alpha: 0.8),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 6),
+            InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: onToggleExpanded,
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: Icon(
+                  Icons.unfold_less_rounded,
+                  size: 18,
+                  color: scheme.onSurface.withValues(alpha: 0.58),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        _Waveform(
+          bars: waveform,
+          color: scheme.primary,
+          dimColor: scheme.onSurface.withValues(alpha: 0.26),
+        ),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(trackHeight: 2.4, thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5)),
+          child: Slider(
+            min: 0,
+            max: durationMs <= 0 ? 1 : durationMs.toDouble(),
+            value: progressMs.clamp(0, durationMs <= 0 ? 1 : durationMs).toDouble(),
+            onChanged: onSeek,
+          ),
+        ),
+        if (transcript != null && transcript!.isNotEmpty)
+          Text(
+            transcript!,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: scheme.onSurface.withValues(alpha: 0.72),
+              fontWeight: FontWeight.w600,
+              fontSize: 11.5,
+            ),
+          ),
       ],
     );
   }
@@ -4796,20 +4955,55 @@ class _InputBar extends StatelessWidget {
                     child: FadeTransition(opacity: animation, child: child),
                   ),
                   child: isComposerFocused
-                      ? InkWell(
-                          key: const ValueKey('expand-attachments'),
-                          borderRadius: BorderRadius.circular(18),
-                          onTap: onOpenAttachmentTray,
-                          child: Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              color: scheme.onSurface.withValues(alpha: 0.10),
-                              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
+                      ? Row(
+                          key: const ValueKey('focused-actions'),
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            InkWell(
+                              borderRadius: BorderRadius.circular(18),
+                              onTap: onOpenAttachmentTray,
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  color: scheme.onSurface.withValues(alpha: 0.10),
+                                  border: Border.all(color: scheme.onSurface.withValues(alpha: 0.16)),
+                                ),
+                                child: Icon(Icons.more_horiz_rounded, color: scheme.onSurface.withValues(alpha: 0.92)),
+                              ),
                             ),
-                            child: Icon(Icons.more_horiz_rounded, color: scheme.onSurface.withValues(alpha: 0.92)),
-                          ),
+                            const SizedBox(width: 8),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(18),
+                              onTap: onVoiceMessage,
+                              child: Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(16),
+                                  gradient: LinearGradient(
+                                    colors: isRecordingVoiceMessage
+                                        ? [const Color(0xFFFF8A8A), const Color(0xFFFF4D6D)]
+                                        : [scheme.primary.withValues(alpha: 0.85), scheme.tertiary.withValues(alpha: 0.75)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: scheme.primary.withValues(alpha: 0.35),
+                                      blurRadius: 14,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ],
+                                ),
+                                child: Icon(
+                                  isRecordingVoiceMessage ? Icons.stop_rounded : Icons.mic_rounded,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
                         )
                       : Row(
                           key: const ValueKey('full-actions'),
@@ -4896,6 +5090,30 @@ class _InputBar extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+class _DmToolsSectionHeader extends StatelessWidget {
+  final String title;
+
+  const _DmToolsSectionHeader({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: scheme.onSurface.withValues(alpha: 0.62),
+          fontWeight: FontWeight.w800,
+          fontSize: 12,
+          letterSpacing: 0.2,
+        ),
       ),
     );
   }

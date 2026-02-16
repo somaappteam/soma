@@ -456,8 +456,8 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                     final isSel = selected == i;
                     final isCorrect = i == _correctIndex;
 
-                    Color bg = scheme.onSurface.withValues(alpha: 0.06);
-                    Color border = scheme.onSurface.withValues(alpha: 0.14);
+                    Color bg = scheme.onSurface.withValues(alpha: 0.10);
+                    Color border = scheme.onSurface.withValues(alpha: 0.20);
 
                     if (revealed) {
                       if (isCorrect) {

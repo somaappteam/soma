@@ -39,6 +39,7 @@ class _InboxScreenState extends State<InboxScreen> {
   final Map<String, DateTime> _snoozedUntil = <String, DateTime>{};
   final Set<String> _hiddenPreviewThreadIds = <String>{};
   bool _scheduledDigestEnabled = false;
+  bool _digestCardExpanded = false;
 
   @override
   void initState() {
@@ -85,6 +86,7 @@ class _InboxScreenState extends State<InboxScreen> {
           ..clear()
           ..addAll(hidden);
         _scheduledDigestEnabled = settings['inbox_digest_enabled'] == true;
+        _digestCardExpanded = settings['inbox_digest_card_expanded'] == true;
       });
     } catch (_) {}
   }
@@ -124,9 +126,38 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
   Future<void> _toggleScheduledDigest() async {
+    HapticFeedback.selectionClick();
     final next = !_scheduledDigestEnabled;
     setState(() => _scheduledDigestEnabled = next);
     await settingsRepository.updateSetting('inbox_digest_enabled', next);
+  }
+
+  Future<void> _setDigestCardExpanded(bool expanded) async {
+    HapticFeedback.selectionClick();
+    setState(() => _digestCardExpanded = expanded);
+    await settingsRepository.updateSetting('inbox_digest_card_expanded', expanded);
+  }
+
+  int get _activeViewOptionCount {
+    var count = 0;
+    if (_filter != _InboxFilter.all) count++;
+    if (_sort != _InboxSort.latest) count++;
+    return count;
+  }
+
+  Future<void> _setSort(_InboxSort next) async {
+    if (_sort == next) return;
+    HapticFeedback.selectionClick();
+    setState(() => _sort = next);
+  }
+
+  void _resetViewOptions() {
+    HapticFeedback.selectionClick();
+    setState(() {
+      _filter = _InboxFilter.all;
+      _showArchivedOnly = false;
+      _sort = _InboxSort.latest;
+    });
   }
 
   bool _isPriorityThread(Map<String, dynamic> t) {
@@ -323,6 +354,197 @@ class _InboxScreenState extends State<InboxScreen> {
     }
   }
 
+  String _filterLabel(_InboxFilter filter) {
+    switch (filter) {
+      case _InboxFilter.all:
+        return 'All';
+      case _InboxFilter.priority:
+        return 'Priority';
+      case _InboxFilter.unread:
+        return 'Unread';
+      case _InboxFilter.friends:
+        return 'Friends';
+      case _InboxFilter.requests:
+        return 'Requests';
+      case _InboxFilter.groups:
+        return 'Groups';
+      case _InboxFilter.muted:
+        return 'Muted';
+      case _InboxFilter.archived:
+        return 'Archived';
+    }
+  }
+
+  void _setFilter(_InboxFilter next) {
+    if (_filter == next && _showArchivedOnly == (next == _InboxFilter.archived)) return;
+    HapticFeedback.selectionClick();
+    setState(() {
+      _filter = next;
+      _showArchivedOnly = next == _InboxFilter.archived;
+    });
+  }
+
+  void _applyPreset(String preset) {
+    HapticFeedback.selectionClick();
+    setState(() {
+      switch (preset) {
+        case 'focus':
+          _filter = _InboxFilter.priority;
+          _showArchivedOnly = false;
+          _sort = _InboxSort.unreadFirst;
+          break;
+        case 'catchup':
+          _filter = _InboxFilter.unread;
+          _showArchivedOnly = false;
+          _sort = _InboxSort.unreadFirst;
+          break;
+        case 'friends':
+          _filter = _InboxFilter.friends;
+          _showArchivedOnly = false;
+          _sort = _InboxSort.latest;
+          break;
+      }
+    });
+  }
+
+  Future<void> _showViewOptionsSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        final options = [
+          _InboxFilter.all,
+          _InboxFilter.priority,
+          _InboxFilter.unread,
+          _InboxFilter.friends,
+          _InboxFilter.requests,
+          _InboxFilter.groups,
+          _InboxFilter.muted,
+          _InboxFilter.archived,
+        ];
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'View options',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Smart presets',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _OptionChip(
+                      label: 'Focus',
+                      selected: _filter == _InboxFilter.priority && _sort == _InboxSort.unreadFirst,
+                      onTap: () => _applyPreset('focus'),
+                    ),
+                    _OptionChip(
+                      label: 'Catch-up',
+                      selected: _filter == _InboxFilter.unread && _sort == _InboxSort.unreadFirst,
+                      onTap: () => _applyPreset('catchup'),
+                    ),
+                    _OptionChip(
+                      label: 'Friends-only',
+                      selected: _filter == _InboxFilter.friends && _sort == _InboxSort.latest,
+                      onTap: () => _applyPreset('friends'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Sort',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _OptionChip(
+                      label: 'Latest',
+                      selected: _sort == _InboxSort.latest,
+                      onTap: () => _setSort(_InboxSort.latest),
+                    ),
+                    _OptionChip(
+                      label: 'Unread first',
+                      selected: _sort == _InboxSort.unreadFirst,
+                      onTap: () => _setSort(_InboxSort.unreadFirst),
+                    ),
+                    _OptionChip(
+                      label: 'Name',
+                      selected: _sort == _InboxSort.name,
+                      onTap: () => _setSort(_InboxSort.name),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Filter',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final option in options)
+                      _FilterPill(
+                        label: _filterLabel(option),
+                        selected: _filter == option,
+                        onTap: () {
+                          _setFilter(option);
+                        },
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                _OptionChip(
+                  label: _scheduledDigestEnabled ? 'Digest: on' : 'Digest: off',
+                  selected: _scheduledDigestEnabled,
+                  onTap: _toggleScheduledDigest,
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Done'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -368,40 +590,10 @@ class _InboxScreenState extends State<InboxScreen> {
                     }),
                   ),
                   const SizedBox(width: 8),
-                  PopupMenuButton<_InboxSort>(
-                    onSelected: (value) => setState(() => _sort = value),
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        value: _InboxSort.latest,
-                        child: Text('Sort: Latest'),
-                      ),
-                      const PopupMenuItem(
-                        value: _InboxSort.unreadFirst,
-                        child: Text('Sort: Unread first'),
-                      ),
-                      const PopupMenuItem(
-                        value: _InboxSort.name,
-                        child: Text('Sort: Name'),
-                      ),
-                      PopupMenuItem(
-                        enabled: false,
-                        child: Row(
-                          children: [
-                            Icon(_scheduledDigestEnabled ? Icons.notifications_active_rounded : Icons.notifications_none_rounded, size: 16),
-                            const SizedBox(width: 8),
-                            Text(_scheduledDigestEnabled ? 'Digest: on' : 'Digest: off'),
-                          ],
-                        ),
-                      ),
-                    ],
-                    child: Glass(
-                      radius: BorderRadius.circular(16),
-                      padding: const EdgeInsets.all(10),
-                      child: Icon(
-                        Icons.tune_rounded,
-                        color: scheme.onSurface.withValues(alpha: 0.92),
-                      ),
-                    ),
+                  _IconGlass(
+                    icon: Icons.tune_rounded,
+                    onTap: _showViewOptionsSheet,
+                    badgeCount: _activeViewOptionCount,
                   ),
                   const SizedBox(width: 8),
                   _IconGlass(
@@ -450,122 +642,40 @@ class _InboxScreenState extends State<InboxScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Morning digest enabled: get one smart summary instead of many pings.',
+                            _digestCardExpanded
+                                ? 'Morning digest enabled: get one smart summary instead of many pings.'
+                                : 'Morning digest is on.',
                             style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.78), fontWeight: FontWeight.w700, fontSize: 11.5),
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Toggle',
-                          onPressed: _toggleScheduledDigest,
-                          icon: Icon(Icons.tune_rounded, size: 16, color: scheme.primary),
+                          tooltip: _digestCardExpanded ? 'Collapse' : 'Expand',
+                          onPressed: () => _setDigestCardExpanded(!_digestCardExpanded),
+                          icon: Icon(
+                            _digestCardExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                            size: 16,
+                            color: scheme.primary,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
-              Glass(
-                radius: BorderRadius.circular(20),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: Row(
+              if (_filter != _InboxFilter.all || _sort != _InboxSort.latest) ...[
+                Row(
                   children: [
-                    Expanded(
-                      child: _FilterPill(
-                        label: 'All',
-                        selected: _filter == _InboxFilter.all,
-                        onTap: () => setState(() => _filter = _InboxFilter.all),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: _FilterPill(
-                        label: 'Priority',
-                        selected: _filter == _InboxFilter.priority,
-                        onTap: () => setState(() => _filter = _InboxFilter.priority),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: _FilterPill(
-                        label: 'Unread',
-                        selected: _filter == _InboxFilter.unread,
-                        onTap: () => setState(() => _filter = _InboxFilter.unread),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: _FilterPill(
-                        label: 'Friends',
-                        selected: _filter == _InboxFilter.friends,
-                        onTap: () => setState(() => _filter = _InboxFilter.friends),
-                      ),
+                    _StatusChip(label: 'Filter: ${_filterLabel(_filter)}'),
+                    const SizedBox(width: 8),
+                    _StatusChip(label: 'Sort: ${_sortLabel(_sort)}'),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: _resetViewOptions,
+                      child: const Text('Reset'),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 6),
-              Glass(
-                radius: BorderRadius.circular(20),
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _FilterPill(
-                        label: 'Requests',
-                        selected: _filter == _InboxFilter.requests,
-                        onTap: () => setState(() => _filter = _InboxFilter.requests),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: _FilterPill(
-                        label: 'Groups',
-                        selected: _filter == _InboxFilter.groups,
-                        onTap: () => setState(() => _filter = _InboxFilter.groups),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: _FilterPill(
-                        label: 'Muted',
-                        selected: _filter == _InboxFilter.muted,
-                        onTap: () => setState(() => _filter = _InboxFilter.muted),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: _FilterPill(
-                        label: 'Archived',
-                        selected: _filter == _InboxFilter.archived,
-                        onTap: () => setState(() {
-                          _filter = _InboxFilter.archived;
-                          _showArchivedOnly = true;
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(999),
-                      color: scheme.onSurface.withValues(alpha: 0.08),
-                    ),
-                    child: Text(
-                      'Sort: ${_sortLabel(_sort)}',
-                      style: TextStyle(
-                        color: scheme.onSurface.withValues(alpha: 0.78),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
+              ],
               Glass(
                 radius: BorderRadius.circular(20),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -723,8 +833,9 @@ class _InboxScreenState extends State<InboxScreen> {
                     final requestCount = visibleThreads.where((t) => t['hasIncomingRequest'] == true || t['hasOutgoingRequest'] == true).length;
                     final archivedMentions = visibleThreads.where((t) => _archivedThreadIds.contains(t['otherId']?.toString() ?? '')).length;
                     final vipThreads = visibleThreads.where((t) => _pinnedThreadIds.contains(t['otherId']?.toString() ?? '')).take(8).toList();
-                    final weeklyPracticeMinutes = (visibleThreads.length * 6).clamp(6, 180);
-                    final weeklyVoiceNotes = visibleThreads.where((t) => (t['lastMsg']?.toString() ?? '').contains('voice')).length;
+                    final voiceNoteThreads = visibleThreads.where((t) => (t['lastMsg']?.toString().toLowerCase() ?? '').contains('voice')).length;
+                    final correctionUnreadCount = visibleThreads.where((t) => t['hasCorrectionUnread'] == true).length;
+                    final challengePendingCount = visibleThreads.where((t) => t['hasChallengePending'] == true).length;
                     return Glass(
                       radius: BorderRadius.circular(22),
                       padding: const EdgeInsets.all(10),
@@ -741,30 +852,33 @@ class _InboxScreenState extends State<InboxScreen> {
                                 archivedMentions: archivedMentions,
                               ),
                               _ConversationMemoryCard(
-                                minutes: weeklyPracticeMinutes,
-                                voiceNotes: weeklyVoiceNotes,
+                                unreadThreads: unreadThreads,
+                                voiceNoteThreads: voiceNoteThreads,
+                                correctionUnreadCount: correctionUnreadCount,
                               ),
                               _WeeklyReportShareCard(
-                                minutes: weeklyPracticeMinutes,
-                                voiceNotes: weeklyVoiceNotes,
-                                cefrHint: visibleThreads.where((t) => t['hasCorrectionUnread'] == true).isNotEmpty ? 'B2' : 'B1',
+                                unreadTotal: unreadTotal,
+                                unreadThreads: unreadThreads,
+                                requestCount: requestCount,
+                                voiceNoteThreads: voiceNoteThreads,
+                                correctionUnreadCount: correctionUnreadCount,
                               ),
                               _AdaptiveChallengesRow(
                                 challenges: [
-                                  if (visibleThreads.where((t) => t['hasCorrectionUnread'] == true).isNotEmpty)
+                                  if (correctionUnreadCount > 0)
                                     _AdaptiveChallenge(
-                                      label: '${visibleThreads.where((t) => t['hasCorrectionUnread'] == true).length} corrections unread — do now',
+                                      label: '$correctionUnreadCount corrections unread — review now',
                                       onTap: () => _openThread(visibleThreads.firstWhere((t) => t['hasCorrectionUnread'] == true)),
                                     ),
                                   if (visibleThreads.where((t) => t['practiceStreakAtRisk'] == true).isNotEmpty)
                                     _AdaptiveChallenge(
-                                      label: 'Streak at risk — send one voice note',
+                                      label: 'Streak at risk — send one message',
                                       onTap: () => _openThread(visibleThreads.firstWhere((t) => t['practiceStreakAtRisk'] == true)),
                                     ),
-                                  if (visibleThreads.isNotEmpty)
+                                  if (challengePendingCount > 0)
                                     _AdaptiveChallenge(
-                                      label: 'Use 3 B2 connectors today',
-                                      onTap: () => _openThread(visibleThreads.first),
+                                      label: '$challengePendingCount challenge threads need attention',
+                                      onTap: () => _openThread(visibleThreads.firstWhere((t) => t['hasChallengePending'] == true)),
                                     ),
                                 ],
                               ),
@@ -773,21 +887,36 @@ class _InboxScreenState extends State<InboxScreen> {
                                   threads: vipThreads,
                                 ),
                               Expanded(
-                                child: ListView.separated(
-                            physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                          itemCount: visibleThreads.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 10),
-                          itemBuilder: (context, index) {
-                            final t = visibleThreads[index];
-                            final otherId = t['otherId']?.toString() ?? '';
-                            final isPinned = _pinnedThreadIds.contains(otherId);
-                            final isMuted = _mutedThreadIds.contains(otherId);
-                            final unreadCount = t['unreadCount'] ?? 0;
-                            final selected = _selectedThreadIds.contains(otherId);
-                            final hidePreview = _hiddenPreviewThreadIds.contains(otherId);
-                            final trustScore = (((t['isFriend'] == true ? 60 : 35) + ((unreadCount as int) > 0 ? 10 : 0) + (t['hasIncomingRequest'] == true ? 5 : 0)).clamp(0, 99) as num).toInt();
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 160),
+                                  switchInCurve: Curves.easeOut,
+                                  switchOutCurve: Curves.easeIn,
+                                  transitionBuilder: (child, animation) {
+                                    final slide = Tween<Offset>(
+                                      begin: const Offset(0, 0.04),
+                                      end: Offset.zero,
+                                    ).animate(animation);
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: SlideTransition(position: slide, child: child),
+                                    );
+                                  },
+                                  child: ListView.separated(
+                                    key: ValueKey('threads-${_filter.name}-${_sort.name}-${query.toLowerCase()}-$_showArchivedOnly'),
+                                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                                    itemCount: visibleThreads.length,
+                                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                                    itemBuilder: (context, index) {
+                                      final t = visibleThreads[index];
+                                      final otherId = t['otherId']?.toString() ?? '';
+                                      final isPinned = _pinnedThreadIds.contains(otherId);
+                                      final isMuted = _mutedThreadIds.contains(otherId);
+                                      final unreadCount = t['unreadCount'] ?? 0;
+                                      final selected = _selectedThreadIds.contains(otherId);
+                                      final hidePreview = _hiddenPreviewThreadIds.contains(otherId);
+                                      final trustScore = (((t['isFriend'] == true ? 60 : 35) + ((unreadCount as int) > 0 ? 10 : 0) + (t['hasIncomingRequest'] == true ? 5 : 0)).clamp(0, 99) as num).toInt();
 
-                            return Dismissible(
+                                      return Dismissible(
                               key: ValueKey('thread-$otherId'),
                               direction: _selectionMode ? DismissDirection.none : DismissDirection.horizontal,
                               confirmDismiss: (direction) async {
@@ -808,7 +937,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                 icon: Icons.snooze_rounded,
                                 label: 'Snooze',
                               ),
-                              child: _ThreadRow(
+                                        child: _ThreadRow(
                                 otherId: otherId,
                                 name: t['otherName'] ?? l10n.unknown,
                                 lastText: hidePreview ? 'Preview hidden for privacy' : (t['lastMsg'] ?? ''),
@@ -826,10 +955,10 @@ class _InboxScreenState extends State<InboxScreen> {
                                 hasChallengePending: t['hasChallengePending'] == true,
                                 hasCorrectionUnread: t['hasCorrectionUnread'] == true,
                                 hasVoiceFeedback: t['hasVoiceFeedback'] == true,
-                                partnerQuality: (t['partnerQuality'] as num?)?.toInt() ?? trustScore,
-                                reliabilityScore: (t['reliabilityScore'] as num?)?.toInt() ?? 72,
-                                correctionHelpfulnessScore: (t['correctionHelpfulnessScore'] as num?)?.toInt() ?? 68,
-                                voiceFeedbackScore: (t['voiceFeedbackScore'] as num?)?.toInt() ?? 70,
+                                partnerQuality: (t['partnerQuality'] as num?)?.toInt(),
+                                reliabilityScore: (t['reliabilityScore'] as num?)?.toInt(),
+                                correctionHelpfulnessScore: (t['correctionHelpfulnessScore'] as num?)?.toInt(),
+                                voiceFeedbackScore: (t['voiceFeedbackScore'] as num?)?.toInt(),
                                 verifiedSeriousLearner: t['verifiedSeriousLearner'] == true,
                                 selected: selected,
                                 selectionMode: _selectionMode,
@@ -864,8 +993,9 @@ class _InboxScreenState extends State<InboxScreen> {
                                     }
                                   },
                                 ),
-                              );
-                            },
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                             ],
@@ -1005,10 +1135,15 @@ class _VipPinnedRow extends StatelessWidget {
 
 
 class _ConversationMemoryCard extends StatelessWidget {
-  final int minutes;
-  final int voiceNotes;
+  final int unreadThreads;
+  final int voiceNoteThreads;
+  final int correctionUnreadCount;
 
-  const _ConversationMemoryCard({required this.minutes, required this.voiceNotes});
+  const _ConversationMemoryCard({
+    required this.unreadThreads,
+    required this.voiceNoteThreads,
+    required this.correctionUnreadCount,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1024,7 +1159,7 @@ class _ConversationMemoryCard extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Weekly memory: you practiced ~$minutes min and exchanged $voiceNotes voice notes.',
+                'Inbox now: $unreadThreads chats with unread messages · $voiceNoteThreads voice-note threads · $correctionUnreadCount corrections waiting.',
                 style: TextStyle(
                   color: scheme.onSurface.withValues(alpha: 0.8),
                   fontWeight: FontWeight.w700,
@@ -1033,6 +1168,77 @@ class _ConversationMemoryCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final String label;
+
+  const _StatusChip({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: scheme.onSurface.withValues(alpha: 0.08),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: scheme.onSurface.withValues(alpha: 0.78),
+          fontWeight: FontWeight.w700,
+          fontSize: 11,
+        ),
+      ),
+    );
+  }
+}
+
+class _OptionChip extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _OptionChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return InkWell(
+      borderRadius: BorderRadius.circular(999),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: selected
+                ? scheme.primary.withValues(alpha: 0.55)
+                : scheme.onSurface.withValues(alpha: 0.14),
+          ),
+          color: selected
+              ? scheme.primary.withValues(alpha: 0.22)
+              : Colors.transparent,
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected
+                ? scheme.primary
+                : scheme.onSurface.withValues(alpha: 0.8),
+            fontWeight: FontWeight.w800,
+            fontSize: 12,
+          ),
         ),
       ),
     );
@@ -1058,7 +1264,7 @@ class _FilterPill extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           color: selected
@@ -1166,16 +1372,24 @@ class _AdaptiveChallengesRow extends StatelessWidget {
 }
 
 class _WeeklyReportShareCard extends StatelessWidget {
-  final int minutes;
-  final int voiceNotes;
-  final String cefrHint;
+  final int unreadTotal;
+  final int unreadThreads;
+  final int requestCount;
+  final int voiceNoteThreads;
+  final int correctionUnreadCount;
 
-  const _WeeklyReportShareCard({required this.minutes, required this.voiceNotes, required this.cefrHint});
+  const _WeeklyReportShareCard({
+    required this.unreadTotal,
+    required this.unreadThreads,
+    required this.requestCount,
+    required this.voiceNoteThreads,
+    required this.correctionUnreadCount,
+  });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final report = 'Weekly Learning Report\n• Voice minutes: $minutes\n• Voice notes: $voiceNotes\n• CEFR confidence: $cefrHint\n• Best partner: Keep your top streak thread active.';
+    final report = 'Inbox Snapshot\n• Unread messages: $unreadTotal\n• Unread chats: $unreadThreads\n• Pending requests: $requestCount\n• Voice-note threads: $voiceNoteThreads\n• Corrections waiting: $correctionUnreadCount';
     return Padding(
       padding: const EdgeInsets.only(top: 6, bottom: 6),
       child: Glass(
@@ -1208,7 +1422,13 @@ class _WeeklyReportShareCard extends StatelessWidget {
 class _IconGlass extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
-  const _IconGlass({required this.icon, required this.onTap});
+  final int badgeCount;
+
+  const _IconGlass({
+    required this.icon,
+    required this.onTap,
+    this.badgeCount = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1216,10 +1436,38 @@ class _IconGlass extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
-      child: Glass(
-        radius: BorderRadius.circular(16),
-        padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Glass(
+            radius: BorderRadius.circular(16),
+            padding: const EdgeInsets.all(10),
+            child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),
+          ),
+          if (badgeCount > 0)
+            Positioned(
+              right: -4,
+              top: -4,
+              child: Container(
+                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  color: scheme.primary,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Center(
+                  child: Text(
+                    '$badgeCount',
+                    style: TextStyle(
+                      color: scheme.onPrimary,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 10,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -1243,10 +1491,10 @@ class _ThreadRow extends StatelessWidget {
   final bool hasChallengePending;
   final bool hasCorrectionUnread;
   final bool hasVoiceFeedback;
-  final int partnerQuality;
-  final int reliabilityScore;
-  final int correctionHelpfulnessScore;
-  final int voiceFeedbackScore;
+  final int? partnerQuality;
+  final int? reliabilityScore;
+  final int? correctionHelpfulnessScore;
+  final int? voiceFeedbackScore;
   final bool verifiedSeriousLearner;
   final bool selectionMode;
   final bool selected;
@@ -1408,24 +1656,29 @@ class _ThreadRow extends StatelessWidget {
                                 ],
                               ),
                             ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: Wrap(
-                              spacing: 6,
-                              runSpacing: 4,
-                              children: [
-                                _MiniBadge(
-                                  label: 'Partner quality $partnerQuality%',
-                                  color: partnerQuality >= 75 ? Colors.green : scheme.onSurface,
-                                ),
-                                _MiniBadge(label: 'Reliability $reliabilityScore%', color: scheme.primary),
-                                _MiniBadge(label: 'Correction helpfulness $correctionHelpfulnessScore%', color: scheme.tertiary),
-                                _MiniBadge(label: 'Voice feedback $voiceFeedbackScore%', color: Colors.deepPurple),
-                                if (verifiedSeriousLearner)
-                                  _MiniBadge(label: 'Verified serious learner', color: Colors.green),
-                              ],
+                          if (partnerQuality != null || reliabilityScore != null || correctionHelpfulnessScore != null || voiceFeedbackScore != null || verifiedSeriousLearner)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: Wrap(
+                                spacing: 6,
+                                runSpacing: 4,
+                                children: [
+                                  if (partnerQuality != null)
+                                    _MiniBadge(
+                                      label: 'Partner quality $partnerQuality%',
+                                      color: partnerQuality! >= 75 ? Colors.green : scheme.onSurface,
+                                    ),
+                                  if (reliabilityScore != null)
+                                    _MiniBadge(label: 'Reliability $reliabilityScore%', color: scheme.primary),
+                                  if (correctionHelpfulnessScore != null)
+                                    _MiniBadge(label: 'Correction helpfulness $correctionHelpfulnessScore%', color: scheme.tertiary),
+                                  if (voiceFeedbackScore != null)
+                                    _MiniBadge(label: 'Voice feedback $voiceFeedbackScore%', color: Colors.deepPurple),
+                                  if (verifiedSeriousLearner)
+                                    _MiniBadge(label: 'Verified serious learner', color: Colors.green),
+                                ],
+                              ),
                             ),
-                          ),
                           if (hasIncomingRequest || hasOutgoingRequest)
                             Padding(
                               padding: const EdgeInsets.only(top: 4),

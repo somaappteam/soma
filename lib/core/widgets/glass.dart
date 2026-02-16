@@ -21,11 +21,14 @@ class Glass extends StatelessWidget {
     final isLight = Theme.of(context).brightness == Brightness.light;
     final fill = glass?.fill ?? T.glassFill;
     final stroke = glass?.stroke ?? T.glassStroke;
+    final effectiveFill = isLight
+        ? Color.alphaBlend(Colors.black.withValues(alpha: 0.035), fill)
+        : fill;
     final shadow = glass?.shadow ?? const Color(0x7A000000);
-    final highlight = Color.lerp(fill, Colors.white, isLight ? 0.24 : 0.18) ??
+    final highlight = Color.lerp(effectiveFill, Colors.white, isLight ? 0.22 : 0.18) ??
         Colors.white.withValues(alpha: 0.12);
-    final highlightOpacity = (fill.a + (isLight ? 0.12 : 0.08)).clamp(0.0, 1.0);
-    final rimColor = Color.lerp(stroke, Colors.white, isLight ? 0.3 : 0.2) ??
+    final highlightOpacity = (effectiveFill.a + (isLight ? 0.14 : 0.08)).clamp(0.0, 1.0);
+    final rimColor = Color.lerp(stroke, Colors.white, isLight ? 0.24 : 0.2) ??
         stroke.withValues(alpha: isLight ? 0.7 : 0.3);
 
     return ClipRRect(
@@ -42,7 +45,7 @@ class Glass extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     highlight.withValues(alpha: highlightOpacity),
-                    fill,
+                    effectiveFill,
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
