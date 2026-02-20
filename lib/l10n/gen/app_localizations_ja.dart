@@ -214,6 +214,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get soloModeReviewDescription => '学んだことを練習：苦手な単語、最近の間違い、間隔反復。';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => '復習を開始';
 
   @override

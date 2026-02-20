@@ -1,0 +1,575 @@
+Analyzing soma app...
+
+  error - lib\features\social\dm_chat_screen.dart:189:5 - The method '_loadDraft' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_loadDraft'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:232:3 - Expected to find '}'. - expected_token
+  error - lib\features\social\dm_chat_screen.dart:277:30 - The method '_applyAutoCorrectBeforeSend' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_applyAutoCorrectBeforeSend'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:327:24 - Undefined name '_tutorPersona'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:328:27 - Undefined name '_autoCorrectMode'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:329:11 - Undefined name '_examModeEnabled'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:330:12 - The method '_isLikelyEnglish' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_isLikelyEnglish'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:330:55 - The method '_buildTransliteration' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_buildTransliteration'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:331:11 - Undefined name 'translatedText'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:332:28 - Undefined name 'translatedText'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:335:11 - Undefined name '_disappearingWindow'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:336:42 - Undefined name '_disappearingWindow'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:342:7 - The method '_saveDraft' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_saveDraft'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:662:9 - Undefined name '_disappearingWindow'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:663:50 - Undefined name '_disappearingWindow'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:831:9 - Undefined name '_smoothedCallQualityScore'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:832:9 - Undefined name '_smoothedCallQualityScore'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:960:24 - Undefined name '_smoothedCallQualityScore'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:963:7 - Undefined name '_callQualityScore'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:964:7 - Undefined name '_smoothedCallQualityScore'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:1237:9 - Undefined name '_callQualityScore'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:1238:9 - Undefined name '_smoothedCallQualityScore'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:1283:7 - Undefined name '_callQualityScore'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:1285:7 - Undefined name '_smoothedCallQualityScore'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:1307:9 - Undefined name '_callRecordingConsent'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:1320:22 - Undefined name '_callRecordingConsent'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:1890:25 - The method '_runCorrectionMode' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_runCorrectionMode'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:1899:25 - The method '_showWordExplanation' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_showWordExplanation'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:1925:42 - Undefined name '_autoTranslateLanguage'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:1950:25 - The method '_showVoicePronunciationCoach' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_showVoicePronunciationCoach'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:2064:27 - The method '_chatBackgroundGradient' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_chatBackgroundGradient'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:2210:21 - Undefined name '_screenshotWarningEnabled'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2226:21 - Undefined name '_dmLocked'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2226:35 - Undefined name '_dmUnlocked'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2240:63 - Undefined name '_dmUnlocked'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2273:31 - The method '_isMessageMutedByKeyword' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_isMessageMutedByKeyword'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:2346:54 - Undefined name '_autoTranslateIncoming'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2347:56 - Undefined name '_autoTranslateLanguage'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2397:21 - Undefined name '_disappearingWindow'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2401:49 - Undefined name '_disappearingWindow'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2401:90 - Undefined name '_disappearingWindow'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2401:141 - Undefined name '_disappearingWindow'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2409:21 - Undefined name '_muteUntil'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2409:43 - Undefined name '_muteUntil'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2413:74 - Undefined name '_muteUntil'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2437:31 - The method '_saveDraft' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_saveDraft'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:2499:36 - Undefined name '_saveDraft'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2509:41 - Undefined name '_duePracticePhrases'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2514:25 - Undefined name '_duePracticePhrases'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2516:23 - The method '_saveLearningPreferences' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_saveLearningPreferences'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:2518:38 - Undefined name '_targetCefrLevel'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2519:38 - The method '_composerSuggestionsForLevel' isn't defined for the type '_DmChatScreenState'. Try correcting the name to the name of an existing method, or defining a method named '_composerSuggestionsForLevel'. - undefined_method
+  error - lib\features\social\dm_chat_screen.dart:2519:67 - Undefined name '_targetCefrLevel'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2523:39 - Undefined name '_targetCefrLevel'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+  error - lib\features\social\dm_chat_screen.dart:2525:38 - Undefined name '_targetCefrLevel'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+warning - lib\data\privacy_repository.dart:80:11 - Unnecessary type check; the result is always 'true'. Try correcting the type check, or removing the type check. - unnecessary_type_check
+warning - lib\data\privacy_repository.dart:81:11 - Unnecessary type check; the result is always 'true'. Try correcting the type check, or removing the type check. - unnecessary_type_check
+warning - lib\data\quiz_repository.dart:16:19 - The value of the field '_cache' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\data\soma_plus_repository.dart:293:7 - This default clause is covered by the previous cases. Try removing the default clause, or restructuring the preceding patterns. - unreachable_switch_default
+warning - lib\data\soma_plus_repository.dart:338:7 - This default clause is covered by the previous cases. Try removing the default clause, or restructuring the preceding patterns. - unreachable_switch_default
+warning - lib\features\circles\circle_lobby_screen.dart:2491:7 - The declaration '_BooleanSettingRow' isn't referenced. Try removing the declaration of '_BooleanSettingRow'. - unused_element
+warning - lib\features\circles\circles_screen.dart:554:10 - A value for optional parameter 'isCurrentUser' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\features\circles\circles_screen.dart:830:10 - The declaration '_learnsSummary' isn't referenced. Try removing the declaration of '_learnsSummary'. - unused_element
+warning - lib\features\circles\circles_screen.dart:1774:16 - The declaration '_showBlockDialog' isn't referenced. Try removing the declaration of '_showBlockDialog'. - unused_element
+warning - lib\features\circles\circles_screen.dart:2313:7 - The declaration '_SessionProgressPreview' isn't referenced. Try removing the declaration of '_SessionProgressPreview'. - unused_element
+warning - lib\features\circles\circles_screen.dart:2352:7 - The declaration '_ExchangeBlockedAllState' isn't referenced. Try removing the declaration of '_ExchangeBlockedAllState'. - unused_element
+warning - lib\features\circles\circles_screen.dart:2422:7 - The declaration '_ExchangeNoPartnersState' isn't referenced. Try removing the declaration of '_ExchangeNoPartnersState'. - unused_element
+warning - lib\features\circles\create_circle_screen.dart:9:8 - Unused import: '../../core/theme/tokens.dart'. Try removing the import directive. - unused_import
+warning - lib\features\circles\live_quiz_screen.dart:21:8 - Unused import: '../../data/circle_chat_repository.dart'. Try removing the import directive. - unused_import
+warning - lib\features\circles\live_quiz_screen.dart:823:11 - The value of the local variable 'totalQuestions' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\features\circles\live_quiz_screen.dart:1175:7 - The declaration '_TinyGlass' isn't referenced. Try removing the declaration of '_TinyGlass'. - unused_element
+warning - lib\features\circles\live_quiz_screen.dart:1179:47 - A value for optional parameter 'onTap' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\features\circles\live_quiz_screen.dart:1565:7 - The declaration '_RolePill' isn't referenced. Try removing the declaration of '_RolePill'. - unused_element
+warning - lib\features\circles\live_quiz_screen.dart:1618:7 - The declaration '_QuizProgressBar' isn't referenced. Try removing the declaration of '_QuizProgressBar'. - unused_element
+warning - lib\features\circles\live_quiz_screen.dart:1649:6 - The declaration '_AnswerState' isn't referenced. Try removing the declaration of '_AnswerState'. - unused_element
+warning - lib\features\circles\live_quiz_screen.dart:1649:21 - The value of the field 'normal' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\circles\live_quiz_screen.dart:1649:29 - The value of the field 'correct' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\circles\live_quiz_screen.dart:1649:38 - The value of the field 'wrong' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\home\home_screen.dart:20:8 - Unused import: '../../data/profile_repository.dart'. Try removing the import directive. - unused_import
+warning - lib\features\home\home_screen.dart:40:8 - The value of the field '_isFirstVisit' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\home\home_screen.dart:310:35 - The value of the local variable 'userId' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\features\home\home_screen.dart:787:11 - The value of the local variable 'scheme' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\features\home\home_screen.dart:897:11 - The value of the local variable 'l10n' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\features\profile\privacy_settings_screen.dart:262:8 - The declaration '_showInfo' isn't referenced. Try removing the declaration of '_showInfo'. - unused_element
+warning - lib\features\social\dm_chat_screen.dart:44:6 - The declaration '_DmThemeStyle' isn't referenced. Try removing the declaration of '_DmThemeStyle'. - unused_element
+warning - lib\features\social\dm_chat_screen.dart:44:22 - The value of the field 'defaultStyle' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:44:36 - The value of the field 'aurora' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:44:44 - The value of the field 'mono' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:44:50 - The value of the field 'sunset' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:48:6 - The declaration '_TutorPersona' isn't referenced. Try removing the declaration of '_TutorPersona'. - unused_element
+warning - lib\features\social\dm_chat_screen.dart:48:22 - The value of the field 'friendlyCoach' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:48:37 - The value of the field 'examTrainer' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:48:50 - The value of the field 'businessCoach' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:48:65 - The value of the field 'casualNative' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:49:6 - The declaration '_AutoCorrectMode' isn't referenced. Try removing the declaration of '_AutoCorrectMode'. - unused_element
+warning - lib\features\social\dm_chat_screen.dart:49:25 - The value of the field 'off' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:49:30 - The value of the field 'light' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:49:37 - The value of the field 'teacher' isn't used. Try removing the field, or using it. - unused_field
+warning - lib\features\social\dm_chat_screen.dart:985:11 - The value of the local variable 'data' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\features\social\dm_chat_screen.dart:3948:7 - The declaration '_CorrectionResult' isn't referenced. Try removing the declaration of '_CorrectionResult'. - unused_element
+warning - lib\features\social\dm_chat_screen.dart:3955:7 - The declaration '_WordInsight' isn't referenced. Try removing the declaration of '_WordInsight'. - unused_element
+warning - lib\features\social\dm_chat_screen.dart:3966:24 - The declaration '_WordInsight.fromWord' isn't referenced. Try removing the declaration of '_WordInsight.fromWord'. - unused_element
+warning - lib\features\social\dm_chat_screen.dart:4420:7 - The declaration '_DmToolsSectionHeader' isn't referenced. Try removing the declaration of '_DmToolsSectionHeader'. - unused_element
+warning - lib\features\social\dm_chat_screen.dart:4581:29 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\features\social\dm_chat_screen.dart:4670:7 - The declaration '_WeeklyReportCard' isn't referenced. Try removing the declaration of '_WeeklyReportCard'. - unused_element
+warning - lib\features\social\dm_chat_screen.dart:4674:34 - A value for optional parameter 'key' isn't ever given. Try removing the unused parameter. - unused_element_parameter
+warning - lib\features\social\friends_screen.dart:144:16 - The declaration '_copyInviteLink' isn't referenced. Try removing the declaration of '_copyInviteLink'. - unused_element
+warning - lib\features\social\friends_screen.dart:623:11 - The value of the local variable 'scheme' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib\features\solo\add_course_screen.dart:4:8 - Unused import: '../../core/theme/tokens.dart'. Try removing the import directive. - unused_import
+warning - scripts\audit_schema_comprehensive.dart:24:21 - Unnecessary cast. Try removing the cast. - unnecessary_cast
+warning - scripts\audit_schema_comprehensive.dart:51:35 - Unnecessary cast. Try removing the cast. - unnecessary_cast
+warning - scripts\audit_schema_rest.dart:17:21 - Unnecessary cast. Try removing the cast. - unnecessary_cast
+warning - scripts\check_columns_onebyone.dart:21:37 - Unnecessary cast. Try removing the cast. - unnecessary_cast
+warning - scripts\check_realtime.dart:3:8 - Unused import: 'dart:io'. Try removing the import directive. - unused_import
+warning - scripts\debug_settings.dart:3:8 - Unused import: 'dart:io'. Try removing the import directive. - unused_import
+warning - scripts\deep_audit_supabase.dart:49:23 - Unnecessary cast. Try removing the cast. - unnecessary_cast
+warning - scripts\enable_realtime.dart:3:8 - Unused import: 'dart:io'. Try removing the import directive. - unused_import
+warning - scripts\final_wiring_check.dart:3:8 - Unused import: 'dart:io'. Try removing the import directive. - unused_import
+warning - scripts\probe_db_conn.dart:3:8 - Unused import: 'dart:io'. Try removing the import directive. - unused_import
+warning - scripts\probe_rls_anon.dart:16:13 - The value of the local variable 'res' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - scripts\test_direct_conn.dart:3:8 - Unused import: 'dart:io'. Try removing the import directive. - unused_import
+warning - scripts\test_ip_conn.dart:3:8 - Unused import: 'dart:io'. Try removing the import directive. - unused_import
+   info - lib\data\content_sync_service.dart:267:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\data\content_sync_service.dart:269:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\data\content_sync_service.dart:274:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\data\content_sync_service.dart:275:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\data\content_sync_service.dart:278:11 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\data\content_sync_service.dart:295:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\data\content_sync_service.dart:298:11 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - lib\features\circles\exchange_session_screen.dart:130:28 - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext. - use_build_context_synchronously
+   info - lib\features\circles\exchange_session_screen.dart:190:28 - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext. - use_build_context_synchronously
+   info - lib\features\circles\exchange_session_screen.dart:277:36 - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext. - use_build_context_synchronously
+   info - lib\features\profile\privacy_settings_screen.dart:282:22 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:1250:28 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:1289:7 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:1296:26 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:1685:30 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:1694:30 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:1879:38 - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:1925:40 - Unnecessary braces in a string interpolation. Try removing the braces. - unnecessary_brace_in_string_interps
+   info - lib\features\social\dm_chat_screen.dart:2009:46 - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:2014:46 - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:2039:44 - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:2688:26 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:2700:26 - Don't use 'BuildContext's across async gaps. Try rewriting the code to not use the 'BuildContext', or guard the use with a 'mounted' check. - use_build_context_synchronously
+   info - lib\features\social\dm_chat_screen.dart:3821:44 - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check. Guard a 'State.context' use with a 'mounted' check on the State, and other BuildContext use with a 'mounted' check on the BuildContext. - use_build_context_synchronously
+   info - lib\features\solo\sentences_fill_blank_screen.dart:104:31 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\features\solo\sentences_fill_blank_screen.dart:108:29 - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss. Try replacing the use of the deprecated member with the replacement. - deprecated_member_use
+   info - lib\features\solo\solo_result_screen.dart:116:45 - Unnecessary braces in a string interpolation. Try removing the braces. - unnecessary_brace_in_string_interps
+   info - scripts\add_questions_column.dart:5:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:16:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:27:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:28:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:32:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:35:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:40:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:41:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:42:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:43:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:44:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:47:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:50:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:51:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:52:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:53:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\add_questions_column.dart:54:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_migration_20260301.dart:8:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_migration_20260301.dart:12:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_migration_20260301.dart:15:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_migration_20260301.dart:28:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_migration_20260301.dart:33:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_migration_20260301.dart:35:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:5:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:19:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:20:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:26:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:29:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:37:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:39:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:43:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:44:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:49:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:51:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:52:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\apply_questions_migration.dart:53:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_comprehensive.dart:13:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_comprehensive.dart:28:33 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - scripts\audit_schema_comprehensive.dart:29:14 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - scripts\audit_schema_comprehensive.dart:55:33 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - scripts\audit_schema_comprehensive.dart:56:14 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - scripts\audit_schema_rest.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:13:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:18:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:22:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:24:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:27:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:28:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:31:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:33:10 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:37:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:41:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:44:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:46:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:50:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:53:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:55:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\audit_schema_rest.dart:58:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\capture_error.dart:10:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\capture_error.dart:12:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\capture_error.dart:14:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:14:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:23:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:27:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:28:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:29:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:30:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:31:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:32:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:36:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:37:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:40:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:42:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_circle_questions.dart:46:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_columns.dart:12:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_columns.dart:17:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_columns_onebyone.dart:31:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_courses.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_courses.dart:14:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_courses.dart:16:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_courses.dart:19:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_data_integrity.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_data_integrity.dart:14:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_data_integrity.dart:16:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_data_integrity.dart:19:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_data_integrity.dart:23:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_data_integrity.dart:25:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_local_db.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_local_db.dart:18:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_local_db.dart:30:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_local_db.dart:38:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_local_db.dart:40:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_local_db.dart:45:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:11:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:32:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:50:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:51:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:53:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:56:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:57:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:59:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:62:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:66:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:67:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:72:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:74:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:80:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:82:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:85:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_migration_status.dart:86:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_realtime.dart:11:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_realtime.dart:16:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_realtime.dart:18:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_realtime.dart:22:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_realtime.dart:24:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_schema_questions.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_schema_questions.dart:20:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_schema_questions.dart:24:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_schema_questions.dart:26:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_schema_questions.dart:29:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_schema_questions.dart:32:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_schema_questions.dart:34:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_supabase_vocabulary.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_supabase_vocabulary.dart:15:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_supabase_vocabulary.dart:18:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_supabase_vocabulary.dart:22:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\check_supabase_vocabulary.dart:25:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_dm.dart:73:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_dm.dart:80:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_dm.dart:83:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_dm.dart:92:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_dm2.dart:132:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_ghosts.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_ghosts.dart:20:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_ghosts.dart:39:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_ghosts.dart:42:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_ghosts.dart:44:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_ghosts.dart:51:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_ghosts.dart:53:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\cleanup_ghosts.dart:57:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\close_all_circles.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\close_all_circles.dart:20:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\close_all_circles.dart:23:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\close_all_circles.dart:32:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\close_all_circles.dart:34:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\close_all_circles.dart:37:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\close_all_circles.dart:40:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\count_supabase_rows.dart:12:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\count_supabase_rows.dart:16:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\count_supabase_rows.dart:18:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\db_migration_direct.dart:8:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\db_migration_direct.dart:12:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\db_migration_direct.dart:15:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\db_migration_direct.dart:29:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\db_migration_direct.dart:35:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\db_migration_direct.dart:37:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:5:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:11:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:21:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:25:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:26:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:27:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:30:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:33:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:35:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:37:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:39:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:42:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_circle_data.dart:46:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:20:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:25:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:26:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:27:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:31:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:33:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:35:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:38:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:39:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_latest_circle.dart:43:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_settings.dart:11:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_settings.dart:16:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_settings.dart:18:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_settings.dart:24:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\debug_settings.dart:26:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\deep_audit_supabase.dart:13:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\deep_audit_supabase.dart:51:35 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - scripts\deep_audit_supabase.dart:52:16 - Statements in an if should be enclosed in a block. Try wrapping the statement in a block. - curly_braces_in_flow_control_structures
+   info - scripts\enable_realtime.dart:16:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\enable_realtime.dart:24:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\enable_realtime.dart:26:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\enable_realtime.dart:28:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\enable_realtime.dart:37:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\enable_realtime.dart:39:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\enable_realtime.dart:45:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\exec_sql_direct.dart:7:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\exec_sql_direct.dart:13:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\exec_sql_direct.dart:17:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\exec_sql_direct.dart:20:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\exec_sql_direct.dart:32:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\exec_sql_direct.dart:34:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\exec_sql_direct.dart:36:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\final_wiring_check.dart:11:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\final_wiring_check.dart:26:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\final_wiring_check.dart:28:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\fix_imports.dart:32:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\fix_imports.dart:37:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:13:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:18:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:22:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:25:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:74:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:81:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:85:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:88:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:137:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:144:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\import_data.dart:152:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:14:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:16:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:19:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:22:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:26:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:28:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:31:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:34:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:38:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_columns.dart:41:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_full_schema.dart:16:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_full_schema.dart:42:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_full_schema.dart:49:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_schema.dart:22:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_schema.dart:25:13 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_schema.dart:27:13 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_schema.dart:31:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\inspect_schema.dart:34:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_alignment_via_rpc.dart:13:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_alignment_via_rpc.dart:18:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_alignment_via_rpc.dart:25:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_alignment_via_rpc.dart:27:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_alignment_via_rpc.dart:28:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_alignment_via_rpc.dart:31:8 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_alignment_via_rpc.dart:33:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:13:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:18:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:19:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:26:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:30:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:33:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:44:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:90:24 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:95:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:102:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:106:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:109:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:119:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:163:24 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:168:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:175:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:187:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:199:11 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:200:11 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\migrate_assets.dart:204:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\probe_db_conn.dart:30:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\probe_db_conn.dart:42:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\probe_db_conn.dart:46:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\probe_rls_anon.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\probe_rls_anon.dart:17:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\probe_rls_anon.dart:19:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\probe_rls_anon.dart:29:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\probe_rls_anon.dart:31:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\probe_rls_anon.dart:34:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\safe_audit.dart:18:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\safe_audit.dart:24:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\safe_audit.dart:26:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\safe_audit.dart:30:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_course_id_parsing.dart:19:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_course_id_parsing.dart:22:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_course_id_parsing.dart:24:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_db_conn.dart:13:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_db_conn.dart:16:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_db_conn.dart:18:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_db_conn.dart:21:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_direct_conn.dart:14:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_direct_conn.dart:17:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_direct_conn.dart:20:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_insert.dart:16:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_insert.dart:18:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_insert_minimal.dart:14:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_insert_minimal.dart:16:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_ip_conn.dart:16:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_ip_conn.dart:19:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_ip_conn.dart:22:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_tts_languages.dart:9:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_tts_languages.dart:14:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_vocabulary_insert.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_vocabulary_insert.dart:27:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_vocabulary_insert.dart:29:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_vocabulary_insert.dart:33:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_vocabulary_insert.dart:37:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\test_vocabulary_insert.dart:40:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upgrade_local_db.dart:12:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upgrade_local_db.dart:13:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upgrade_local_db.dart:17:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upgrade_local_db.dart:73:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upgrade_local_db.dart:78:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upgrade_local_db.dart:80:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upgrade_local_db.dart:85:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:21:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:23:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:30:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:34:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:37:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:42:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:46:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:49:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:52:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:75:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:81:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:85:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:88:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:93:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:97:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:100:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:103:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\upload_csv_to_supabase.dart:125:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:11:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:25:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:30:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:38:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:39:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:41:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:46:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:61:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:62:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:66:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:67:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:68:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:69:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:72:10 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:74:10 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:79:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:84:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:99:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:100:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:104:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:105:8 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:106:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:107:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:110:10 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:112:10 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_manual_import.dart:116:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_migration.dart:13:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_migration.dart:14:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_migration_simple.dart:16:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_migration_simple.dart:17:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:6:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:11:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:20:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:27:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:34:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:42:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:43:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:47:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:50:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:51:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:52:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:53:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:54:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:55:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:56:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_questions_column.dart:57:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:9:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:13:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:16:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:18:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:21:8 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:24:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:29:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:32:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:34:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:36:8 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_rls.dart:39:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:10:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:19:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:23:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:26:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:29:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:31:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:37:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:44:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:66:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:73:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:82:8 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_schema.dart:85:8 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:13:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:24:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:39:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:41:9 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:44:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:48:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:51:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:54:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:56:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:59:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:62:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:66:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:68:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:71:3 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:90:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - scripts\verify_sync.dart:92:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - temp_migration\main.dart:11:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - temp_migration\main.dart:15:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - temp_migration\main.dart:18:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - temp_migration\main.dart:31:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - temp_migration\main.dart:33:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - temp_migration\main.dart:35:7 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - temp_migration\main.dart:42:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+   info - test\exchange_session_controller_test.dart:81:62 - Unnecessary braces in a string interpolation. Try removing the braces. - unnecessary_brace_in_string_interps
+
+571 issues found.

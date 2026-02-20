@@ -293,7 +293,13 @@ class ContentSyncService {
         await offlineQueueRepository.delete(item.id!);
       } catch (e) {
         print("Offline Sync failed for item ${item.id}: $e");
-        rethrow;
+        final es = e.toString();
+        if (e is PostgrestException || es.contains('PostgrestException') || es.contains('PGRST')) {
+          print("Permanent database/schema error detected. Dropping offline queue item to unblock sync.");
+          await offlineQueueRepository.delete(item.id!);
+        } else {
+          rethrow;
+        }
       }
     }
     debugPrint('SYNC: Offline queue processed successfully.');

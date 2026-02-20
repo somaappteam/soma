@@ -217,6 +217,9 @@ class AppLocalizationsId extends AppLocalizations {
       'Praktikkan apa yang telah dipelajari: kata-kata lemah, kesalahan terbaru, pengulangan berjarak.';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Mulai Tinjauan';
 
   @override

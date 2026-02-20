@@ -216,6 +216,9 @@ class AppLocalizationsBn extends AppLocalizations {
       'আপনি যা শিখেছেন তা অনুশীলন করুন: দুর্বল শব্দ, সাম্প্রতিক ভুল এবং স্পেসড পুনরাবৃত্তি।';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'পর্যালোচনা শুরু করুন';
 
   @override

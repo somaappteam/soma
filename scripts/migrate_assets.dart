@@ -10,7 +10,7 @@ const String serviceRoleKey =
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
 
-  print('--- Starting Data Migration ---');
+  print('--- Starting Data Migration (Fix EOL) ---');
 
   // Adjust these paths if running from a different directory
   final assetsDir = Directory('assets');
@@ -37,20 +37,27 @@ Future<void> migrateVocabulary(SupabaseClient client, String filePath) async {
   final input = file.openRead();
   final fields = await input
       .transform(utf8.decoder)
-      .transform(const CsvToListConverter())
+      // Try \n as EOL. If that fails, we might need to inspect the file.
+      .transform(const CsvToListConverter(eol: '\n'))
       .toList();
+
+  print('Parsed ${fields.length} rows from vocabulary CSV.');
 
   if (fields.isEmpty) return;
 
   final rawHeaders = fields[0];
+  // print('Vocabulary Headers found: $rawHeaders');
+  
   final headers = <int, String>{};
   for (var j = 0; j < rawHeaders.length; j++) {
     final key = rawHeaders[j].toString().trim();
-    // Include all columns including voca_id as PK
+    // Headers: vocabulary_id, concept_id, lang_code, word, article, pronunciation, level
     if (key.isNotEmpty) {
       headers[j] = key;
     }
   }
+
+  // print('Mapped headers: $headers');
 
   final data = <Map<String, dynamic>>[];
 
@@ -61,16 +68,17 @@ Future<void> migrateVocabulary(SupabaseClient client, String filePath) async {
 
     headers.forEach((index, key) {
       if (index < values.length) {
+        // if (index < 0 || index >= values.length) return; // Safety check
         var val = values[index];
-        // Parse integer columns
-        if (key == 'concept_id' || key == 'voca_id') {
+        // Parse integer/bigint columns
+        if (key == 'concept_id' || key == 'vocabulary_id') {
           if (val is int) {
             row[key] = val;
           } else {
             row[key] = int.tryParse(val.toString().trim());
           }
         } else {
-          row[key] = val.toString().trim().isEmpty ? null : val;
+          row[key] = val.toString().trim().isEmpty ? null : val.toString().trim();
         }
       }
     });
@@ -78,8 +86,10 @@ Future<void> migrateVocabulary(SupabaseClient client, String filePath) async {
     if (row.isNotEmpty) {
       data.add(row);
     }
+    
+    if (i % 5000 == 0) print('Processed $i rows locally...');
 
-    if (data.length >= 500) {
+    if (data.length >= 1000) { // Batch 1000
       await _upsert(client, 'vocabulary', data);
       data.clear();
       print('Uploaded vocabulary up to row $i...');
@@ -103,20 +113,26 @@ Future<void> migrateSentences(SupabaseClient client, String filePath) async {
   final input = file.openRead();
   final fields = await input
       .transform(utf8.decoder)
-      .transform(const CsvToListConverter())
+      .transform(const CsvToListConverter(eol: '\n'))
       .toList();
+      
+  print('Parsed ${fields.length} rows from sentences CSV.');
 
   if (fields.isEmpty) return;
 
   final rawHeaders = fields[0];
+  // print('Sentences Headers found: $rawHeaders');
+
   final headers = <int, String>{};
   for (var j = 0; j < rawHeaders.length; j++) {
     final key = rawHeaders[j].toString().trim();
-    // Include all columns including sentence_id as PK
+    // Headers: sentence_id, concept_id, lang_code, sentence, pronunciation, level
     if (key.isNotEmpty) {
       headers[j] = key;
     }
   }
+  
+  // print('Mapped headers: $headers');
 
   final data = <Map<String, dynamic>>[];
 
@@ -135,7 +151,7 @@ Future<void> migrateSentences(SupabaseClient client, String filePath) async {
             row[key] = int.tryParse(val.toString().trim());
           }
         } else {
-          row[key] = val.toString().trim().isEmpty ? null : val;
+          row[key] = val.toString().trim().isEmpty ? null : val.toString().trim();
         }
       }
     });
@@ -143,8 +159,10 @@ Future<void> migrateSentences(SupabaseClient client, String filePath) async {
     if (row.isNotEmpty) {
       data.add(row);
     }
+    
+    if (i % 5000 == 0) print('Processed $i rows locally...');
 
-    if (data.length >= 500) {
+    if (data.length >= 1000) {
       await _upsert(client, 'sentences', data);
       data.clear();
       print('Uploaded sentences up to row $i...');
@@ -162,18 +180,18 @@ Future<void> _upsert(SupabaseClient client, String table,
   if (data.isEmpty) return;
   
   try {
-    // Use simple insert - table should be empty or use upsert on PK
-    await client.from(table).insert(data);
-    print('  Inserted ${data.length} rows to $table');
+    // Use upsert on PK to handle existing rows if running multiple times
+    await client.from(table).upsert(data); 
+    // print('  Upserted ${data.length} rows to $table');
   } catch (e) {
-    print('Error inserting to $table: $e');
+    print('Error upserting to $table: $e');
     
     // If batch fails, try one by one to find the problematic row
     int success = 0;
     int failed = 0;
     for (final row in data) {
       try {
-        await client.from(table).insert(row);
+        await client.from(table).upsert(row);
         success++;
       } catch (e2) {
         failed++;
@@ -183,6 +201,6 @@ Future<void> _upsert(SupabaseClient client, String table,
         }
       }
     }
-    print('  Individual insert: $success succeeded, $failed failed');
+    print('  Individual upsert: $success succeeded, $failed failed');
   }
 }

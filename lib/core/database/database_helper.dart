@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 5,
+      version: 6,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -30,15 +30,18 @@ class DatabaseHelper {
       await _createUserTables(db);
     }
     if (oldVersion < 4) {
-      // Add created_at column to sentences table
       try {
         await db.execute('ALTER TABLE sentences ADD COLUMN created_at TEXT');
-      } catch (_) {
-        // Column might already exist
-      }
+      } catch (_) {}
     }
     if (oldVersion < 5) {
       await _createOfflineQueueTable(db);
+    }
+    if (oldVersion < 6) {
+      // Recreate vocabulary and sentences tables for new schema
+      await db.execute('DROP TABLE IF EXISTS vocabulary');
+      await db.execute('DROP TABLE IF EXISTS sentences');
+      await _createContentTables(db);
     }
   }
 
@@ -57,18 +60,21 @@ class DatabaseHelper {
       )
     ''');
 
+    await _createContentTables(db);
+    await _createUserTables(db);
+    await _createOfflineQueueTable(db);
+  }
+
+  Future<void> _createContentTables(Database db) async {
     // Vocabulary Table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS vocabulary (
-        id TEXT PRIMARY KEY,
+        vocabulary_id TEXT PRIMARY KEY,
         concept_id INTEGER,
-        lang TEXT,
+        lang_code TEXT,
         word TEXT,
         article TEXT,
-        gender TEXT,
-        romanization TEXT,
-        pinyin TEXT,
-        transliteration TEXT,
+        pronunciation TEXT,
         level TEXT,
         created_at TEXT
       )
@@ -77,21 +83,15 @@ class DatabaseHelper {
     // Sentences Table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS sentences (
-        id TEXT PRIMARY KEY,
+        sentence_id TEXT PRIMARY KEY,
         concept_id INTEGER,
         lang_code TEXT,
-        lang_name TEXT,
         sentence TEXT,
-        romanization TEXT,
-        pinyin TEXT,
-        transliteration TEXT,
+        pronunciation TEXT,
         level TEXT,
         created_at TEXT
       )
     ''');
-
-    await _createUserTables(db);
-    await _createOfflineQueueTable(db);
   }
 
   Future<void> _createUserTables(Database db) async {
@@ -185,15 +185,12 @@ class DatabaseHelper {
     await db.insert(
       'vocabulary',
       {
-        'id': vocab['id'].toString(),
+        'vocabulary_id': vocab['vocabulary_id'].toString(),
         'concept_id': vocab['concept_id'],
-        'lang': vocab['lang'],
+        'lang_code': vocab['lang_code'], // Was 'lang'
         'word': vocab['word'],
         'article': vocab['article'],
-        'gender': vocab['gender'],
-        'romanization': vocab['romanization'],
-        'pinyin': vocab['pinyin'],
-        'transliteration': vocab['transliteration'],
+        'pronunciation': vocab['pronunciation'], // Replaced romanization/pinyin/transliteration
         'level': vocab['level'],
         'created_at': vocab['created_at'],
       },
@@ -206,14 +203,11 @@ class DatabaseHelper {
     await db.insert(
       'sentences',
       {
-        'id': sentence['id'].toString(),
+        'sentence_id': sentence['sentence_id'].toString(),
         'concept_id': sentence['concept_id'],
         'lang_code': sentence['lang_code'],
-        'lang_name': sentence['lang_name'],
         'sentence': sentence['sentence'],
-        'romanization': sentence['romanization'],
-        'pinyin': sentence['pinyin'],
-        'transliteration': sentence['transliteration'],
+        'pronunciation': sentence['pronunciation'], // Replaced romanization/pinyin/transliteration
         'level': sentence['level'],
         'created_at': sentence['created_at'],
       },
@@ -226,9 +220,9 @@ class DatabaseHelper {
     return await db.query('courses');
   }
 
-  Future<List<Map<String, dynamic>>> getVocabularyByLang(String lang) async {
+  Future<List<Map<String, dynamic>>> getVocabularyByLang(String langCode) async {
     final db = await instance.database;
-    return await db.query('vocabulary', where: 'lang = ?', whereArgs: [lang]);
+    return await db.query('vocabulary', where: 'lang_code = ?', whereArgs: [langCode]);
   }
 
   Future<List<Map<String, dynamic>>> getSentencesByLang(String langCode) async {

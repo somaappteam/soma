@@ -1,0 +1,21 @@
+--- Testing Quiz Data Fetch ---
+
+[Vocabulary] Fetching for en -> es
+  Fetched 10 source items
+  Fetched 10 target items
+  Sample Target Item:
+    ID: 100
+    Word: ser
+    Pronunciation (reading): null
+  WARNING: Pronunciation is missing or empty!
+
+[Sentences] Fetching for en -> es
+  Fetched 10 source items
+  Fetched 10 target items
+  Sample Target Item:
+    ID: 100
+    Sentence: Probemos algo
+    Pronunciation (reading): null
+  WARNING: Pronunciation is missing or empty!
+--- Test Completed ---
+^C

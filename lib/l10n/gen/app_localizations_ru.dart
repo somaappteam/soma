@@ -217,6 +217,9 @@ class AppLocalizationsRu extends AppLocalizations {
       'Практикуйте изученное: слабые слова, недавние ошибки и интервальное повторение.';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Начать повторение';
 
   @override

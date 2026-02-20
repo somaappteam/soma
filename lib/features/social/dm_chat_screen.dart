@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +16,6 @@ import '../../core/theme/tokens.dart';
 import '../../core/theme/motion.dart';
 
 import '../../core/widgets/glass.dart';
-import '../../core/widgets/staggered_in.dart';
 import '../../core/services/haptics_service.dart';
 import '../../data/rtc_voice_service.dart';
 import '../../data/chat_repository.dart';
@@ -27,7 +25,6 @@ import '../../data/settings_repository.dart';
 import '../../data/soma_plus_repository.dart';
 import '../../data/user_report_repository.dart';
 import '../../data/ai_repository.dart';
-import '../../data/stats_repository.dart';
 import '../../models/user_stats.dart';
 import '../../models/user_profile.dart';
 import '../profile/profile_screen.dart';
@@ -36,37 +33,10 @@ import '../../data/call_signaling_service.dart';
 
 enum DmCallState { idle, ringingOutgoing, ringingIncoming, connecting, connected }
 enum _DmMenuAction {
-  media,
-  documents,
-  clearDraft,
-  togglePinnedOnly,
-  scheduleMessage,
-  undoSend,
-  muteOneHour,
-  muteKeyword,
   togglePin,
   toggleMute,
-  chooseDisappearing,
-  chooseTheme,
-  aiPolish,
-  smartComposeMode,
-  chooseTutorPersona,
-  chooseAutoCorrect,
-  toggleExamMode,
-  conversationReplay,
-  weeklyReportCard,
-  privacyControls,
-  addMessagePack,
   advancedSearch,
-  moreTools,
 }
-
-enum _DmThemeStyle { defaultStyle, aurora, mono, sunset }
-enum _SearchRange { all, today, week }
-enum _DmTimelineTab { all, media, files }
-enum _CefrLevel { a1, a2, b1, b2, c1, c2 }
-enum _TutorPersona { friendlyCoach, examTrainer, businessCoach, casualNative }
-enum _AutoCorrectMode { off, light, teacher }
 
 class DmChatScreen extends StatefulWidget {
   const DmChatScreen({
@@ -128,14 +98,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
   DmPlanLimits get _dmLimits => SomaPlusRepository.dmLimitsForTier(_planTier);
   bool _showSearch = false;
   String _searchQuery = '';
-  String _draftText = '';
   bool _showPinnedOnly = false;
   bool _callPanelMinimized = false;
   bool _isMicMuted = false;
   bool _isSpeakerOn = true;
   bool _isRtcConnected = false;
   Offset _floatingChipOffset = Offset.zero;
-  int _callQualityScore = 78;
   int _smoothedCallQualityScore = 78;
   Set<String> _pinnedMessageIds = <String>{};
   // NEW: Track block status
@@ -150,11 +118,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
   bool _typingStateSent = false;
   bool _isComposerFocused = false;
   Timer? _scheduledSendTimer;
-  String? _pendingUndoText;
   DateTime? _muteUntil;
-  final Set<String> _mutedKeywords = <String>{};
   Duration? _disappearingWindow;
-  _DmThemeStyle _themeStyle = _DmThemeStyle.defaultStyle;
   final Map<String, DateTime> _messageEditTimes = <String, DateTime>{};
   String? _replyToMessageId;
   String? _jumpHighlightMessageId;
@@ -162,22 +127,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
   bool _showUnreadOnly = false;
   bool _showLinksOnly = false;
   bool _showMentionsOnly = false;
-  _SearchRange _searchRange = _SearchRange.all;
-  _DmTimelineTab _timelineTab = _DmTimelineTab.all;
   bool _autoTranslateIncoming = false;
   String _autoTranslateLanguage = 'English';
-  _CefrLevel _targetCefrLevel = _CefrLevel.b1;
-  _TutorPersona _tutorPersona = _TutorPersona.friendlyCoach;
-  _AutoCorrectMode _autoCorrectMode = _AutoCorrectMode.off;
   bool _examModeEnabled = false;
-  final List<String> _duePracticePhrases = <String>[];
   String? _lastFailedTextMessage;
-  bool _dmLocked = false;
-  bool _dmUnlocked = false;
-  bool _screenshotWarningEnabled = true;
-  bool _hidePreviewInInbox = false;
   bool _noiseSuppressionEnabled = true;
-  bool _callRecordingConsent = false;
+
   String? _liveCaption;
 
   int get _maxImageBytes => _dmLimits.maxImageBytes;
@@ -214,7 +169,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
   StreamSubscription<Map<String, dynamic>?>? _conversationSub;
   bool _isConversationPinned = false;
   bool _isConversationMuted = false;
-  bool _isConversationArchived = false;
 
   @override
   void initState() {
@@ -229,22 +183,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _loadDmGate();
     _loadDraft();
     _loadPinnedMessages();
-    _loadDisappearingWindow();
-    _loadThemeStyle();
-    _loadPremiumToggles();
-    _loadLearningPracticeState();
     _initDmCallSignaling();
     
     if (widget.initialIncomingCall) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _startVoiceCall(sendInvite: false, incoming: true);
       });
-    }
-    if ((widget.initialDraftText ?? '').trim().isNotEmpty) {
-      final initial = widget.initialDraftText!.trim();
-      _controller.text = initial;
-      _controller.selection = TextSelection.fromPosition(TextPosition(offset: initial.length));
-      _draftText = initial;
     }
     _rtcConnectionSub = rtcVoiceService.connectionStream.listen(_onRtcConnectionState);
     _rtcTelemetrySub = rtcVoiceService.telemetryStream.listen(_onRtcTelemetry);
@@ -255,7 +199,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
       setState(() {
         _isConversationPinned = conv['is_pinned'] == true;
         _isConversationMuted = conv['is_muted'] == true;
-        _isConversationArchived = conv['is_archived'] == true;
       });
     });
 
@@ -342,11 +285,8 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   void _send() {
     final raw = _controller.text.trim();
-    unawaited(() async {
-      final prepared = await _applyAutoCorrectBeforeSend(raw);
-      if (!mounted || prepared == null) return;
-      await _sendText(prepared);
-    }());
+    if (!mounted) return;
+    unawaited(_sendText(raw));
   }
 
   bool _ensureCanSendInDm() {
@@ -367,86 +307,13 @@ class _DmChatScreenState extends State<DmChatScreen> {
     return true;
   }
 
-  String _tutorPersonaLabel(_TutorPersona value) => switch (value) {
-        _TutorPersona.friendlyCoach => 'Friendly coach',
-        _TutorPersona.examTrainer => 'Exam trainer',
-        _TutorPersona.businessCoach => 'Business coach',
-        _TutorPersona.casualNative => 'Casual native',
-      };
 
-  String _autoCorrectLabel(_AutoCorrectMode value) => switch (value) {
-        _AutoCorrectMode.off => 'Off',
-        _AutoCorrectMode.light => 'Light polish',
-        _AutoCorrectMode.teacher => 'Teacher correction',
-      };
 
-  Future<String?> _applyAutoCorrectBeforeSend(String source) async {
-    if (_autoCorrectMode == _AutoCorrectMode.off) return source;
-    final corrected = switch (_autoCorrectMode) {
-      _AutoCorrectMode.light => source
-          .replaceAll(RegExp(r'\s+'), ' ')
-          .replaceAll(RegExp(r'\bi\b'), 'I')
-          .trim(),
-      _AutoCorrectMode.teacher => _buildCorrection(source).corrected,
-      _AutoCorrectMode.off => source,
-    };
-    if (corrected == source) return source;
+  
 
-    final use = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Auto-correct (${_autoCorrectLabel(_autoCorrectMode)})'),
-        content: Text('Before\n$source\n\nAfter\n$corrected'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Keep original')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Use corrected')),
-        ],
-      ),
-    );
-    return use == true ? corrected : source;
-  }
+  
 
-  Future<void> _openTutorPersonaPicker() async {
-    final picked = await showModalBottomSheet<_TutorPersona>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: _TutorPersona.values
-              .map((persona) => ListTile(
-                    leading: const Icon(Icons.psychology_rounded),
-                    title: Text(_tutorPersonaLabel(persona)),
-                    onTap: () => Navigator.pop(context, persona),
-                  ))
-              .toList(),
-        ),
-      ),
-    );
-    if (picked == null || !mounted) return;
-    setState(() => _tutorPersona = picked);
-    await _saveLearningPreferences();
-  }
-
-  Future<void> _openAutoCorrectPicker() async {
-    final picked = await showModalBottomSheet<_AutoCorrectMode>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: _AutoCorrectMode.values
-              .map((mode) => ListTile(
-                    leading: const Icon(Icons.spellcheck_rounded),
-                    title: Text(_autoCorrectLabel(mode)),
-                    onTap: () => Navigator.pop(context, mode),
-                  ))
-              .toList(),
-        ),
-      ),
-    );
-    if (picked == null || !mounted) return;
-    setState(() => _autoCorrectMode = picked);
-    await _saveLearningPreferences();
-  }
+  
 
   Future<void> _sendText(String text) async {
     if (!_ensureCanSendInDm()) return;
@@ -471,10 +338,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final payload = <String, dynamic>{
       'type': 'text',
       'text': text,
-      'tutor_persona': _tutorPersona.name,
-      'autocorrect_mode': _autoCorrectMode.name,
       if (_examModeEnabled) 'exam_mode': true,
-      if (!_isLikelyEnglish(text)) 'transliteration': _buildTransliteration(text),
       if (translatedText != null)
         'translated_text': translatedText,
       if (_replyPreview != null) 'reply_to': _replyPreview,
@@ -526,480 +390,36 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
 
 
-  Future<void> _aiPolishDraft() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Type something to polish.')),
-      );
-      return;
-    }
+  
 
-    try {
-      final polished = await aiRepository.polishText(text);
-      if (!mounted) {
-        return;
-      }
+  
 
-      
-      final confirmed = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('AI Polish'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Original:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                Text(text, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8))),
-                const SizedBox(height: 12),
-                const Text('Polished:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                Text(polished, style: const TextStyle(fontWeight: FontWeight.w600)),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Replace'),
-            ),
-          ],
-        ),
-      );
+  
 
-      if (confirmed == true) {
-        _controller.text = polished;
-      }
-    } catch (e) {
-      if (!mounted) {
-        return;
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to polish: $e')),
-      );
-    }
-  }
-
-  Future<void> _rewriteDraftStyle() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Type something to rewrite.')),
-      );
-      return;
-    }
-
-    final style = await showModalBottomSheet<String>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(
-              leading: const Icon(Icons.business_center_outlined),
-              title: const Text('Formal'), 
-              onTap: () => Navigator.pop(context, 'formal')
-            ),
-            ListTile(
-              leading: const Icon(Icons.coffee_outlined),
-              title: const Text('Casual'), 
-              onTap: () => Navigator.pop(context, 'casual')
-            ),
-            ListTile(
-               leading: const Icon(Icons.translate_rounded),
-               title: const Text('Native Speaker'), 
-               onTap: () => Navigator.pop(context, 'native')
-            ),
-            ListTile(
-               leading: const Icon(Icons.favorite_border_rounded),
-               title: const Text('Romantic'), 
-               onTap: () => Navigator.pop(context, 'romantic')
-            ),
-             ListTile(
-               leading: const Icon(Icons.emoji_emotions_outlined),
-               title: const Text('Fun & Witty'), 
-               onTap: () => Navigator.pop(context, 'witty')
-            ),
-          ],
-        ),
-      ),
-    );
-
-    if (style == null) {
-      return;
-    }
-
-    try {
-      final rewritten = await aiRepository.rewriteText(text, style);
-      if (!mounted) {
-        return;
-      }
-
-      _controller.text = rewritten;
-    } catch (e) {
-      if (!mounted) {
-        return;
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to rewrite: $e')),
-      );
-    }
-  }
-
-  Future<void> _openConversationReplayMode() async {
-    final stream = chatRepository.getMessagesStream(widget.otherId);
-    final messages = await stream.first;
-    final recent = messages.length > 20 ? messages.sublist(messages.length - 20) : messages;
-
-    if (!mounted) {
-      return;
-    }
-    if (recent.isEmpty) {
-         ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No messages to replay.')),
-      );
-      return;
-    }
-
-    await showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      builder: (context) => _ReplaySheet(
-        messages: recent, 
-        otherName: _otherProfile?.username ?? 'User',
-      ),
-    );
-  }
-
-  Future<void> _showWeeklyLearningReportCard() async {
-    final uid = Supabase.instance.client.auth.currentUser?.id;
-    if (uid == null) {
-      return;
-    }
-
-    final stats = await statsRepository.getStats();
-
-    final sevenDaysAgo = DateTime.now().subtract(const Duration(days: 7)).toIso8601String();
-    final res = await Supabase.instance.client
-        .from('messages')
-        .select('id')
-        .eq('sender_id', uid)
-        .gte('created_at', sevenDaysAgo)
-        .count(CountOption.exact);
-    final msgsCount = res.count;
-
-    if (!mounted) {
-      return;
-    }
-
-    await showDialog(
-      context: context,
-      builder: (context) => _WeeklyReportCard(
-        stats: stats,
-        messagesSent: msgsCount,
-      ),
-    );
-  }
+  
 
 
-  bool _isLikelyEnglish(String source) {
-    final clean = source.replaceAll(RegExp(r'[^a-zA-Z ]'), '');
-    return clean.isNotEmpty && clean.length / source.length > 0.65;
-  }
+  
 
-  String _buildTransliteration(String source) {
-    final collapsed = source
-        .replaceAll(RegExp(r'\s+'), ' ')
-        .trim();
-    if (collapsed.isEmpty) return source;
-    return collapsed;
-  }
+  
 
-  List<String> _composerSuggestionsForLevel(_CefrLevel level) {
-    return switch (level) {
-      _CefrLevel.a1 => const ['I think...', 'Can you help me?', 'I like this.'],
-      _CefrLevel.a2 => const ['Could you repeat that?', 'I went there yesterday.', 'What do you mean?'],
-      _CefrLevel.b1 => const ['From my perspective...', 'I would prefer to...', 'It depends on the context.'],
-      _CefrLevel.b2 => const ['That makes a strong point.', 'I partially agree because...', 'Let me clarify my thought.'],
-      _CefrLevel.c1 => const ['A more nuanced view is...', 'It is worth emphasizing that...', 'I can elaborate further if needed.'],
-      _CefrLevel.c2 => const ['That interpretation is reductive.', 'A compelling counterargument is...', 'The broader implication is that...'],
-    };
-  }
+  
 
-  Future<void> _runCorrectionMode(_ChatMessage msg) async {
-    final source = (msg.payload.text ?? msg.previewText).trim();
-    if (source.isEmpty) return;
-    final correction = _buildCorrection(source);
-    final focusPhrase = correction.corrected.split(' ').take(4).join(' ');
-    await showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 18),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('Correction mode', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
-              const SizedBox(height: 12),
-              Text('Original', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65), fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
-              Text(source),
-              const SizedBox(height: 10),
-              Text('Corrected', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65), fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
-              Text(correction.corrected, style: const TextStyle(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 10),
-              Text('Reason', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65), fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
-              Text(correction.reason),
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () async {
-                        await Clipboard.setData(ClipboardData(text: correction.corrected));
-                        if (!context.mounted) return;
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.copy_rounded),
-                      label: const Text('Copy correction'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: () {
-                        _controller.text = correction.corrected;
-                        _controller.selection = TextSelection.fromPosition(TextPosition(offset: correction.corrected.length));
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.edit_note_rounded),
-                      label: const Text('Use in composer'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () async {
-                        if (!_duePracticePhrases.contains(focusPhrase)) {
-                          setState(() => _duePracticePhrases.add(focusPhrase));
-                          await _saveLearningPreferences();
-                        }
-                        if (!context.mounted) return;
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.replay_circle_filled_rounded),
-                      label: const Text('Save to practice'),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () async {
-                        await _sendMessagePayload({
-                          'type': 'correction_request',
-                          'label': 'Native correction requested',
-                          'text': source,
-                          'items': ['Please provide natural correction', 'Add short reason'],
-                        });
-                        if (!context.mounted) return;
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.groups_rounded),
-                      label: const Text('Request native correction'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  
 
-  _CorrectionResult _buildCorrection(String source) {
-    var corrected = source.replaceAll(RegExp(r'\s+'), ' ').trim();
-    corrected = corrected.replaceAll(RegExp(r'\bi\b'), 'I');
-    if (corrected.isNotEmpty) {
-      corrected = corrected[0].toUpperCase() + corrected.substring(1);
-    }
-    if (!RegExp(r'[.!?]$').hasMatch(corrected)) {
-      corrected = '$corrected.';
-    }
-    var reason = corrected == source
-        ? 'Looks correct. Minor cleanup only.'
-        : 'Adjusted capitalization, spacing, and punctuation to match natural sentence form.';
-    if (_examModeEnabled) {
-      reason = '$reason Exam note: improve lexical variety and coherence for scoring.';
-    }
-    if (_tutorPersona == _TutorPersona.businessCoach) {
-      reason = '$reason Business tone: keep sentences concise and professional.';
-    }
-    return _CorrectionResult(corrected: corrected, reason: reason);
-  }
+  
 
-  Future<void> _showWordExplanation(_ChatMessage msg) async {
-    final words = (msg.payload.text ?? msg.previewText)
-        .split(RegExp(r'\s+'))
-        .map((e) => e.replaceAll(RegExp(r'[^A-Za-z0-9\-]'), ''))
-        .where((e) => e.isNotEmpty)
-        .toList();
-    if (words.isEmpty) return;
-    final selectedWord = await showModalBottomSheet<String>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            const ListTile(title: Text('Tap a word to explain')),
-            for (final word in words.take(12))
-              ListTile(
-                leading: const Icon(Icons.translate_rounded),
-                title: Text(word),
-                onTap: () => Navigator.pop(context, word),
-              ),
-          ],
-        ),
-      ),
-    );
-    if (!mounted || selectedWord == null) return;
-    final insight = _WordInsight.fromWord(selectedWord);
-    final save = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('“$selectedWord”'),
-        content: Text('Definition: ${insight.definition}\nCEFR: ${insight.cefr}\nExample: ${insight.example}'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Close')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Save to vocab deck')),
-        ],
-      ),
-    );
-    if (save == true) {
-      final settings = await settingsRepository.getSettings();
-      final existing = ((settings['learning_vocab_deck'] as List?) ?? const []).map((e) => e.toString()).toList();
-      if (!existing.contains(selectedWord)) {
-        existing.add(selectedWord);
-      }
-      if (!_duePracticePhrases.contains(selectedWord)) {
-        _duePracticePhrases.add(selectedWord);
-      }
-      await settingsRepository.updateSettings({
-        'learning_vocab_deck': existing,
-        'dm_due_practice_${widget.otherId}': _duePracticePhrases,
-      });
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Saved “$selectedWord” to vocabulary deck')),
-      );
-    }
-  }
+  
 
-  Future<void> _sendWithUndoWindow() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-    setState(() {
-      _pendingUndoText = text;
-      _controller.clear();
-    });
+  
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Message queued for 5 seconds'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            if (!mounted) return;
-            setState(() {
-              _controller.text = _pendingUndoText ?? '';
-              _controller.selection = TextSelection.fromPosition(
-                TextPosition(offset: _controller.text.length),
-              );
-              _pendingUndoText = null;
-            });
-          },
-        ),
-      ),
-    );
+  
 
-    await Future<void>.delayed(const Duration(seconds: 5));
-    if (!mounted || _pendingUndoText == null) return;
-    final toSend = _pendingUndoText!;
-    setState(() => _pendingUndoText = null);
-    await _sendText(toSend);
-  }
+  
 
-  Future<void> _scheduleMessage() async {
-    final selected = await showTimePicker(context: context, initialTime: TimeOfDay.now());
-    if (selected == null || !mounted) return;
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
-    final now = DateTime.now();
-    var when = DateTime(now.year, now.month, now.day, selected.hour, selected.minute);
-    if (when.isBefore(now)) when = when.add(const Duration(days: 1));
-    _scheduledSendTimer?.cancel();
-    _scheduledSendTimer = Timer(when.difference(now), () {
-      if (!mounted) return;
-      unawaited(_sendText(text));
-    });
-    _controller.clear();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Scheduled for ${selected.format(context)}')),
-    );
-  }
+  
 
-  Future<void> _muteConversationOneHour() async {
-    final until = DateTime.now().add(const Duration(hours: 1));
-    setState(() => _muteUntil = until);
-    await chatRepository.setConversationPreference(widget.otherId, muted: true);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Muted until ${TimeOfDay.fromDateTime(until).format(context)}')),
-    );
-  }
-
-  bool _isMessageMutedByKeyword(String text) {
-    if (_mutedKeywords.isEmpty) return false;
-    final lower = text.toLowerCase();
-    return _mutedKeywords.any(lower.contains);
-  }
-
-  Future<void> _addMutedKeyword() async {
-    final c = TextEditingController();
-    final value = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Mute keyword'),
-        content: TextField(
-          controller: c,
-          decoration: const InputDecoration(hintText: 'e.g. promo'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          FilledButton(onPressed: () => Navigator.pop(context, c.text.trim().toLowerCase()), child: const Text('Save')),
-        ],
-      ),
-    );
-    if (value == null || value.isEmpty || !mounted) return;
-    setState(() => _mutedKeywords.add(value));
-  }
+  
 
 
   void _onTypingChanged(bool hasText) {
@@ -1022,7 +442,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final key = widget.otherId;
     final draft = drafts[key]?.toString() ?? '';
     if (!mounted) return;
-    _draftText = draft;
     _controller.text = draft;
     _controller.selection = TextSelection.fromPosition(
       TextPosition(offset: _controller.text.length),
@@ -1076,195 +495,15 @@ class _DmChatScreenState extends State<DmChatScreen> {
   }
 
 
-  Future<void> _loadDisappearingWindow() async {
-    try {
-      final settings = await settingsRepository.getSettings();
-      final minutes = int.tryParse('${settings['dm_disappearing_minutes_${widget.otherId}']}');
-      if (!mounted) return;
-      setState(() {
-        _disappearingWindow = minutes == null || minutes <= 0 ? null : Duration(minutes: minutes);
-      });
-    } catch (_) {}
-  }
-
-  Future<void> _loadThemeStyle() async {
-    try {
-      final settings = await settingsRepository.getSettings();
-      final raw = settings['dm_theme_${widget.otherId}']?.toString();
-      final style = _DmThemeStyle.values.cast<_DmThemeStyle?>().firstWhere((e) => e?.name == raw, orElse: () => null) ?? _DmThemeStyle.defaultStyle;
-      if (!mounted) return;
-      setState(() => _themeStyle = style);
-    } catch (_) {}
-  }
 
 
-  Future<void> _loadPremiumToggles() async {
-    try {
-      final settings = await settingsRepository.getSettings();
-      if (!mounted) return;
-      setState(() {
-        _dmLocked = settings['dm_locked_${widget.otherId}'] == true;
-        _dmUnlocked = !_dmLocked;
-        _screenshotWarningEnabled = settings['dm_screenshot_warn_${widget.otherId}'] != false;
-        _hidePreviewInInbox = settings['dm_hide_preview_${widget.otherId}'] == true;
-        _noiseSuppressionEnabled = settings['dm_noise_suppress_${widget.otherId}'] != false;
-        _autoTranslateIncoming = settings['dm_auto_translate_${widget.otherId}'] == true;
-        _autoTranslateLanguage = settings['dm_auto_translate_lang_${widget.otherId}']?.toString() ?? 'English';
-      });
-    } catch (_) {}
-  }
-
-
-  Future<void> _loadLearningPracticeState() async {
-    try {
-      final settings = await settingsRepository.getSettings();
-      final personaRaw = settings['dm_tutor_persona_${widget.otherId}']?.toString();
-      final autoRaw = settings['dm_autocorrect_mode_${widget.otherId}']?.toString();
-      final dueRaw = ((settings['dm_due_practice_${widget.otherId}'] as List?) ?? const [])
-          .map((e) => e.toString())
-          .where((e) => e.trim().isNotEmpty)
-          .toList();
-      if (!mounted) return;
-      setState(() {
-        _tutorPersona = _TutorPersona.values.cast<_TutorPersona?>().firstWhere(
-              (p) => p?.name == personaRaw,
-              orElse: () => null,
-            ) ??
-            _TutorPersona.friendlyCoach;
-        _autoCorrectMode = _AutoCorrectMode.values.cast<_AutoCorrectMode?>().firstWhere(
-              (p) => p?.name == autoRaw,
-              orElse: () => null,
-            ) ??
-            _AutoCorrectMode.off;
-        _examModeEnabled = settings['dm_exam_mode_${widget.otherId}'] == true;
-        _duePracticePhrases
-          ..clear()
-          ..addAll(dueRaw.take(8));
-      });
-    } catch (_) {}
-  }
-
-  Future<void> _saveLearningPreferences() async {
-    await settingsRepository.updateSettings({
-      'dm_tutor_persona_${widget.otherId}': _tutorPersona.name,
-      'dm_autocorrect_mode_${widget.otherId}': _autoCorrectMode.name,
-      'dm_exam_mode_${widget.otherId}': _examModeEnabled,
-      'dm_due_practice_${widget.otherId}': _duePracticePhrases,
-    });
-  }
-
-  Future<void> _toggleDmLock() async {
-    final next = !_dmLocked;
-    setState(() {
-      _dmLocked = next;
-      _dmUnlocked = !next;
-    });
-    await settingsRepository.updateSetting('dm_locked_${widget.otherId}', next);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(next ? 'Chat locked. Unlock required each open.' : 'Chat lock disabled')),
-    );
-  }
-
-  Future<void> _toggleScreenshotWarning() async {
-    final next = !_screenshotWarningEnabled;
-    setState(() => _screenshotWarningEnabled = next);
-    await settingsRepository.updateSetting('dm_screenshot_warn_${widget.otherId}', next);
-  }
-
-  Future<void> _toggleHidePreview() async {
-    final next = !_hidePreviewInInbox;
-    setState(() => _hidePreviewInInbox = next);
-    await settingsRepository.updateSetting('dm_hide_preview_${widget.otherId}', next);
-    await chatRepository.setConversationPreference(widget.otherId, muted: _isConversationMuted);
-  }
-
-  Future<void> _showPrivacyControls() async {
-    await showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SwitchListTile.adaptive(
-              value: _screenshotWarningEnabled,
-              onChanged: (_) => _toggleScreenshotWarning(),
-              title: const Text('Screenshot warning policy'),
-              subtitle: const Text('Show warning banner in this chat'),
-            ),
-            SwitchListTile.adaptive(
-              value: _dmLocked,
-              onChanged: (_) => _toggleDmLock(),
-              title: const Text('Lock chat'),
-              subtitle: const Text('Require unlock to view messages'),
-            ),
-            SwitchListTile.adaptive(
-              value: _hidePreviewInInbox,
-              onChanged: (_) => _toggleHidePreview(),
-              title: const Text('Hide preview in inbox'),
-              subtitle: const Text('Show generic thread summary instead of text preview'),
-            ),
-            SwitchListTile.adaptive(
-              value: _autoTranslateIncoming,
-              onChanged: (_) async {
-                final next = !_autoTranslateIncoming;
-                setState(() => _autoTranslateIncoming = next);
-                await settingsRepository.updateSetting('dm_auto_translate_${widget.otherId}', next);
-              },
-              title: const Text('Auto-translate incoming messages'),
-              subtitle: Text('Translate incoming text to $_autoTranslateLanguage'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  
 
 
 
 
 
-  Future<void> _showVoicePronunciationCoach(_ChatMessage msg) async {
-    final transcript = msg.payload.transcript ?? msg.previewText;
-    try {
-      final result = await aiRepository.analyzePronunciation(transcript);
-      final score = result['score'] as int? ?? 0;
-      final difficult = List<String>.from(result['difficult_words'] ?? []);
-      final tip = result['tip'] as String? ?? 'Keep practicing!';
-      
-      final target = difficult.isNotEmpty ? difficult.first : (transcript.split(' ').isNotEmpty ? transcript.split(' ').first : 'phrase');
-      if (!mounted) return;
-      
-      final savePractice = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Pronunciation coach'),
-          content: Text('Score: $score/100\nDifficult words: ${difficult.isEmpty ? 'None' : difficult.join(', ')}\nAccent tip: $tip'),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Close')),
-            FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Repeat this phrase')),
-          ],
-        ),
-      );
-    if (savePractice == true) {
-      if (!_duePracticePhrases.contains(target)) {
-        setState(() => _duePracticePhrases.add(target));
-      }
-      await _saveLearningPreferences();
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Added "$target" to due practice today')),
-      );
-    }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pronunciation analysis failed: $e')),
-      );
-    }
-  }
-}
+  
 
   Future<void> _openAttachmentTray() async {
     final action = await showModalBottomSheet<String>(
@@ -1451,112 +690,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
     await _sendMessagePayload(payload);
   }
 
-  Future<void> _showMessagePackPicker() async {
-    final action = await showModalBottomSheet<String>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Wrap(
-          children: [
-            ListTile(title: const Text('Poll'), onTap: () => Navigator.pop(context, 'poll')),
-            ListTile(title: const Text('Checklist'), onTap: () => Navigator.pop(context, 'checklist')),
-            ListTile(title: const Text('Mini invite'), onTap: () => Navigator.pop(context, 'invite')),
-          ],
-        ),
-      ),
-    );
-    if (action == 'poll') {
-      _sendMessagePayload({'type': 'poll', 'text': 'Quick poll', 'label': 'When to practice?', 'options': ['Now', 'Tonight', 'Tomorrow']});
-    } else if (action == 'checklist') {
-      _sendMessagePayload({'type': 'checklist', 'text': 'Practice checklist', 'items': ['Warm-up', 'Vocabulary', 'Review']});
-    } else if (action == 'invite') {
-      _sendMessagePayload({'type': 'invite', 'text': 'Practice invite', 'label': 'Join 20-min speaking session'});
-    }
-  }
+  
 
 
-  Future<void> _openMoreDmToolsSheet() async {
-    final picked = await showModalBottomSheet<_DmMenuAction>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            _DmToolsSectionHeader(title: 'Filters & focus'),
-            ListTile(
-              leading: const Icon(Icons.push_pin_rounded),
-              title: Text(_showPinnedOnly ? 'Show all messages' : 'Show pinned only'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.togglePinnedOnly),
-            ),
-            ListTile(
-              leading: const Icon(Icons.tune_rounded),
-              title: const Text('Advanced filters'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.advancedSearch),
-            ),
-            const Divider(height: 1),
-            _DmToolsSectionHeader(title: 'Mute controls'),
-            ListTile(
-              leading: const Icon(Icons.notifications_paused_rounded),
-              title: const Text('Mute for 1 hour'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.muteOneHour),
-            ),
-            ListTile(
-              leading: const Icon(Icons.block_rounded),
-              title: const Text('Mute keyword'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.muteKeyword),
-            ),
-            const Divider(height: 1),
-            _DmToolsSectionHeader(title: 'Learning tools'),
-            ListTile(
-              leading: const Icon(Icons.auto_fix_high_rounded),
-              title: const Text('AI polish draft'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.aiPolish),
-            ),
-            ListTile(
-              leading: const Icon(Icons.lightbulb_rounded),
-              title: const Text('Smart compose mode'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.smartComposeMode),
-            ),
-            ListTile(
-              leading: const Icon(Icons.record_voice_over_rounded),
-              title: const Text('Tutor persona'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.chooseTutorPersona),
-            ),
-            ListTile(
-              leading: const Icon(Icons.spellcheck_rounded),
-              title: const Text('Auto-correct strictness'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.chooseAutoCorrect),
-            ),
-            ListTile(
-              leading: const Icon(Icons.school_rounded),
-              title: const Text('Toggle exam mode'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.toggleExamMode),
-            ),
-            ListTile(
-              leading: const Icon(Icons.replay_rounded),
-              title: const Text('Conversation replay mode'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.conversationReplay),
-            ),
-            ListTile(
-              leading: const Icon(Icons.insights_rounded),
-              title: const Text('Weekly learning report card'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.weeklyReportCard),
-            ),
-            const Divider(height: 1),
-            _DmToolsSectionHeader(title: 'Extras'),
-            ListTile(
-              leading: const Icon(Icons.add_box_rounded),
-              title: const Text('Send message pack'),
-              onTap: () => Navigator.pop(context, _DmMenuAction.addMessagePack),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (picked == null) return;
-    _handleMenuAction(picked);
-  }
+  
 
   Future<void> _sendMessagePayload(Map<String, dynamic> payload) async {
     if (!_ensureCanSendInDm()) return;
@@ -1601,168 +738,26 @@ class _DmChatScreenState extends State<DmChatScreen> {
     return 'Delivered';
   }
 
-  Future<void> _chooseDisappearingWindow() async {
-    final chosen = await showModalBottomSheet<int>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('Off'),
-              subtitle: const Text('Keep messages forever'),
-              trailing: const Text('Off'),
-              onTap: () => Navigator.pop(context, 0),
-            ),
-            ListTile(
-              title: const Text('1 hour'),
-              trailing: const Text('1h'),
-              onTap: () => Navigator.pop(context, 60),
-            ),
-            ListTile(
-              title: const Text('24 hours'),
-              trailing: const Text('24h'),
-              onTap: () => Navigator.pop(context, 1440),
-            ),
-            ListTile(
-              title: const Text('7 days'),
-              trailing: const Text('7d'),
-              onTap: () => Navigator.pop(context, 10080),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (chosen == null) return;
-    final next = chosen <= 0 ? null : Duration(minutes: chosen);
-    setState(() => _disappearingWindow = next);
-    await settingsRepository.updateSetting('dm_disappearing_minutes_${widget.otherId}', chosen);
-  }
+  
 
-  Future<void> _chooseThemeStyle() async {
-    final chosen = await showModalBottomSheet<_DmThemeStyle>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final style in _DmThemeStyle.values)
-              ListTile(
-                title: Text(_themeLabel(style)),
-                trailing: _themeStyle == style ? const Icon(Icons.check_rounded) : null,
-                onTap: () => Navigator.pop(context, style),
-              ),
-          ],
-        ),
-      ),
-    );
-    if (chosen == null) return;
-    setState(() => _themeStyle = chosen);
-    await settingsRepository.updateSetting('dm_theme_${widget.otherId}', chosen.name);
-  }
+  
 
-  String _themeLabel(_DmThemeStyle style) => switch (style) {
-        _DmThemeStyle.defaultStyle => 'Default glass',
-        _DmThemeStyle.aurora => 'Aurora premium',
-        _DmThemeStyle.mono => 'Monochrome luxe',
-        _DmThemeStyle.sunset => 'Sunset glow',
-      };
+  
 
-  List<Color> _chatBackgroundGradient(ColorScheme scheme) {
-    return switch (_themeStyle) {
-      _DmThemeStyle.aurora => [const Color(0xFF0E1026), const Color(0xFF1E2A52), const Color(0xFF2A5E66)],
-      _DmThemeStyle.mono => [const Color(0xFF0E0E10), const Color(0xFF1A1A1E), const Color(0xFF222228)],
-      _DmThemeStyle.sunset => [const Color(0xFF1A1020), const Color(0xFF412347), const Color(0xFF6A2D47)],
-      _DmThemeStyle.defaultStyle => [
-          scheme.surface,
-          scheme.surfaceContainerHighest.withValues(alpha: 0.6),
-        ],
-    };
-  }
+  
 
 
 
   void _handleMenuAction(_DmMenuAction action) {
     switch (action) {
-      case _DmMenuAction.media:
-        setState(() {
-          _showSearch = true;
-          _searchQuery = '"type":"image"';
-        });
-        break;
-      case _DmMenuAction.documents:
-        setState(() {
-          _showSearch = true;
-          _searchQuery = '"type":"file"';
-        });
-        break;
-      case _DmMenuAction.clearDraft:
-        _controller.clear();
-        _saveDraft('');
-        _setTypingState(false, immediate: true);
-        break;
-      case _DmMenuAction.togglePinnedOnly:
-        setState(() => _showPinnedOnly = !_showPinnedOnly);
-        break;
-      case _DmMenuAction.scheduleMessage:
-        _scheduleMessage();
-        break;
-      case _DmMenuAction.undoSend:
-        _sendWithUndoWindow();
-        break;
-      case _DmMenuAction.muteOneHour:
-        _muteConversationOneHour();
-        break;
-      case _DmMenuAction.muteKeyword:
-        _addMutedKeyword();
-        break;
       case _DmMenuAction.togglePin:
         chatRepository.setConversationPreference(widget.otherId, pinned: !_isConversationPinned);
         break;
       case _DmMenuAction.toggleMute:
         chatRepository.setConversationPreference(widget.otherId, muted: !_isConversationMuted);
         break;
-      case _DmMenuAction.chooseDisappearing:
-        _chooseDisappearingWindow();
-        break;
-      case _DmMenuAction.chooseTheme:
-        _chooseThemeStyle();
-        break;
-      case _DmMenuAction.aiPolish:
-        _aiPolishDraft();
-        break;
-      case _DmMenuAction.smartComposeMode:
-        _rewriteDraftStyle();
-        break;
-      case _DmMenuAction.chooseTutorPersona:
-        _openTutorPersonaPicker();
-        break;
-      case _DmMenuAction.chooseAutoCorrect:
-        _openAutoCorrectPicker();
-        break;
-      case _DmMenuAction.toggleExamMode:
-        setState(() => _examModeEnabled = !_examModeEnabled);
-        _saveLearningPreferences();
-        break;
-      case _DmMenuAction.conversationReplay:
-        _openConversationReplayMode();
-        break;
-      case _DmMenuAction.weeklyReportCard:
-        _showWeeklyLearningReportCard();
-        break;
-      case _DmMenuAction.privacyControls:
-        _showPrivacyControls();
-        break;
-      case _DmMenuAction.addMessagePack:
-        _showMessagePackPicker();
-        break;
       case _DmMenuAction.advancedSearch:
         setState(() => _showSearch = true);
-        break;
-      case _DmMenuAction.moreTools:
-        _openMoreDmToolsSheet();
         break;
     }
   }
@@ -2003,7 +998,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final smoothed = ((_smoothedCallQualityScore * 0.7) + (clamped * 0.3)).round();
     if (!mounted) return;
     setState(() {
-      _callQualityScore = clamped;
       _smoothedCallQualityScore = smoothed;
     });
   }
@@ -2043,7 +1037,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
       if (!mounted || _callState != DmCallState.ringingIncoming) return;
 
       if (accepted) {
-        await _emitDmCallSignal(CallSignalType.accept);
         await _startVoiceCall(sendInvite: false, incoming: true);
       } else {
         setState(() => _callState = DmCallState.idle);
@@ -2277,13 +1270,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
         _isMicMuted = false;
         _isSpeakerOn = true;
         _isRtcConnected = false;
-        _callQualityScore = 78;
         _smoothedCallQualityScore = 78;
       });
 
       if (sendInvite) {
         await _emitDmCallSignal(CallSignalType.invite);
         _startOutgoingRing();
+      } else if (incoming) {
+        await _emitDmCallSignal(CallSignalType.accept);
       }
 
       await _setGlobalCallState(active: true);
@@ -2323,7 +1317,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
       _isMicMuted = false;
       _isSpeakerOn = true;
       _isRtcConnected = false;
-      _callQualityScore = 78;
       _liveCaption = null;
       _smoothedCallQualityScore = 78;
     });
@@ -2346,25 +1339,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
   }
 
 
-  Future<bool> _ensureCallRecordingConsent() async {
-    if (_callRecordingConsent) return true;
-    final accepted = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Call recording consent'),
-        content: const Text('For safety and quality features, both users should consent before call analytics/captions are shown.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Decline')),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('I consent')),
-        ],
-      ),
-    );
-    if (accepted == true) {
-      setState(() => _callRecordingConsent = true);
-      return true;
-    }
-    return false;
-  }
+
 
   Future<void> _toggleNoiseSuppression() async {
     final next = !_noiseSuppressionEnabled;
@@ -2385,8 +1360,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       return;
     }
 
-    final consented = await _ensureCallRecordingConsent();
-    if (!consented) return;
+
 
     final canCall = await _canUseFreeQuota(
       key: 'dm_quota_call_count',
@@ -2924,24 +1898,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                 );
               },
             ),
-            if (msg.payload.type == 'text')
-              ListTile(
-                leading: const Icon(Icons.spellcheck_rounded),
-                title: const Text('Correct this sentence'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await _runCorrectionMode(msg);
-                },
-              ),
-            if (msg.payload.type == 'text')
-              ListTile(
-                leading: const Icon(Icons.menu_book_rounded),
-                title: const Text('Explain word'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await _showWordExplanation(msg);
-                },
-              ),
+
             ListTile(
               leading: Icon(_pinnedMessageIds.contains(msg.id) ? Icons.push_pin_outlined : Icons.push_pin_rounded),
               title: Text(_pinnedMessageIds.contains(msg.id) ? 'Unpin message' : 'Pin message'),
@@ -2984,15 +1941,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                   });
                 },
               ),
-            if (msg.payload.type == 'voice' && (msg.payload.transcript?.isNotEmpty ?? false))
-              ListTile(
-                leading: const Icon(Icons.record_voice_over_rounded),
-                title: const Text('Pronunciation coach'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  await _showVoicePronunciationCoach(msg);
-                },
-              ),
+
             if (msg.isMine && msg.payload.type == 'text')
               ListTile(
                 leading: const Icon(Icons.edit_rounded),
@@ -3101,11 +2050,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
           children: [
             Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: _chatBackgroundGradient(theme.colorScheme),
-                ),
+                color: Theme.of(context).colorScheme.surface,
               ),
               child: Column(
               children: [
@@ -3225,70 +2170,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
                     ],
                   ),
                 ),
-                if (_showSearch)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
-                    child: SegmentedButton<_SearchRange>(
-                      segments: const [
-                        ButtonSegment(value: _SearchRange.all, label: Text('All')),
-                        ButtonSegment(value: _SearchRange.today, label: Text('Today')),
-                        ButtonSegment(value: _SearchRange.week, label: Text('7d')),
-                      ],
-                      selected: {_searchRange},
-                      onSelectionChanged: (v) => setState(() => _searchRange = v.first),
-                    ),
-                  ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
-                  child: SegmentedButton<_DmTimelineTab>(
-                    segments: const [
-                      ButtonSegment(value: _DmTimelineTab.all, label: Text('All')),
-                      ButtonSegment(value: _DmTimelineTab.media, label: Text('Media')),
-                      ButtonSegment(value: _DmTimelineTab.files, label: Text('Files')),
-                    ],
-                    selected: {_timelineTab},
-                    onSelectionChanged: (v) => setState(() => _timelineTab = v.first),
-                  ),
-                ),
-                if (_screenshotWarningEnabled)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 0, 14, 6),
-                    child: Text(
-                      'Privacy notice: avoid sharing screenshots from this chat.',
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
+
                 _PinnedMomentsStrip(
                   messageIds: _pinnedMessageIds.toList(),
                   onTap: _jumpToMessageById,
                 ),
-                if (_dmLocked && !_dmUnlocked)
-                  Expanded(
-                    child: Center(
-                      child: Glass(
-                        radius: BorderRadius.circular(18),
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.lock_rounded, size: 28),
-                            const SizedBox(height: 8),
-                            const Text('This chat is locked'),
-                            const SizedBox(height: 8),
-                            FilledButton(
-                              onPressed: () => setState(() => _dmUnlocked = true),
-                              child: const Text('Unlock with biometrics'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  )
-                else
                   Expanded(
                     child: StreamBuilder<List<Map<String, dynamic>>>(
                       stream: _messagesStream,
@@ -3313,16 +2199,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         visibleMsgs = visibleMsgs.where((m) {
                           final payload = _MessagePayload.parse(m['content']?.toString() ?? '');
                           final text = payload.text ?? payload.fileName ?? '';
-                          if (_isMessageMutedByKeyword(text)) return false;
                           if (payload.expiresAt != null && payload.expiresAt!.isBefore(DateTime.now())) return false;
                           final created = DateTime.tryParse(m['created_at']?.toString() ?? '');
-                          if (_searchRange == _SearchRange.today && (created == null || !DateUtils.isSameDay(created.toLocal(), DateTime.now()))) return false;
-                          if (_searchRange == _SearchRange.week && (created == null || DateTime.now().difference(created.toLocal()).inDays > 7)) return false;
                           if (_showUnreadOnly && m['is_read'] == true) return false;
                           if (_showLinksOnly && !text.contains('http')) return false;
                           if (_showMentionsOnly && !text.contains('@')) return false;
-                          if (_timelineTab == _DmTimelineTab.media && payload.type != 'image') return false;
-                          if (_timelineTab == _DmTimelineTab.files && payload.type != 'file') return false;
                           return true;
                         }).toList();
                         if (_showPinnedOnly) {
@@ -3549,24 +2430,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
                     onToggleDraftVoice: _toggleDraftVoicePlayback,
                     onSendDraftVoice: _sendDraftVoiceMessage,
                     onDeleteDraftVoice: _deleteDraftVoice,
-                    duePracticePhrases: _duePracticePhrases,
-                    onUsePracticePhrase: (phrase) {
-                      setState(() {
-                        _controller.text = phrase;
-                        _controller.selection = TextSelection.fromPosition(TextPosition(offset: phrase.length));
-                        _duePracticePhrases.remove(phrase);
-                      });
-                      _saveLearningPreferences();
-                    },
-                    targetCefrLevel: _targetCefrLevel.name.toUpperCase(),
-                    cefrSuggestions: _composerSuggestionsForLevel(_targetCefrLevel),
-                    onSelectCefrLevel: (value) {
-                      final parsed = _CefrLevel.values.firstWhere(
-                        (level) => level.name.toUpperCase() == value,
-                        orElse: () => _targetCefrLevel,
-                      );
-                      setState(() => _targetCefrLevel = parsed);
-                    },
                   ),
               ],
             ),
@@ -4073,28 +2936,6 @@ class _TopBar extends StatelessWidget {
           PopupMenuButton<_DmMenuAction>(
             onSelected: onMenuSelected,
             itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: _DmMenuAction.media,
-                child: Text('Find photos & videos'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.documents,
-                child: Text('Find documents'),
-              ),
-              const PopupMenuDivider(),
-              const PopupMenuItem(
-                value: _DmMenuAction.scheduleMessage,
-                child: Text('Schedule message'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.undoSend,
-                child: Text('Send with 5s undo'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.clearDraft,
-                child: Text('Clear draft'),
-              ),
-              const PopupMenuDivider(),
               PopupMenuItem(
                 value: _DmMenuAction.togglePin,
                 child: Text(isConversationPinned ? 'Unpin thread' : 'Pin thread'),
@@ -4103,22 +2944,10 @@ class _TopBar extends StatelessWidget {
                 value: _DmMenuAction.toggleMute,
                 child: Text(isConversationMuted ? 'Unmute thread' : 'Mute thread'),
               ),
-              const PopupMenuItem(
-                value: _DmMenuAction.chooseDisappearing,
-                child: Text('Disappearing messages'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.chooseTheme,
-                child: Text('Chat theme'),
-              ),
-              const PopupMenuItem(
-                value: _DmMenuAction.privacyControls,
-                child: Text('Privacy controls'),
-              ),
               const PopupMenuDivider(),
               const PopupMenuItem(
-                value: _DmMenuAction.moreTools,
-                child: Text('More tools'),
+                value: _DmMenuAction.advancedSearch,
+                child: Text('Search messages'),
               ),
             ],
             child: Glass(
@@ -4141,11 +2970,6 @@ class _TopBar extends StatelessWidget {
     );
   }
 
-  String _fmtCallDuration(int seconds) {
-    final mm = (seconds ~/ 60).toString().padLeft(2, '0');
-    final ss = (seconds % 60).toString().padLeft(2, '0');
-    return '$mm:$ss';
-  }
 }
 
 class _Bubble extends StatefulWidget {
@@ -5031,42 +3855,6 @@ class _MessagePayload {
 }
 
 
-class _CorrectionResult {
-  final String corrected;
-  final String reason;
-
-  const _CorrectionResult({required this.corrected, required this.reason});
-}
-
-class _WordInsight {
-  final String definition;
-  final String cefr;
-  final String example;
-
-  const _WordInsight({
-    required this.definition,
-    required this.cefr,
-    required this.example,
-  });
-
-  factory _WordInsight.fromWord(String word) {
-    final cleaned = word.toLowerCase();
-    final cefr = switch (cleaned.length) {
-      <= 4 => 'A1',
-      <= 6 => 'A2',
-      <= 8 => 'B1',
-      <= 10 => 'B2',
-      <= 13 => 'C1',
-      _ => 'C2',
-    };
-    return _WordInsight(
-      definition: 'Likely means or relates to "$word" in this context.',
-      cefr: cefr,
-      example: 'Try: "I can use $word in a sentence today."',
-    );
-  }
-}
-
 class _ChatMessage {
   final String id;
   final bool isMine;
@@ -5128,11 +3916,6 @@ class _InputBar extends StatelessWidget {
   final VoidCallback onToggleDraftVoice;
   final VoidCallback onSendDraftVoice;
   final VoidCallback onDeleteDraftVoice;
-  final List<String> duePracticePhrases;
-  final ValueChanged<String> onUsePracticePhrase;
-  final String targetCefrLevel;
-  final List<String> cefrSuggestions;
-  final ValueChanged<String> onSelectCefrLevel;
 
   const _InputBar({
     required this.controller,
@@ -5154,11 +3937,6 @@ class _InputBar extends StatelessWidget {
     required this.onToggleDraftVoice,
     required this.onSendDraftVoice,
     required this.onDeleteDraftVoice,
-    required this.duePracticePhrases,
-    required this.onUsePracticePhrase,
-    required this.targetCefrLevel,
-    required this.cefrSuggestions,
-    required this.onSelectCefrLevel,
   });
 
   @override
@@ -5259,68 +4037,7 @@ class _InputBar extends StatelessWidget {
                 ),
               ),
             ),
-          if (duePracticePhrases.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: SizedBox(
-                height: 34,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, i) => ActionChip(
-                    avatar: const Icon(Icons.replay_rounded, size: 14),
-                    label: Text('Due: ${duePracticePhrases[i]}'),
-                    onPressed: () => onUsePracticePhrase(duePracticePhrases[i]),
-                  ),
-                  separatorBuilder: (_, __) => const SizedBox(width: 6),
-                  itemCount: duePracticePhrases.length,
-                ),
-              ),
-            ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              children: [
-                const Icon(Icons.school_rounded, size: 16),
-                const SizedBox(width: 8),
-                DropdownButton<String>(
-                  value: targetCefrLevel,
-                  underline: const SizedBox.shrink(),
-                  items: const ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
-                      .map((level) => DropdownMenuItem(value: level, child: Text(level)))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value == null) return;
-                    onSelectCefrLevel(value);
-                  },
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        for (final suggestion in cefrSuggestions.take(2))
-                          Padding(
-                            padding: const EdgeInsets.only(right: 6),
-                            child: ActionChip(
-                              label: Text(suggestion, maxLines: 1, overflow: TextOverflow.ellipsis),
-                              onPressed: () {
-                                controller.text = suggestion;
-                                controller.selection = TextSelection.fromPosition(
-                                  TextPosition(offset: controller.text.length),
-                                );
-                                onTypingChanged(true);
-                                onTextChanged(controller.text);
-                              },
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+
           Glass(
             radius: BorderRadius.circular(22),
             padding: const EdgeInsets.fromLTRB(12, 10, 10, 10),

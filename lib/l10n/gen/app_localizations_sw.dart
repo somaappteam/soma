@@ -217,6 +217,9 @@ class AppLocalizationsSw extends AppLocalizations {
       'Fanya mazoezi uliyojifunza: maneno magumu, makosa ya hivi karibuni';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Anza Mapitio';
 
   @override

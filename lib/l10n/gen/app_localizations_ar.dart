@@ -216,6 +216,9 @@ class AppLocalizationsAr extends AppLocalizations {
       'تدرّب على ما تعلمته: الكلمات الضعيفة والأخطاء الأخيرة والتكرار المتباعد.';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'بدء المراجعة';
 
   @override

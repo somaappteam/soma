@@ -73,7 +73,6 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                         final showOnline = data['show_online_status'] ?? true;
                         final showActivity = data['show_learning_activity'] ?? true;
                         final allowRequests = data['allow_friend_requests'] ?? true;
-                        final exchangeActive = data['exchange_active'] == true;
                         final dmPermission = _parseDmPermission(data['dm_permission']);
                         final blockedIds = _parseBlockedUsers(data['blocked_user_ids']);
 
@@ -123,15 +122,6 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                               onChanged: (v) => settingsRepository.updateSetting('show_learning_activity', v),
                             ),
 
-
-                            const SizedBox(height: 10),
-                            _SwitchTile(
-                              icon: Icons.language_rounded,
-                              title: 'Appear in two-language exchange',
-                              subtitle: 'When enabled, active users can discover you in exchange.',
-                              value: exchangeActive,
-                              onChanged: (v) => settingsRepository.updateSetting('exchange_active', v),
-                            ),
 
                             const SizedBox(height: 14),
 

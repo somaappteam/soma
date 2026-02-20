@@ -47,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<UserStats>? _statsFuture;
   Future<List<Map<String, dynamic>>>? _friendsFuture;
   Future<List<Achievement>>? _achievementsFuture;
-  Future<Map<String, dynamic>>? _exchangePrefsFuture;
+
 
   bool get _isGuest => authRepository.currentUser == null;
   String? get _viewerId => authRepository.currentUser?.id;
@@ -64,7 +64,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _statsFuture = statsRepository.getStats(userId: _viewedUserId);
       _friendsFuture = _isVisitorView ? null : socialRepository.getFriends();
       _achievementsFuture = achievementsRepository.getAchievements();
-      _exchangePrefsFuture = _isVisitorView ? null : settingsRepository.getSettings();
     }
   }
 
@@ -447,17 +446,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       wins: (snapshot.data ?? UserStats.empty()).totalWins,
                                       streak: (snapshot.data ?? UserStats.empty()).streakDays,
                                     )),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: S.sm),
-                        _ProfileSectionLabel(label: 'Exchange'),
-                        const SizedBox(height: 6),
-                        FutureBuilder<Map<String, dynamic>>(
-                          future: _exchangePrefsFuture,
-                          builder: (context, snapshot) {
-                            return _PremiumSectionShell(
-                              child: _ExchangeLanguagesProfileCard(settings: snapshot.data ?? const <String, dynamic>{}),
                             );
                           },
                         ),
@@ -2118,104 +2106,6 @@ class _NeonProgressBar extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _ExchangeLanguagesProfileCard extends StatelessWidget {
-  final Map<String, dynamic> settings;
-
-  const _ExchangeLanguagesProfileCard({required this.settings});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final speaksCodes = ((settings['exchange_speaks_languages'] as List?) ?? const [])
-        .map((e) => e.toString())
-        .where((e) => e.isNotEmpty)
-        .toList();
-    final speaksNames = ((settings['exchange_speaks_languages_names'] as List?) ?? const [])
-        .map((e) => e.toString())
-        .where((e) => e.isNotEmpty)
-        .toList();
-    final learns = ((settings['exchange_learns_languages'] as List?) ?? const [])
-        .whereType<Map>()
-        .map((e) => Map<String, dynamic>.from(e))
-        .toList();
-
-    if (speaksCodes.isEmpty && learns.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    return Glass(
-      radius: BorderRadius.circular(16),
-      padding: const EdgeInsets.all(14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.translate_rounded, size: 16, color: scheme.primary),
-              const SizedBox(width: 8),
-              Text(
-                '2-language exchange profile',
-                style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          if (speaksCodes.isNotEmpty) ...[
-            Text('Speaks (max 3)', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75), fontWeight: FontWeight.w700, fontSize: 12)),
-            const SizedBox(height: 6),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-                children: [
-                  for (var i = 0; i < speaksCodes.length; i++)
-                    _TinyExchangeChip(label: i < speaksNames.length ? speaksNames[i] : speaksCodes[i]),
-                ],
-              ),
-            const SizedBox(height: 10),
-          ],
-          if (learns.isNotEmpty) ...[
-            Text('Learning goals (max 5)', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75), fontWeight: FontWeight.w700, fontSize: 12)),
-            const SizedBox(height: 6),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                for (final item in learns)
-                  _TinyExchangeChip(
-                    label: '${item['name'] ?? item['code'] ?? ''} · ${item['level'] ?? 'Beginner'}',
-                  ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _TinyExchangeChip extends StatelessWidget {
-  final String label;
-
-  const _TinyExchangeChip({required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        color: scheme.onSurface.withValues(alpha: 0.08),
-        border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.9), fontWeight: FontWeight.w700, fontSize: 11),
       ),
     );
   }

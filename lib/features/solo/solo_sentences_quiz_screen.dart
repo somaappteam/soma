@@ -52,6 +52,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
   List<String> _choices = [];
   int _correctIndex = 0;
   String _prompt = '';
+  String _correctAnswer = ''; // the word that fills the blank
   double _speechRate = 1.0;
 
   final List<Map<String, dynamic>> mistakes = [];
@@ -175,7 +176,10 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     if (widget.timePerQuestion != null) {
       speakFuture.whenComplete(() {
         if (!mounted) return;
-        _next();
+        Future.delayed(const Duration(milliseconds: 1000), () {
+          if (!mounted) return;
+          _next();
+        });
       });
     }
   }
@@ -183,20 +187,22 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
   Future<void> _speakSentence({bool withDelay = true}) {
     if (!revealed) return Future.value();
     final q = questions[index % questions.length];
-    final sentence = q["full_sentence"]?.toString() ?? '';
-    if (sentence.trim().isEmpty) return Future.value();
+    final sentence = q['full_sentence']?.toString() ?? '';
+    if (sentence.trim().isEmpty || sentence.trim() == 'null') return Future.value();
+    final lang = q['target_lang']?.toString().trim() ?? '';
+    // Always pass a language. TtsService will stay silent if empty or unavailable.
+    if (lang.isEmpty) return Future.value();
     final completer = Completer<void>();
-    final delay = withDelay ? const Duration(milliseconds: 300) : Duration.zero;
+    final delay = withDelay ? const Duration(milliseconds: 350) : Duration.zero;
     Timer(delay, () async {
       if (!mounted) {
         completer.complete();
         return;
       }
       try {
-        await ttsService.setRate(_speechRate);
-        await ttsService.speak(sentence);
+        await ttsService.speak(sentence, language: lang);
       } catch (e) {
-        debugPrint("TTS Error in _speakSentence: $e");
+        debugPrint('TTS Error in _speakSentence: $e');
       }
       completer.complete();
     });
@@ -228,57 +234,49 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     try {
       if (questions.isEmpty) return;
       final q = questions[index % questions.length];
-      final hasPool = q["choice_pool"] is List;
-      final sentence =
-          q["full_sentence"]?.toString() ?? q["sentence"]?.toString() ?? '';
-      final blanked =
-          hasPool && sentence.isNotEmpty ? _blankSentence(sentence) : null;
+
+      // Sanitise DB null literals — Supabase may return the string 'null' for NULL columns.
+      String sanitize(dynamic v) {
+        final s = v?.toString().trim() ?? '';
+        return s == 'null' ? '' : s;
+      }
+
+      final sentence = sanitize(q['full_sentence'] ?? q['sentence']);
+      if ((q['full_sentence']?.toString().trim() ?? '') == 'null') q['full_sentence'] = null;
+      if ((q['reading']?.toString().trim() ?? '') == 'null') q['reading'] = null;
+      if ((q['translation']?.toString().trim() ?? '') == 'null') q['translation'] = null;
+
+      final hasPool = q['choice_pool'] is List;
+      final blanked = hasPool && sentence.isNotEmpty ? _blankSentence(sentence) : null;
       final choiceSet = _buildChoiceSet(q, blanked?.answer);
       setState(() {
-        _prompt = blanked?.prompt ?? (q["prompt"]?.toString() ?? sentence);
+        _prompt = blanked?.prompt ?? sanitize(q['prompt'] ?? sentence);
+        _correctAnswer = blanked?.answer ?? sanitize(q['correct_answer']);
         _choices = choiceSet.choices;
         _correctIndex = choiceSet.correctIndex;
       });
-      // Assuming _scheduleQuestionAudio() is a new method to be added or already exists
-      // If it doesn't exist, this line will cause a compilation error.
-      // For now, commenting it out as it was not part of the original code and not fully defined in the instruction.
-      // _scheduleQuestionAudio();
-       _scheduleQuestionAudio();
     } catch (e, stack) {
-       showDialog(context: context, builder: (_) => AlertDialog(
-          title: const Text("Error Preparing Question"),
-          content: SingleChildScrollView(child: Text("$e\n$stack")),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))],
-        ));
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Error Preparing Question'),
+          content: SingleChildScrollView(child: Text('$e\n$stack')),
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+        ),
+      );
     }
   }
 
-  // Added missing method
-  Timer? _ttsTimer;
-  void _scheduleQuestionAudio() {
-    _ttsTimer?.cancel();
-    if (_prompt.trim().isEmpty) return;
-    _ttsTimer = Timer(const Duration(milliseconds: 350), () async {
-      if (!mounted) return;
-      try {
-        await ttsService.setRate(_speechRate);
-        await ttsService.speak(_prompt);
-      } catch (e) {
-         debugPrint("TTS Error in _scheduleQuestionAudio: $e");
-      }
-    });
-  }
 
   _ChoiceSet _buildChoiceSet(
       Map<String, dynamic> question, String? correctOverride) {
-    final pool = question["choice_pool"];
+    final pool = question['choice_pool'];
     final correctAnswer =
-        (correctOverride ?? question["correct_answer"]?.toString() ?? '')
-            .trim();
+        (correctOverride ?? question['correct_answer']?.toString() ?? '').trim();
     if (pool is List && correctAnswer.isNotEmpty) {
       final items = pool
-          .map((e) => e.toString())
-          .where((e) => e.trim().isNotEmpty && e != correctAnswer)
+          .map((e) => e.toString().trim())
+          .where((e) => e.isNotEmpty && e != 'null' && e != correctAnswer)
           .toSet()
           .toList();
       items.shuffle();
@@ -288,11 +286,14 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
           choices: choices, correctIndex: choices.indexOf(correctAnswer));
     }
 
-    final fallback = question["choices"];
+    final fallback = question['choices'];
     if (fallback is List) {
-      final choices = fallback.map((e) => e.toString()).toList();
+      final choices = fallback
+          .map((e) => e.toString().trim())
+          .where((e) => e.isNotEmpty && e != 'null')
+          .toList();
       final correctIndex =
-          question["correct"] is int ? question["correct"] as int : 0;
+          question['correct'] is int ? question['correct'] as int : 0;
       return _ChoiceSet(choices: choices, correctIndex: correctIndex);
     }
 
@@ -468,54 +469,63 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                 ),
               ),
               SizedBox(height: topSpacing),
-              ConstrainedBox(
-                constraints: const BoxConstraints(minWidth: 200),
-                child: Glass(
-                  radius: BorderRadius.circular(22),
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 92),
-                    child: Column(
+              Glass(
+                radius: BorderRadius.circular(22),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(minHeight: 92),
+                  child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                      Text(
-                        _prompt.isNotEmpty
-                            ? _prompt
-                            : (q["prompt"]?.toString() ?? ''),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: scheme.onSurface,
-                            fontSize: 22,
-                            height: 1.25,
-                            fontWeight: FontWeight.w900),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _SentencePromptWidget(
+                              prompt: _prompt,
+                              correctAnswer: _correctAnswer,
+                              revealed: revealed,
+                              langCode: q['target_lang']?.toString() ?? '',
+                              scheme: scheme,
+                              fontSize: 22,
+                            ),
+                          ),
+                        ],
                       ),
                       if (revealed &&
                           showReading &&
-                          (q["reading"] as String?)?.trim().isNotEmpty ==
-                              true) ...[
+                          (q['reading']?.toString().trim() ?? '').isNotEmpty) ...[
                         const SizedBox(height: 8),
-                        Text(
-                          q["reading"] as String,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: scheme.onSurface.withValues(alpha: 0.55),
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600),
+                        Directionality(
+                          textDirection: _isRtlLang(q['target_lang']?.toString() ?? '')
+                              ? TextDirection.rtl
+                              : TextDirection.ltr,
+                          child: Text(
+                            q['reading'] as String,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: scheme.onSurface.withValues(alpha: 0.55),
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600),
+                          ),
                         ),
                       ],
                       if (showTranslation) ...[
                         SizedBox(height: compactHeight ? 8 : 10),
-                        Text(
-                          q["translation"],
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: scheme.onSurface.withValues(alpha: 0.80),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700),
+                        Directionality(
+                          textDirection: _isRtlLang(q['source_lang']?.toString() ?? '')
+                              ? TextDirection.rtl
+                              : TextDirection.ltr,
+                          child: Text(
+                            q['translation']?.toString() ?? '',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: scheme.onSurface.withValues(alpha: 0.80),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700),
+                          ),
                         ),
                       ],
                     ],
-                    ),
                   ),
                 ),
               ),
@@ -597,12 +607,17 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: Text(
-                                    choices[i],
-                                    style: TextStyle(
-                                        color: scheme.onSurface.withValues(alpha: 0.92),
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w800),
+                                  child: Directionality(
+                                    textDirection: _isRtlLang(q['target_lang']?.toString() ?? '')
+                                        ? TextDirection.rtl
+                                        : TextDirection.ltr,
+                                    child: Text(
+                                      choices[i],
+                                      style: TextStyle(
+                                          color: scheme.onSurface.withValues(alpha: 0.92),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w800),
+                                    ),
                                   ),
                                 ),
                                 if (revealed && isCorrect) ...[
@@ -647,6 +662,84 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
   }
 }
 
+// ----------- RTL detection ---------------------------------------------------
+
+/// Returns [true] if the given 2-letter language code uses a right-to-left script.
+bool _isRtlLang(String code) {
+  const rtl = {
+    'ar', 'he', 'fa', 'ur', 'ps', 'sd', 'ug', 'yi',
+    'dv', 'ks', 'ku', 'ha', 'az', // Azerbaijani when written in Arabic script
+  };
+  return rtl.contains(code.trim().toLowerCase().split('-').first);
+}
+
+// ----------- Widgets ---------------------------------------------------------
+
+class _SentencePromptWidget extends StatelessWidget {
+  final String prompt;       // The blanked sentence  e.g. "Ich ____ Deutsch"
+  final String correctAnswer; // The word that fills the blank
+  final bool revealed;
+  final String langCode;
+  final ColorScheme scheme;
+  final double fontSize;
+
+  const _SentencePromptWidget({
+    required this.prompt,
+    required this.correctAnswer,
+    required this.revealed,
+    required this.langCode,
+    required this.scheme,
+    required this.fontSize,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isRtl = _isRtlLang(langCode);
+    final textDir = isRtl ? TextDirection.rtl : TextDirection.ltr;
+    final baseStyle = TextStyle(
+      color: scheme.onSurface,
+      fontSize: fontSize,
+      height: 1.35,
+      fontWeight: FontWeight.w900,
+    );
+
+    Widget child;
+    if (revealed && correctAnswer.isNotEmpty && prompt.contains('____')) {
+      // Replace ____ with the highlighted correct answer.
+      final parts = prompt.split('____');
+      child = Text.rich(
+        TextSpan(
+          children: [
+            for (var i = 0; i < parts.length; i++) ...[
+              TextSpan(text: parts[i], style: baseStyle),
+              if (i < parts.length - 1)
+                TextSpan(
+                  text: correctAnswer,
+                  style: baseStyle.copyWith(
+                    color: const Color(0xFF2AFADF),
+                    decoration: TextDecoration.underline,
+                    decorationColor: const Color(0xFF2AFADF),
+                  ),
+                ),
+            ],
+          ],
+        ),
+        textAlign: TextAlign.center,
+        textDirection: textDir,
+      );
+    } else {
+      child = Text(
+        prompt.isNotEmpty ? prompt : '…',
+        textAlign: TextAlign.center,
+        textDirection: textDir,
+        style: baseStyle,
+      );
+    }
+
+    return Directionality(textDirection: textDir, child: child);
+  }
+}
+
 class _IconGlass extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -678,6 +771,7 @@ class _BlankResult {
 
   const _BlankResult({required this.prompt, required this.answer});
 }
+
 
 class _TtsControls extends StatelessWidget {
   final List<double> rates;

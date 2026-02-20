@@ -23,6 +23,7 @@ class RtcVoiceService {
   final Map<String, RTCIceConnectionState> _peerIceStates = {};
   final Map<String, bool> _hasRemoteDescription = {};
   final Map<String, List<RTCIceCandidate>> _pendingCandidates = {};
+  final Map<String, RTCVideoRenderer> _renderers = {};
   final StreamController<bool> _connectionStream =
       StreamController<bool>.broadcast();
   final StreamController<Map<String, dynamic>> _telemetryStream =
@@ -378,8 +379,20 @@ class RtcVoiceService {
       }
     };
 
-    pc.onTrack = (event) {
+    pc.onTrack = (event) async {
       debugPrint('Voice track received from $peerId: ${event.track.kind}');
+      if (event.streams.isNotEmpty) {
+        final stream = event.streams[0];
+        try {
+          final renderer = RTCVideoRenderer();
+          await renderer.initialize();
+          renderer.srcObject = stream;
+          _renderers[peerId] = renderer;
+          debugPrint('Successfully wired audio via RTCVideoRenderer for $peerId');
+        } catch (e) {
+          debugPrint('Failed to wire audio for $peerId: $e');
+        }
+      }
     };
 
     return pc;
@@ -514,6 +527,11 @@ class RtcVoiceService {
   }
 
   void _closePeer(String peerId) {
+    if (_renderers.containsKey(peerId)) {
+      final renderer = _renderers.remove(peerId);
+      renderer?.srcObject = null;
+      renderer?.dispose();
+    }
     _peers.remove(peerId)?.close();
     _peerUsingTurn.remove(peerId);
     _peerIceStates.remove(peerId);

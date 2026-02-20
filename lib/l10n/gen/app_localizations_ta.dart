@@ -218,6 +218,9 @@ class AppLocalizationsTa extends AppLocalizations {
       'கற்றவற்றைப் பயிற்சி செய்யுங்கள்: பலவீனமான சொற்கள், சமீபத்திய பிழைகள் மற்றும் இடைவெளி முறையிலான மறுலாய்வு';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'மதிப்பாய்வைத் துவங்கு';
 
   @override

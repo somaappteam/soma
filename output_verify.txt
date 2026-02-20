@@ -1,0 +1,25 @@
+--- Testing Manual Import Data Integrity ---
+
+[Discovery] Checking available languages...
+  Vocabulary Languages found (sample): {af, sq, am, ar-EG, ar-AE, ar-IQ, ar-LB, ar-MA, ar, hy, ast, eu, be, bn, bs, br, bg, my, ca, ceb, co, hr, cs, da, nl, en, eo, et, fo, fil, fi, fr, fy, gl, ka, de, el, gu, ht, ha, he, hi, hu, is, ig, ilo, id, ga, xh, it}
+  Sentence Languages found (sample): {af, sq, am, ar-EG, ar-AE, ar-IQ, ar-LB, ar-MA, ar, hy, ast, eu, be, bn, bs, br, bg, my, ca, ceb, co, hr, cs, da, nl, en, eo, et, fo, fil, fi, fr, fy, gl, ka, de, el, gu, ht, ha, he, hi, hu, is, ig, ilo, id, ga, xh, it}
+
+[Vocabulary] Fetching for en -> es
+  Fetched 5 source items
+  Fetched 5 target items
+  Sample Target Item:
+    ID: 100
+    Word: ser
+    Pronunciation: null
+  Note: Pronunciation is empty.
+
+[Sentences] Fetching for en -> es
+  Fetched 5 source items
+  Fetched 5 target items
+  Sample Target Item:
+    ID: 100
+    Sentence: Probemos algo
+    Pronunciation: null
+  Note: Pronunciation is empty.
+--- Test Completed ---
+^C

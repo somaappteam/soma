@@ -544,6 +544,12 @@ abstract class AppLocalizations {
   /// **'Practice what you learned: weak words, recent mistakes, and spaced repetition.'**
   String get soloModeReviewDescription;
 
+  /// No description provided for @soloReverse.
+  ///
+  /// In en, this message translates to:
+  /// **'Reverse mode'**
+  String get soloReverse;
+
   /// No description provided for @startReview.
   ///
   /// In en, this message translates to:

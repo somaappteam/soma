@@ -216,6 +216,9 @@ class AppLocalizationsFa extends AppLocalizations {
       'تمرین آموخته‌ها: کلمات ضعیف، اشتباهات اخیر و تکرار فاصله‌دار';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'شروع بازبینی';
 
   @override

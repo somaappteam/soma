@@ -217,6 +217,9 @@ class AppLocalizationsTe extends AppLocalizations {
       'నేర్చుకున్నవాటిని ప్రాక్టీస్ చేయండి: బలహీనమైన పదాలు, ఇటీవల చేసిన తప్పులు';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'సమీక్షను ప్రారంభించండి';
 
   @override

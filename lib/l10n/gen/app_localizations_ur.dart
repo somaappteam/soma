@@ -217,6 +217,9 @@ class AppLocalizationsUr extends AppLocalizations {
       'سیکھے ہوئے کی مشق کریں: کمزور الفاظ، حالیہ غلطیاں، اور وقفہ دہرائی';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'نظرثانی شروع کریں';
 
   @override

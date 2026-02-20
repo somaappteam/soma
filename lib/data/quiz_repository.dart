@@ -8,6 +8,7 @@ import 'achievements_repository.dart';
 import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'offline_queue_repository.dart';
+import 'csv_service.dart';
 
 class QuizRepository {
   final SupabaseClient _client = Supabase.instance.client;
@@ -15,30 +16,16 @@ class QuizRepository {
   final QuizCache _cache = QuizCache();
   final VocabSrsStore _srsStore = VocabSrsStore();
 
-  Future<List<Map<String, dynamic>>> getVocabQuestions(String courseId, int limit) async {
+  Future<List<Map<String, dynamic>>> getVocabQuestions(String courseId, int limit,
+      {bool reverse = false}) async {
     final langs = _parseCourseLangs(courseId);
     if (langs == null) return [];
-    final cacheKey = 'vocab_${courseId}_$limit';
     final dueConcepts = await _srsStore.dueConceptIds(courseId);
 
-    if (dueConcepts.isEmpty) {
-      final cached = await _cache.load(cacheKey);
-      if (cached.isNotEmpty) return cached;
-    }
-
     try {
-      // Prioritize Supabase for real-time/group quizzes if available
-      if (_client.auth.currentUser != null) {
-        final supabaseQs = await getVocabQuestionsFromSupabase(courseId, limit);
-        if (supabaseQs.isNotEmpty) {
-          await _cache.save(cacheKey, supabaseQs);
-          return supabaseQs;
-        }
-      }
-
-      final dbHelper = DatabaseHelper.instance;
-      final sourceRows = await dbHelper.getVocabularyByLang(langs.source);
-      final targetRows = await dbHelper.getVocabularyByLang(langs.target);
+      final csvService = CsvService.instance;
+      final sourceRows = await csvService.getVocabularyByLang(langs.source);
+      final targetRows = await csvService.getVocabularyByLang(langs.target);
 
       final sourceList = _rowsToMapList(sourceRows);
       final targetList = _rowsToMapList(targetRows);
@@ -93,6 +80,12 @@ class QuizRepository {
           .toSet()
           .toList();
 
+      final targetWords = targetList
+          .map(_formatVocabWord)
+          .where((word) => word.isNotEmpty)
+          .toSet()
+          .toList();
+
       final questions = selected.map((row) {
         final concept = _parseInt(row['concept_id']);
         final sourceRow = concept != null ? sourceByConcept[concept] : null;
@@ -102,29 +95,45 @@ class QuizRepository {
         final correct = _formatVocabWord(sourceRow);
         if (targetWord.isEmpty || correct.isEmpty) return null;
 
-        final choices = _buildChoices(sourceWords, correct);
+        // Strip the string literal 'null' returned by Supabase for NULL columns.
+        String s(dynamic v) {
+          final t = v?.toString().trim() ?? '';
+          return t.toLowerCase() == 'null' ? '' : t;
+        }
+
+        final nativeChoices = _buildChoices(sourceWords, correct);
+        final targetChoices = _buildChoices(targetWords, targetWord);
+        
         return {
           "concept_id": concept,
-          "prompt": targetWord,
-          "word": row['word'],
-          "article": row['article'],
-          "gender": row['gender'],
-          "reading": _formatReading(row),
-          "choices": choices,
-          "correct": choices.indexOf(correct),
-          "choice_pool": sourceWords,
-          "correct_answer": correct,
+          "word": s(row['word']),
+          "article": s(row['article']),
+          "reading": s(row['pronunciation']),
+          "gender": s(row['gender']),
+
+          // Reversible toggle properties
+          "target_word": targetWord,
+          "native_word": correct,
+          "target_choices": targetChoices,
+          "native_choices": nativeChoices,
+
+          // Language codes for TTS
+          "target_lang": langs.target,
+          "source_lang": langs.source,
+
+          // Reverse-aware display fields
+          "prompt": reverse ? correct : targetWord,
+          "choices": reverse ? targetChoices : nativeChoices,
+          "correct": reverse ? targetChoices.indexOf(targetWord) : nativeChoices.indexOf(correct),
+          "correct_answer": reverse ? targetWord : correct,
+          "choice_pool": reverse ? targetWords : sourceWords,
         };
       }).whereType<Map<String, dynamic>>().toList();
 
-      if (questions.isNotEmpty) {
-        await _cache.save(cacheKey, questions);
-      }
-
       return questions;
     } catch (e) {
-      final cached = await _cache.load(cacheKey, allowStale: true);
-      return cached;
+      debugPrint("Error fetching vocab questions from CSV/SQLite: $e");
+      return [];
     }
   }
 
@@ -132,23 +141,11 @@ class QuizRepository {
   Future<List<Map<String, dynamic>>> getSentenceQuestions(String courseId, int limit) async {
     final langs = _parseCourseLangs(courseId);
     if (langs == null) return [];
-    final cacheKey = 'sentences_${courseId}_$limit';
-    final cached = await _cache.load(cacheKey);
-    if (cached.isNotEmpty) return cached;
 
     try {
-      // Prioritize Supabase
-      if (_client.auth.currentUser != null) {
-        final supabaseQs = await getSentenceQuestionsFromSupabase(courseId, limit);
-        if (supabaseQs.isNotEmpty) {
-          await _cache.save(cacheKey, supabaseQs);
-          return supabaseQs;
-        }
-      }
-
-      final dbHelper = DatabaseHelper.instance;
-      final sourceRows = await dbHelper.getSentencesByLang(langs.source);
-      final targetRows = await dbHelper.getSentencesByLang(langs.target);
+      final csvService = CsvService.instance;
+      final sourceRows = await csvService.getSentencesByLang(langs.source);
+      final targetRows = await csvService.getSentencesByLang(langs.target);
 
       final sourceList = _rowsToMapList(sourceRows);
       final targetList = _rowsToMapList(targetRows);
@@ -198,31 +195,36 @@ class QuizRepository {
         final sourceSentence = sourceRow['sentence']?.toString() ?? '';
         if (targetSentence.trim().isEmpty || sourceSentence.trim().isEmpty) return null;
 
+        // Strip 'null' literals that Supabase may return for NULL columns.
+        String s(dynamic v) {
+          final t = v?.toString().trim() ?? '';
+          return t.toLowerCase() == 'null' ? '' : t;
+        }
+
         final blanked = _blankSentence(targetSentence);
         if (blanked == null) return null;
 
         final choices = _buildChoices(targetPool, blanked.answer);
         return {
-          "concept_id": concept,
-          "prompt": blanked.prompt,
-          "full_sentence": targetSentence,
-          "translation": sourceSentence,
-          "reading": _formatReading(targetRow),
-          "choices": choices,
-          "correct": choices.indexOf(blanked.answer),
-          "choice_pool": targetPool,
-          "correct_answer": blanked.answer,
+          'concept_id': concept,
+          'prompt': blanked.prompt,
+          'full_sentence': targetSentence,
+          'translation': s(sourceSentence),
+          'reading': s(targetRow['pronunciation']),
+          'choices': choices,
+          'correct': choices.indexOf(blanked.answer),
+          'choice_pool': targetPool,
+          'correct_answer': blanked.answer,
+          // Language codes for TTS
+          'target_lang': langs.target,
+          'source_lang': langs.source,
         };
       }).whereType<Map<String, dynamic>>().toList();
 
-      if (questions.isNotEmpty) {
-        await _cache.save(cacheKey, questions);
-      }
-
-      return questions;
+        return questions;
     } catch (e) {
-      final cached = await _cache.load(cacheKey, allowStale: true);
-      return cached;
+      debugPrint("Error fetching sentence questions from CSV/SQLite: $e");
+      return [];
     }
   }
 
@@ -272,19 +274,15 @@ class QuizRepository {
   }
 
   String _formatVocabWord(Map<String, dynamic> row) {
-    final word = row['word']?.toString().trim() ?? '';
+    // Treat the string literal 'null' (which SQLite/CSV can produce) as empty.
+    String nonNull(dynamic v) {
+      final s = v?.toString().trim() ?? '';
+      return s.toLowerCase() == 'null' ? '' : s;
+    }
+    final word = nonNull(row['word']);
     if (word.isEmpty) return '';
-    final article = row['article']?.toString().trim() ?? '';
+    final article = nonNull(row['article']);
     return article.isEmpty ? word : '$article $word';
-  }
-
-  String _formatReading(Map<String, dynamic> row) {
-    final romanization = row['romanization']?.toString().trim() ?? '';
-    if (romanization.isNotEmpty) return romanization;
-    final pinyin = row['pinyin']?.toString().trim() ?? '';
-    if (pinyin.isNotEmpty) return pinyin;
-    final transliteration = row['transliteration']?.toString().trim() ?? '';
-    return transliteration;
   }
 
   List<String> _buildChoices(List<String> pool, String correct) {
@@ -347,7 +345,9 @@ class QuizRepository {
 
   // Supabase Fetching Methods
 
-  Future<List<Map<String, dynamic>>> getVocabQuestionsFromSupabase(String courseId, int limit) async {
+  Future<List<Map<String, dynamic>>> getVocabQuestionsFromSupabase(
+      String courseId, int limit,
+      {bool reverse = false}) async {
     final langs = _parseCourseLangs(courseId);
     if (langs == null) return [];
 
@@ -356,14 +356,14 @@ class QuizRepository {
       final sourceResponse = await _client
           .from('vocabulary')
           .select()
-          .eq('lang', langs.source)
+          .eq('lang_code', langs.source) // Changed to lang_code
           .limit(1000); // Fetch a decent pool
 
       // 2. Fetch target language items 
       final targetResponse = await _client
           .from('vocabulary')
           .select()
-          .eq('lang', langs.target)
+          .eq('lang_code', langs.target) // Changed to lang_code
           .limit(1000);
 
       final sourceList = List<Map<String, dynamic>>.from(sourceResponse);
@@ -401,29 +401,46 @@ class QuizRepository {
           .toSet()
           .toList();
 
+      final targetWords = targetList
+          .map(_formatVocabWord)
+          .where((word) => word.isNotEmpty)
+          .toSet()
+          .toList();
+
       return selected.map((row) {
         final concept = _parseInt(row['concept_id'])!;
         final sourceRow = sourceByConcept[concept]!;
-        
-        final targetWord = _formatVocabWord(row);
-        final correct = _formatVocabWord(sourceRow);
-        
-        if (targetWord.isEmpty || correct.isEmpty) return null;
 
-        final choices = _buildChoices(sourceWords, correct);
-        
+        // Strip the string literal 'null' returned by Supabase for NULL columns.
+        String s(dynamic v) {
+          final t = v?.toString().trim() ?? '';
+          return t == 'null' ? '' : t;
+        }
+
+        final targetWord = _formatVocabWord(row);
+        final nativeWord = _formatVocabWord(sourceRow);
+
+        if (targetWord.isEmpty || nativeWord.isEmpty) return null;
+
+        final nativeChoices = _buildChoices(sourceWords, nativeWord);
+        final targetChoices = _buildChoices(targetWords, targetWord);
+
         return {
           "concept_id": concept,
-          "prompt": targetWord,
-          "word": row['word'],
-          "article": row['article'],
-          "gender": row['gender'],
-          "reading": _formatReading(row),
-          "choices": choices,
-          "correct": choices.indexOf(correct),
-          "choice_pool": sourceWords,
-          "correct_answer": correct,
-          "translation": correct,
+          "prompt": reverse ? nativeWord : targetWord,
+          "word": s(row['word']),
+          "article": s(row['article']),
+          "reading": s(row['pronunciation']),
+          "gender": s(row['gender']),
+          "choices": reverse ? targetChoices : nativeChoices,
+          "correct": reverse ? targetChoices.indexOf(targetWord) : nativeChoices.indexOf(nativeWord),
+          "choice_pool": reverse ? targetWords : sourceWords,
+          "correct_answer": reverse ? targetWord : nativeWord,
+          "translation": reverse ? targetWord : nativeWord,
+          "target_word": targetWord,
+          "native_word": nativeWord,
+          "target_lang": langs.target,
+          "source_lang": langs.source,
         };
       }).whereType<Map<String, dynamic>>().toList();
 
@@ -506,7 +523,7 @@ class QuizRepository {
           "prompt": blanked.prompt,
           "full_sentence": targetSentence,
           "translation": sourceSentence,
-          "reading": _formatReading(row),
+          "reading": row['pronunciation'] ?? '',
           "choices": choices,
           "correct": choices.indexOf(blanked.answer),
           "choice_pool": targetPool,

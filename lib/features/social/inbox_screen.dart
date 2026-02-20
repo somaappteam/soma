@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/widgets/glass.dart';
-import '../../core/widgets/premium_dialog.dart';
 import '../../data/auth_repository.dart';
 import '../../data/chat_repository.dart';
 import '../../data/experiment_repository.dart';
@@ -29,19 +28,14 @@ class _InboxScreenState extends State<InboxScreen> {
   final Set<String> _deletedThreadIds = <String>{};
   final Set<String> _pinnedThreadIds = <String>{};
   final Set<String> _mutedThreadIds = <String>{};
-  final Set<String> _selectedThreadIds = <String>{};
   bool _showArchivedOnly = false;
-  bool _selectionMode = false;
   _InboxFilter _filter = _InboxFilter.all;
   String _onboardingPrompt = 'Start with a quick hello to a friend.';
   int _refreshNonce = 0;
   _InboxSort _sort = _InboxSort.latest;
   final Map<String, DateTime> _snoozedUntil = <String, DateTime>{};
   final Set<String> _hiddenPreviewThreadIds = <String>{};
-  bool _scheduledDigestEnabled = false;
-  bool _digestCardExpanded = false;
   bool _showSearchBar = false;
-  bool _showInboxInsights = false;
 
   @override
   void initState() {
@@ -87,10 +81,7 @@ class _InboxScreenState extends State<InboxScreen> {
         _hiddenPreviewThreadIds
           ..clear()
           ..addAll(hidden);
-        _scheduledDigestEnabled = settings['inbox_digest_enabled'] == true;
-        _digestCardExpanded = settings['inbox_digest_card_expanded'] == true;
         _showSearchBar = settings['inbox_search_expanded'] == true;
-        _showInboxInsights = settings['inbox_insights_expanded'] == true;
       });
     } catch (_) {}
   }
@@ -129,18 +120,7 @@ class _InboxScreenState extends State<InboxScreen> {
     await _setSnooze(otherId, selected);
   }
 
-  Future<void> _toggleScheduledDigest() async {
-    HapticFeedback.selectionClick();
-    final next = !_scheduledDigestEnabled;
-    setState(() => _scheduledDigestEnabled = next);
-    await settingsRepository.updateSetting('inbox_digest_enabled', next);
-  }
 
-  Future<void> _setDigestCardExpanded(bool expanded) async {
-    HapticFeedback.selectionClick();
-    setState(() => _digestCardExpanded = expanded);
-    await settingsRepository.updateSetting('inbox_digest_card_expanded', expanded);
-  }
 
   Future<void> _toggleSearchBar() async {
     HapticFeedback.selectionClick();
@@ -152,12 +132,7 @@ class _InboxScreenState extends State<InboxScreen> {
     await settingsRepository.updateSetting('inbox_search_expanded', next);
   }
 
-  Future<void> _toggleInboxInsights() async {
-    HapticFeedback.selectionClick();
-    final next = !_showInboxInsights;
-    setState(() => _showInboxInsights = next);
-    await settingsRepository.updateSetting('inbox_insights_expanded', next);
-  }
+
 
   int get _activeViewOptionCount {
     var count = 0;
@@ -207,22 +182,7 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
 
-  Future<void> _openThread(Map<String, dynamic> t) async {
-    final otherId = t['otherId']?.toString() ?? '';
-    if (otherId.isEmpty) return;
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => DmChatScreen(
-          meId: authRepository.currentUser?.id ?? 'me',
-          otherId: otherId,
-          otherName: t['otherName']?.toString() ?? 'Unknown',
-        ),
-      ),
-    );
-    // Force refresh when returning from chat to clear unread count immediately
-    if (mounted) _refreshInbox();
-  }
+
 
   Stream<List<Map<String, dynamic>>> _inboxThreadsStream() {
     return chatRepository.getInboxThreadsStream();
@@ -253,64 +213,7 @@ class _InboxScreenState extends State<InboxScreen> {
     }
   }
 
-  Future<void> _bulkMarkRead() async {
-    final ids = _selectedThreadIds.toList();
-    await chatRepository.markAllConversationsAsRead(ids);
-    if (!mounted) return;
-    setState(() {
-      _selectionMode = false;
-      _selectedThreadIds.clear();
-    });
-  }
 
-  Future<void> _bulkArchive() async {
-    final ids = _selectedThreadIds.toList();
-    await chatRepository.archiveConversations(ids);
-    if (!mounted) return;
-    setState(() {
-      _archivedThreadIds.addAll(ids);
-      _selectionMode = false;
-      _selectedThreadIds.clear();
-    });
-  }
-
-  Future<void> _deleteThread(String otherId) async {
-    setState(() {
-      _deletedThreadIds.add(otherId);
-      _archivedThreadIds.remove(otherId);
-      _pinnedThreadIds.remove(otherId);
-      _mutedThreadIds.remove(otherId);
-    });
-
-    await chatRepository.deleteConversation(otherId);
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Conversation deleted')),
-    );
-  }
-
-  Future<void> _archiveThread(String otherId) async {
-    setState(() {
-      _archivedThreadIds.add(otherId);
-    });
-    await chatRepository.setConversationPreference(otherId, archived: true);
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Chat archived'),
-        action: SnackBarAction(
-          label: 'Undo',
-          onPressed: () {
-            if (!mounted) return;
-            setState(() => _archivedThreadIds.remove(otherId));
-            chatRepository.setConversationPreference(otherId, archived: false);
-          },
-        ),
-      ),
-    );
-  }
 
   /*
   Future<void> _unarchiveThread(String otherId) async {
@@ -336,20 +239,7 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 
-  Future<void> _toggleMutedThread(String otherId, {required bool next}) async {
-    setState(() {
-      if (next) {
-        _mutedThreadIds.add(otherId);
-      } else {
-        _mutedThreadIds.remove(otherId);
-      }
-    });
-    await chatRepository.setConversationPreference(otherId, muted: next);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(next ? 'Chat muted' : 'Chat unmuted')),
-    );
-  }
+
 
   /*
   Future<bool?> _confirmDelete() {
@@ -544,12 +434,7 @@ class _InboxScreenState extends State<InboxScreen> {
                       ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                _OptionChip(
-                  label: _scheduledDigestEnabled ? 'Digest: on' : 'Digest: off',
-                  selected: _scheduledDigestEnabled,
-                  onTap: _toggleScheduledDigest,
-                ),
+
                 const SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
@@ -592,25 +477,6 @@ class _InboxScreenState extends State<InboxScreen> {
                     ),
                   ),
                   const Spacer(),
-                  if (_selectionMode) ...[
-                    _IconGlass(icon: Icons.mark_chat_read_rounded, onTap: _bulkMarkRead),
-                    const SizedBox(width: 8),
-                    _IconGlass(icon: Icons.archive_rounded, onTap: _bulkArchive),
-                    const SizedBox(width: 8),
-                  ],
-                  _IconGlass(
-                    icon: _showArchivedOnly ? Icons.archive : Icons.archive_outlined,
-                    onTap: () => setState(() => _showArchivedOnly = !_showArchivedOnly),
-                  ),
-                  const SizedBox(width: 8),
-                  _IconGlass(
-                    icon: _selectionMode ? Icons.close_rounded : Icons.checklist_rounded,
-                    onTap: () => setState(() {
-                      _selectionMode = !_selectionMode;
-                      if (!_selectionMode) _selectedThreadIds.clear();
-                    }),
-                  ),
-                  const SizedBox(width: 8),
                   _IconGlass(
                     icon: Icons.tune_rounded,
                     onTap: _showViewOptionsSheet,
@@ -620,11 +486,6 @@ class _InboxScreenState extends State<InboxScreen> {
                   _IconGlass(
                     icon: _showSearchBar ? Icons.search_off_rounded : Icons.search_rounded,
                     onTap: _toggleSearchBar,
-                  ),
-                  const SizedBox(width: 8),
-                  _IconGlass(
-                    icon: _scheduledDigestEnabled ? Icons.notifications_active_rounded : Icons.notifications_none_rounded,
-                    onTap: _toggleScheduledDigest,
                   ),
                   const SizedBox(width: 8),
                   _IconGlass(
@@ -644,49 +505,10 @@ class _InboxScreenState extends State<InboxScreen> {
                 children: [
                   _SectionTitle(_showArchivedOnly ? 'Archived chats' : 'Recent chats'),
                   const Spacer(),
-                  if (_selectionMode && _selectedThreadIds.isNotEmpty)
-                    Text(
-                      '${_selectedThreadIds.length} selected',
-                      style: TextStyle(
-                        color: scheme.onSurface.withValues(alpha: 0.72),
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                      ),
-                    ),
                 ],
               ),
               const SizedBox(height: 8),
-              if (_scheduledDigestEnabled)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Glass(
-                    radius: BorderRadius.circular(14),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Row(
-                      children: [
-                        Icon(Icons.wb_sunny_rounded, size: 16, color: scheme.primary),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            _digestCardExpanded
-                                ? 'Morning digest enabled: get one smart summary instead of many pings.'
-                                : 'Morning digest is on.',
-                            style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.78), fontWeight: FontWeight.w700, fontSize: 11.5),
-                          ),
-                        ),
-                        IconButton(
-                          tooltip: _digestCardExpanded ? 'Collapse' : 'Expand',
-                          onPressed: () => _setDigestCardExpanded(!_digestCardExpanded),
-                          icon: Icon(
-                            _digestCardExpanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
-                            size: 16,
-                            color: scheme.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+              // Removed digest summary card
               if (_filter != _InboxFilter.all || _sort != _InboxSort.latest) ...[
                 Row(
                   children: [
@@ -869,14 +691,7 @@ class _InboxScreenState extends State<InboxScreen> {
                     }
 
                     final participantIds = visibleThreads.map((t) => t['otherId']?.toString() ?? '').where((id) => id.isNotEmpty).toList();
-                    final unreadTotal = visibleThreads.fold<int>(0, (sum, t) => sum + ((t['unreadCount'] as int?) ?? 0));
-                    final unreadThreads = visibleThreads.where((t) => ((t['unreadCount'] as int?) ?? 0) > 0).length;
-                    final requestCount = visibleThreads.where((t) => t['hasIncomingRequest'] == true || t['hasOutgoingRequest'] == true).length;
-                    final archivedMentions = visibleThreads.where((t) => _archivedThreadIds.contains(t['otherId']?.toString() ?? '')).length;
                     final vipThreads = visibleThreads.where((t) => _pinnedThreadIds.contains(t['otherId']?.toString() ?? '')).take(8).toList();
-                    final voiceNoteThreads = visibleThreads.where((t) => (t['lastMsg']?.toString().toLowerCase() ?? '').contains('voice')).length;
-                    final correctionUnreadCount = visibleThreads.where((t) => t['hasCorrectionUnread'] == true).length;
-                    final challengePendingCount = visibleThreads.where((t) => t['hasChallengePending'] == true).length;
                     return Glass(
                       radius: BorderRadius.circular(22),
                       padding: const EdgeInsets.all(10),
@@ -886,58 +701,10 @@ class _InboxScreenState extends State<InboxScreen> {
                           final onlineStatuses = presenceSnapshot.data ?? {};
                           return Column(
                             children: [
-                              _CatchUpSummaryCard(
-                                unreadTotal: unreadTotal,
-                                unreadThreads: unreadThreads,
-                                requestCount: requestCount,
-                                archivedMentions: archivedMentions,
-                                expanded: _showInboxInsights,
-                                onToggle: _toggleInboxInsights,
-                              ),
-                              AnimatedCrossFade(
-                                firstChild: const SizedBox.shrink(),
-                                secondChild: Column(
-                                  children: [
-                                    _ConversationMemoryCard(
-                                      unreadThreads: unreadThreads,
-                                      voiceNoteThreads: voiceNoteThreads,
-                                      correctionUnreadCount: correctionUnreadCount,
-                                    ),
-                                    _WeeklyReportShareCard(
-                                      unreadTotal: unreadTotal,
-                                      unreadThreads: unreadThreads,
-                                      requestCount: requestCount,
-                                      voiceNoteThreads: voiceNoteThreads,
-                                      correctionUnreadCount: correctionUnreadCount,
-                                    ),
-                                    _AdaptiveChallengesRow(
-                                      challenges: [
-                                        if (correctionUnreadCount > 0)
-                                          _AdaptiveChallenge(
-                                            label: '$correctionUnreadCount corrections unread — review now',
-                                            onTap: () => _openThread(visibleThreads.firstWhere((t) => t['hasCorrectionUnread'] == true)),
-                                          ),
-                                        if (visibleThreads.where((t) => t['practiceStreakAtRisk'] == true).isNotEmpty)
-                                          _AdaptiveChallenge(
-                                            label: 'Streak at risk — send one message',
-                                            onTap: () => _openThread(visibleThreads.firstWhere((t) => t['practiceStreakAtRisk'] == true)),
-                                          ),
-                                        if (challengePendingCount > 0)
-                                          _AdaptiveChallenge(
-                                            label: '$challengePendingCount challenge threads need attention',
-                                            onTap: () => _openThread(visibleThreads.firstWhere((t) => t['hasChallengePending'] == true)),
-                                          ),
-                                      ],
-                                    ),
-                                    if (vipThreads.isNotEmpty)
-                                      _VipPinnedRow(
-                                        threads: vipThreads,
-                                      ),
-                                  ],
+                              if (vipThreads.isNotEmpty)
+                                _VipPinnedRow(
+                                  threads: vipThreads,
                                 ),
-                                crossFadeState: _showInboxInsights ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-                                duration: const Duration(milliseconds: 180),
-                              ),
                               Expanded(
                                 child: AnimatedSwitcher(
                                   duration: const Duration(milliseconds: 160),
@@ -964,13 +731,12 @@ class _InboxScreenState extends State<InboxScreen> {
                                       final isPinned = _pinnedThreadIds.contains(otherId);
                                       final isMuted = _mutedThreadIds.contains(otherId);
                                       final unreadCount = t['unreadCount'] ?? 0;
-                                      final selected = _selectedThreadIds.contains(otherId);
                                       final hidePreview = _hiddenPreviewThreadIds.contains(otherId);
                                       final trustScore = (((t['isFriend'] == true ? 60 : 35) + ((unreadCount as int) > 0 ? 10 : 0) + (t['hasIncomingRequest'] == true ? 5 : 0)).clamp(0, 99) as num).toInt();
 
                                       return Dismissible(
                               key: ValueKey('thread-$otherId'),
-                              direction: _selectionMode ? DismissDirection.none : DismissDirection.horizontal,
+                              direction: DismissDirection.horizontal,
                               confirmDismiss: (direction) async {
                                 if (direction == DismissDirection.startToEnd) {
                                   await _togglePinnedThread(otherId, next: !isPinned);
@@ -1012,38 +778,19 @@ class _InboxScreenState extends State<InboxScreen> {
                                 correctionHelpfulnessScore: (t['correctionHelpfulnessScore'] as num?)?.toInt(),
                                 voiceFeedbackScore: (t['voiceFeedbackScore'] as num?)?.toInt(),
                                 verifiedSeriousLearner: t['verifiedSeriousLearner'] == true,
-                                selected: selected,
-                                selectionMode: _selectionMode,
                                 onTap: () async {
-                                  if (_selectionMode) {
-                                    setState(() {
-                                      if (selected) {
-                                        _selectedThreadIds.remove(otherId);
-                                      } else {
-                                        _selectedThreadIds.add(otherId);
-                                      }
-                                    });
-                                  } else {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => DmChatScreen(
-                                          meId: authRepository.currentUser?.id ?? "me",
-                                          otherId: otherId,
-                                          otherName: t['otherName'] ?? l10n.unknown,
-                                        ),
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => DmChatScreen(
+                                        meId: authRepository.currentUser?.id ?? "me",
+                                        otherId: otherId,
+                                        otherName: t['otherName'] ?? l10n.unknown,
                                       ),
-                                    );
-                                    if (mounted) setState(() => _refreshNonce++);
-                                  }
+                                    ),
+                                  );
+                                  if (mounted) setState(() => _refreshNonce++);
                                 },
-                                onLongPress: () {
-                                  if (!_selectionMode) {
-                                    setState(() {
-                                      _selectionMode = true;
-                                      });
-                                    }
-                                  },
                                 ),
                                       );
                                     },
@@ -1097,60 +844,7 @@ class _SectionTitle extends StatelessWidget {
 }
 
 
-class _CatchUpSummaryCard extends StatelessWidget {
-  final int unreadTotal;
-  final int unreadThreads;
-  final int requestCount;
-  final int archivedMentions;
-  final bool expanded;
-  final VoidCallback onToggle;
 
-  const _CatchUpSummaryCard({
-    required this.unreadTotal,
-    required this.unreadThreads,
-    required this.requestCount,
-    required this.archivedMentions,
-    required this.expanded,
-    required this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Glass(
-        radius: BorderRadius.circular(16),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: Row(
-          children: [
-            Icon(Icons.auto_awesome_rounded, size: 16, color: scheme.primary),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                '$unreadTotal unread across $unreadThreads chats · $requestCount requests · $archivedMentions archived mentions',
-                style: TextStyle(
-                  color: scheme.onSurface.withValues(alpha: 0.82),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 11.5,
-                ),
-              ),
-            ),
-            IconButton(
-              tooltip: expanded ? 'Hide insights' : 'Show insights',
-              onPressed: onToggle,
-              icon: Icon(
-                expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
-                size: 18,
-                color: scheme.primary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _VipPinnedRow extends StatelessWidget {
   final List<Map<String, dynamic>> threads;
@@ -1199,45 +893,7 @@ class _VipPinnedRow extends StatelessWidget {
 }
 
 
-class _ConversationMemoryCard extends StatelessWidget {
-  final int unreadThreads;
-  final int voiceNoteThreads;
-  final int correctionUnreadCount;
 
-  const _ConversationMemoryCard({
-    required this.unreadThreads,
-    required this.voiceNoteThreads,
-    required this.correctionUnreadCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Glass(
-        radius: BorderRadius.circular(14),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          children: [
-            Icon(Icons.insights_rounded, size: 16, color: scheme.tertiary),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Inbox now: $unreadThreads chats with unread messages · $voiceNoteThreads voice-note threads · $correctionUnreadCount corrections waiting.',
-                style: TextStyle(
-                  color: scheme.onSurface.withValues(alpha: 0.8),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 11.5,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _StatusChip extends StatelessWidget {
   final String label;
@@ -1399,89 +1055,7 @@ class _SwipeActionBackground extends StatelessWidget {
   }
 }
 
-class _AdaptiveChallenge {
-  final String label;
-  final VoidCallback onTap;
 
-  const _AdaptiveChallenge({required this.label, required this.onTap});
-}
-
-class _AdaptiveChallengesRow extends StatelessWidget {
-  final List<_AdaptiveChallenge> challenges;
-
-  const _AdaptiveChallengesRow({required this.challenges});
-
-  @override
-  Widget build(BuildContext context) {
-    if (challenges.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(top: 6, bottom: 6),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (final c in challenges)
-              Padding(
-                padding: const EdgeInsets.only(right: 6),
-                child: ActionChip(
-                  avatar: const Icon(Icons.flash_on_rounded, size: 14),
-                  label: Text(c.label),
-                  onPressed: c.onTap,
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _WeeklyReportShareCard extends StatelessWidget {
-  final int unreadTotal;
-  final int unreadThreads;
-  final int requestCount;
-  final int voiceNoteThreads;
-  final int correctionUnreadCount;
-
-  const _WeeklyReportShareCard({
-    required this.unreadTotal,
-    required this.unreadThreads,
-    required this.requestCount,
-    required this.voiceNoteThreads,
-    required this.correctionUnreadCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final report = 'Inbox Snapshot\n• Unread messages: $unreadTotal\n• Unread chats: $unreadThreads\n• Pending requests: $requestCount\n• Voice-note threads: $voiceNoteThreads\n• Corrections waiting: $correctionUnreadCount';
-    return Padding(
-      padding: const EdgeInsets.only(top: 6, bottom: 6),
-      child: Glass(
-        radius: BorderRadius.circular(14),
-        padding: const EdgeInsets.all(10),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                report,
-                style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.8), fontWeight: FontWeight.w700, fontSize: 11.5),
-              ),
-            ),
-            const SizedBox(width: 8),
-            IconButton(
-              tooltip: 'Copy report',
-              onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: report));
-              },
-              icon: const Icon(Icons.ios_share_rounded),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 
 class _IconGlass extends StatelessWidget {
@@ -1561,10 +1135,7 @@ class _ThreadRow extends StatelessWidget {
   final int? correctionHelpfulnessScore;
   final int? voiceFeedbackScore;
   final bool verifiedSeriousLearner;
-  final bool selectionMode;
-  final bool selected;
   final VoidCallback onTap;
-  final VoidCallback onLongPress;
 
   const _ThreadRow({
     required this.otherId,
@@ -1589,10 +1160,7 @@ class _ThreadRow extends StatelessWidget {
     required this.correctionHelpfulnessScore,
     required this.voiceFeedbackScore,
     required this.verifiedSeriousLearner,
-    required this.selectionMode,
-    required this.selected,
     required this.onTap,
-    required this.onLongPress,
   });
 
   @override
@@ -1603,22 +1171,17 @@ class _ThreadRow extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: onTap,
-      onLongPress: onLongPress,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: selected
-              ? scheme.primary.withValues(alpha: 0.12)
-              : (highlight
-                  ? scheme.onSurface.withValues(alpha: 0.10)
-                  : scheme.onSurface.withValues(alpha: 0.06)),
+          color: highlight
+              ? scheme.onSurface.withValues(alpha: 0.10)
+              : scheme.onSurface.withValues(alpha: 0.06),
           border: Border.all(
-            color: selected
-                ? scheme.primary
-                : (highlight
-                    ? scheme.onSurface.withValues(alpha: 0.24)
-                    : scheme.onSurface.withValues(alpha: 0.14)),
+            color: highlight
+                ? scheme.onSurface.withValues(alpha: 0.24)
+                : scheme.onSurface.withValues(alpha: 0.14),
           ),
         ),
         child: Row(
@@ -1703,47 +1266,7 @@ class _ThreadRow extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          if (practiceStreakAtRisk || hasChallengePending || hasCorrectionUnread || hasVoiceFeedback)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Wrap(
-                                spacing: 6,
-                                runSpacing: 4,
-                                children: [
-                                  if (practiceStreakAtRisk)
-                                    _MiniBadge(label: '⚠️ Streak at risk', color: Colors.orange),
-                                  if (hasChallengePending)
-                                    _MiniBadge(label: 'Challenge pending', color: scheme.primary),
-                                  if (hasCorrectionUnread)
-                                    _MiniBadge(label: 'Correction unread', color: scheme.tertiary),
-                                  if (hasVoiceFeedback)
-                                    _MiniBadge(label: 'Voice feedback', color: Colors.deepPurple),
-                                ],
-                              ),
-                            ),
-                          if (partnerQuality != null || reliabilityScore != null || correctionHelpfulnessScore != null || voiceFeedbackScore != null || verifiedSeriousLearner)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Wrap(
-                                spacing: 6,
-                                runSpacing: 4,
-                                children: [
-                                  if (partnerQuality != null)
-                                    _MiniBadge(
-                                      label: 'Partner quality $partnerQuality%',
-                                      color: partnerQuality! >= 75 ? Colors.green : scheme.onSurface,
-                                    ),
-                                  if (reliabilityScore != null)
-                                    _MiniBadge(label: 'Reliability $reliabilityScore%', color: scheme.primary),
-                                  if (correctionHelpfulnessScore != null)
-                                    _MiniBadge(label: 'Correction helpfulness $correctionHelpfulnessScore%', color: scheme.tertiary),
-                                  if (voiceFeedbackScore != null)
-                                    _MiniBadge(label: 'Voice feedback $voiceFeedbackScore%', color: Colors.deepPurple),
-                                  if (verifiedSeriousLearner)
-                                    _MiniBadge(label: 'Verified serious learner', color: Colors.green),
-                                ],
-                              ),
-                            ),
+
                           if (hasIncomingRequest || hasOutgoingRequest)
                             Padding(
                               padding: const EdgeInsets.only(top: 4),
@@ -1770,26 +1293,7 @@ class _ThreadRow extends StatelessWidget {
                                 ),
                               ),
                             ),
-                          if (hasIncomingRequest)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(999),
-                                  color: scheme.tertiary.withValues(alpha: 0.14),
-                                  border: Border.all(color: scheme.tertiary.withValues(alpha: 0.35)),
-                                ),
-                                child: Text(
-                                  'Likely safe · $trustScore%',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    color: scheme.tertiary,
-                                  ),
-                                ),
-                              ),
-                            ),
+
                         ],
                       );
                     },
@@ -1828,7 +1332,7 @@ class _ThreadRow extends StatelessWidget {
                     ),
                   )
                 else
-                  Icon(selectionMode ? Icons.check_circle_outline : Icons.chevron_right_rounded,
+                  Icon(Icons.chevron_right_rounded,
                       color: scheme.onSurface.withValues(alpha: 0.45)),
               ],
             ),
@@ -1840,32 +1344,7 @@ class _ThreadRow extends StatelessWidget {
 }
 
 
-class _MiniBadge extends StatelessWidget {
-  final String label;
-  final Color color;
 
-  const _MiniBadge({required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(999),
-        color: color.withValues(alpha: 0.14),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 10,
-          fontWeight: FontWeight.w800,
-          color: color,
-        ),
-      ),
-    );
-  }
-}
 
 class _Avatar extends StatelessWidget {
   final bool showOnlineIndicator;
@@ -1900,7 +1379,6 @@ class _Avatar extends StatelessWidget {
   }
 
   Widget _buildAvatarContent(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
     final url = avatarUrl?.trim() ?? '';
     if (url.isNotEmpty) {
       return Image.network(

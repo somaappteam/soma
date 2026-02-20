@@ -216,6 +216,9 @@ class AppLocalizationsTh extends AppLocalizations {
       'ฝึกฝนสิ่งที่เรียนรู้: คำที่จำไม่ได้ ข้อผิดพลาดล่าสุด การทบทวนตามช่วงเวลา';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'เริ่มทบทวน';
 
   @override

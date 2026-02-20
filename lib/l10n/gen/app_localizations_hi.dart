@@ -217,6 +217,9 @@ class AppLocalizationsHi extends AppLocalizations {
       'जो आपने सीखा है उसका अभ्यास करें: कमजोर शब्द, हाल की गलतियां और स्पेस्ड रिपीटिशन।';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'समीक्षा शुरू करें';
 
   @override

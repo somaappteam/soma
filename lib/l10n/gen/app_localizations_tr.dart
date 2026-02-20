@@ -216,6 +216,9 @@ class AppLocalizationsTr extends AppLocalizations {
       'Öğrendiklerinizi pratik edin: unutulan kelimeler, son hatalar, aralıklı tekrar';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Gözden Geçirmeyi Başlat';
 
   @override

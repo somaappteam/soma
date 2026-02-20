@@ -217,6 +217,9 @@ class AppLocalizationsEs extends AppLocalizations {
       'Practica lo aprendido: palabras debiles, errores recientes y repeticion espaciada.';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Iniciar revision';
 
   @override

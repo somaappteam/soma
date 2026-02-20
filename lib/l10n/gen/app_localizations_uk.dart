@@ -218,6 +218,9 @@ class AppLocalizationsUk extends AppLocalizations {
       'Практикуйте вивчене: слабкі слова, нещодавні помилки та інтервальне повторення';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Почати повторення';
 
   @override

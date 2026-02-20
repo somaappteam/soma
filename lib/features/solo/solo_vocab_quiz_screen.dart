@@ -47,6 +47,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
   int? selected;
   bool revealed = false;
   bool showReading = true;
+  bool _reverseLanguage = false;
   List<String> _choices = [];
   int _correctIndex = 0;
   double _speechRate = 1.0;
@@ -200,18 +201,59 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
     try {
       if (questions.isEmpty) return;
       final q = questions[index % questions.length];
-      final choiceSet = _buildChoiceSet(q);
+
+      // Sanitise raw DB values — Supabase may return the string 'null' for NULL columns.
+      String sanitize(String? v) {
+        final s = v?.toString().trim() ?? '';
+        return s == 'null' ? '' : s;
+      }
+
+      final nativeWord = sanitize(q['native_word']?.toString());
+      final targetWord = sanitize(q['target_word']?.toString());
+
+      // Also sanitise per-question fields that may be 'null'.
+      if ((q['article']?.toString().trim() ?? '') == 'null') q['article'] = null;
+      if ((q['word']?.toString().trim() ?? '') == 'null') q['word'] = null;
+      if ((q['reading']?.toString().trim() ?? '') == 'null') q['reading'] = null;
+
+      // Build the full word pool from whichever language is the answer language.
+      // native_choices / target_choices are the pre-built pools stored in the question.
+      List<String> answerPool;
+      String correctAnswer;
+      String promptText;
+
+      if (_reverseLanguage && nativeWord.isNotEmpty && targetWord.isNotEmpty) {
+        // Prompt: native word → answer: target word.
+        promptText = nativeWord;
+        correctAnswer = targetWord;
+        answerPool = (q['target_choices'] as List?)?.map((e) => e.toString()).where(
+          (e) => e.trim().isNotEmpty && e.trim() != 'null').toList() ?? [];
+      } else {
+        // Prompt: target word → answer: native word.
+        promptText = targetWord.isNotEmpty ? targetWord : sanitize(q['prompt']?.toString());
+        correctAnswer = nativeWord.isNotEmpty ? nativeWord : sanitize(q['correct_answer']?.toString());
+        answerPool = (q['native_choices'] as List?)?.map((e) => e.toString()).where(
+          (e) => e.trim().isNotEmpty && e.trim() != 'null').toList() ?? [];
+      }
+
+      // Update the question map so the prompt widget shows the right text.
+      q['prompt'] = promptText;
+
+      final choiceSet = _buildChoiceSet(correctAnswer, answerPool);
       setState(() {
         _choices = choiceSet.choices;
         _correctIndex = choiceSet.correctIndex;
       });
       _scheduleQuestionAudio();
     } catch (e, stack) {
-       showDialog(context: context, builder: (_) => AlertDialog(
-          title: const Text("Error Preparing Question"),
-          content: SingleChildScrollView(child: Text("$e\n$stack")),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))],
-        ));
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('Error Preparing Question'),
+          content: SingleChildScrollView(child: Text('$e\n$stack')),
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+        ),
+      );
     }
   }
 
@@ -220,11 +262,15 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
     final q = questions[index % questions.length];
     final prompt = _speechText(q);
     if (prompt.trim().isEmpty) return;
+    // When reversed the user reads the native word, so we speak source lang; otherwise target.
+    final lang = _reverseLanguage
+        ? (q['source_lang']?.toString() ?? '')
+        : (q['target_lang']?.toString() ?? '');
     _ttsTimer = Timer(const Duration(milliseconds: 350), () async {
       if (!mounted) return;
       try {
         await ttsService.setRate(_speechRate);
-        await ttsService.speak(prompt);
+        await ttsService.speak(prompt, language: lang.isNotEmpty ? lang : null);
       } catch (e) {
         debugPrint("TTS Error in _scheduleQuestionAudio: $e");
       }
@@ -236,8 +282,11 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
       final q = questions[index % questions.length];
       final prompt = _speechText(q);
       if (prompt.trim().isEmpty) return;
+      final lang = _reverseLanguage
+          ? (q['source_lang']?.toString() ?? '')
+          : (q['target_lang']?.toString() ?? '');
       await ttsService.setRate(_speechRate);
-      await ttsService.speak(prompt);
+      await ttsService.speak(prompt, language: lang.isNotEmpty ? lang : null);
     } catch (e) {
       debugPrint("TTS Error (Manual): $e");
     }
@@ -250,31 +299,22 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
     return question["prompt"]?.toString() ?? '';
   }
 
-  _ChoiceSet _buildChoiceSet(Map<String, dynamic> question) {
-    final pool = question["choice_pool"];
-    final correctAnswer = question["correct_answer"]?.toString() ?? '';
-    if (pool is List && correctAnswer.trim().isNotEmpty) {
-      final items = pool
-          .map((e) => e.toString())
-          .where((e) => e.trim().isNotEmpty && e != correctAnswer)
-          .toSet()
-          .toList();
-      items.shuffle();
-      final choices = <String>[correctAnswer, ...items.take(3)];
-      choices.shuffle();
-      return _ChoiceSet(
-          choices: choices, correctIndex: choices.indexOf(correctAnswer));
-    }
+  /// Builds a [_ChoiceSet] with exactly 4 options: the [correctAnswer] plus up to
+  /// 3 unique random distractors drawn from [pool]. The list is always shuffled
+  /// so the correct answer appears in a random position each time.
+  _ChoiceSet _buildChoiceSet(String correctAnswer, List<String> pool) {
+    if (correctAnswer.trim().isEmpty) return const _ChoiceSet(choices: [], correctIndex: 0);
 
-    final fallback = question["choices"];
-    if (fallback is List) {
-      final choices = fallback.map((e) => e.toString()).toList();
-      final correctIndex =
-          question["correct"] is int ? question["correct"] as int : 0;
-      return _ChoiceSet(choices: choices, correctIndex: correctIndex);
-    }
+    final distractors = pool
+        .map((e) => e.toString().trim())
+        .where((e) => e.isNotEmpty && e != 'null' && e != correctAnswer)
+        .toSet()
+        .toList();
+    distractors.shuffle();
 
-    return const _ChoiceSet(choices: [], correctIndex: 0);
+    final choices = <String>[correctAnswer, ...distractors.take(3)];
+    choices.shuffle();
+    return _ChoiceSet(choices: choices, correctIndex: choices.indexOf(correctAnswer));
   }
 
   void _goToResults() {
@@ -377,6 +417,16 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                     ),
                   ),
                   _IconGlass(
+                    icon: Icons.swap_horiz_rounded,
+                    onTap: () {
+                      setState(() {
+                        _reverseLanguage = !_reverseLanguage;
+                        _prepareQuestion(); // Re-prepare current question instantly
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 8),
+                  _IconGlass(
                     icon: showReading
                         ? Icons.text_fields_rounded
                         : Icons.text_fields_outlined,
@@ -413,18 +463,31 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _VocabPromptRow(question: q),
+                    _VocabPromptRow(
+                      question: q,
+                      langCode: _reverseLanguage
+                          ? (q['source_lang']?.toString() ?? '')
+                          : (q['target_lang']?.toString() ?? ''),
+                    ),
                     if (showReading &&
-                        (q["reading"] as String?)?.trim().isNotEmpty ==
-                            true) ...[
+                        (q['reading']?.toString().trim() ?? '').isNotEmpty) ...[
                       const SizedBox(height: 8),
-                      Text(
-                        q["reading"] as String,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: scheme.onSurface.withValues(alpha: 0.55),
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.w600),
+                      Directionality(
+                        textDirection: _isRtlLang(
+                                _reverseLanguage
+                                    ? (q['source_lang']?.toString() ?? '')
+                                    : (q['target_lang']?.toString() ?? ''),
+                              )
+                            ? TextDirection.rtl
+                            : TextDirection.ltr,
+                        child: Text(
+                          q['reading']?.toString() ?? '',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: scheme.onSurface.withValues(alpha: 0.55),
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600),
+                        ),
                       ),
                     ],
                   ],
@@ -509,12 +572,21 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                             child: Row(
                               children: [
                                 Expanded(
-                                  child: Text(
-                                    choices[i],
-                                    style: TextStyle(
-                                        color: scheme.onSurface.withValues(alpha: 0.92),
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w800),
+                                  child: Directionality(
+                                    textDirection: _isRtlLang(
+                                            _reverseLanguage
+                                                ? (q['target_lang']?.toString() ?? '')
+                                                : (q['source_lang']?.toString() ?? ''),
+                                          )
+                                        ? TextDirection.rtl
+                                        : TextDirection.ltr,
+                                    child: Text(
+                                      choices[i],
+                                      style: TextStyle(
+                                          color: scheme.onSurface.withValues(alpha: 0.92),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w800),
+                                    ),
                                   ),
                                 ),
                                 if (revealed && isCorrect) ...[
@@ -546,6 +618,17 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
       ),
     );
   }
+}
+
+// ----------- RTL detection ---------------------------------------------------
+
+/// Returns [true] if the given 2-letter language code uses a right-to-left script.
+bool _isRtlLang(String code) {
+  const rtl = {
+    'ar', 'he', 'fa', 'ur', 'ps', 'sd', 'ug', 'yi',
+    'dv', 'ks', 'ku', 'ha',
+  };
+  return rtl.contains(code.trim().toLowerCase().split('-').first);
 }
 
 class _IconGlass extends StatelessWidget {
@@ -692,17 +775,23 @@ class _Pill extends StatelessWidget {
 
 class _VocabPromptRow extends StatelessWidget {
   final Map<String, dynamic> question;
+  final String langCode;
 
-  const _VocabPromptRow({required this.question});
+  const _VocabPromptRow({required this.question, required this.langCode});
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final prompt = question["prompt"]?.toString() ?? '';
-    final article = question["article"]?.toString().trim() ?? '';
-    final word = question["word"]?.toString().trim() ?? '';
-    final gender = question["gender"]?.toString().trim() ?? '';
-    final hasArticle = article.isNotEmpty && word.isNotEmpty;
+    final prompt = question['prompt']?.toString() ?? '';
+    final article = question['article']?.toString().trim() ?? '';
+    final word = question['word']?.toString().trim() ?? '';
+    final gender = question['gender']?.toString().trim() ?? '';
+    final isReversed = prompt == question['native_word']; // Native word acts as prompt
+    final hasArticle = article.isNotEmpty && word.isNotEmpty && !isReversed
+        && article != 'null' && word != 'null';
+
+    final isRtl = _isRtlLang(langCode);
+    final textDir = isRtl ? TextDirection.rtl : TextDirection.ltr;
 
     final baseStyle = TextStyle(
       color: scheme.onSurface,
@@ -712,29 +801,35 @@ class _VocabPromptRow extends StatelessWidget {
     );
 
     final textWidget = hasArticle
-        ? Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: article,
-                  style: baseStyle.copyWith(color: const Color(0xFF2AFADF)),
-                ),
-                const TextSpan(text: ' '),
-                TextSpan(text: word, style: baseStyle),
-              ],
+        ? Directionality(
+            textDirection: textDir,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: article,
+                    style: baseStyle.copyWith(color: const Color(0xFF2AFADF)),
+                  ),
+                  const TextSpan(text: ' '),
+                  TextSpan(text: word, style: baseStyle),
+                ],
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           )
-        : Text(
-            prompt,
-            textAlign: TextAlign.center,
-            style: baseStyle,
+        : Directionality(
+            textDirection: textDir,
+            child: Text(
+              prompt,
+              textAlign: TextAlign.center,
+              style: baseStyle,
+            ),
           );
 
     return Row(
       children: [
         Expanded(child: textWidget),
-        if (gender.isNotEmpty) ...[
+        if (gender.isNotEmpty && gender != 'null') ...[
           const SizedBox(width: 8),
           _GenderChip(label: gender),
         ],

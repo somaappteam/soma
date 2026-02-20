@@ -217,6 +217,9 @@ class AppLocalizationsPt extends AppLocalizations {
       'Pratique o que aprendeu: palavras fracas, erros recentes e repetição espaçada.';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Iniciar revisão';
 
   @override

@@ -218,6 +218,9 @@ class AppLocalizationsDe extends AppLocalizations {
       'Üben Sie, was Sie gelernt haben: schwache Wörter, aktuelle Fehler und verteilte Wiederholung.';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Wiederholung starten';
 
   @override

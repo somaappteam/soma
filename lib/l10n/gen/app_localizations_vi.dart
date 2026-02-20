@@ -217,6 +217,9 @@ class AppLocalizationsVi extends AppLocalizations {
       'Luyện tập những gì đã học: từ yếu, lỗi gần đây và ôn tập ngắt quãng';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Bắt đầu ôn tập';
 
   @override

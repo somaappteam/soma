@@ -45,9 +45,21 @@ dev_dependencies:
     sdk: flutter
 
   supabase: any
+  flutter_launcher_icons: "^0.13.1"
+  analyzer: ^10.0.1
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo.jpeg"
+  min_sdk_android: 21
+
 flutter:
   generate: true
   uses-material-design: true
   assets:
     - assets/bg/
     - assets/avatar/
+    - assets/vocabulary.csv
+    - assets/sentences.csv
+    - assets/logo.jpeg

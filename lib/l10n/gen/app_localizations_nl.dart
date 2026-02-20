@@ -217,6 +217,9 @@ class AppLocalizationsNl extends AppLocalizations {
       'Oefen wat je hebt geleerd: zwakke woorden, recente fouten, gespreide herhaling.';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Start Herhaling';
 
   @override

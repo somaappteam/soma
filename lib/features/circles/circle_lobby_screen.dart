@@ -180,6 +180,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                   timePerQ: circleData?['time_per_q'] ?? 10,
                   role: isHost ? LiveQuizRole.host : LiveQuizRole.participant,
                   circleId: widget.circleId,
+                  targetLangFallback: circleData?['to_lang']?.toString(),
+                  sourceLangFallback: circleData?['from_lang']?.toString(),
                 ),
               ),
             );
@@ -2480,6 +2482,44 @@ class _HostSettingRow extends StatelessWidget {
                   : Theme.of(context).colorScheme.onSurface,
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BooleanSettingRow extends StatelessWidget {
+  final String title;
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  const _BooleanSettingRow({
+    required this.title,
+    required this.value,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        color: Colors.black.withValues(alpha: 0.12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+          AppNeonSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

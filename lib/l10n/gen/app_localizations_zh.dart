@@ -212,6 +212,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get soloModeReviewDescription => '练习所学内容：薄弱的单词、最近的错误、间隔重复。';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => '开始复习';
 
   @override

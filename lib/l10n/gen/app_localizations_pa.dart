@@ -216,6 +216,9 @@ class AppLocalizationsPa extends AppLocalizations {
       'ਜੋ ਸਿੱਖਿਆ ਹੈ ਉਸਦਾ ਅਭਿਆਸ ਕਰੋ: ਕਮਜ਼ੋਰ ਸ਼ਬਦ, ਤਾਜ਼ਾ ਗਲਤੀਆਂ ਅਤੇ ਦੁਹਰਾਓ';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'ਸਮੀਖਿਆ ਸ਼ੁਰੂ ਕਰੋ';
 
   @override

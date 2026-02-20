@@ -217,6 +217,9 @@ class AppLocalizationsCs extends AppLocalizations {
       'Practice what you learned: weak words, recent mistakes, and spaced repetition.';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => 'Start Review';
 
   @override

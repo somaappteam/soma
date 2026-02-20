@@ -214,6 +214,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get soloModeReviewDescription => '배운 내용을 연습하세요: 약한 단어, 최근 실수, 간격 반복.';
 
   @override
+  String get soloReverse => 'Reverse mode';
+
+  @override
   String get startReview => '복습 시작';
 
   @override
