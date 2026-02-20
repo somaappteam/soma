@@ -15,9 +15,9 @@ class PressableScale extends StatefulWidget {
     super.key,
     required this.child,
     this.onTap,
-    this.pressedScale = 0.98,
+    this.pressedScale = 0.97,
     this.duration = MotionTokens.micro,
-    this.curve = MotionTokens.standardCurve,
+    this.curve = MotionTokens.emphasisCurve,
     this.enableHaptics = true,
   });
 
@@ -36,10 +36,18 @@ class _PressableScaleState extends State<PressableScale> {
   @override
   Widget build(BuildContext context) {
     final enabled = widget.onTap != null;
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final effectiveDuration = widget.duration == MotionTokens.micro
+        ? (isLight ? MotionTokens.lightTap : MotionTokens.darkTap)
+        : widget.duration;
+    final effectiveCurve = widget.curve == MotionTokens.emphasisCurve
+        ? (isLight ? MotionTokens.lightTapCurve : MotionTokens.darkTapCurve)
+        : widget.curve;
+
     return AnimatedScale(
       scale: _pressed && enabled ? widget.pressedScale : 1,
-      duration: widget.duration,
-      curve: widget.curve,
+      duration: effectiveDuration,
+      curve: effectiveCurve,
       child: GestureDetector(
         behavior: HitTestBehavior.translucent,
         onTap: widget.onTap,

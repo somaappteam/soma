@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/services/haptics_service.dart';
+import '../../core/services/sfx_service.dart';
 import 'widgets/circle_chat_sheet.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/theme/tokens.dart';
@@ -359,8 +360,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     if (myAnswerIndex != null) {
       if (myAnswerCorrect) {
         hapticsService.mediumImpact();
+      sfxService.softClick();
       } else {
         hapticsService.lightImpact();
+      sfxService.click();
       }
     }
     

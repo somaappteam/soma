@@ -298,60 +298,69 @@ class _AppShellState extends State<AppShell> {
       builder: (context, constraints) {
         final isWide = constraints.maxWidth >= SomaBreakpoints.medium;
 
+        final contentSlot = isWide
+            ? Row(
+                children: [
+                  _SomaSideNav(
+                    index: _index,
+                    onChanged: _handleNavChange,
+                  ),
+                  Expanded(child: activePage),
+                ],
+              )
+            : activePage;
+
+        final topOverlaySlot = StreamBuilder<Map<String, dynamic>>(
+          stream: settingsRepository.getSettingsStream(),
+          builder: (context, snapshot) {
+            final call = snapshot.data?['dm_active_call'];
+            final isActive = call is Map && call['active'] == true;
+            final name = call is Map ? (call['other_name']?.toString() ?? 'Voice call') : 'Voice call';
+            final otherId = call is Map ? call['other_id']?.toString() : null;
+            if (!isActive) return const SizedBox.shrink();
+            return Positioned(
+              right: 14,
+              top: 16,
+              child: _GlobalActiveCallPill(
+                name: name,
+                onTap: otherId == null || otherId.isEmpty
+                    ? null
+                    : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => DmChatScreen(
+                              meId: authRepository.currentUser?.id ?? '',
+                              otherId: otherId,
+                              otherName: name,
+                            ),
+                          ),
+                        );
+                      },
+              ),
+            );
+          },
+        );
+
+        final floatingContextActionSlot = const SizedBox.shrink();
+
+        final bottomNavSlot = isWide
+            ? null
+            : _SomaBottomNav(
+                index: _index,
+                onChanged: _handleNavChange,
+              );
+
         return Scaffold(
           backgroundColor: Colors.transparent,
           body: Stack(
             children: [
-              isWide
-                  ? Row(
-                      children: [
-                        _SomaSideNav(
-                          index: _index,
-                          onChanged: _handleNavChange,
-                        ),
-                        Expanded(child: activePage),
-                      ],
-                    )
-                  : activePage,
-              StreamBuilder<Map<String, dynamic>>(
-                stream: settingsRepository.getSettingsStream(),
-                builder: (context, snapshot) {
-                  final call = snapshot.data?['dm_active_call'];
-                  final isActive = call is Map && call['active'] == true;
-                  final name = call is Map ? (call['other_name']?.toString() ?? 'Voice call') : 'Voice call';
-                  final otherId = call is Map ? call['other_id']?.toString() : null;
-                  if (!isActive) return const SizedBox.shrink();
-                  return Positioned(
-                    right: 14,
-                    top: 16,
-                    child: _GlobalActiveCallPill(
-                      name: name,
-                      onTap: otherId == null || otherId.isEmpty
-                          ? null
-                          : () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => DmChatScreen(
-                                    meId: authRepository.currentUser?.id ?? '',
-                                    otherId: otherId,
-                                    otherName: name,
-                                  ),
-                                ),
-                              );
-                            },
-                    ),
-                  );
-                },
-              ),
+              contentSlot,
+              topOverlaySlot,
+              floatingContextActionSlot,
             ],
           ),
-          bottomNavigationBar: isWide
-              ? null
-              : _SomaBottomNav(
-                  index: _index,
-                  onChanged: _handleNavChange,
-                ),
+          bottomNavigationBar: bottomNavSlot,
         );
       },
     );

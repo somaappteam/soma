@@ -29,6 +29,23 @@ class SfxService {
       SystemSound.play(SystemSoundType.click);
     }
   }
+
+  void softClick() {
+    click();
+  }
+
+  void risingTone() {
+    if (_enabled) {
+      SystemSound.play(SystemSoundType.alert);
+    }
+  }
+
+  void sparkle() {
+    if (_enabled) {
+      SystemSound.play(SystemSoundType.alert);
+      SystemSound.play(SystemSoundType.click);
+    }
+  }
 }
 
 final sfxService = SfxService();

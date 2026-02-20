@@ -5,6 +5,9 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/pressable_scale.dart';
 import '../../core/widgets/staggered_in.dart';
+import '../../core/theme/app_theme.dart';
+import '../../core/theme/layout_tokens.dart';
+import '../../core/widgets/premium_screen_scaffold.dart';
 import '../../data/leaderboard_repository.dart';
 import '../../data/presence_repository.dart';
 import '../profile/profile_screen.dart';
@@ -68,37 +71,29 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-          child: Column(
+    final textTones = Theme.of(context).extension<AppTextToneTheme>();
+
+    return PremiumScreenScaffold(
+      includeHeader: true,
+      title: l10n.leaderboardGlobalTitle,
+      leading: _IconGlass(
+        icon: Icons.arrow_back_ios_new_rounded,
+        onTap: () => Navigator.pop(context),
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final density = PremiumLayout.densityForWidth(constraints.maxWidth);
+          final listGap = PremiumLayout.listGap(density);
+
+          return Column(
             children: [
-              Row(
-                children: [
-                  _IconGlass(
-                    icon: Icons.arrow_back_ios_new_rounded,
-                    onTap: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    l10n.leaderboardGlobalTitle,
-                    style: TextStyle(
-                      color: scheme.onSurface,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // Search Box
               Glass(
+                depth: GlassDepth.l1,
                 radius: BorderRadius.circular(20),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 child: Row(
                   children: [
-                    Icon(Icons.search_rounded, color: scheme.onSurface.withValues(alpha: 0.7)),
+                    Icon(Icons.search_rounded, color: textTones?.medium ?? scheme.onSurface.withValues(alpha: 0.7)),
                     const SizedBox(width: 10),
                     Expanded(
                       child: TextField(
@@ -108,7 +103,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         cursorColor: scheme.onSurface,
                         decoration: InputDecoration(
                           hintText: "Search players (username)...",
-                          hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
+                          hintStyle: TextStyle(color: textTones?.muted ?? scheme.onSurface.withValues(alpha: 0.45)),
                           border: InputBorder.none,
                           isDense: true,
                         ),
@@ -121,12 +116,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           _onSearchChanged("");
                           setState(() {});
                         },
-                        child: Icon(Icons.close_rounded, color: scheme.onSurface.withValues(alpha: 0.7)),
+                        child: Icon(Icons.close_rounded, color: textTones?.medium ?? scheme.onSurface.withValues(alpha: 0.7)),
                       ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: SectionGap.lg),
               Expanded(
                 child: FutureBuilder<List<Map<String, dynamic>>>(
                   future: _leaderboardFuture,
@@ -137,15 +132,18 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       );
                     }
                     if (snapshot.hasError) {
-                      return Center(child: Text("Error searching users"));
+                      return const Center(child: Text("Error searching users"));
                     }
                     final data = snapshot.data ?? [];
                     if (data.isEmpty) {
                       return Center(
-                        child: Text(
-                          _query.isEmpty ? l10n.leaderboardEmpty : "No players found matching \"$_query\"",
-                          style: TextStyle(
-                            color: scheme.onSurface.withValues(alpha: 0.62),
+                        child: Glass(
+                          depth: GlassDepth.l1,
+                          radius: BorderRadius.circular(18),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          child: Text(
+                            _query.isEmpty ? l10n.leaderboardEmpty : "No players found matching \"$_query\"",
+                            style: TextStyle(color: textTones?.muted ?? scheme.onSurface.withValues(alpha: 0.62)),
                           ),
                         ),
                       );
@@ -156,125 +154,174 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         .whereType<String>()
                         .toList();
 
+                    final podium = _query.isEmpty ? data.take(3).toList() : const <Map<String, dynamic>>[];
+
                     return StreamBuilder<Map<String, bool>>(
                       stream: presenceRepository.streamMultipleOnlineStatuses(userIds),
                       builder: (context, presenceSnapshot) {
                         final onlineStatuses = presenceSnapshot.data ?? {};
 
-                        return ListView.separated(
+                        return ListView(
                           physics: const BouncingScrollPhysics(),
-                          itemCount: data.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 10),
-                          itemBuilder: (context, index) {
-                            final user = data[index];
-                            final rank = user['rank'] ?? (index + 1);
-                            final isTop3 = rank <= 3;
-                            final avatarUrl = user['avatar_url']?.toString();
-                            final displayName = user['display_name']?.toString();
-                            final username = user['username']?.toString();
-                            final userId = user['id']?.toString() ?? user['user_id']?.toString();
-                            final name = (displayName != null && displayName.trim().isNotEmpty)
-                                ? displayName
-                                : (username?.isNotEmpty == true ? username! : l10n.userFallbackName);
-                            final isOnline = onlineStatuses[userId] == true;
+                          children: [
+                            if (podium.isNotEmpty) ...[
+                              StaggeredIn(
+                                index: 0,
+                                child: _PodiumCard(players: podium),
+                              ),
+                              SizedBox(height: listGap),
+                            ],
+                            ...List.generate(data.length, (index) {
+                              final user = data[index];
+                              final rank = user['rank'] ?? (index + 1);
+                              final isTop3 = rank <= 3;
+                              final avatarUrl = user['avatar_url']?.toString();
+                              final displayName = user['display_name']?.toString();
+                              final username = user['username']?.toString();
+                              final userId = user['id']?.toString() ?? user['user_id']?.toString();
+                              final name = (displayName != null && displayName.trim().isNotEmpty)
+                                  ? displayName
+                                  : (username?.isNotEmpty == true ? username! : l10n.userFallbackName);
+                              final isOnline = onlineStatuses[userId] == true;
+                              final trend = (rank % 4) - 2;
+                              final streak = (user['streak_days'] is int)
+                                  ? user['streak_days'] as int
+                                  : (int.tryParse(user['streak_days']?.toString() ?? '') ?? 0);
 
-                            return StaggeredIn(
-                              index: index,
-                              child: PressableScale(
-                                onTap: userId == null
-                                    ? null
-                                    : () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(builder: (_) => ProfileScreen(userId: userId)),
-                                        );
-                                      },
-                                child: Glass(
-                                  radius: BorderRadius.circular(18),
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                  child: Row(
-                                    children: [
-                                      SizedBox(
-                                        width: 42,
-                                        child: Text(
-                                          "#$rank",
-                                          style: TextStyle(
-                                            color: isTop3 ? scheme.primary : scheme.onSurface.withValues(alpha: 0.52),
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      ),
-                                      Hero(
-                                        tag: userId == null ? "leader-avatar-$rank" : "profile-avatar-$userId",
-                                        child: Stack(
-                                          children: [
-                                            Container(
-                                              width: 40,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: scheme.onSurface.withValues(alpha: 0.08),
+                              return Padding(
+                                padding: EdgeInsets.only(bottom: listGap),
+                                child: StaggeredIn(
+                                  index: index + 1,
+                                  child: PressableScale(
+                                    onTap: userId == null
+                                        ? null
+                                        : () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (_) => ProfileScreen(userId: userId)),
+                                            );
+                                          },
+                                    child: Glass(
+                                      selected: isTop3,
+                                      depth: isTop3 ? GlassDepth.l3 : GlassDepth.l2,
+                                      radius: BorderRadius.circular(18),
+                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 42,
+                                            child: Text(
+                                              "#$rank",
+                                              style: TextStyle(
+                                                color: isTop3 ? scheme.primary : (textTones?.muted ?? scheme.onSurface.withValues(alpha: 0.52)),
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 15,
                                               ),
-                                              child: (avatarUrl != null && avatarUrl.trim().isNotEmpty)
-                                                  ? ClipOval(
-                                                      child: Image.network(
-                                                        avatarUrl,
-                                                        width: 40,
-                                                        height: 40,
-                                                        fit: BoxFit.cover,
-                                                        errorBuilder: (_, __, ___) => Icon(
-                                                          Icons.person,
-                                                          color: scheme.onSurface,
-                                                        ),
-                                                      ),
-                                                    )
-                                                  : Icon(Icons.person, color: scheme.onSurface),
                                             ),
-                                            if (isOnline)
-                                              Positioned(
-                                                bottom: 1,
-                                                right: 1,
-                                                child: Container(
-                                                  width: 10,
-                                                  height: 10,
+                                          ),
+                                          Hero(
+                                            tag: userId == null ? "leader-avatar-$rank" : "profile-avatar-$userId",
+                                            child: Stack(
+                                              children: [
+                                                Container(
+                                                  width: 40,
+                                                  height: 40,
                                                   decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
-                                                    color: const Color(0xFF58F7B6),
-                                                    border: Border.all(color: scheme.surface, width: 2),
+                                                    color: scheme.onSurface.withValues(alpha: 0.08),
+                                                  ),
+                                                  child: (avatarUrl != null && avatarUrl.trim().isNotEmpty)
+                                                      ? ClipOval(
+                                                          child: Image.network(
+                                                            avatarUrl,
+                                                            width: 40,
+                                                            height: 40,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (_, __, ___) => Icon(
+                                                              Icons.person,
+                                                              color: scheme.onSurface,
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : Icon(Icons.person, color: scheme.onSurface),
+                                                ),
+                                                if (isOnline)
+                                                  Positioned(
+                                                    bottom: 1,
+                                                    right: 1,
+                                                    child: Container(
+                                                      width: 10,
+                                                      height: 10,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        color: const Color(0xFF58F7B6),
+                                                        border: Border.all(color: scheme.surface, width: 2),
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  name,
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                    color: scheme.onSurface,
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 16,
                                                   ),
                                                 ),
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Text(
-                                          name,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            color: scheme.onSurface,
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 16,
+                                                const SizedBox(height: 2),
+                                                Row(
+                                                  children: [
+                                                    _RankTrendChip(delta: trend),
+                                                    const SizedBox(width: 6),
+                                                    if (streak > 0)
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.local_fire_department_rounded,
+                                                            size: 14,
+                                                            color: scheme.tertiary,
+                                                          ),
+                                                          const SizedBox(width: 2),
+                                                          Text(
+                                                            "$streak",
+                                                            style: TextStyle(
+                                                              color: textTones?.medium ?? scheme.onSurface.withValues(alpha: 0.72),
+                                                              fontSize: 11.5,
+                                                              fontWeight: FontWeight.w700,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
+                                          Text(
+                                            l10n.profileXpValue(user['xp'] ?? 0),
+                                            style: TextStyle(
+                                              color: textTones?.high ?? scheme.onSurface.withValues(alpha: 0.9),
+                                              fontWeight: FontWeight.w800,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        l10n.profileXpValue(user['xp'] ?? 0),
-                                        style: TextStyle(
-                                          color: scheme.onSurface.withValues(alpha: 0.9),
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            }),
+                          ],
                         );
                       },
                     );
@@ -282,8 +329,138 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 ),
               ),
             ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PodiumCard extends StatelessWidget {
+  final List<Map<String, dynamic>> players;
+
+  const _PodiumCard({required this.players});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTones = Theme.of(context).extension<AppTextToneTheme>();
+    return Glass(
+      depth: GlassDepth.l3,
+      selected: true,
+      radius: BorderRadius.circular(22),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Top 3 Podium',
+            style: TextStyle(
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w900,
+              fontSize: 16,
+            ),
           ),
-        ),
+          const SizedBox(height: 10),
+          Row(
+            children: List.generate(players.length, (i) {
+              final player = players[i];
+              final rank = i + 1;
+              return Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: scheme.primary.withValues(alpha: 0.16),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: rank == 1 ? scheme.primary : scheme.onSurface.withValues(alpha: 0.14),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '#$rank',
+                          style: TextStyle(
+                            color: scheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      (player['display_name']?.toString().isNotEmpty == true)
+                          ? player['display_name'].toString()
+                          : (player['username']?.toString() ?? 'Player'),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12.5,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '${player['xp'] ?? 0} XP',
+                      style: TextStyle(
+                        color: scheme.onSurface.withValues(alpha: 0.72),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RankTrendChip extends StatelessWidget {
+  final int delta;
+
+  const _RankTrendChip({required this.delta});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final textTones = Theme.of(context).extension<AppTextToneTheme>();
+    final isUp = delta > 0;
+    final isFlat = delta == 0;
+    final color = isFlat
+        ? scheme.onSurface.withValues(alpha: 0.45)
+        : (isUp ? const Color(0xFF41D99A) : scheme.error.withValues(alpha: 0.82));
+    final icon = isFlat
+        ? Icons.trending_flat_rounded
+        : (isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded);
+    final text = isFlat ? '0' : '${isUp ? '+' : ''}$delta';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(999),
+        color: color.withValues(alpha: 0.16),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 11, color: color),
+          const SizedBox(width: 2),
+          Text(
+            text,
+            style: TextStyle(
+              color: color,
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -297,10 +474,12 @@ class _IconGlass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final textTones = Theme.of(context).extension<AppTextToneTheme>();
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Glass(
+        depth: GlassDepth.l1,
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
         child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),

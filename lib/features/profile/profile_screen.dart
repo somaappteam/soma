@@ -24,6 +24,8 @@ import '../leaderboard/leaderboard_screen.dart';
 import '../social/friends_screen.dart';
 import '../social/dm_chat_screen.dart';
 import '../../core/theme/spacing.dart';
+import '../../core/theme/layout_tokens.dart';
+import '../../core/widgets/premium_screen_scaffold.dart';
 import '../../data/settings_repository.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -356,11 +358,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       dailyGoalMinutes: 15,
     );
 
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
-        child: Column(
-          children: [
+    return PremiumScreenScaffold(
+      body: Column(
+        children: [
                 _TopBar(
                   title: l10n.profileTitle,
                   onBack: _isVisitorView && Navigator.canPop(context)
@@ -484,8 +484,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ],
             ),
-          ),
-      );
+      padding: PremiumLayout.screenPadding(PremiumLayout.densityForWidth(MediaQuery.of(context).size.width)),
+    );
   }
 }
 
@@ -1310,12 +1310,20 @@ class _AchievementsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.profileAchievementsTitle,
-            style: textTheme.titleMedium?.copyWith(
-              color: scheme.onSurface,
-              fontWeight: FontWeight.w800,
-            ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  l10n.profileAchievementsTitle,
+                  style: textTheme.titleMedium?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+              RewardSparkle(show: achievements.any((a) => a.unlocked), size: 16),
+            ],
           ),
           const SizedBox(height: S.sm),
           if (achievements.isEmpty)
@@ -1344,8 +1352,8 @@ class _AchievementsCard extends StatelessWidget {
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: S.xs,
-              crossAxisSpacing: S.xs,
+              mainAxisSpacing: S.sm,
+              crossAxisSpacing: S.sm,
               childAspectRatio: 1.05,
               children: achievements.map((a) {
                 return _BadgeTile(

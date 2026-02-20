@@ -22,4 +22,28 @@ class MotionTokens {
   static const Curve fadeCurve = Curves.easeIn;
   static const Curve ambientCurve = Curves.easeInOutSine;
   static const Curve breatheCurve = Curves.easeInOutSine;
+
+  // Theme-specific motion personality.
+  static const Duration lightPageIn = Duration(milliseconds: 420);
+  static const Duration lightPageOut = Duration(milliseconds: 300);
+  static const Duration darkPageIn = Duration(milliseconds: 520);
+  static const Duration darkPageOut = Duration(milliseconds: 360);
+
+  static const Curve lightPageInCurve = Curves.easeOutCubic;
+  static const Curve lightPageOutCurve = Curves.easeInCubic;
+  static const Curve darkPageInCurve = Curves.easeOutQuart;
+  static const Curve darkPageOutCurve = Curves.easeInOutCubicEmphasized;
+
+  // Component-level motion personality.
+  static const Duration lightTap = Duration(milliseconds: 140);
+  static const Duration darkTap = Duration(milliseconds: 180);
+  static const Duration lightStagger = Duration(milliseconds: 220);
+  static const Duration darkStagger = Duration(milliseconds: 280);
+  static const Duration lightPulse = Duration(milliseconds: 2400);
+  static const Duration darkPulse = Duration(milliseconds: 3200);
+
+  static const Curve lightTapCurve = Curves.easeOutBack;
+  static const Curve darkTapCurve = Curves.easeOutCubic;
+  static const Curve lightStaggerCurve = Curves.easeOutCubic;
+  static const Curve darkStaggerCurve = Curves.easeInOutCubic;
 }
