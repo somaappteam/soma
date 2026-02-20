@@ -25,6 +25,11 @@ class T {
   static const neonC = Color(0xFFFF3DB4); // richer pink
   static const neonG = Color(0xFF2BD910); // slightly more natural green
 
+  // Semantic accents (consistent meaning across themes)
+  static const semanticProgress = Color(0xFF3EDC9B);
+  static const semanticSocial = Color(0xFF7B6CFF);
+  static const semanticReward = Color(0xFFFFC85C);
+
   static const r20 = BorderRadius.all(Radius.circular(20));
   static const r28 = BorderRadius.all(Radius.circular(28));
 

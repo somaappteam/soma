@@ -21,6 +21,8 @@ import '../../data/profile_repository.dart';
 import '../../core/theme/motion.dart';
 import '../../core/widgets/responsive.dart';
 import '../../core/theme/spacing.dart';
+import '../../core/theme/layout_tokens.dart';
+import '../../core/widgets/premium_screen_scaffold.dart';
 import '../profile/profile_screen.dart';
 
 
@@ -212,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCourseList(List<SoloCourse> courses, {required bool editing}) {
+  Widget _buildCourseList(List<SoloCourse> courses, {required bool editing, required double listGap}) {
     final l10n = AppLocalizations.of(context);
     // If courses is empty, the ListView.separated below will correctly handle it
     // by rendering just the AddCourseButton (count = 0 + 1).
@@ -220,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListView.separated(
               physics: const BouncingScrollPhysics(),
               itemCount: editing ? courses.length : courses.length + 1,
-              separatorBuilder: (_, __) => const SizedBox(height: S.sm),
+              separatorBuilder: (_, __) => SizedBox(height: listGap),
               itemBuilder: (context, i) {
         if (!editing && i == courses.length) {
           return _StaggeredIn(
@@ -286,14 +288,12 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = AppLocalizations.of(context);
     final isGuest = authRepository.currentUser == null;
     
-    return SafeArea(
-        child: ResponsiveFrame(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.sm),
-            child: Column(
-              children: [
-                // Header row
-                Row(
+    return PremiumScreenScaffold(
+      body: ResponsiveFrame(
+        child: Column(
+          children: [
+            // Header row
+            Row(
                   children: [
                     // Profile Pic + Username
                     StreamBuilder<Map<String, bool>>(
@@ -412,11 +412,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
 
-                const SizedBox(height: S.lg),
+                const SizedBox(height: SectionGap.xl),
 
                 if (!isGuest) ...[
                   _ActiveFriendsStrip(),
-                  const SizedBox(height: S.lg),
+                  const SizedBox(height: SectionGap.lg),
                 ],
 
                 // Welcome
@@ -434,15 +434,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       }
                        
                       final courses = snapshot.data ?? [];
-                      return _buildCourseList(courses, editing: _isEditingCourses);
+                      final density = PremiumLayout.densityForWidth(MediaQuery.of(context).size.width);
+                      final listGap = PremiumLayout.listGap(density);
+                      return _buildCourseList(courses, editing: _isEditingCourses, listGap: listGap);
                     },
                   ),
                 ),
-              ],
-            ),
-          ),
+          ],
         ),
-      );
+      ),
+      padding: PremiumLayout.screenPadding(PremiumLayout.densityForWidth(MediaQuery.of(context).size.width)),
+    );
   }
 }
 
@@ -480,10 +482,12 @@ class _CoursesSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final density = PremiumLayout.densityForWidth(MediaQuery.of(context).size.width);
+    final listGap = PremiumLayout.listGap(density);
     return ListView.separated(
       physics: const BouncingScrollPhysics(),
       itemCount: 3,
-      separatorBuilder: (_, __) => const SizedBox(height: S.sm),
+      separatorBuilder: (_, __) => SizedBox(height: listGap),
       itemBuilder: (context, index) => const _SkeletonCard(),
     );
   }

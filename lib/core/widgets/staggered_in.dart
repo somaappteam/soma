@@ -8,6 +8,7 @@ class StaggeredIn extends StatefulWidget {
   final Duration baseDelay;
   final Curve curve;
   final Offset offset;
+  final bool withScale;
 
   const StaggeredIn({
     super.key,
@@ -15,8 +16,9 @@ class StaggeredIn extends StatefulWidget {
     required this.index,
     this.duration = MotionTokens.short,
     this.baseDelay = const Duration(milliseconds: 40),
-    this.curve = MotionTokens.movementCurve,
+    this.curve = MotionTokens.standardCurve,
     this.offset = const Offset(0, 0.04),
+    this.withScale = true,
   });
 
   @override
@@ -25,16 +27,36 @@ class StaggeredIn extends StatefulWidget {
 
 class _StaggeredInState extends State<StaggeredIn> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _fade;
-  late final Animation<Offset> _slide;
+  late Animation<double> _fade;
+  late Animation<Offset> _slide;
+  late Animation<double> _scale;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
-    _fade = CurvedAnimation(parent: _controller, curve: widget.curve);
-    _slide = Tween<Offset>(begin: widget.offset, end: Offset.zero).animate(_fade);
+    _configureAnimations();
     _play();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    if (widget.duration == MotionTokens.short) {
+      _controller.duration = isLight ? MotionTokens.lightStagger : MotionTokens.darkStagger;
+    }
+    _configureAnimations();
+  }
+
+  void _configureAnimations() {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final effectiveCurve = widget.curve == MotionTokens.standardCurve
+        ? (isLight ? MotionTokens.lightStaggerCurve : MotionTokens.darkStaggerCurve)
+        : widget.curve;
+    _fade = CurvedAnimation(parent: _controller, curve: effectiveCurve);
+    _slide = Tween<Offset>(begin: widget.offset, end: Offset.zero).animate(_fade);
+    _scale = Tween<double>(begin: 0.97, end: 1).animate(_fade);
   }
 
   Future<void> _play() async {
@@ -54,12 +76,18 @@ class _StaggeredInState extends State<StaggeredIn> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
-    return FadeTransition(
+    Widget child = FadeTransition(
       opacity: _fade,
       child: SlideTransition(
         position: _slide,
         child: widget.child,
       ),
     );
+
+    if (widget.withScale) {
+      child = ScaleTransition(scale: _scale, child: child);
+    }
+
+    return child;
   }
 }

@@ -3,35 +3,66 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../services/haptics_service.dart';
 import '../services/sfx_service.dart';
+import '../theme/motion.dart';
 import '../theme/tokens.dart';
+
+enum NeonButtonStyle { vibrant, subtle }
 
 class NeonButton extends StatefulWidget {
   final String label;
   final VoidCallback? onTap;
+  final NeonButtonStyle style;
 
   const NeonButton({
     super.key,
     required this.label,
     this.onTap,
+    this.style = NeonButtonStyle.vibrant,
   });
 
   @override
   State<NeonButton> createState() => _NeonButtonState();
 }
 
-class _NeonButtonState extends State<NeonButton>
-    with SingleTickerProviderStateMixin {
+class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _pulse;
+  late Animation<double> _pulse;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2800),
-    )..repeat(reverse: true);
+    _controller = AnimationController(vsync: this, duration: MotionTokens.lightPulse);
     _pulse = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _configurePulse();
+  }
+
+  @override
+  void didUpdateWidget(covariant NeonButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.style != widget.style || oldWidget.onTap != widget.onTap) {
+      _configurePulse();
+    }
+  }
+
+  void _configurePulse() {
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    _controller.duration = isLight ? MotionTokens.lightPulse : MotionTokens.darkPulse;
+    _pulse = CurvedAnimation(
+      parent: _controller,
+      curve: isLight ? MotionTokens.lightStaggerCurve : MotionTokens.darkStaggerCurve,
+    );
+    final shouldAnimate = widget.style == NeonButtonStyle.vibrant && widget.onTap != null;
+    if (shouldAnimate) {
+      _controller.repeat(reverse: true);
+    } else {
+      _controller.stop();
+      _controller.value = 0.5;
+    }
   }
 
   @override
@@ -45,9 +76,10 @@ class _NeonButtonState extends State<NeonButton>
     final enabled = widget.onTap != null;
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
+    final isSubtle = widget.style == NeonButtonStyle.subtle;
 
     final gradientStart = isLight ? scheme.primary : T.neonA;
-    final gradientEnd = isLight ? scheme.tertiary : T.neonC;
+    final gradientEnd = isSubtle ? scheme.secondary : (isLight ? scheme.tertiary : T.neonC);
     final ambientGlow = isLight ? scheme.primary : T.neonA;
     final accentGlow = isLight ? scheme.secondary : T.neonB;
 
@@ -62,8 +94,10 @@ class _NeonButtonState extends State<NeonButton>
       child: AnimatedBuilder(
         animation: _pulse,
         builder: (context, child) {
-          final glowStrength = lerpDouble(0.12, 0.28, _pulse.value) ?? 0.2;
-          final shimmerShift = lerpDouble(-0.2, 0.2, _pulse.value) ?? 0.0;
+          final glowStrength = isSubtle
+              ? 0.02
+              : (lerpDouble(0.08, 0.16, _pulse.value) ?? 0.12);
+          final shimmerShift = isSubtle ? 0.0 : (lerpDouble(-0.2, 0.2, _pulse.value) ?? 0.0);
           final baseA = enabled
               ? gradientStart
               : gradientStart.withValues(alpha: 0.45);
@@ -74,7 +108,6 @@ class _NeonButtonState extends State<NeonButton>
             alignment: Alignment.center,
             clipBehavior: Clip.none,
             children: [
-              // 1. Pulsing ambient glow (alive feel)
               Container(
                 height: 48,
                 width: double.infinity,
@@ -84,20 +117,18 @@ class _NeonButtonState extends State<NeonButton>
                     BoxShadow(
                       color: ambientGlow.withValues(alpha: glowStrength),
                       offset: const Offset(0, 6),
-                      blurRadius: 20,
+                      blurRadius: isSubtle ? 6 : 10,
                       spreadRadius: -7,
                     ),
                     BoxShadow(
                       color: accentGlow.withValues(alpha: glowStrength * 0.6),
                       offset: const Offset(0, 1),
-                      blurRadius: 14,
+                      blurRadius: isSubtle ? 5 : 10,
                       spreadRadius: -9,
                     ),
                   ],
                 ),
               ),
-
-              // 2. Main Button Pill (animated gradient shimmer)
               Container(
                 height: 48,
                 width: double.infinity,
@@ -108,14 +139,15 @@ class _NeonButtonState extends State<NeonButton>
                     end: Alignment(1, 1 + shimmerShift),
                     colors: [baseA, baseC],
                   ),
+                  border: isSubtle
+                      ? Border.all(color: scheme.onPrimary.withValues(alpha: 0.22), width: 0.8)
+                      : null,
                 ),
                 child: Center(
                   child: Text(
                     widget.label,
                     style: TextStyle(
-                      color: Colors.white.withValues(
-                        alpha: enabled ? 1 : 0.7,
-                      ),
+                      color: Colors.white.withValues(alpha: enabled ? 1 : 0.7),
                       fontSize: 15.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.5,
@@ -123,8 +155,6 @@ class _NeonButtonState extends State<NeonButton>
                   ),
                 ),
               ),
-
-              // 3. Subtle top specular highlight
               Positioned(
                 top: 1,
                 left: 20,
@@ -133,16 +163,14 @@ class _NeonButtonState extends State<NeonButton>
                   height: 1,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(1),
-                    color: Colors.white.withValues(alpha: 0.25),
+                    color: Colors.white.withValues(alpha: isSubtle ? 0.16 : 0.25),
                   ),
                 ),
               ),
-
-              // 4. Animated sheen sweep
               Positioned.fill(
                 child: IgnorePointer(
                   child: Opacity(
-                    opacity: enabled ? 0.22 : 0.1,
+                    opacity: isSubtle ? 0.05 : (enabled ? 0.14 : 0.08),
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: T.r20,
@@ -151,7 +179,7 @@ class _NeonButtonState extends State<NeonButton>
                           end: Alignment(1.2 + shimmerShift, 0.6),
                           colors: [
                             Colors.white.withValues(alpha: 0),
-                            Colors.white.withValues(alpha: 0.35),
+                            Colors.white.withValues(alpha: isSubtle ? 0.2 : 0.35),
                             Colors.white.withValues(alpha: 0),
                           ],
                           stops: const [0.25, 0.5, 0.75],

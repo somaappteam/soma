@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../core/services/haptics_service.dart';
+import '../../core/services/sfx_service.dart';
 
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
@@ -162,10 +163,17 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
 
     if (ok) {
       correctCount++;
-      hapticsService.mediumImpact();
+      if (correctCount > 0 && correctCount % 3 == 0) {
+        hapticsService.mediumImpact();
+        sfxService.risingTone();
+      } else {
+        hapticsService.mediumImpact();
+        sfxService.softClick();
+      }
     } else {
       mistakes.add(q);
       hapticsService.lightImpact();
+      sfxService.click();
     }
 
     setState(() {
