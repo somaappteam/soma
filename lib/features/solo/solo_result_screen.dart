@@ -419,6 +419,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
       padding: PremiumLayout.screenPadding(PremiumLayout.densityForWidth(MediaQuery.of(context).size.width)),
     );
   }
+}
 
 // ---------------- UI parts ----------------
 

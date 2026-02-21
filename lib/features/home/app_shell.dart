@@ -105,7 +105,7 @@ class _AppShellState extends State<AppShell> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.call_rounded, size: 48, color: Colors.blue),
+              Icon(Icons.call_rounded, size: 48, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 16),
               Text(
                 'Incoming call from $name',
@@ -448,9 +448,9 @@ class _SomaBottomNav extends StatelessWidget {
         builder: (context, constraints) {
           final width = constraints.maxWidth;
           final scale = (width / 360).clamp(0.85, 1.1);
-          final outerPad = EdgeInsets.fromLTRB(14 * scale, 0, 14 * scale, 12 * scale);
+          final outerPad = EdgeInsets.fromLTRB(14 * scale, 0, 14 * scale, 14 * scale);
           final innerPad = EdgeInsets.symmetric(horizontal: 6 * scale, vertical: 8 * scale);
-          final radius = 24 * scale;
+          final radius = 28 * scale;
           final iconSize = 22 * scale;
           final fontSize = 12 * scale;
           final labelGap = 4 * scale;
@@ -539,11 +539,11 @@ class _NavItem extends StatelessWidget {
         : scheme.onSurface.withValues(alpha: 0.65);
     final bg = selected
         ? (isDark
-            ? const Color(0xFF3A3568)
+            ? const Color(0xFF2E2B54)
             : Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), scheme.surface))
         : Colors.transparent;
     final border = selected
-        ? (isDark ? const Color(0xFF6B5CFF) : scheme.primary.withValues(alpha: 0.35))
+        ? (isDark ? const Color(0xFF8B7AFF) : scheme.primary.withValues(alpha: 0.35))
         : Colors.transparent;
 
     return PressableScale(
@@ -652,11 +652,11 @@ class _RailItem extends StatelessWidget {
         : scheme.onSurface.withValues(alpha: 0.65);
     final bg = selected
         ? (isDark
-            ? const Color(0xFF3A3568)
+            ? const Color(0xFF2E2B54)
             : Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), scheme.surface))
         : Colors.transparent;
     final border = selected
-        ? (isDark ? const Color(0xFF6B5CFF) : scheme.primary.withValues(alpha: 0.35))
+        ? (isDark ? const Color(0xFF8B7AFF) : scheme.primary.withValues(alpha: 0.35))
         : Colors.transparent;
 
     return PressableScale(

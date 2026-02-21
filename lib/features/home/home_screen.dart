@@ -188,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: scheme.onSurface,
                   fontWeight: FontWeight.w800,
-                  fontSize: 18,
+                  fontSize: 19,
                 ),
           ),
         ),
@@ -314,8 +314,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Stack(
                                   children: [
                                     Container(
-                                      width: 38,
-                                      height: 38,
+                                      width: 42,
+                                      height: 42,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -326,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               )
                                             : null,
                                         border: Border.all(
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16),
                                           width: 1.5,
                                         ),
                                       ),
@@ -348,12 +348,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         bottom: 0,
                                         right: 0,
                                         child: Container(
-                                          width: 11,
-                                          height: 11,
+                                          width: 12,
+                                          height: 12,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             color: const Color(0xFF58F7B6),
-                                            border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
+                                            border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2.5),
                                           ),
                                         ),
                                       ),
@@ -693,7 +693,9 @@ class _Pill extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: scheme.onSurface.withValues(alpha: 0.9)),
+          Icon(icon, size: 16, color: icon == Icons.bolt_rounded
+              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.9)
+              : Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.85)),
           const SizedBox(width: 6),
           Text(
             label,

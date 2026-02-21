@@ -169,8 +169,8 @@ class AppTheme {
     const scheme = ColorScheme.dark(
       primary: T.neonA,
       secondary: T.neonB,
-      surface: Color(0xFF06070F),
-      surfaceContainerHighest: Color(0xFF181E2E),
+      surface: Color(0xFF050610),
+      surfaceContainerHighest: Color(0xFF111630),
       onPrimary: Colors.white,
       onSecondary: Colors.black,
       onSurface: Color(0xFFF6F5FF),
@@ -178,7 +178,7 @@ class AppTheme {
 
     const glass = GlassTheme(
       fill: Color(0x1EFFFFFF),
-      stroke: Color(0x2B77E7FF),
+      stroke: Color(0x3377E7FF),
       shadow: Color(0x66000000),
     );
     const background = AppBackgroundTheme(
@@ -403,7 +403,7 @@ class AppTheme {
         shadowColor: isLight ? cardShadow : Colors.transparent,
         elevation: isLight ? 10 : 0,
         surfaceTintColor: scheme.primary.withValues(alpha: isLight ? 0.04 : 0),
-        indicatorColor: scheme.primary.withValues(alpha: isLight ? 0.20 : 0.3),
+        indicatorColor: scheme.primary.withValues(alpha: isLight ? 0.20 : 0.38),
         iconTheme: WidgetStateProperty.resolveWith(
           (states) => IconThemeData(
             color: states.contains(WidgetState.selected)

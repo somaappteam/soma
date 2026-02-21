@@ -17,16 +17,16 @@ class T {
   // Glass
   static const glassFill = Color(0x14FFFFFF); // ~8%
   static const glassStroke = Color(0x26FFFFFF); // ~15%
-  static const fieldFill = Color(0xFF1B1D3A);
+  static const fieldFill = Color(0xFF141727); // richer dark, better contrast
 
   // Premium accents
-  static const neonA = Color(0xFF6C4DFF); // deeper purple
-  static const neonB = Color(0xFF2AE6FF); // sharp cyan
+  static const neonA = Color(0xFF7B5FFF); // warmer, richer purple
+  static const neonB = Color(0xFF00D9F5); // deeper, less harsh cyan
   static const neonC = Color(0xFFFF3DB4); // richer pink
   static const neonG = Color(0xFF2BD910); // slightly more natural green
 
   // Semantic accents (consistent meaning across themes)
-  static const semanticProgress = Color(0xFF3EDC9B);
+  static const semanticProgress = Color(0xFF2AFADF); // teal-leaning, matches progress bar gradient
   static const semanticSocial = Color(0xFF7B6CFF);
   static const semanticReward = Color(0xFFFFC85C);
 

@@ -35,22 +35,24 @@ class _StaggeredInState extends State<StaggeredIn> with SingleTickerProviderStat
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this, duration: widget.duration);
-    _configureAnimations();
     _play();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Defer theme-dependent setup to build or ensured method
+  }
+
+  void _ensureInitialized() {
     final isLight = Theme.of(context).brightness == Brightness.light;
     if (widget.duration == MotionTokens.short) {
       _controller.duration = isLight ? MotionTokens.lightStagger : MotionTokens.darkStagger;
     }
-    _configureAnimations();
+    _configureAnimations(isLight);
   }
 
-  void _configureAnimations() {
-    final isLight = Theme.of(context).brightness == Brightness.light;
+  void _configureAnimations(bool isLight) {
     final effectiveCurve = widget.curve == MotionTokens.standardCurve
         ? (isLight ? MotionTokens.lightStaggerCurve : MotionTokens.darkStaggerCurve)
         : widget.curve;
@@ -76,6 +78,7 @@ class _StaggeredInState extends State<StaggeredIn> with SingleTickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    _ensureInitialized();
     Widget child = FadeTransition(
       opacity: _fade,
       child: SlideTransition(

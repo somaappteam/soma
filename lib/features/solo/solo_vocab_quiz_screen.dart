@@ -468,9 +468,12 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(minHeight: 92),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+                  child: AnimatedSize(
+                    duration: MotionTokens.short,
+                    curve: MotionTokens.standardCurve,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                     _VocabPromptRow(
                       question: q,
                       langCode: _reverseLanguage
@@ -497,8 +500,9 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                               fontWeight: FontWeight.w600),
                         ),
                       ),
+                      ],
                     ],
-                  ],
+                    ),
                   ),
                 ),
               ),
@@ -521,6 +525,8 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
               Expanded(
                 child: ListView.separated(
                   physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(12, 20, 12, 20),
+                  clipBehavior: Clip.none,
                   itemCount: choices.length,
                   separatorBuilder: (_, __) => const SizedBox(height: 10),
                   itemBuilder: (_, i) {
@@ -552,17 +558,18 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                         onTap: revealed
                             ? null
                             : () {
-                                setState(() => selected = i);
-                                _submit();
-                              },
+                                  setState(() => selected = i);
+                                  _submit();
+                                },
                         child: AnimatedScale(
-                          scale: revealed && isCorrect ? 1.02 : 1,
-                          duration: MotionTokens.short,
-                          curve: MotionTokens.standardCurve,
-                          child: AnimatedContainer(
+                            scale: revealed && isCorrect ? 1.02 : 1,
                             duration: MotionTokens.short,
                             curve: MotionTokens.standardCurve,
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                            child: AnimatedContainer(
+                            duration: MotionTokens.short,
+                            curve: MotionTokens.standardCurve,
+                            constraints: const BoxConstraints(minHeight: 72),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(18),
                               color: bg,
@@ -577,35 +584,52 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                                     ]
                                   : [],
                             ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Directionality(
-                                    textDirection: _isRtlLang(
+                            child: AnimatedSize(
+                              duration: MotionTokens.short,
+                              curve: MotionTokens.standardCurve,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Directionality(
+                                      textDirection: _isRtlLang(
                                             _reverseLanguage
                                                 ? (q['target_lang']?.toString() ?? '')
                                                 : (q['source_lang']?.toString() ?? ''),
                                           )
                                         ? TextDirection.rtl
                                         : TextDirection.ltr,
-                                    child: Text(
-                                      choices[i],
-                                      style: TextStyle(
-                                          color: scheme.onSurface.withValues(alpha: 0.92),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w800),
+                                      child: Text(
+                                        choices[i],
+                                        style: TextStyle(
+                                            color: scheme.onSurface.withValues(alpha: 0.92),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w800),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                if (revealed && isCorrect) ...[
-                                  const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
-                                  const SizedBox(width: 6),
-                                  const RewardSparkle(show: true),
-                                ] else if (revealed && isSel && !isCorrect)
-                                  const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8))
+                                  const SizedBox(width: 8),
+                                 AnimatedSwitcher(
+                                   duration: MotionTokens.short,
+                                   transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: ScaleTransition(scale: anim, child: child)),
+                                   child: (revealed && isCorrect)
+                                     ? Row(
+                                         mainAxisSize: MainAxisSize.min,
+                                         key: const ValueKey('correct-reveal'),
+                                         children: [
+                                           const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
+                                           const SizedBox(width: 6),
+                                           const RewardSparkle(show: true),
+                                         ],
+                                       )
+                                     : (revealed && isSel && !isCorrect)
+                                         ? const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8), key: ValueKey('wrong-reveal'))
+                                         : const SizedBox.shrink(key: ValueKey('none')),
+                                 ),
                               ],
                             ),
                           ),
+                        ),
                         ),
                       ),
                     );
@@ -613,10 +637,19 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                 ),
               ),
               SizedBox(height: compactHeight ? 8 : 10),
-              if (revealed && widget.timePerQuestion == null)
-                NeonButton(
-                  label: "Next",
-                  onTap: _next,
+              if (widget.timePerQuestion == null)
+                AnimatedSize(
+                  duration: MotionTokens.short,
+                  curve: MotionTokens.standardCurve,
+                  child: revealed
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: NeonButton(
+                            label: "Next",
+                            onTap: _next,
+                          ),
+                        )
+                      : const SizedBox(width: double.infinity, height: 0),
                 ),
             ],
               ),

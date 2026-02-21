@@ -951,7 +951,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(minHeight: 92),
-                    child: Column(
+                    child: AnimatedSize(
+                      duration: MotionTokens.short,
+                      curve: MotionTokens.standardCurve,
+                      child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                         if (_isSentenceQuestion(q))
@@ -1019,7 +1022,8 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                               ),
                             ),
                           ],
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -1047,6 +1051,8 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                   Expanded(
                     child: ListView.separated(
                       physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(12, 20, 12, 20),
+                      clipBehavior: Clip.none,
                       itemCount: _choices.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (_, i) {
@@ -1078,17 +1084,18 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                           child: PressableScale(
                             onTap: (canPlay && !isLocked && !revealed) ? () => _select(i) : null,
                             child: AnimatedScale(
-                              scale: showCorrect && isCorrect ? 1.02 : 1,
-                              duration: const Duration(milliseconds: 200),
-                              curve: Curves.easeOut,
-                              child: AnimatedOpacity(
-                                opacity: 1.0,
+                                scale: showCorrect && isCorrect ? 1.02 : 1,
                                 duration: const Duration(milliseconds: 200),
-                                curve: MotionTokens.standardCurve,
-                                child: AnimatedContainer(
+                                curve: Curves.easeOut,
+                                child: AnimatedOpacity(
+                                  opacity: 1.0,
                                   duration: const Duration(milliseconds: 200),
                                   curve: MotionTokens.standardCurve,
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: MotionTokens.standardCurve,
+                                    constraints: const BoxConstraints(minHeight: 72),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(18),
                                     color: bg,
@@ -1103,12 +1110,16 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                                           ]
                                         : [],
                                   ),
-                                  child: Row(
-                                    children: [
+                                  child: AnimatedSize(
+                                    duration: MotionTokens.short,
+                                    curve: MotionTokens.standardCurve,
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
                                        Expanded(
                                         child: Directionality(
                                           textDirection: _isRtlLang(
-                                                  q.sourceLang,
+                                                  questions[qIndex].targetLang,
                                                 )
                                               ? TextDirection.rtl
                                               : TextDirection.ltr,
@@ -1121,16 +1132,29 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                                           ),
                                         ),
                                       ),
-                                      if (showCorrect && isCorrect) ...[
-                                        const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
-                                        const SizedBox(width: 6),
-                                        const RewardSparkle(show: true),
-                                      ] else if (showCorrect && isSelected && !isCorrect)
-                                        const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8))
+                                       const SizedBox(width: 8),
+                                       AnimatedSwitcher(
+                                        duration: MotionTokens.short,
+                                        transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: ScaleTransition(scale: anim, child: child)),
+                                        child: (showCorrect && isCorrect)
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              key: const ValueKey('correct-reveal'),
+                                              children: [
+                                                const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
+                                                const SizedBox(width: 6),
+                                                const RewardSparkle(show: true),
+                                              ],
+                                            )
+                                          : (showCorrect && isSelected && !isCorrect)
+                                              ? const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8), key: ValueKey('wrong-reveal'))
+                                              : const SizedBox.shrink(key: ValueKey('none')),
+                                      ),
                                     ],
                                   ),
                                 ),
                               ),
+                            ),
                             ),
                           ),
                         );

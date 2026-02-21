@@ -70,16 +70,16 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 color: isLight ? scheme.primary : Colors.white,
                                 shadows: [
                                   Shadow(
-                                    color: const Color(0xFF00FFFF).withValues(alpha: 0.6),
-                                    blurRadius: 20,
+                                    color: T.neonB.withValues(alpha: 0.55),
+                                    blurRadius: 22,
                                   ),
                                   Shadow(
-                                    color: const Color(0xFF9D00FF).withValues(alpha: 0.5),
-                                    blurRadius: 40,
+                                    color: T.neonA.withValues(alpha: 0.45),
+                                    blurRadius: 44,
                                   ),
                                   Shadow(
-                                    color: const Color(0xFF6A00FF).withValues(alpha: 0.3),
-                                    blurRadius: 80,
+                                    color: T.neonA.withValues(alpha: 0.25),
+                                    blurRadius: 90,
                                   ),
                                 ],
                               ),
