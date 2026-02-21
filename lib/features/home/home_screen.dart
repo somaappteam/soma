@@ -1,10 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../core/services/haptics_service.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
 import '../../core/widgets/pressable_scale.dart';
+import '../../core/widgets/staggered_in.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../models/solo_course.dart';
 import '../solo/solo_course_detail_screen.dart';
 import '../solo/add_course_screen.dart';
@@ -39,7 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
   // We'll load courses via StreamBuilder
   late Stream<List<SoloCourse>> _coursesStream;
   bool _isEditingCourses = false;
-  bool _isFirstVisit = false;
 
   @override
   void initState() {
@@ -66,7 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final settings = await settingsRepository.getSettings();
     final hasSeenHome = settings['has_seen_home'] == true;
     if (!mounted) return;
-    setState(() => _isFirstVisit = !hasSeenHome);
     if (!hasSeenHome) {
       await settingsRepository.updateSetting('has_seen_home', true);
     }
@@ -225,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
               separatorBuilder: (_, __) => SizedBox(height: listGap),
               itemBuilder: (context, i) {
         if (!editing && i == courses.length) {
-          return _StaggeredIn(
+          return StaggeredIn(
             index: i,
             child: _AddCourseButton(
               onAdded: (newCourse) {
@@ -243,7 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
         final progress = _progressForCourse(c.xp);
         final timeLabel = _formatElapsed(c.lastAccessed);
 
-        return _StaggeredIn(
+        return StaggeredIn(
           index: i,
           child: CourseCard(
             fromLang: fromLang,
@@ -307,7 +308,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             final p = profileStore.profile;
                             final hasAvatar = p.avatarUrl != null && p.avatarUrl!.isNotEmpty;
                             final username = p.username.isNotEmpty ? p.username : l10n.guestUsername;
-                            final userId = authRepository.currentUser?.id;
                             
                             return Row(
                               children: [
@@ -321,7 +321,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         color: Theme.of(context).colorScheme.surfaceContainerHighest,
                                         image: hasAvatar
                                             ? DecorationImage(
-                                                image: NetworkImage(p.avatarUrl!),
+                                                image: CachedNetworkImageProvider(p.avatarUrl!),
                                                 fit: BoxFit.cover,
                                               )
                                             : null,
@@ -734,53 +734,7 @@ class _FlagDot extends StatelessWidget {
   }
 }
 
-class _StaggeredIn extends StatefulWidget {
-  final int index;
-  final Widget child;
 
-  const _StaggeredIn({required this.index, required this.child});
-
-  @override
-  State<_StaggeredIn> createState() => _StaggeredInState();
-}
-
-class _StaggeredInState extends State<_StaggeredIn> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _opacity;
-  late final Animation<Offset> _offset;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this, duration: MotionTokens.long);
-    final curve = CurvedAnimation(parent: _controller, curve: MotionTokens.pageInCurve);
-    _opacity = Tween<double>(begin: 0, end: 1).animate(curve);
-    _offset = Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(curve);
-    final delayMs = min(widget.index * 60, 240);
-    Future.delayed(Duration(milliseconds: delayMs), () {
-      if (mounted) {
-        _controller.forward();
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(
-      opacity: _opacity,
-      child: SlideTransition(
-        position: _offset,
-        child: widget.child,
-      ),
-    );
-  }
-}
 
 class _AddCourseButton extends StatelessWidget {
   final void Function(SoloCourse newCourse) onAdded;
@@ -972,7 +926,7 @@ class _ActiveFriendsStrip extends StatelessWidget {
                                     ),
                                     image: (avatarUrl != null && avatarUrl.isNotEmpty)
                                         ? DecorationImage(
-                                            image: NetworkImage(avatarUrl),
+                                            image: CachedNetworkImageProvider(avatarUrl),
                                             fit: BoxFit.cover,
                                           )
                                         : null,

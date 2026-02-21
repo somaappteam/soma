@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
@@ -2871,7 +2872,7 @@ class _TopBar extends StatelessWidget {
                       foregroundColor: Theme.of(context).colorScheme.onSurface,
                       backgroundImage:
                           (avatarUrl != null && avatarUrl!.trim().isNotEmpty)
-                              ? NetworkImage(avatarUrl!)
+                              ? CachedNetworkImageProvider(avatarUrl!)
                               : null,
                       child: (avatarUrl == null || avatarUrl!.trim().isEmpty)
                           ? const Icon(Icons.person_rounded, size: 16)
@@ -3135,10 +3136,10 @@ class _BubbleState extends State<_Bubble> {
             child: isImage
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      imageUrl ?? '',
+                    child: CachedNetworkImage(
+                      imageUrl: imageUrl ?? '',
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Padding(
+                      errorWidget: (_, __, ___) => Padding(
                         padding: const EdgeInsets.all(10),
                         child: Text(
                           'Image unavailable',

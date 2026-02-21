@@ -824,5 +824,23 @@
     "placeholders": {
       "id": {}
     }
-  }
+  },
+  "incomingCallFrom": "Incoming call from {name}",
+  "@incomingCallFrom": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "declineCall": "Decline",
+  "acceptCall": "Accept",
+  "voiceCall": "Voice call",
+  "inCallWith": "In call • {name}",
+  "@inCallWith": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "authBenefitLiveCircles": "Live circles with real learners",
+  "authBenefitVoiceRooms": "Voice rooms with instant practice",
+  "authBenefitFriendChallenges": "Friend challenges and saved progress"
 }

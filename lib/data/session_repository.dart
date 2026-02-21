@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/di/locator.dart';
 
 class UserSession {
   final String id;
@@ -60,4 +61,4 @@ class SessionRepository {
   }
 }
 
-final sessionRepository = SessionRepository();
+SessionRepository get sessionRepository => locator<SessionRepository>();

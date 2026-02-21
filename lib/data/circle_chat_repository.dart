@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/di/locator.dart';
 
 class CircleChatRepository {
   final _supabase = Supabase.instance.client;
@@ -189,4 +190,4 @@ class CircleChatRepository {
   }
 }
 
-final circleChatRepository = CircleChatRepository();
+CircleChatRepository get circleChatRepository => locator<CircleChatRepository>();

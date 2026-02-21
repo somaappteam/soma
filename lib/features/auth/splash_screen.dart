@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../auth/welcome_screen.dart';
@@ -41,7 +42,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   Future<void> _goNext() async {
-    await Future.delayed(const Duration(milliseconds: 220));
+    // Run animation for at least 600ms AND ensure auth session is fresh.
+    await Future.wait([
+      Future.delayed(const Duration(milliseconds: 600)),
+      Supabase.instance.client.auth.refreshSession().catchError((_) {}),
+    ]);
     if (!mounted) return;
 
     final session = authRepository.currentUser;

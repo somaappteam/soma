@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../core/widgets/glass.dart';
 import '../../core/widgets/neon_button.dart';
@@ -7,6 +9,7 @@ import '../../core/widgets/premium_dialog.dart';
 import 'settings_screen.dart';
 import '../../core/theme/tokens.dart';
 import '../../core/theme/motion.dart';
+import '../../data/activity_feed_repository.dart';
 import '../../data/auth_repository.dart';
 import '../../data/profile_repository.dart';
 import '../../data/profile_store.dart';
@@ -15,6 +18,7 @@ import '../../data/stats_repository.dart';
 import '../../data/user_report_repository.dart';
 import '../../data/achievements_repository.dart';
 import '../../data/presence_repository.dart';
+import '../../models/activity_event.dart';
 import '../../models/user_profile.dart';
 import '../../models/user_stats.dart';
 import '../../models/achievement.dart';
@@ -49,7 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<UserStats>? _statsFuture;
   Future<List<Map<String, dynamic>>>? _friendsFuture;
   Future<List<Achievement>>? _achievementsFuture;
-
+  Future<List<ActivityEvent>>? _activityFuture;
 
   bool get _isGuest => authRepository.currentUser == null;
   String? get _viewerId => authRepository.currentUser?.id;
@@ -66,6 +70,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _statsFuture = statsRepository.getStats(userId: _viewedUserId);
       _friendsFuture = _isVisitorView ? null : socialRepository.getFriends();
       _achievementsFuture = achievementsRepository.getAchievements();
+      if (!_isVisitorView) {
+        _activityFuture = activityFeedRepository.getFriendActivity();
+      }
     }
   }
 
@@ -476,10 +483,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             );
                           },
                         ),
-                      ],
+                        const SizedBox(height: S.sm),
+                        _ProfileSectionLabel(label: 'Friends Activity'),
+                        const SizedBox(height: 6),
+                        FutureBuilder<List<ActivityEvent>>(
+                          future: _activityFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const _PremiumSectionShell(
+                                  child: _AchievementsSkeleton());
+                            }
+                            final events = snapshot.data ?? [];
+                            return _PremiumSectionShell(
+                              child: _ActivityFeedCard(events: events),
+                            );
+                          },
+                        ),
                       const SizedBox(height: S.sm),
                       const SizedBox(height: S.xl),
-                    ],
+                    ], // end of else ...[
+                    ], // end of ListView children
                   ),
                 ),
               ],
@@ -879,7 +903,7 @@ class _HeaderCard extends StatelessWidget {
                 child: _AvatarGlow(
                   size: 64,
                   image: (profile.avatarUrl?.isNotEmpty == true)
-                      ? NetworkImage(profile.avatarUrl!) as ImageProvider
+                      ? CachedNetworkImageProvider(profile.avatarUrl!) as ImageProvider
                       : const AssetImage("assets/avatar/avatar_1.png"),
                   showOnlineIndicator: showOnlineIndicator,
                 ),
@@ -1278,7 +1302,7 @@ class _FriendsCard extends StatelessWidget {
                     for (final friend in visibleFriends)
                       _MiniAvatar(
                         image: (friend['avatar_url']?.toString().isNotEmpty == true)
-                            ? NetworkImage(friend['avatar_url'].toString()) as ImageProvider
+                            ? CachedNetworkImageProvider(friend['avatar_url'].toString()) as ImageProvider
                             : const AssetImage("assets/avatar/avatar_1.png"),
                         tooltip: '@${friend['username']?.toString() ?? 'friend'}',
                         isOnline: onlineStatuses[friend['id']?.toString()] == true,
@@ -2011,7 +2035,7 @@ class _BadgeTile extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final opacity = unlocked ? 1.0 : 0.45;
-    return Glass(
+    Widget tile = Glass(
       radius: BorderRadius.circular(18),
       padding: const EdgeInsets.all(S.xs),
       child: Column(
@@ -2030,6 +2054,12 @@ class _BadgeTile extends StatelessWidget {
         ],
       ),
     );
+
+    if (unlocked) {
+      return tile.animate(onPlay: (controller) => controller.repeat(reverse: true))
+          .shimmer(duration: const Duration(seconds: 3), color: scheme.primary.withValues(alpha: 0.15));
+    }
+    return tile;
   }
 }
 
@@ -2114,6 +2144,115 @@ class _NeonProgressBar extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ─── Friend Activity Feed Card ───────────────────────────────────────────────
+
+class _ActivityFeedCard extends StatelessWidget {
+  final List<ActivityEvent> events;
+  const _ActivityFeedCard({required this.events});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    if (events.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        child: Center(
+          child: Text(
+            'Add friends to see their activity here.',
+            style: TextStyle(
+              color: scheme.onSurface.withValues(alpha: 0.5),
+              fontSize: 13.5,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: events
+          .map((e) => _ActivityEventTile(event: e))
+          .expand((w) => [w, const Divider(height: 1, indent: 52)])
+          .take(events.length * 2 - 1)
+          .toList(),
+    );
+  }
+}
+
+class _ActivityEventTile extends StatelessWidget {
+  final ActivityEvent event;
+  const _ActivityEventTile({required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final avatarUrl = event.avatarUrl;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Avatar.
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: scheme.onSurface.withValues(alpha: 0.08),
+            ),
+            child: (avatarUrl != null && avatarUrl.trim().isNotEmpty)
+                ? ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: avatarUrl,
+                      width: 38,
+                      height: 38,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) =>
+                          Icon(Icons.person, color: scheme.onSurface, size: 20),
+                    ),
+                  )
+                : Icon(Icons.person, color: scheme.onSurface, size: 20),
+          ),
+          const SizedBox(width: 10),
+          // Text.
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  text: TextSpan(
+                    style: TextStyle(
+                      color: scheme.onSurface,
+                      fontSize: 13.5,
+                    ),
+                    children: [
+                      TextSpan(
+                        text: event.displayName,
+                        style: const TextStyle(fontWeight: FontWeight.w700),
+                      ),
+                      const TextSpan(text: ' '),
+                      TextSpan(text: event.actionText),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  event.timeAgo,
+                  style: TextStyle(
+                    color: scheme.onSurface.withValues(alpha: 0.45),
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

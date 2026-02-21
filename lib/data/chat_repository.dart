@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'presence_repository.dart';
+import '../core/di/locator.dart';
 
 class ChatRepository {
   static const int _maxContentChars = 4000;
@@ -717,4 +718,4 @@ class _PendingDmSend {
   const _PendingDmSend({required this.receiverId, required this.content});
 }
 
-final chatRepository = ChatRepository();
+ChatRepository get chatRepository => locator<ChatRepository>();

@@ -3333,6 +3333,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Circle ID: {id}'**
   String circlesShareId(Object id);
+
+  /// No description provided for @incomingCallFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Incoming call from {name}'**
+  String incomingCallFrom(Object name);
+
+  /// No description provided for @declineCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get declineCall;
+
+  /// No description provided for @acceptCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get acceptCall;
+
+  /// No description provided for @voiceCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice call'**
+  String get voiceCall;
+
+  /// No description provided for @inCallWith.
+  ///
+  /// In en, this message translates to:
+  /// **'In call • {name}'**
+  String inCallWith(Object name);
+
+  /// No description provided for @authBenefitLiveCircles.
+  ///
+  /// In en, this message translates to:
+  /// **'Live circles with real learners'**
+  String get authBenefitLiveCircles;
+
+  /// No description provided for @authBenefitVoiceRooms.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice rooms with instant practice'**
+  String get authBenefitVoiceRooms;
+
+  /// No description provided for @authBenefitFriendChallenges.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend challenges and saved progress'**
+  String get authBenefitFriendChallenges;
 }
 
 class _AppLocalizationsDelegate

@@ -19,7 +19,7 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 6,
+      version: 7,
       onCreate: _createDB,
       onUpgrade: _onUpgrade,
     );
@@ -42,6 +42,14 @@ class DatabaseHelper {
       await db.execute('DROP TABLE IF EXISTS vocabulary');
       await db.execute('DROP TABLE IF EXISTS sentences');
       await _createContentTables(db);
+    }
+    if (oldVersion < 7) {
+      // Add SM-2 ease_factor column. Default 2.5 matches SM-2 spec.
+      try {
+        await db.execute(
+          'ALTER TABLE user_learned_items ADD COLUMN ease_factor REAL DEFAULT 2.5',
+        );
+      } catch (_) {}
     }
   }
 
@@ -102,6 +110,7 @@ class DatabaseHelper {
         course_id TEXT,
         concept_id INTEGER,
         interval_days INTEGER,
+        ease_factor REAL DEFAULT 2.5,
         due_at TEXT,
         PRIMARY KEY (user_id, course_id, concept_id)
       )
@@ -239,6 +248,7 @@ class DatabaseHelper {
         'course_id': item['course_id'],
         'concept_id': item['concept_id'],
         'interval_days': item['interval_days'],
+        'ease_factor': item['ease_factor'] ?? 2.5,
         'due_at': item['due_at'],
       },
       conflictAlgorithm: ConflictAlgorithm.replace,

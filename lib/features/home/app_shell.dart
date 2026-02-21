@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/settings_repository.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import '../../data/auth_repository.dart';
+import '../../data/achievements_repository.dart';
 import '../../core/widgets/glass.dart';
 import '../auth/sign_in_screen.dart';
 import '../auth/sign_up_screen.dart';
@@ -14,7 +17,9 @@ import '../../core/theme/motion.dart';
 import '../../core/widgets/pressable_scale.dart';
 import '../../core/widgets/responsive.dart';
 import '../../data/call_signaling_service.dart';
+import '../../data/leaderboard_repository.dart';
 import '../../data/profile_repository.dart';
+
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -26,6 +31,9 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _index = 0;
   StreamSubscription<CallSignalEvent>? _signalSub;
+  StreamSubscription<Uri>? _deepLinkSub;
+  StreamSubscription<List<Map<String, dynamic>>>? _inviteSub;
+  int _pendingCircleInvites = 0;
 
   bool get _isGuest => authRepository.currentUser == null;
 
@@ -41,6 +49,50 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     _initGlobalSignaling();
+    _initDeepLinks();
+    _initInviteStream();
+  }
+
+  void _initInviteStream() {
+    final uid = authRepository.currentUser?.id;
+    if (uid == null) return;
+    final stream = Supabase.instance.client
+        .from('notifications')
+        .stream(primaryKey: ['id'])
+        .eq('user_id', uid)
+        .map((rows) => rows
+            .where((r) =>
+                r['read'] != true &&
+                (r['type']?.toString() ?? '').contains('invite'))
+            .toList());
+    _inviteSub = stream.listen((unread) {
+      if (mounted) setState(() => _pendingCircleInvites = unread.length);
+    });
+  }
+
+  void _initDeepLinks() {
+    _deepLinkSub = AppLinks().uriLinkStream.listen((uri) {
+      // Handle soma://profile/<username>
+      if (uri.scheme == 'soma' && uri.host == 'profile') {
+        final username = uri.pathSegments.isNotEmpty
+            ? uri.pathSegments.first
+            : null;
+        if (username != null && username.isNotEmpty) {
+          _navigateToProfileByUsername(username);
+        }
+      }
+    });
+  }
+
+  Future<void> _navigateToProfileByUsername(String username) async {
+    final row = await leaderboardRepository.fetchByUsername(username);
+    final userId = row?['id']?.toString() ?? row?['user_id']?.toString();
+    if (userId != null && mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ProfileScreen(userId: userId)),
+      );
+    }
   }
 
   void _initGlobalSignaling() {
@@ -108,7 +160,7 @@ class _AppShellState extends State<AppShell> {
               Icon(Icons.call_rounded, size: 48, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 16),
               Text(
-                'Incoming call from $name',
+                AppLocalizations.of(context).incomingCallFrom(name),
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
@@ -118,14 +170,14 @@ class _AppShellState extends State<AppShell> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => Navigator.pop(context, false),
-                      child: const Text('Decline'),
+                      child: Text(AppLocalizations.of(context).declineCall),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: FilledButton(
                       onPressed: () => Navigator.pop(context, true),
-                      child: const Text('Accept'),
+                      child: Text(AppLocalizations.of(context).acceptCall),
                     ),
                   ),
                 ],
@@ -140,6 +192,8 @@ class _AppShellState extends State<AppShell> {
   @override
   void dispose() {
     _signalSub?.cancel();
+    _deepLinkSub?.cancel();
+    _inviteSub?.cancel();
     super.dispose();
   }
 
@@ -202,9 +256,9 @@ class _AppShellState extends State<AppShell> {
                 ),
               ),
               const SizedBox(height: 10),
-              _BenefitRow(label: 'Live circles with real learners'),
-              _BenefitRow(label: 'Voice rooms with instant practice'),
-              _BenefitRow(label: 'Friend challenges and saved progress'),
+              _BenefitRow(label: l10n.authBenefitLiveCircles),
+              _BenefitRow(label: l10n.authBenefitVoiceRooms),
+              _BenefitRow(label: l10n.authBenefitFriendChallenges),
               const SizedBox(height: 18),
               Row(
                 children: [
@@ -310,37 +364,7 @@ class _AppShellState extends State<AppShell> {
               )
             : activePage;
 
-        final topOverlaySlot = StreamBuilder<Map<String, dynamic>>(
-          stream: settingsRepository.getSettingsStream(),
-          builder: (context, snapshot) {
-            final call = snapshot.data?['dm_active_call'];
-            final isActive = call is Map && call['active'] == true;
-            final name = call is Map ? (call['other_name']?.toString() ?? 'Voice call') : 'Voice call';
-            final otherId = call is Map ? call['other_id']?.toString() : null;
-            if (!isActive) return const SizedBox.shrink();
-            return Positioned(
-              right: 14,
-              top: 16,
-              child: _GlobalActiveCallPill(
-                name: name,
-                onTap: otherId == null || otherId.isEmpty
-                    ? null
-                    : () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => DmChatScreen(
-                              meId: authRepository.currentUser?.id ?? '',
-                              otherId: otherId,
-                              otherName: name,
-                            ),
-                          ),
-                        );
-                      },
-              ),
-            );
-          },
-        );
+        const topOverlaySlot = _GlobalActiveCallOverlay();
 
         final floatingContextActionSlot = const SizedBox.shrink();
 
@@ -348,6 +372,7 @@ class _AppShellState extends State<AppShell> {
             ? null
             : _SomaBottomNav(
                 index: _index,
+                badge: _pendingCircleInvites,
                 onChanged: _handleNavChange,
               );
 
@@ -358,9 +383,85 @@ class _AppShellState extends State<AppShell> {
               contentSlot,
               topOverlaySlot,
               floatingContextActionSlot,
+              // Achievement unlock toast — slides in from top when a new achievement is earned.
+              ValueListenableBuilder(
+                valueListenable: achievementUnlockNotifier,
+                builder: (context, achievement, _) {
+                  if (achievement == null) return const SizedBox.shrink();
+                  return Positioned(
+                    top: MediaQuery.of(context).padding.top + 12,
+                    left: 16,
+                    right: 16,
+                    child: _AchievementToast(
+                      key: ValueKey(achievement.id + DateTime.now().millisecondsSinceEpoch.toString()),
+                      title: achievement.title,
+                      icon: achievement.icon,
+                      onDismissed: () => achievementUnlockNotifier.value = null,
+                    ),
+                  );
+                },
+              ),
             ],
           ),
           bottomNavigationBar: bottomNavSlot,
+        );
+      },
+    );
+  }
+}
+
+class _GlobalActiveCallOverlay extends StatefulWidget {
+  const _GlobalActiveCallOverlay();
+
+  @override
+  State<_GlobalActiveCallOverlay> createState() => _GlobalActiveCallOverlayState();
+}
+
+class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
+  late final Stream<Map<String, dynamic>> _settingsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _settingsStream = settingsRepository.getSettingsStream();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<Map<String, dynamic>>(
+      stream: _settingsStream,
+      builder: (context, snapshot) {
+        final call = snapshot.data?['dm_active_call'];
+        final isActive = call is Map && call['active'] == true;
+        
+        // Safety check if l10n isn't ready
+        final l10n = AppLocalizations.of(context);
+        final defaultName = l10n.voiceCall;
+        final name = call is Map ? (call['other_name']?.toString() ?? defaultName) : defaultName;
+        final otherId = call is Map ? call['other_id']?.toString() : null;
+        
+        if (!isActive) return const SizedBox.shrink();
+        
+        return Positioned(
+          right: 14,
+          top: 16,
+          child: _GlobalActiveCallPill(
+            name: name,
+            onTap: otherId == null || otherId.isEmpty
+                ? null
+                : () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DmChatScreen(
+                          meId: authRepository.currentUser?.id ?? '',
+                          otherId: otherId,
+                          otherName: name,
+                        ),
+                      ),
+                    );
+                  },
+          ),
         );
       },
     );
@@ -386,7 +487,7 @@ class _GlobalActiveCallPill extends StatelessWidget {
             Icon(Icons.call_rounded, size: 16, color: scheme.primary),
             const SizedBox(width: 6),
             Text(
-              'In call • $name',
+              AppLocalizations.of(context).inCallWith(name),
               style: TextStyle(
                 color: scheme.onSurface,
                 fontWeight: FontWeight.w800,
@@ -433,10 +534,12 @@ class _BenefitRow extends StatelessWidget {
 class _SomaBottomNav extends StatelessWidget {
   final int index;
   final ValueChanged<int> onChanged;
+  final int badge;
 
   const _SomaBottomNav({
     required this.index,
     required this.onChanged,
+    this.badge = 0,
   });
 
   @override
@@ -484,6 +587,7 @@ class _SomaBottomNav extends StatelessWidget {
                       fontSize: fontSize,
                       labelGap: labelGap,
                       padding: itemPad,
+                      badge: badge,
                       onTap: () => onChanged(1),
                     ),
                   ),
@@ -518,6 +622,7 @@ class _NavItem extends StatelessWidget {
   final double fontSize;
   final double labelGap;
   final EdgeInsets padding;
+  final int badge;
 
   const _NavItem({
     required this.label,
@@ -528,6 +633,7 @@ class _NavItem extends StatelessWidget {
     required this.fontSize,
     required this.labelGap,
     required this.padding,
+    this.badge = 0,
   });
 
   @override
@@ -546,19 +652,50 @@ class _NavItem extends StatelessWidget {
         ? (isDark ? const Color(0xFF8B7AFF) : scheme.primary.withValues(alpha: 0.35))
         : Colors.transparent;
 
-    return PressableScale(
-      onTap: onTap,
-      child: Container(
-        padding: padding,
-        decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: border),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: iconSize),
+    return Semantics(
+      label: '$label tab${selected ? ", selected" : ""}',
+      button: true,
+      child: PressableScale(
+        onTap: onTap,
+        isButton: false, // Semantics already wraps it
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: border),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(icon, color: color, size: iconSize),
+                  if (badge > 0)
+                    Positioned(
+                      top: -4,
+                      right: -6,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
+                        child: Text(
+                          badge > 9 ? '9+' : '$badge',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 8,
+                            fontWeight: FontWeight.w800,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             SizedBox(height: labelGap),
             Text(
               label,
@@ -573,7 +710,7 @@ class _NavItem extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -682,6 +819,139 @@ class _RailItem extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────── Achievement Toast ────────────────────────────────
+
+/// Animated slide-in toast that appears at the top of the screen when an
+/// achievement is unlocked. Auto-dismisses after [_kDuration] and calls
+/// [onDismissed] so the global notifier can be cleared.
+class _AchievementToast extends StatefulWidget {
+  final String title;
+  final String? icon;
+  final VoidCallback onDismissed;
+
+  const _AchievementToast({
+    super.key,
+    required this.title,
+    this.icon,
+    required this.onDismissed,
+  });
+
+  @override
+  State<_AchievementToast> createState() => _AchievementToastState();
+}
+
+class _AchievementToastState extends State<_AchievementToast>
+    with SingleTickerProviderStateMixin {
+  static const _kVisible  = Duration(seconds: 3);
+  static const _kAnimate  = Duration(milliseconds: 420);
+
+  late final AnimationController _ctrl = AnimationController(
+    vsync: this,
+    duration: _kAnimate,
+  );
+  late final Animation<Offset> _slide = Tween<Offset>(
+    begin: const Offset(0, -1.4),
+    end: Offset.zero,
+  ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+  late final Animation<double> _fade = Tween<double>(begin: 0, end: 1)
+      .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOut));
+
+  Timer? _dismissTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl.forward();
+    _dismissTimer = Timer(_kVisible, _dismiss);
+  }
+
+  void _dismiss() {
+    if (!mounted) return;
+    _ctrl.reverse().then((_) {
+      if (mounted) widget.onDismissed();
+    });
+  }
+
+  @override
+  void dispose() {
+    _dismissTimer?.cancel();
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final emoji = widget.icon ?? '🏆';
+
+    return SlideTransition(
+      position: _slide,
+      child: FadeTransition(
+        opacity: _fade,
+        child: GestureDetector(
+          onTap: _dismiss,
+          child: Glass(
+            radius: BorderRadius.circular(20),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFC107).withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: const Color(0xFFFFC107).withValues(alpha: 0.55),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(emoji, style: const TextStyle(fontSize: 22)),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Achievement unlocked!',
+                        style: TextStyle(
+                          color: const Color(0xFFFFC107),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.6,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        widget.title,
+                        style: TextStyle(
+                          color: scheme.onSurface,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w900,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.close_rounded,
+                  size: 18,
+                  color: scheme.onSurface.withValues(alpha: 0.45),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

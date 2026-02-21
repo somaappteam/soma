@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'stats_repository.dart';
 import 'achievements_repository.dart';
+import '../core/di/locator.dart';
 
 class CirclesRepository {
   final _supabase = Supabase.instance.client;
@@ -429,6 +430,6 @@ class CircleJoinOutcome {
   const CircleJoinOutcome({required this.role, required this.status});
 }
 
-final circlesRepository = CirclesRepository();
+CirclesRepository get circlesRepository => locator<CirclesRepository>();
 
 

@@ -3,6 +3,7 @@ import 'notifications_repository.dart';
 import 'profile_repository.dart';
 import 'achievements_repository.dart';
 import 'package:flutter/foundation.dart';
+import '../core/di/locator.dart';
 
 class SocialRepository {
   final _supabase = Supabase.instance.client;
@@ -233,4 +234,4 @@ class SocialRepository {
   }
 }
 
-final socialRepository = SocialRepository();
+SocialRepository get socialRepository => locator<SocialRepository>();

@@ -1,6 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:sqflite/sqflite.dart';
 import '../core/database/database_helper.dart';
+import '../core/di/locator.dart';
 
 class OfflineQueueItem {
   final int? id;
@@ -40,6 +45,12 @@ class OfflineQueueItem {
 
 class OfflineQueueRepository {
   final _dbHelper = DatabaseHelper.instance;
+  final _supabase = Supabase.instance.client;
+
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
+  bool _isDraining = false;
+
+  // ─────────────────────────── Enqueue ────────────────────────────────────────
 
   Future<void> enqueue({
     required String tableName,
@@ -59,6 +70,8 @@ class OfflineQueueRepository {
     );
   }
 
+  // ─────────────────────────── Read / Delete ───────────────────────────────────
+
   Future<List<OfflineQueueItem>> getAll() async {
     final db = await _dbHelper.database;
     final maps = await db.query('offline_queue', orderBy: 'created_at ASC');
@@ -74,6 +87,79 @@ class OfflineQueueRepository {
     final db = await _dbHelper.database;
     await db.delete('offline_queue');
   }
+
+  // ─────────────────────────── Drain ──────────────────────────────────────────
+
+  /// Replays all queued items to Supabase in order.
+  /// Items that succeed are deleted; failures stay in the queue for next retry.
+  Future<void> drain() async {
+    if (_isDraining) return;
+    _isDraining = true;
+    try {
+      final items = await getAll();
+      if (items.isEmpty) return;
+      debugPrint('OfflineQueue: draining ${items.length} item(s)…');
+
+      for (final item in items) {
+        try {
+          await _replay(item);
+          if (item.id != null) await delete(item.id!);
+          debugPrint('OfflineQueue: replayed ${item.operation} on ${item.tableName}');
+        } catch (e) {
+          debugPrint('OfflineQueue: replay failed for ${item.tableName} – $e (kept in queue)');
+        }
+      }
+    } finally {
+      _isDraining = false;
+    }
+  }
+
+  Future<void> _replay(OfflineQueueItem item) async {
+    switch (item.operation) {
+      case 'UPSERT':
+        await _supabase.from(item.tableName).upsert(item.data);
+      case 'DELETE':
+        final id = item.data['id'];
+        if (id != null) {
+          await _supabase.from(item.tableName).delete().eq('id', id);
+        }
+      default:
+        debugPrint('OfflineQueue: unknown operation "${item.operation}" — skipping');
+    }
+  }
+
+  // ─────────────────────────── Connectivity listener ──────────────────────────
+
+  /// Subscribes to network changes. Call once from app init.
+  /// Automatically drains the queue whenever the device goes back online.
+  void startListening() {
+    _connectivitySub?.cancel();
+    _connectivitySub = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> results) {
+      final isOnline = results.any((r) =>
+          r == ConnectivityResult.wifi ||
+          r == ConnectivityResult.mobile ||
+          r == ConnectivityResult.ethernet);
+      if (isOnline) {
+        debugPrint('OfflineQueue: network back online — draining queue…');
+        drain();
+      }
+    });
+
+    // Also drain immediately in case we're already online at startup.
+    Connectivity().checkConnectivity().then((results) {
+      final isOnline = results.any((r) =>
+          r == ConnectivityResult.wifi ||
+          r == ConnectivityResult.mobile ||
+          r == ConnectivityResult.ethernet);
+      if (isOnline) drain();
+    });
+  }
+
+  void dispose() {
+    _connectivitySub?.cancel();
+  }
 }
 
-final offlineQueueRepository = OfflineQueueRepository();
+OfflineQueueRepository get offlineQueueRepository => locator<OfflineQueueRepository>();

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/services/session_tracker.dart';
 import 'app_analytics_repository.dart';
+import '../core/di/locator.dart';
 
 class AuthRepository {
   final SupabaseClient _client = Supabase.instance.client;
@@ -116,4 +117,4 @@ class AuthRepository {
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 }
 
-final authRepository = AuthRepository();
+AuthRepository get authRepository => locator<AuthRepository>();

@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/services/haptics_service.dart';
 import '../../core/services/sfx_service.dart';
 
@@ -70,9 +72,165 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
       _prepareQuestion();
       _startTimer();
     } else {
+      _checkForSavedSession();
+    }
+  }
+
+  // --------------- Session persistence ----------------------------------------
+
+  String get _sessionKey => 'quiz_session_vocab_${widget.course.id}';
+
+  Future<void> _saveSession() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final payload = jsonEncode({
+        'index': index,
+        'correct': correctCount,
+        'level': widget.level,
+        'total': widget.totalQuestions,
+        'saved_at': DateTime.now().millisecondsSinceEpoch,
+        'questions': questions,
+      });
+      await prefs.setString(_sessionKey, payload);
+    } catch (e) {
+      debugPrint('Session save error: $e');
+    }
+  }
+
+  Future<void> _clearSession() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_sessionKey);
+    } catch (_) {}
+  }
+
+  Future<void> _checkForSavedSession() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_sessionKey);
+      if (raw == null) {
+        _loadQuestions();
+        return;
+      }
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      final savedAt = data['saved_at'] as int? ?? 0;
+      final ageH = (DateTime.now().millisecondsSinceEpoch - savedAt) / 3600000;
+      // Discard sessions older than 24 hours.
+      if (ageH > 24) {
+        await _clearSession();
+        _loadQuestions();
+        return;
+      }
+      final savedLevel = data['level']?.toString() ?? widget.level;
+      if (savedLevel != widget.level) {
+        await _clearSession();
+        _loadQuestions();
+        return;
+      }
+      // Offer resume dialog.
+      if (!mounted) return;
+      final resume = await _showResumeDialog();
+      if (!mounted) return;
+      if (resume == true) {
+        final savedQuestions = (data['questions'] as List? ?? [])
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList();
+        final savedIndex = (data['index'] as int? ?? 0).clamp(0, savedQuestions.length - 1);
+        setState(() {
+          questions = savedQuestions;
+          index = savedIndex;
+          correctCount = data['correct'] as int? ?? 0;
+          _loading = false;
+          _loadError = savedQuestions.isEmpty ? 'No questions in saved session.' : null;
+        });
+        if (questions.isNotEmpty) {
+          _prepareQuestion();
+          _startTimer();
+        }
+      } else {
+        await _clearSession();
+        _loadQuestions();
+      }
+    } catch (e) {
+      debugPrint('Session load error: $e');
       _loadQuestions();
     }
   }
+
+  Future<bool?> _showResumeDialog() {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        final scheme = Theme.of(ctx).colorScheme;
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: scheme.surface.withValues(alpha: 0.95),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.history_rounded, size: 40, color: scheme.primary),
+                const SizedBox(height: 12),
+                Text(
+                  'Resume session?',
+                  style: TextStyle(
+                    color: scheme.onSurface,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'You have an unfinished quiz. Would you like to continue where you left off?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: scheme.onSurface.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: scheme.onSurface,
+                          side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.25)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text('Start fresh'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text('Resume'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  // ---------------------------------------------------------------------------
 
   Future<void> _loadSettings() async {
     final settings = await settingsRepository.getSettings();
@@ -201,6 +359,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
       selected = null;
       revealed = false;
     });
+    _saveSession(); // persist progress after each question
     _prepareQuestion();
     _startTimer();
   }
@@ -326,6 +485,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
   }
 
   void _goToResults() {
+    _clearSession(); // clear saved session on quiz completion
     final totalAnswered = questions.length < widget.totalQuestions
         ? questions.length
         : widget.totalQuestions;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/haptics_service.dart';
 import '../services/sfx_service.dart';
 import '../theme/motion.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class PressableScale extends StatefulWidget {
   final Widget child;
@@ -10,6 +11,8 @@ class PressableScale extends StatefulWidget {
   final Duration duration;
   final Curve curve;
   final bool enableHaptics;
+  final String? semanticLabel;
+  final bool isButton;
 
   const PressableScale({
     super.key,
@@ -19,6 +22,8 @@ class PressableScale extends StatefulWidget {
     this.duration = MotionTokens.micro,
     this.curve = MotionTokens.emphasisCurve,
     this.enableHaptics = true,
+    this.semanticLabel,
+    this.isButton = true,
   });
 
   @override
@@ -44,26 +49,34 @@ class _PressableScaleState extends State<PressableScale> {
         ? (isLight ? MotionTokens.lightTapCurve : MotionTokens.darkTapCurve)
         : widget.curve;
 
-    return AnimatedScale(
-      scale: _pressed && enabled ? widget.pressedScale : 1,
-      duration: effectiveDuration,
-      curve: effectiveCurve,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: widget.onTap,
-        onTapDown: enabled
-            ? (_) {
-                if (widget.enableHaptics) {
-                  hapticsService.selectionClick();
-                  sfxService.click();
-                }
-                _setPressed(true);
+    Widget core = GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTap: widget.onTap,
+      onTapDown: enabled
+          ? (_) {
+              if (widget.enableHaptics) {
+                hapticsService.selectionClick();
+                sfxService.click();
               }
-            : null,
-        onTapUp: enabled ? (_) => _setPressed(false) : null,
-        onTapCancel: enabled ? () => _setPressed(false) : null,
-        child: widget.child,
-      ),
-    );
+              _setPressed(true);
+            }
+          : null,
+      onTapUp: enabled ? (_) => _setPressed(false) : null,
+      onTapCancel: enabled ? () => _setPressed(false) : null,
+      child: widget.child,
+    ).animate(target: _pressed && enabled ? 1 : 0)
+     .scaleXY(end: widget.pressedScale, duration: effectiveDuration, curve: effectiveCurve)
+     .tint(color: isLight ? Colors.black : Colors.white, end: 0.05, duration: effectiveDuration);
+
+    if (widget.semanticLabel != null || widget.isButton) {
+      core = Semantics(
+        label: widget.semanticLabel,
+        button: widget.isButton,
+        enabled: enabled,
+        child: core,
+      );
+    }
+
+    return core;
   }
 }

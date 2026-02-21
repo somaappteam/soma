@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/di/locator.dart';
 
 class PrivacyRepository {
   final _supabase = Supabase.instance.client;
@@ -120,4 +121,4 @@ class PrivacyRepository {
   }
 }
 
-final privacyRepository = PrivacyRepository();
+PrivacyRepository get privacyRepository => locator<PrivacyRepository>();

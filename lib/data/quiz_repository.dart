@@ -9,11 +9,12 @@ import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'offline_queue_repository.dart';
 import 'csv_service.dart';
+import 'vocab_data_source.dart';
+import '../core/di/locator.dart';
 
 class QuizRepository {
   final SupabaseClient _client = Supabase.instance.client;
   final Random _random = Random();
-  final QuizCache _cache = QuizCache();
   final VocabSrsStore _srsStore = VocabSrsStore();
 
   Future<List<Map<String, dynamic>>> getVocabQuestions(String courseId, int limit,
@@ -23,12 +24,21 @@ class QuizRepository {
     final dueConcepts = await _srsStore.dueConceptIds(courseId);
 
     try {
-      final csvService = CsvService.instance;
-      final sourceRows = await csvService.getVocabularyByLang(langs.source);
-      final targetRows = await csvService.getVocabularyByLang(langs.target);
+      List<Map<String, dynamic>> sourceList;
+      List<Map<String, dynamic>> targetList;
 
-      final sourceList = _rowsToMapList(sourceRows);
-      final targetList = _rowsToMapList(targetRows);
+      final sqliteSrc = const SqliteVocabDataSource();
+      final sqliteRes = await sqliteSrc.fetchVocab(sourceLang: langs.source, targetLang: langs.target);
+      sourceList = sqliteRes.source;
+      targetList = sqliteRes.target;
+
+      if (sourceList.isEmpty || targetList.isEmpty) {
+        final csvSrc = const CsvVocabDataSource();
+        final csvRes = await csvSrc.fetchVocab(sourceLang: langs.source, targetLang: langs.target);
+        sourceList = csvRes.source;
+        targetList = csvRes.target;
+      }
+
       if (sourceList.isEmpty || targetList.isEmpty) {
         return [];
       }
@@ -143,12 +153,21 @@ class QuizRepository {
     if (langs == null) return [];
 
     try {
-      final csvService = CsvService.instance;
-      final sourceRows = await csvService.getSentencesByLang(langs.source);
-      final targetRows = await csvService.getSentencesByLang(langs.target);
+      List<Map<String, dynamic>> sourceList;
+      List<Map<String, dynamic>> targetList;
 
-      final sourceList = _rowsToMapList(sourceRows);
-      final targetList = _rowsToMapList(targetRows);
+      final sqliteSrc = const SqliteSentenceDataSource();
+      final sqliteRes = await sqliteSrc.fetchSentences(sourceLang: langs.source, targetLang: langs.target);
+      sourceList = sqliteRes.source;
+      targetList = sqliteRes.target;
+
+      if (sourceList.isEmpty || targetList.isEmpty) {
+        final csvSrc = const CsvSentenceDataSource();
+        final csvRes = await csvSrc.fetchSentences(sourceLang: langs.source, targetLang: langs.target);
+        sourceList = csvRes.source;
+        targetList = csvRes.target;
+      }
+
       if (sourceList.isEmpty || targetList.isEmpty) {
          return [];
       }
@@ -285,10 +304,69 @@ class QuizRepository {
     return article.isEmpty ? word : '$article $word';
   }
 
+  // ----------- Stopwords -------------------------------------------------------
+  // Common stopwords and grammatical particles to skip when blanking sentences.
+  // Kept deliberately minimal — covers the most frequent languages in the app.
+  static final Set<String> _kStopwords = {
+    // English
+    'a', 'an', 'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+    'i', 'me', 'my', 'we', 'our', 'you', 'your', 'he', 'she', 'it',
+    'they', 'them', 'their', 'this', 'that', 'these', 'those',
+    'in', 'on', 'at', 'to', 'for', 'of', 'and', 'or', 'but', 'not',
+    'with', 'by', 'from', 'as', 'so', 'do', 'did', 'does', 'have', 'has', 'had',
+    // German
+    'der', 'die', 'das', 'ein', 'eine', 'und', 'oder', 'aber', 'ist', 'sind',
+    'war', 'ich', 'du', 'er', 'sie', 'es', 'wir', 'ihr', 'den', 'dem',
+    'in', 'an', 'auf', 'bei', 'mit', 'von', 'zu', 'für', 'als',
+    // French
+    'le', 'la', 'les', 'un', 'une', 'des', 'et', 'ou', 'mais', 'est',
+    'je', 'tu', 'il', 'elle', 'nous', 'vous', 'ils', 'elles',
+    'en', 'à', 'de', 'du', 'au', 'par', 'sur', 'dans', 'avec',
+    // Spanish
+    'el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas', 'y', 'o',
+    'es', 'son', 'era', 'yo', 'tú', 'él', 'ella', 'nosotros', 'ellos',
+    'en', 'de', 'del', 'al', 'con', 'por', 'para', 'que', 'no',
+    // Japanese particles/copulas (common)
+    'は', 'が', 'を', 'に', 'で', 'と', 'も', 'か', 'の', 'へ', 'から', 'まで',
+    'です', 'ます', 'した', 'て', 'な', 'だ',
+    // Chinese particles/copulas
+    '的', '了', '在', '是', '有', '和', '也', '都', '不', '没', '人',
+    // Korean particles
+    '은', '는', '이', '가', '을', '를', '에', '의', '과', '와', '도', '로',
+  };
+
+  /// Builds 4 answer choices: [correct] + 3 distractors.
+  /// Distractors are preferred from the same word-length bucket as [correct]
+  /// (short ≤5, medium 6-10, long >10) for more plausible wrong options.
   List<String> _buildChoices(List<String> pool, String correct) {
-    final unique = pool.where((value) => value.trim().isNotEmpty && value != correct).toSet().toList();
-    unique.shuffle();
-    final choices = <String>[correct, ...unique.take(3)];
+    final unique = pool
+        .where((v) => v.trim().isNotEmpty && v != correct)
+        .toSet()
+        .toList();
+
+    // Bucket by word length for more plausible distractors.
+    int bucket(String w) {
+      final len = w.length;
+      if (len <= 5) return 0;   // short
+      if (len <= 10) return 1;  // medium
+      return 2;                 // long
+    }
+
+    final correctBucket = bucket(correct);
+    final sameBucket = unique.where((v) => bucket(v) == correctBucket).toList();
+    sameBucket.shuffle();
+
+    List<String> distractors;
+    if (sameBucket.length >= 3) {
+      distractors = sameBucket.take(3).toList();
+    } else {
+      // Not enough same-bucket words — pad from the full pool.
+      final rest = unique.where((v) => bucket(v) != correctBucket).toList();
+      rest.shuffle();
+      distractors = [...sameBucket, ...rest.take(3 - sameBucket.length)];
+    }
+
+    final choices = <String>[correct, ...distractors];
     choices.shuffle();
     return choices;
   }
@@ -315,16 +393,26 @@ class QuizRepository {
     if (sentence.trim().isEmpty) return null;
     if (sentence.contains(RegExp(r'\s'))) {
       final parts = sentence.split(RegExp(r'\s+'));
-      final candidates = <int>[];
-      for (var i = 0; i < parts.length; i++) {
-        final cleaned = parts[i]
-            .replaceAll(RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
-            .trim();
-        if (cleaned.isNotEmpty) {
-          candidates.add(i);
+
+      // Build candidate indices, skipping stopwords/particles.
+      List<int> _candidates(bool skipStopwords) {
+        final result = <int>[];
+        for (var i = 0; i < parts.length; i++) {
+          final cleaned = parts[i]
+              .replaceAll(RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
+              .trim();
+          if (cleaned.isEmpty) continue;
+          if (skipStopwords && _kStopwords.contains(cleaned.toLowerCase())) continue;
+          result.add(i);
         }
+        return result;
       }
+
+      // Prefer content-word candidates; fall back to all words if none found.
+      var candidates = _candidates(true);
+      if (candidates.isEmpty) candidates = _candidates(false);
       if (candidates.isEmpty) return null;
+
       final pickIndex = candidates[_random.nextInt(candidates.length)];
       final original = parts[pickIndex];
       final cleaned = original
@@ -335,9 +423,18 @@ class QuizRepository {
       return _BlankResult(prompt: parts.join(' '), answer: cleaned);
     }
 
+    // CJK / single-character language fallback: pick a non-stopword char.
     final chars = sentence.runes.map((rune) => String.fromCharCode(rune)).toList();
     if (chars.isEmpty) return null;
-    final pickIndex = _random.nextInt(chars.length);
+    final contentChars = chars
+        .asMap()
+        .entries
+        .where((e) => e.value.trim().isNotEmpty && !_kStopwords.contains(e.value))
+        .map((e) => e.key)
+        .toList();
+    final pickIndex = contentChars.isNotEmpty
+        ? contentChars[_random.nextInt(contentChars.length)]
+        : _random.nextInt(chars.length);
     final answer = chars[pickIndex];
     chars[pickIndex] = '____';
     return _BlankResult(prompt: chars.join(''), answer: answer);
@@ -648,7 +745,7 @@ class QuizRepository {
   }
 }
 
-final quizRepository = QuizRepository();
+QuizRepository get quizRepository => locator<QuizRepository>();
 
 class _LangPair {
   final String source;

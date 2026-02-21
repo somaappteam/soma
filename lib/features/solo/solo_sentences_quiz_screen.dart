@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/services/haptics_service.dart';
 import '../../core/services/sfx_service.dart';
 
@@ -72,9 +74,156 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       _prepareQuestion();
       _startTimer();
     } else {
+      _checkForSavedSession();
+    }
+  }
+
+  // --------------- Session persistence ----------------------------------------
+
+  String get _sessionKey => 'quiz_session_sentences_${widget.course.id}';
+
+  Future<void> _saveSession() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final payload = jsonEncode({
+        'index': index,
+        'correct': correctCount,
+        'level': widget.level,
+        'total': widget.totalQuestions,
+        'saved_at': DateTime.now().millisecondsSinceEpoch,
+        'questions': questions,
+      });
+      await prefs.setString(_sessionKey, payload);
+    } catch (e) {
+      debugPrint('Session save error: $e');
+    }
+  }
+
+  Future<void> _clearSession() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_sessionKey);
+    } catch (_) {}
+  }
+
+  Future<void> _checkForSavedSession() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_sessionKey);
+      if (raw == null) {
+        _loadQuestions();
+        return;
+      }
+      final data = jsonDecode(raw) as Map<String, dynamic>;
+      final savedAt = data['saved_at'] as int? ?? 0;
+      final ageH = (DateTime.now().millisecondsSinceEpoch - savedAt) / 3600000;
+      if (ageH > 24) {
+        await _clearSession();
+        _loadQuestions();
+        return;
+      }
+      final savedLevel = data['level']?.toString() ?? widget.level;
+      if (savedLevel != widget.level) {
+        await _clearSession();
+        _loadQuestions();
+        return;
+      }
+      if (!mounted) return;
+      final resume = await _showResumeDialog();
+      if (!mounted) return;
+      if (resume == true) {
+        final savedQuestions = (data['questions'] as List? ?? [])
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList();
+        final savedIndex = (data['index'] as int? ?? 0).clamp(0, savedQuestions.length - 1);
+        setState(() {
+          questions = savedQuestions;
+          index = savedIndex;
+          correctCount = data['correct'] as int? ?? 0;
+          _loading = false;
+          _loadError = savedQuestions.isEmpty ? 'No questions in saved session.' : null;
+        });
+        if (questions.isNotEmpty) {
+          _prepareQuestion();
+          _startTimer();
+        }
+      } else {
+        await _clearSession();
+        _loadQuestions();
+      }
+    } catch (e) {
+      debugPrint('Session load error: $e');
       _loadQuestions();
     }
   }
+
+  Future<bool?> _showResumeDialog() {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        final scheme = Theme.of(ctx).colorScheme;
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: scheme.surface.withValues(alpha: 0.95),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.history_rounded, size: 40, color: scheme.primary),
+                const SizedBox(height: 12),
+                Text(
+                  'Resume session?',
+                  style: TextStyle(color: scheme.onSurface, fontSize: 18, fontWeight: FontWeight.w900),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'You have an unfinished quiz. Continue where you left off?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: scheme.onSurface,
+                          side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.25)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text('Start fresh'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: const Text('Resume'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  // ---------------------------------------------------------------------------
 
   Future<void> _loadSettings() async {
     final settings = await settingsRepository.getSettings();
@@ -234,6 +383,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       selected = null;
       revealed = false;
     });
+    _saveSession(); // persist progress after each question
     _prepareQuestion();
     _startTimer();
   }
@@ -308,49 +458,78 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     return const _ChoiceSet(choices: [], correctIndex: 0);
   }
 
+  // Stopwords used in _blankSentence to avoid blanking trivial grammatical words.
+  static const Set<String> _kStopwords = {
+    'a','an','the','is','are','was','were','be','been','being',
+    'i','me','my','we','our','you','your','he','she','it',
+    'they','them','their','this','that','these','those',
+    'in','on','at','to','for','of','and','or','but','not',
+    'with','by','from','as','so','do','did','does','have','has','had',
+    'der','die','das','ein','eine','und','oder','aber','ist','sind',
+    'war','ich','du','er','sie','es','wir','ihr','den','dem',
+    'le','la','les','un','une','des','et','ou','mais','est',
+    'je','tu','il','elle','nous','vous','ils','elles',
+    'el','los','las','y','o','son','era','yo','ellos',
+    'は','が','を','に','で','と','も','か','の','へ','から','まで',
+    'です','ます','した','て','な','だ',
+    '的','了','在','是','有','和','也','都','不','没','人',
+    '은','는','이','가','을','를','에','의','과','와','도','로',
+  };
+
   _BlankResult? _blankSentence(String sentence) {
     if (sentence.trim().isEmpty) return null;
     if (sentence.contains(RegExp(r'\s'))) {
       final parts = sentence.split(RegExp(r'\s+'));
-      final candidates = <int>[];
-      for (var i = 0; i < parts.length; i++) {
-        final cleaned = parts[i]
-            .replaceAll(
-                RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true),
-                '')
-            .trim();
-        if (cleaned.isNotEmpty) {
-          candidates.add(i);
+
+      List<int> _candidates(bool skipStopwords) {
+        final result = <int>[];
+        for (var i = 0; i < parts.length; i++) {
+          final cleaned = parts[i]
+              .replaceAll(RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
+              .trim();
+          if (cleaned.isEmpty) continue;
+          if (skipStopwords && _kStopwords.contains(cleaned.toLowerCase())) continue;
+          result.add(i);
         }
+        return result;
       }
+
+      // Prefer content-word candidates; fall back to all words.
+      var candidates = _candidates(true);
+      if (candidates.isEmpty) candidates = _candidates(false);
       if (candidates.isEmpty) return null;
       candidates.shuffle();
       final pickIndex = candidates.first;
       final original = parts[pickIndex];
       final cleaned = original
-          .replaceAll(
-              RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
+          .replaceAll(RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
           .trim();
       if (cleaned.isEmpty) return null;
       parts[pickIndex] = original.replaceFirst(cleaned, '____');
       return _BlankResult(prompt: parts.join(' '), answer: cleaned);
     }
 
-    final chars =
-        sentence.runes.map((rune) => String.fromCharCode(rune)).toList();
+    // CJK / single-char fallback: pick a non-stopword character.
+    final chars = sentence.runes.map((rune) => String.fromCharCode(rune)).toList();
     if (chars.isEmpty) return null;
-    chars.shuffle();
-    final answer = chars.first;
-    final index = sentence.runes.toList().indexOf(answer.runes.first);
-    final promptChars =
-        sentence.runes.map((rune) => String.fromCharCode(rune)).toList();
-    if (index >= 0 && index < promptChars.length) {
-      promptChars[index] = '____';
-    }
-    return _BlankResult(prompt: promptChars.join(''), answer: answer);
+    final contentChars = chars
+        .asMap()
+        .entries
+        .where((e) => e.value.trim().isNotEmpty && !_kStopwords.contains(e.value))
+        .map((e) => e.key)
+        .toList();
+    contentChars.shuffle();
+    final chars2 = sentence.runes.map((rune) => String.fromCharCode(rune)).toList();
+    final pickIdx = contentChars.isNotEmpty
+        ? contentChars.first
+        : (chars2..shuffle()).isEmpty ? 0 : 0;
+    final answer = chars2[pickIdx];
+    chars2[pickIdx] = '____';
+    return _BlankResult(prompt: chars2.join(''), answer: answer);
   }
 
   void _goToResults() {
+    _clearSession(); // clear saved session on quiz completion
     final totalAnswered = questions.length < widget.totalQuestions
         ? questions.length
         : widget.totalQuestions;

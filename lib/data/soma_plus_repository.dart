@@ -1,8 +1,18 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'settings_repository.dart';
+import '../core/di/locator.dart';
+
+// ─── Product IDs (must match App Store Connect / Play Console) ───────────────
+const kIapPlusMonthly  = 'soma_plus_monthly';
+const kIapPlusAnnual   = 'soma_plus_annual';
+const kIapProMonthly   = 'soma_pro_monthly';
+const kIapProAnnual    = 'soma_pro_annual';
 
 enum SomaSubscriptionTier { free, plus, pro }
 
@@ -270,6 +280,8 @@ class SomaPlusRepository {
     const SomaPlusState(tier: SomaSubscriptionTier.free, isActive: false),
   );
   StreamSubscription<Map<String, dynamic>>? _subscription;
+  StreamSubscription<List<PurchaseDetails>>? _iapSub;
+  final _supabase = Supabase.instance.client;
 
   ValueListenable<SomaPlusState> get state => _stateNotifier;
 
@@ -308,10 +320,23 @@ class SomaPlusRepository {
     _subscription = settingsRepository.getSettingsStream().listen((settings) {
       _stateNotifier.value = _fromSettings(settings);
     });
+
+    // Start IAP purchase stream (mobile only).
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      _iapSub?.cancel();
+      _iapSub = InAppPurchase.instance.purchaseStream
+          .listen(_onPurchaseUpdate, onError: (e) {
+        debugPrint('SomaPlusRepository: IAP stream error – $e');
+      });
+    }
+
+    // Validate subscription server-side (best-effort).
+    validateSubscriptionServerSide().ignore();
   }
 
   void dispose() {
     _subscription?.cancel();
+    _iapSub?.cancel();
   }
 
   bool get isSomaPlus => _stateNotifier.value.isActive && !_stateNotifier.value.isExpired;
@@ -386,6 +411,122 @@ class SomaPlusRepository {
       expiresAt: expiresAt,
     );
   }
+
+  // ─────────────────────────── In-App Purchase ─────────────────────────────────
+
+  /// Initiates a purchase for the given [productId].
+  Future<void> purchaseProduct(String productId) async {
+    if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) {
+      debugPrint('SomaPlusRepository: IAP not supported on this platform');
+      return;
+    }
+
+    final available = await InAppPurchase.instance.isAvailable();
+    if (!available) {
+      debugPrint('SomaPlusRepository: IAP not available');
+      return;
+    }
+
+    final response = await InAppPurchase.instance
+        .queryProductDetails({productId});
+    if (response.productDetails.isEmpty) {
+      debugPrint('SomaPlusRepository: product not found – $productId');
+      return;
+    }
+
+    final product = response.productDetails.first;
+    final param = PurchaseParam(productDetails: product);
+    // Subscriptions are treated as non-consumable on iOS, subscription on Android.
+    await InAppPurchase.instance.buyNonConsumable(purchaseParam: param);
+  }
+
+  /// Restores previous purchases (required for App Store compliance).
+  Future<void> restorePurchases() async {
+    if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) return;
+    await InAppPurchase.instance.restorePurchases();
+  }
+
+  Future<void> _onPurchaseUpdate(
+      List<PurchaseDetails> purchaseDetailsList) async {
+    for (final purchase in purchaseDetailsList) {
+      switch (purchase.status) {
+        case PurchaseStatus.purchased:
+        case PurchaseStatus.restored:
+          await _verifyPurchaseWithServer(purchase);
+          await InAppPurchase.instance.completePurchase(purchase);
+        case PurchaseStatus.error:
+          debugPrint(
+              'SomaPlusRepository: purchase error – ${purchase.error}');
+          if (purchase.pendingCompletePurchase) {
+            await InAppPurchase.instance.completePurchase(purchase);
+          }
+        default:
+          break;
+      }
+    }
+  }
+
+  Future<void> _verifyPurchaseWithServer(PurchaseDetails purchase) async {
+    try {
+      final receiptData = Platform.isIOS
+          ? (purchase.verificationData.serverVerificationData)
+          : (purchase.verificationData.serverVerificationData);
+
+      final response = await _supabase.functions.invoke(
+        'verify-purchase',
+        body: {
+          'platform': Platform.isIOS ? 'ios' : 'android',
+          'productId': purchase.productID,
+          'receiptData': receiptData,
+        },
+      );
+
+      final data = response.data as Map<String, dynamic>?;
+      if (data?['valid'] == true) {
+        final tier = parseTier(data!['tier']?.toString());
+        final expiry = DateTime.tryParse(data['expiresAt']?.toString() ?? '');
+        await setTier(tier, expiresAt: expiry);
+        debugPrint('SomaPlusRepository: purchase verified – tier=$tier');
+      } else {
+        debugPrint('SomaPlusRepository: receipt rejected by server');
+      }
+    } catch (e) {
+      debugPrint('SomaPlusRepository: server verification failed – $e');
+    }
+  }
+
+  // ─────────────────────────── Server-side validation ──────────────────────────
+
+  /// Calls the `verify-subscription` Edge Function to server-side validate
+  /// the user's current tier. Auto-cancels locally if expired on server.
+  Future<void> validateSubscriptionServerSide() async {
+    final uid = _supabase.auth.currentUser?.id;
+    if (uid == null) return;
+    try {
+      final response = await _supabase.functions.invoke(
+        'verify-subscription',
+        body: {'user_id': uid},
+      );
+      final data = response.data as Map<String, dynamic>?;
+      if (data == null) return;
+
+      final serverTier    = parseTier(data['tier']?.toString());
+      final serverActive  = data['isActive'] == true;
+      final serverExpiry  = DateTime.tryParse(data['expiresAt']?.toString() ?? '');
+      final localState    = _stateNotifier.value;
+
+      // If server says inactive but local thinks active → sync down.
+      if (!serverActive && localState.isActive) {
+        debugPrint('SomaPlusRepository: server says subscription expired — revoking locally');
+        await cancelPlan();
+      } else if (serverActive && serverTier != localState.tier) {
+        // Server has a different (upgraded) tier — sync it locally.
+        await setTier(serverTier, expiresAt: serverExpiry);
+      }
+    } catch (e) {
+      debugPrint('SomaPlusRepository: server validation failed (best-effort) – $e');
+    }
+  }
 }
 
-final somaPlusRepository = SomaPlusRepository();
+SomaPlusRepository get somaPlusRepository => locator<SomaPlusRepository>();

@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/di/locator.dart';
 
 class PresenceRepository {
   PresenceRepository({SupabaseClient? client})
@@ -79,4 +80,4 @@ class PresenceRepository {
   }
 }
 
-final presenceRepository = PresenceRepository();
+PresenceRepository get presenceRepository => locator<PresenceRepository>();

@@ -3,6 +3,7 @@ import '../models/user_stats.dart';
 import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'offline_queue_repository.dart';
+import '../core/di/locator.dart';
 
 class StatsRepository {
   final _supabase = Supabase.instance.client;
@@ -11,12 +12,12 @@ class StatsRepository {
     final uid = userId ?? _supabase.auth.currentUser?.id;
     if (uid == null) return UserStats.empty();
 
-    // Try local first for faster UI
+    // Try local first for faster UI.
     try {
       final local = await DatabaseHelper.instance.getUserStats(uid);
       if (local != null) return UserStats.fromRow(local);
     } catch (e) {
-      debugPrint("Local stats fetch failed: $e");
+      debugPrint('Local stats fetch failed: $e');
     }
 
     final row = await _supabase
@@ -26,10 +27,10 @@ class StatsRepository {
         .maybeSingle();
 
     if (row == null) return UserStats.empty();
-    
-    // Update local mirror
+
+    // Mirror to local SQLite.
     await DatabaseHelper.instance.upsertUserStats(row);
-    
+
     return UserStats.fromRow(row);
   }
 
@@ -40,16 +41,20 @@ class StatsRepository {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return UserStats.empty();
 
+    // Read existing stats — prefer local (already up-to-date) over cloud.
     Map<String, dynamic>? existing;
     try {
-      existing = await _supabase
-          .from('user_stats')
-          .select()
-          .eq('user_id', uid)
-          .maybeSingle();
-    } catch (_) {
-      // Offline fallback: try local
       existing = await DatabaseHelper.instance.getUserStats(uid);
+    } catch (_) {}
+    // If local is empty, fall back to cloud once.
+    if (existing == null) {
+      try {
+        existing = await _supabase
+            .from('user_stats')
+            .select()
+            .eq('user_id', uid)
+            .maybeSingle();
+      } catch (_) {}
     }
 
     final now = DateTime.now().toUtc();
@@ -78,16 +83,16 @@ class StatsRepository {
       longest = streak > currentLongest ? streak : currentLongest;
     }
 
-    final totalQuizzes = (existing?['total_quizzes'] ?? 0) + 1;
-    final totalCorrect = (existing?['total_correct'] ?? 0) + correctCount;
+    final totalQuizzes   = (existing?['total_quizzes']   ?? 0) + 1;
+    final totalCorrect   = (existing?['total_correct']   ?? 0) + correctCount;
     final totalQuestions = (existing?['total_questions'] ?? 0) + totalCount;
     final perfectQuizzes = (existing?['perfect_quizzes'] ?? 0) +
         ((totalCount > 0 && correctCount == totalCount) ? 1 : 0);
 
     final winThreshold = (totalCount * 0.7).ceil();
     final didWin = totalCount > 0 && correctCount >= winThreshold;
-    final totalWins = (existing?['total_wins'] ?? 0) + (didWin ? 1 : 0);
-    final circlesJoined = (existing?['circles_joined'] ?? 0);
+    final totalWins     = (existing?['total_wins']     ?? 0) + (didWin ? 1 : 0);
+    final circlesJoined = (existing?['circles_joined'] ?? 0) as int;
 
     final payload = {
       'user_id': uid,
@@ -103,44 +108,36 @@ class StatsRepository {
       'updated_at': DateTime.now().toIso8601String(),
     };
 
+    // ── SQLite-first: write locally without blocking the caller. ────────────
     try {
-      final updated = await _supabase
-          .from('user_stats')
-          .upsert(payload, onConflict: 'user_id')
-          .select()
-          .single();
-      
-      // Mirror to local SQLite
-      await DatabaseHelper.instance.upsertUserStats(updated);
-      return UserStats.fromRow(updated);
-      
-    } catch (e) {
-      debugPrint("Cloud User Stats Upsert failed: $e. Enqueuing.");
-      await offlineQueueRepository.enqueue(
-          tableName: 'user_stats',
-          operation: 'UPSERT',
-          data: payload,
-      );
-      
-      // Update local SQLite anyway
       await DatabaseHelper.instance.upsertUserStats(payload);
-      return UserStats.fromRow(payload);
+    } catch (e) {
+      debugPrint('StatsRepository: local write failed – $e');
     }
+
+    // ── Cloud in background: fire-and-forget, enqueue on failure. ───────────
+    _pushToCloud('user_stats', payload);
+
+    return UserStats.fromRow(payload);
   }
 
   Future<UserStats> incrementCirclesJoined() async {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return UserStats.empty();
 
+    // Read existing stats — prefer local.
     Map<String, dynamic>? existing;
     try {
-      existing = await _supabase
-          .from('user_stats')
-          .select()
-          .eq('user_id', uid)
-          .maybeSingle();
-    } catch (_) {
       existing = await DatabaseHelper.instance.getUserStats(uid);
+    } catch (_) {}
+    if (existing == null) {
+      try {
+        existing = await _supabase
+            .from('user_stats')
+            .select()
+            .eq('user_id', uid)
+            .maybeSingle();
+      } catch (_) {}
     }
 
     final next = (existing?['circles_joined'] ?? 0) + 1;
@@ -151,26 +148,35 @@ class StatsRepository {
       'updated_at': DateTime.now().toIso8601String(),
     };
 
+    // SQLite-first.
     try {
-      final updated = await _supabase
-          .from('user_stats')
-          .upsert(payload, onConflict: 'user_id')
-          .select()
-          .single();
-      
-      await DatabaseHelper.instance.upsertUserStats(updated);
-      return UserStats.fromRow(updated);
+      await DatabaseHelper.instance.upsertUserStats(payload);
     } catch (e) {
-      debugPrint("Cloud Stats (Circles) Upsert failed: $e. Enqueuing.");
-      await offlineQueueRepository.enqueue(
-        tableName: 'user_stats',
+      debugPrint('StatsRepository: local write (circles) failed – $e');
+    }
+
+    // Cloud in background.
+    _pushToCloud('user_stats', payload);
+
+    return UserStats.fromRow({...?existing, ...payload});
+  }
+
+  /// Upserts [payload] to Supabase in the background.
+  /// On failure, enqueues the payload for offline retry.
+  void _pushToCloud(String table, Map<String, dynamic> payload) {
+    _supabase
+        .from(table)
+        .upsert(payload, onConflict: 'user_id')
+        .then((_) {
+      debugPrint('StatsRepository: cloud sync OK for $table');
+    }).catchError((e) {
+      debugPrint('StatsRepository: cloud sync failed for $table – $e. Enqueuing.');
+      offlineQueueRepository.enqueue(
+        tableName: table,
         operation: 'UPSERT',
         data: payload,
       );
-      
-      await DatabaseHelper.instance.upsertUserStats(payload);
-      return UserStats.fromRow(payload);
-    }
+    });
   }
 
   static DateTime? _parseDate(dynamic value) {
@@ -183,4 +189,4 @@ class StatsRepository {
   }
 }
 
-final statsRepository = StatsRepository();
+StatsRepository get statsRepository => locator<StatsRepository>();

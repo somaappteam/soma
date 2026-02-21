@@ -6,67 +6,49 @@ import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
 import 'offline_queue_repository.dart';
 
-class QuizCache {
-  static const Duration defaultMaxAge = Duration(days: 7);
-  static const String _cachePrefix = 'quiz_cache';
-  static const String _timePrefix = 'quiz_cache_time';
+// QuizCache has been removed in favor of SQLite local storage in DatabaseHelper
 
-  Future<void> save(String key, List<Map<String, dynamic>> questions) async {
-    final prefs = await SharedPreferences.getInstance();
-    final encoded = jsonEncode(questions);
-    await prefs.setString('$_cachePrefix:$key', encoded);
-    await prefs.setInt('$_timePrefix:$key', DateTime.now().millisecondsSinceEpoch);
-  }
-
-  Future<List<Map<String, dynamic>>> load(
-    String key, {
-    Duration maxAge = defaultMaxAge,
-    bool allowStale = false,
-  }) async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString('$_cachePrefix:$key');
-    if (raw == null) return [];
-
-    final ts = prefs.getInt('$_timePrefix:$key') ?? 0;
-    final ageMs = DateTime.now().millisecondsSinceEpoch - ts;
-    if (!allowStale && ageMs > maxAge.inMilliseconds) return [];
-
-    try {
-      final decoded = jsonDecode(raw);
-      if (decoded is! List) return [];
-      return decoded
-          .whereType<Map>()
-          .map((row) => Map<String, dynamic>.from(row))
-          .toList();
-    } catch (_) {
-      return [];
-    }
-  }
-}
-
+/// SM-2 Spaced Repetition System implementation.
+///
+/// Algorithm:
+///   - First correct answer  → interval = 1 day
+///   - Second correct answer → interval = 6 days
+///   - Subsequent correct    → interval = round(prev_interval × ease_factor)
+///   - Correct answer        → ease_factor += 0.1
+///   - Wrong answer          → interval resets to 1 day, ease_factor -= 0.2 (min 1.3)
 class VocabSrsStore {
   final _supabase = Supabase.instance.client;
   final _dbHelper = DatabaseHelper.instance;
-  static const List<int> _scheduleDays = [1, 3, 7, 14, 30];
+
+  static const int _firstInterval = 1;
+  static const int _secondInterval = 6;
+  static const double _defaultEase = 2.5;
+  static const double _minEase = 1.3;
 
   String? get _uid => _supabase.auth.currentUser?.id;
 
   Future<Map<int, SrsEntry>> load(String courseId) async {
     final uid = _uid;
     final localItems = await _dbHelper.getUserLearnedItems(uid ?? 'guest', courseId);
-    
+
     final entries = <int, SrsEntry>{};
     for (final item in localItems) {
       final conceptId = _parseInt(item['concept_id']);
       final interval = _parseInt(item['interval_days']);
       final dueAtStr = item['due_at']?.toString();
       if (conceptId == null || interval == null || dueAtStr == null) continue;
-      
+
       final dueAtMs = DateTime.parse(dueAtStr).millisecondsSinceEpoch;
+      final rawEase = item['ease_factor'];
+      final easeFactor = (rawEase is num)
+          ? rawEase.toDouble()
+          : (double.tryParse(rawEase?.toString() ?? '') ?? _defaultEase);
+
       entries[conceptId] = SrsEntry(
         conceptId: conceptId,
         intervalDays: interval,
         dueAtMs: dueAtMs,
+        easeFactor: easeFactor,
       );
     }
 
@@ -82,13 +64,16 @@ class VocabSrsStore {
         'course_id': courseId,
         'concept_id': entry.conceptId,
         'interval_days': entry.intervalDays,
+        'ease_factor': entry.easeFactor,
         'due_at': DateTime.fromMillisecondsSinceEpoch(entry.dueAtMs).toIso8601String(),
       };
       await _dbHelper.upsertUserLearnedItem(item);
 
       if (uid != 'guest') {
         try {
-          await _supabase.from('user_learned_items').upsert(item, onConflict: 'user_id, course_id, concept_id');
+          await _supabase
+              .from('user_learned_items')
+              .upsert(item, onConflict: 'user_id, course_id, concept_id');
         } catch (e) {
           debugPrint("Cloud SRS push failed: $e. Enqueuing.");
           await offlineQueueRepository.enqueue(
@@ -120,40 +105,50 @@ class VocabSrsStore {
     final existing = entries[conceptId];
 
     if (!correct) {
-      final interval = _scheduleDays.first;
+      // SM-2: wrong answer resets interval to 1, reduces ease factor.
+      final oldEase = existing?.easeFactor ?? _defaultEase;
+      final newEase = (oldEase - 0.2).clamp(_minEase, double.infinity);
       entries[conceptId] = SrsEntry(
         conceptId: conceptId,
-        intervalDays: interval,
-        dueAtMs: _dueAtMs(interval),
+        intervalDays: _firstInterval,
+        dueAtMs: _dueAtMs(_firstInterval),
+        easeFactor: newEase,
       );
       await save(courseId, entries);
       return;
     }
 
+    // SM-2: correct answer — compute next interval.
     if (existing == null) {
-      final interval = _scheduleDays.first;
+      // Brand new card: first correct → 1 day.
       entries[conceptId] = SrsEntry(
         conceptId: conceptId,
-        intervalDays: interval,
-        dueAtMs: _dueAtMs(interval),
+        intervalDays: _firstInterval,
+        dueAtMs: _dueAtMs(_firstInterval),
+        easeFactor: _defaultEase,
+      );
+    } else if (existing.intervalDays <= _firstInterval) {
+      // Second correct answer → 6 days (SM-2 step 2).
+      final newEase = (existing.easeFactor + 0.1).clamp(_minEase, double.infinity);
+      entries[conceptId] = SrsEntry(
+        conceptId: conceptId,
+        intervalDays: _secondInterval,
+        dueAtMs: _dueAtMs(_secondInterval),
+        easeFactor: newEase,
       );
     } else {
-      final nextInterval = _advanceInterval(existing.intervalDays);
+      // Subsequent correct → multiply by ease factor.
+      final newEase = (existing.easeFactor + 0.1).clamp(_minEase, double.infinity);
+      final newInterval = (existing.intervalDays * newEase).round().clamp(1, 365);
       entries[conceptId] = SrsEntry(
         conceptId: conceptId,
-        intervalDays: nextInterval,
-        dueAtMs: _dueAtMs(nextInterval),
+        intervalDays: newInterval,
+        dueAtMs: _dueAtMs(newInterval),
+        easeFactor: newEase,
       );
     }
-    
-    await save(courseId, entries);
-  }
 
-  int _advanceInterval(int current) {
-    final index = _scheduleDays.indexWhere((d) => d >= current);
-    if (index == -1) return _scheduleDays.last;
-    final nextIndex = (index + 1).clamp(0, _scheduleDays.length - 1);
-    return _scheduleDays[nextIndex];
+    await save(courseId, entries);
   }
 
   int _dueAtMs(int intervalDays) {
@@ -171,9 +166,14 @@ class SrsEntry {
   final int intervalDays;
   final int dueAtMs;
 
+  /// SM-2 ease factor — controls interval growth speed on correct answers.
+  /// Default: 2.5 (SM-2 spec). Minimum: 1.3.
+  final double easeFactor;
+
   const SrsEntry({
     required this.conceptId,
     required this.intervalDays,
     required this.dueAtMs,
+    this.easeFactor = 2.5,
   });
 }

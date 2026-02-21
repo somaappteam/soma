@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/widgets/glass.dart';
+import '../../core/widgets/staggered_in.dart';
 import '../../data/auth_repository.dart';
 import '../../data/chat_repository.dart';
 import '../../data/experiment_repository.dart';
@@ -734,8 +736,10 @@ class _InboxScreenState extends State<InboxScreen> {
                                       final hidePreview = _hiddenPreviewThreadIds.contains(otherId);
                                       final trustScore = (((t['isFriend'] == true ? 60 : 35) + ((unreadCount as int) > 0 ? 10 : 0) + (t['hasIncomingRequest'] == true ? 5 : 0)).clamp(0, 99) as num).toInt();
 
-                                      return Dismissible(
-                              key: ValueKey('thread-$otherId'),
+                                      return StaggeredIn(
+                                        index: index,
+                                        child: Dismissible(
+                                          key: ValueKey('thread-$otherId'),
                               direction: DismissDirection.horizontal,
                               confirmDismiss: (direction) async {
                                 if (direction == DismissDirection.startToEnd) {
@@ -792,8 +796,9 @@ class _InboxScreenState extends State<InboxScreen> {
                                   if (mounted) setState(() => _refreshNonce++);
                                 },
                                 ),
-                                      );
-                                    },
+                              ),
+                            );
+                          },
                                   ),
                                 ),
                               ),
@@ -861,27 +866,30 @@ class _VipPinnedRow extends StatelessWidget {
         itemBuilder: (context, i) {
           final t = threads[i];
           final name = (t['otherName']?.toString() ?? 'U').trim();
-          return Glass(
-            radius: BorderRadius.circular(999),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _Avatar(
-                  showOnlineIndicator: t['isOnline'] == true,
-                  avatarUrl: t['avatar_url']?.toString(),
-                  name: name,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  name.split(' ').first,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 12,
+          return StaggeredIn(
+            index: i,
+            child: Glass(
+              radius: BorderRadius.circular(999),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _Avatar(
+                    showOnlineIndicator: t['isOnline'] == true,
+                    avatarUrl: t['avatar_url']?.toString(),
+                    name: name,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 6),
+                  Text(
+                    name.split(' ').first,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -1381,10 +1389,10 @@ class _Avatar extends StatelessWidget {
   Widget _buildAvatarContent(BuildContext context) {
     final url = avatarUrl?.trim() ?? '';
     if (url.isNotEmpty) {
-      return Image.network(
-        url,
+      return CachedNetworkImage(
+        imageUrl: url,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _AvatarFallback(name: name),
+        errorWidget: (_, __, ___) => _AvatarFallback(name: name),
       );
     }
     return _AvatarFallback(name: name);

@@ -8,6 +8,7 @@ import '../config/app_config.dart';
 import '../../data/settings_repository.dart';
 import '../../data/soma_plus_repository.dart';
 import 'haptics_service.dart';
+import 'notification_service.dart';
 import 'session_tracker.dart';
 import 'sfx_service.dart';
 import 'theme_mode_controller.dart';
@@ -35,6 +36,19 @@ class AppBootstrap {
     await sfxService.init();
     await settingsRepository.init();
     await somaPlusRepository.init();
+
+    // Initialize push notifications on mobile only (best-effort).
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      try {
+        final settings = await settingsRepository.getTypedSettings();
+        await notificationService.initialize(
+          pushEnabled: settings.pushNotifications,
+          reminderTime: settings.dailyReminder,
+        );
+      } catch (e) {
+        debugPrint('AppBootstrap: notification init failed – $e');
+      }
+    }
   }
 
   void _initSqliteIfNeeded() {

@@ -5,6 +5,7 @@ import '../models/solo_course.dart';
 import '../core/database/database_helper.dart';
 import 'settings_repository.dart';
 import 'package:flutter/foundation.dart';
+import '../core/di/locator.dart';
 
 class CoursesRepository {
   final _supabase = Supabase.instance.client;
@@ -297,4 +298,4 @@ class CoursesRepository {
   }
 }
 
-final coursesRepository = CoursesRepository();
+CoursesRepository get coursesRepository => locator<CoursesRepository>();

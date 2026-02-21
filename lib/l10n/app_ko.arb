@@ -65,7 +65,6 @@
   "soloModeSentencesSubtitle": "빈칸 채우기 + 번역 + 읽기",
   "soloModeReviewDescription": "배운 내용을 연습하세요: 약한 단어, 최근 실수, 간격 반복.",
   "startReview": "복습 시작",
-
   "soloReviewModeTitle": "Review mode",
   "soloReviewOptionsTitle": "Review options",
   "soloReviewScopeAllLearned": "All learned",
@@ -807,5 +806,23 @@
   "circlesLiveChatEmpty": "No messages yet. Start the chat!",
   "circlesLiveChatUnavailable": "Live chat is available inside active circles.",
   "circlesCreateHelpTitle": "Create a circle",
-  "circlesCreateHelpBody": "Choose your languages, mode, and difficulty, then set room limits. Spectators can watch, and live chat lets everyone talk during the match."
+  "circlesCreateHelpBody": "Choose your languages, mode, and difficulty, then set room limits. Spectators can watch, and live chat lets everyone talk during the match.",
+  "incomingCallFrom": "Incoming call from {name}",
+  "@incomingCallFrom": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "declineCall": "Decline",
+  "acceptCall": "Accept",
+  "voiceCall": "Voice call",
+  "inCallWith": "In call • {name}",
+  "@inCallWith": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "authBenefitLiveCircles": "Live circles with real learners",
+  "authBenefitVoiceRooms": "Voice rooms with instant practice",
+  "authBenefitFriendChallenges": "Friend challenges and saved progress"
 }

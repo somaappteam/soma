@@ -1,12 +1,16 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 
 import '../core/i18n/ui_language.dart';
+import '../core/services/notification_service.dart';
 import '../models/app_settings.dart';
+import 'achievements_repository.dart';
 import 'soma_plus_repository.dart';
+import '../core/di/locator.dart';
 
 class SettingsRepository {
   final _supabase = Supabase.instance.client;
@@ -74,10 +78,17 @@ class SettingsRepository {
   void _initAuthListener() {
     _supabase.auth.onAuthStateChange.listen((data) {
       if (data.session != null) {
-        // User logged in, switch to user stream
+        // User logged in — switch to user stream and sweep achievements.
         _listenToUserSettings(data.session!.user.id);
+        // Delay slightly so the shell UI is ready before toasts appear.
+        Future.delayed(const Duration(seconds: 2), () {
+          achievementsRepository.checkOnLogin();
+          notificationService.startRealtimeListener();
+        });
       } else {
-        // User logged out, revert to guest settings
+        // User logged out — revert to guest settings and clean up notifications.
+        notificationService.stopRealtimeListener();
+        notificationService.clearToken();
         _userSettingsSubscription?.cancel();
         _effectiveSettings = Map<String, dynamic>.from(_guestSettings);
         _settingsController.add(_effectiveSettings);
@@ -132,6 +143,9 @@ class SettingsRepository {
     // User is logged in
     _effectiveSettings[key] = _normalizeSettingValue(key, value);
     _settingsController.add(Map<String, dynamic>.from(_effectiveSettings));
+
+    // Reflect notification-related setting changes immediately.
+    _applyNotificationSetting(key, _effectiveSettings[key], _effectiveSettings);
 
     try {
       final resp = await _supabase
@@ -216,9 +230,26 @@ class SettingsRepository {
       _prefs?.setInt(key, value);
     } else if (value is double) {
       _prefs?.setDouble(key, value);
+    } else if (value is Map || value is List) {
+      // Maps and Lists are stored as JSON strings.
+      _prefs?.setString(key, jsonEncode(value));
     }
   }
 
+  /// Reacts immediately to notification-related setting changes.
+  void _applyNotificationSetting(
+      String key, dynamic value, Map<String, dynamic> current) {
+    if (key == 'push_notifications') {
+      final enabled = value == true;
+      notificationService.setPushEnabled(enabled);
+      // Re-schedule or cancel reminder based on new toggle.
+      final time = current['daily_reminder']?.toString() ?? '20:00';
+      notificationService.scheduleReminder(time, enabled: enabled);
+    } else if (key == 'daily_reminder') {
+      final enabled = current['push_notifications'] == true;
+      notificationService.scheduleReminder(value?.toString() ?? '', enabled: enabled);
+    }
+  }
 
   Future<void> _hydrateFromCurrentSessionIfNeeded() async {
     final uid = currentUserId;
@@ -255,7 +286,17 @@ class SettingsRepository {
       for (final key in keys) {
         final val = _prefs?.get(key);
         if (val != null) {
-          _guestSettings[key] = val;
+          final defaultVal = _guestSettings[key];
+          // If we stored a Map/List as a JSON string, decode it back.
+          if (val is String && (defaultVal is Map || defaultVal is List)) {
+            try {
+              _guestSettings[key] = jsonDecode(val);
+            } catch (_) {
+              _guestSettings[key] = val;
+            }
+          } else {
+            _guestSettings[key] = val;
+          }
           changed = true;
         }
       }
@@ -271,4 +312,4 @@ class SettingsRepository {
   }
 }
 
-final settingsRepository = SettingsRepository();
+SettingsRepository get settingsRepository => locator<SettingsRepository>();

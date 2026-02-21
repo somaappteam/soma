@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/di/locator.dart';
 
 class AiRepository {
   final SupabaseClient _supabase;
@@ -58,4 +59,4 @@ class AiRepository {
   }
 }
 
-final aiRepository = AiRepository(Supabase.instance.client);
+AiRepository get aiRepository => locator<AiRepository>();

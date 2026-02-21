@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'settings_repository.dart';
+import '../core/di/locator.dart';
 
 class ExperimentRepository {
   final Random _random = Random();
@@ -18,4 +19,4 @@ class ExperimentRepository {
   }
 }
 
-final experimentRepository = ExperimentRepository();
+ExperimentRepository get experimentRepository => locator<ExperimentRepository>();

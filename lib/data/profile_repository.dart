@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_profile.dart';
 import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
+import '../core/di/locator.dart';
 
 class ProfileRepository {
   final _supabase = Supabase.instance.client;
@@ -158,4 +159,4 @@ class ProfileRepository {
 
 }
 
-final profileRepository = ProfileRepository();
+ProfileRepository get profileRepository => locator<ProfileRepository>();

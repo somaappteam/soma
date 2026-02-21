@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../core/services/haptics_service.dart';
 import '../../core/services/sfx_service.dart';
@@ -1512,12 +1513,12 @@ class _AvatarBubble extends StatelessWidget {
           ),
           child: ClipOval(
             child: (avatarUrl != null && avatarUrl!.trim().isNotEmpty)
-                ? Image.network(
-                    avatarUrl!,
+                ? CachedNetworkImage(
+                    imageUrl: avatarUrl!,
                     width: size,
                     height: size,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Center(
+                    errorWidget: (_, __, ___) => Center(
                       child: Text(
                         initial,
                         style: TextStyle(

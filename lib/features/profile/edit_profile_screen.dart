@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -476,10 +477,10 @@ class _Avatar extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: (imageUrl ?? '').isNotEmpty
-          ? Image.network(
-              imageUrl!,
+          ? CachedNetworkImage(
+              imageUrl: imageUrl!,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Center(
+              errorWidget: (_, __, ___) => Center(
                 child: Text(
                   "🙂",
                   style: TextStyle(

@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/di/locator.dart';
 
 class UserReportRepository {
   final _supabase = Supabase.instance.client;
@@ -43,4 +44,4 @@ class UserReportRepository {
   }
 }
 
-final userReportRepository = UserReportRepository();
+UserReportRepository get userReportRepository => locator<UserReportRepository>();

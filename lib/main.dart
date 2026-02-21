@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 import 'core/i18n/ui_language.dart';
@@ -11,22 +12,40 @@ import 'core/theme/app_theme.dart';
 import 'core/widgets/app_lock_gate.dart';
 import 'data/app_analytics_repository.dart';
 import 'data/content_sync_service.dart';
+import 'data/offline_queue_repository.dart';
 import 'data/settings_repository.dart';
 import 'features/auth/splash_screen.dart';
 import 'models/app_settings.dart';
+import 'core/di/locator.dart';
 
 enum SyncStatus { idle, syncing, error }
 
 final syncStatusNotifier = ValueNotifier<SyncStatus>(SyncStatus.idle);
 final syncMessageNotifier = ValueNotifier<String?>(null);
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  const bootstrap = AppBootstrap();
-  await bootstrap.initialize();
+  await SentryFlutter.init(
+    (options) {
+      // Pass --dart-define=SENTRY_DSN=https://... to enable in release.
+      const dsn = String.fromEnvironment('SENTRY_DSN');
+      options.dsn = dsn.isEmpty ? '' : dsn;
+      options.tracesSampleRate = 0.2;
+      options.profilesSampleRate = 0.1;
+    },
+    appRunner: () async {
+      WidgetsFlutterBinding.ensureInitialized();
+      setupLocator();
+      const bootstrap = AppBootstrap();
+      await bootstrap.initialize();
 
-  unawaited(runContentSync());
-  runApp(const App());
+      // Start listening for connectivity changes to auto-drain the offline queue.
+      offlineQueueRepository.startListening();
+
+      unawaited(runContentSync());
+      runApp(const App());
+    },
+  );
 }
 
 Future<void> runContentSync() async {
@@ -128,6 +147,7 @@ class _AppState extends State<App> {
       animation: themeModeController,
       builder: (context, _) {
         return MaterialApp(
+          navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
           localizationsDelegates: const [

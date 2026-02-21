@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../core/di/locator.dart';
 
 class ExchangeAnalyticsRepository {
   final _supabase = Supabase.instance.client;
@@ -21,4 +22,4 @@ class ExchangeAnalyticsRepository {
   }
 }
 
-final exchangeAnalyticsRepository = ExchangeAnalyticsRepository();
+ExchangeAnalyticsRepository get exchangeAnalyticsRepository => locator<ExchangeAnalyticsRepository>();

@@ -1720,4 +1720,33 @@ class AppLocalizationsJa extends AppLocalizations {
   String circlesShareId(Object id) {
     return 'Circle ID: $id';
   }
+
+  @override
+  String incomingCallFrom(Object name) {
+    return 'Incoming call from $name';
+  }
+
+  @override
+  String get declineCall => 'Decline';
+
+  @override
+  String get acceptCall => 'Accept';
+
+  @override
+  String get voiceCall => 'Voice call';
+
+  @override
+  String inCallWith(Object name) {
+    return 'In call • $name';
+  }
+
+  @override
+  String get authBenefitLiveCircles => 'Live circles with real learners';
+
+  @override
+  String get authBenefitVoiceRooms => 'Voice rooms with instant practice';
+
+  @override
+  String get authBenefitFriendChallenges =>
+      'Friend challenges and saved progress';
 }

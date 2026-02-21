@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'experiment_repository.dart';
+import '../core/di/locator.dart';
 
 class NotificationsRepository {
   final _supabase = Supabase.instance.client;
@@ -97,4 +98,4 @@ class NotificationsRepository {
   }
 }
 
-final notificationsRepository = NotificationsRepository();
+NotificationsRepository get notificationsRepository => locator<NotificationsRepository>();
