@@ -107,6 +107,7 @@ class _AppState extends State<App> {
     super.initState();
     _loadSavedLocale();
     _listenToSettingsChanges();
+    syncStatusNotifier.addListener(_handleSyncStatusChanged);
   }
 
   Future<void> _loadSavedLocale() async {
@@ -135,8 +136,33 @@ class _AppState extends State<App> {
     });
   }
 
+  void _handleSyncStatusChanged() {
+    if (syncStatusNotifier.value != SyncStatus.error) return;
+
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+
+    final messenger = ScaffoldMessenger.of(context);
+    final message = syncMessageNotifier.value ?? 'Background sync failed. We will retry automatically.';
+
+    messenger
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 4),
+          action: SnackBarAction(
+            label: 'Retry',
+            onPressed: () => unawaited(runContentSync()),
+          ),
+        ),
+      );
+  }
+
   @override
   void dispose() {
+    syncStatusNotifier.removeListener(_handleSyncStatusChanged);
     _settingsSubscription?.cancel();
     super.dispose();
   }
@@ -204,101 +230,9 @@ class _AppState extends State<App> {
               child: decoratedChild,
             );
 
-            return AppLockGate(
-              child: ValueListenableBuilder<SyncStatus>(
-                valueListenable: syncStatusNotifier,
-                builder: (context, status, _) {
-                  return Stack(
-                    children: [
-                      content,
-                      if (status != SyncStatus.idle)
-                        SafeArea(
-                          child: Align(
-                            alignment: Alignment.topCenter,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 8,
-                              ),
-                              child: _SyncStatusBanner(
-                                status: status,
-                                onRetry: runContentSync,
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-            );
+            return AppLockGate(child: content);
           },
           home: const SplashScreen(),
-        );
-      },
-    );
-  }
-}
-
-class _SyncStatusBanner extends StatelessWidget {
-  final SyncStatus status;
-  final Future<void> Function() onRetry;
-
-  const _SyncStatusBanner({
-    required this.status,
-    required this.onRetry,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
-    final isError = status == SyncStatus.error;
-    final icon = isError ? Icons.wifi_off_rounded : Icons.sync_rounded;
-    final label = isError ? 'Sync failed' : 'Syncing…';
-
-    return ValueListenableBuilder<String?>(
-      valueListenable: syncMessageNotifier,
-      builder: (context, message, _) {
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 250),
-          child: Container(
-            key: ValueKey(status),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: isError
-                  ? scheme.error.withValues(alpha: 0.2)
-                  : scheme.surfaceContainerHighest.withValues(alpha: 0.85),
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.15)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    message ?? label,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurface.withValues(alpha: 0.9),
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                if (isError) ...[
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () {
-                      unawaited(appAnalyticsRepository.track('sync_retry_tapped'));
-                      onRetry();
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ],
-            ),
-          ),
         );
       },
     );
