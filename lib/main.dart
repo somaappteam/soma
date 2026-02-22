@@ -7,6 +7,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 
 import 'core/i18n/ui_language.dart';
 import 'core/services/app_bootstrap.dart';
+import 'core/services/sync_retry_policy.dart';
 import 'core/services/theme_mode_controller.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/app_lock_gate.dart';
@@ -29,9 +30,16 @@ Future<void> main() async {
     (options) {
       // Pass --dart-define=SENTRY_DSN=https://... to enable in release.
       const dsn = String.fromEnvironment('SENTRY_DSN');
+      const traceRate = double.fromEnvironment('SENTRY_TRACE_SAMPLE_RATE', defaultValue: 0.2);
+      const profileRate = double.fromEnvironment('SENTRY_PROFILE_SAMPLE_RATE', defaultValue: 0.1);
+      const enableInDebug = bool.fromEnvironment('SENTRY_ENABLE_IN_DEBUG', defaultValue: false);
+
       options.dsn = dsn.isEmpty ? '' : dsn;
-      options.tracesSampleRate = 0.2;
-      options.profilesSampleRate = 0.1;
+      options.tracesSampleRate = traceRate.clamp(0, 1);
+      options.profilesSampleRate = profileRate.clamp(0, 1);
+      options.enableAppLifecycleBreadcrumbs = true;
+      options.environment = const String.fromEnvironment('APP_ENV', defaultValue: 'development');
+      options.debug = enableInDebug;
     },
     appRunner: () async {
       WidgetsFlutterBinding.ensureInitialized();
@@ -52,40 +60,29 @@ Future<void> runContentSync() async {
   syncStatusNotifier.value = SyncStatus.syncing;
   syncMessageNotifier.value = null;
 
-  const baseDelayMs = 700;
-  const maxAttempts = 3;
-  ContentSyncResult? result;
+  final retryPolicy = SyncRetryPolicy();
+  final result = await retryPolicy.execute(
+    runSync: contentSyncService.syncEverything,
+    onRetryScheduled: (attempt, failedSteps) async {
+      syncMessageNotifier.value =
+          'Sync issue (${failedSteps.join(', ')}). Retrying ($attempt/${SyncRetryPolicy.maxAttempts})…';
+      await appAnalyticsRepository.track('sync_retry_scheduled', metadata: {
+        'attempt': attempt,
+        'failed_steps': failedSteps,
+      });
+    },
+  );
 
-  for (var attempt = 1; attempt <= maxAttempts; attempt++) {
-    result = await contentSyncService.syncEverything();
-    if (result.success) {
-      syncStatusNotifier.value = SyncStatus.idle;
-      return;
-    }
-
-    if (attempt == maxAttempts) {
-      break;
-    }
-
-    final delayMs = baseDelayMs * (1 << (attempt - 1));
-    syncMessageNotifier.value =
-        'Sync issue (${result.failedSteps.join(', ')}). Retrying (${attempt + 1}/$maxAttempts)…';
-    unawaited(appAnalyticsRepository.track('sync_retry_scheduled', metadata: {
-      'attempt': attempt + 1,
-      'failed_steps': result.failedSteps,
-    }));
-    await Future.delayed(Duration(milliseconds: delayMs));
+  if (result.success) {
+    syncStatusNotifier.value = SyncStatus.idle;
+    return;
   }
 
-  final failedSteps = result?.failedSteps ?? const <String>[];
-  final durations = result?.stepDurationsMs.entries
-          .map((e) => '${e.key}:${e.value}ms')
-          .join(' · ') ??
-      '';
+  final durations = result.stepDurationsMs.entries.map((e) => '${e.key}:${e.value}ms').join(' · ');
   syncStatusNotifier.value = SyncStatus.error;
-  syncMessageNotifier.value = failedSteps.isEmpty
+  syncMessageNotifier.value = result.failedSteps.isEmpty
       ? 'Sync failed unexpectedly. Tap retry to try again.'
-      : 'Sync failed: ${failedSteps.join(', ')}. $durations Tap retry to try again.';
+      : 'Sync failed: ${result.failedSteps.join(', ')}. $durations Tap retry to try again.';
 }
 
 class App extends StatefulWidget {

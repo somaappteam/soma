@@ -30,7 +30,9 @@ final GetIt locator = GetIt.instance;
 
 void setupLocator() {
   // Pass required dependencies to constructors
-  locator.registerLazySingleton<AiRepository>(() => AiRepository(Supabase.instance.client));
+  locator.registerLazySingleton<AiRepository>(
+    () => AiRepository(SupabaseEdgeFunctionInvoker(Supabase.instance.client)),
+  );
 
   // No-arg constructors
   locator.registerLazySingleton<AchievementsRepository>(() => AchievementsRepository());

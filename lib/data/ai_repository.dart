@@ -1,61 +1,115 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/di/locator.dart';
+import 'dart:async';
 
-class AiRepository {
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../core/di/locator.dart';
+import '../core/services/app_logger.dart';
+
+abstract class EdgeFunctionInvoker {
+  Future<FunctionResponse> invoke(String name, {Object? body});
+}
+
+class SupabaseEdgeFunctionInvoker implements EdgeFunctionInvoker {
   final SupabaseClient _supabase;
 
-  AiRepository(this._supabase);
+  SupabaseEdgeFunctionInvoker(this._supabase);
 
-  /// Polish text to be more grammatically correct and natural
+  @override
+  Future<FunctionResponse> invoke(String name, {Object? body}) {
+    return _supabase.functions.invoke(name, body: body);
+  }
+}
+
+class AiRepository {
+  AiRepository(this._invoker);
+
+  final EdgeFunctionInvoker _invoker;
+
+  static const int _maxAttempts = 3;
+  static const Duration _requestTimeout = Duration(seconds: 8);
+
   Future<String> polishText(String text) async {
-    try {
-      final res = await _supabase.functions.invoke('ai-polish', body: {
-        'text': text,
-      });
-      return res.data['text'] as String;
-    } catch (e) {
-      // Fallback to original if offline/error, or rethrow to let UI handle
-      rethrow;
-    }
+    final res = await _invokeWithRetry('ai-polish', body: {'text': text});
+    return _readTextResponse(res.data, field: 'text');
   }
 
-  /// Rewrite text in a specific style (formal, romantic, etc)
   Future<String> rewriteText(String text, String style) async {
-    try {
-      final res = await _supabase.functions.invoke('ai-rewrite', body: {
-        'text': text,
-        'style': style,
-      });
-      return res.data['text'] as String;
-    } catch (e) {
-      rethrow;
-    }
+    final res = await _invokeWithRetry('ai-rewrite', body: {'text': text, 'style': style});
+    return _readTextResponse(res.data, field: 'text');
   }
 
-  /// Translate text to target language
   Future<String> translateText(String text, String targetLanguage) async {
-    try {
-      final res = await _supabase.functions.invoke('ai-translate', body: {
-        'text': text,
-        'target_language': targetLanguage,
-      });
-      return res.data['text'] as String;
-    } catch (e) {
-      rethrow;
+    final res = await _invokeWithRetry(
+      'ai-translate',
+      body: {'text': text, 'target_language': targetLanguage},
+    );
+    final translated = _readTextResponse(res.data, field: 'text');
+    if (translated.length > 1200) {
+      throw const FormatException('Translated output exceeded maximum allowed length');
     }
+    return translated;
   }
 
-  /// Analyze pronunciation from audio transcript
-  /// Returns a Map with score, difficult words, and tips
   Future<Map<String, dynamic>> analyzePronunciation(String transcript) async {
-    try {
-      final res = await _supabase.functions.invoke('ai-pronunciation', body: {
-        'transcript': transcript,
-      });
-      return res.data as Map<String, dynamic>;
-    } catch (e) {
-      rethrow;
+    final res = await _invokeWithRetry('ai-pronunciation', body: {'transcript': transcript});
+    final data = res.data;
+    if (data is! Map<String, dynamic>) {
+      throw const FormatException('Unexpected response format for pronunciation analysis');
     }
+
+    final score = data['score'];
+    final difficultWords = data['difficult_words'];
+    final tip = data['tip'];
+    if (score is! num || score < 0 || score > 100 || difficultWords is! List || tip is! String) {
+      throw const FormatException('Pronunciation analysis payload schema mismatch');
+    }
+    return data;
+  }
+
+  Future<FunctionResponse> _invokeWithRetry(String name, {required Map<String, Object?> body}) async {
+    Object? lastError;
+
+    for (var attempt = 1; attempt <= _maxAttempts; attempt++) {
+      try {
+        final response = await _invoker.invoke(name, body: body).timeout(_requestTimeout);
+        return response;
+      } catch (error) {
+        lastError = error;
+        if (!_isTransient(error) || attempt == _maxAttempts) {
+          rethrow;
+        }
+        final delay = Duration(milliseconds: 250 * attempt);
+        appLogger.warning(
+          'Retrying AI invocation',
+          context: {'function': name, 'attempt': attempt + 1, 'delay_ms': delay.inMilliseconds},
+          error: error,
+        );
+        await Future<void>.delayed(delay);
+      }
+    }
+
+    throw Exception('Unknown AI invocation failure: $lastError');
+  }
+
+  bool _isTransient(Object error) {
+    final lower = error.toString().toLowerCase();
+    return error is TimeoutException ||
+        lower.contains('socketexception') ||
+        lower.contains('network') ||
+        lower.contains('connection') ||
+        lower.contains('503') ||
+        lower.contains('504');
+  }
+
+  String _readTextResponse(dynamic data, {required String field}) {
+    if (data is! Map<String, dynamic>) {
+      throw const FormatException('Unexpected AI response payload');
+    }
+    final value = data[field];
+    if (value is! String || value.trim().isEmpty) {
+      throw FormatException('Missing "$field" in AI response');
+    }
+    return value.trim();
   }
 }
 

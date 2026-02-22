@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../core/database/database_helper.dart';
+import '../core/services/app_logger.dart';
+import '../core/services/error_reporter.dart';
 import 'app_analytics_repository.dart';
 import 'settings_repository.dart';
 import 'offline_queue_repository.dart';
@@ -31,7 +33,7 @@ class ContentSyncService {
     final startedAt = DateTime.now();
     final settings = await settingsRepository.getSettings();
 
-    debugPrint('SYNC: Starting content sync...');
+    appLogger.info('Starting content sync');
 
     await _runStep(
       'offline_queue',
@@ -97,12 +99,9 @@ class ContentSyncService {
     );
 
     if (result.success) {
-      debugPrint('SYNC: Content sync completed in ${duration.inMilliseconds}ms.');
+      appLogger.info('Content sync completed', context: {'duration_ms': duration.inMilliseconds});
     } else {
-      debugPrint(
-        'SYNC: Content sync completed with failures in ${duration.inMilliseconds}ms. '
-        'Failed steps: ${failedSteps.join(', ')}',
-      );
+      appLogger.warning('Content sync completed with failures', context: {'duration_ms': duration.inMilliseconds, 'failed_steps': failedSteps});
     }
 
     return result;
@@ -119,7 +118,8 @@ class ContentSyncService {
       await action();
     } catch (e, st) {
       failedSteps.add(name);
-      debugPrint('SYNC: $name failed: $e\n$st');
+      appLogger.error('Sync step failed', context: {'step': name}, error: e, stackTrace: st);
+      await errorReporter.capture(e, st, hint: 'ContentSyncService._runStep::$name');
     } finally {
       stepDurationsMs[name] = DateTime.now().difference(startedAt).inMilliseconds;
     }
@@ -180,7 +180,7 @@ class ContentSyncService {
       await _dbHelper.upsertCourse(row);
     }
     await _persistCursor('sync_cursor_courses', response);
-    debugPrint('SYNC: Synced ${response.length} courses.');
+    appLogger.debug('Courses synced', context: {'count': response.length});
   }
 
   Future<void> _syncVocabulary(String? cursor) async {
@@ -189,7 +189,7 @@ class ContentSyncService {
       await _dbHelper.upsertVocabulary(row);
     }
     await _persistCursor('sync_cursor_vocabulary', response);
-    debugPrint('SYNC: Synced ${response.length} vocabulary items.');
+    appLogger.debug('Vocabulary synced', context: {'count': response.length});
   }
 
   Future<void> _syncSentences(String? cursor) async {
@@ -198,7 +198,7 @@ class ContentSyncService {
       await _dbHelper.upsertSentence(row);
     }
     await _persistCursor('sync_cursor_sentences', response);
-    debugPrint('SYNC: Synced ${response.length} sentences.');
+    appLogger.debug('Sentences synced', context: {'count': response.length});
   }
 
   Future<void> _syncProfile(String userId, String? cursor) async {
@@ -212,7 +212,7 @@ class ContentSyncService {
     if (profileRows.isNotEmpty) {
       await _dbHelper.upsertProfile(profileRows.first);
       await _persistCursor('sync_cursor_profile', profileRows);
-      debugPrint('SYNC: Synced profile for $userId.');
+      appLogger.debug('Profile synced', context: {'user_id': userId});
     }
   }
 
@@ -242,7 +242,7 @@ class ContentSyncService {
     await _persistCursor('sync_cursor_user_courses', coursesResp);
     await _persistCursor('sync_cursor_user_learned_items', srsResp);
 
-    debugPrint('SYNC: Synced user progress for $userId.');
+    appLogger.debug('User progress synced', context: {'user_id': userId});
   }
 
   Future<void> _syncUserStats(String userId, String? cursor) async {
@@ -256,7 +256,7 @@ class ContentSyncService {
     if (statsResp.isNotEmpty) {
       await _dbHelper.upsertUserStats(statsResp.first);
       await _persistCursor('sync_cursor_user_stats', statsResp);
-      debugPrint('SYNC: Synced user stats for $userId.');
+      appLogger.debug('User stats synced', context: {'user_id': userId});
     }
   }
 
@@ -264,18 +264,27 @@ class ContentSyncService {
     final items = await offlineQueueRepository.getAll();
     if (items.isEmpty) return;
     
-    print('SYNC: Processing ${items.length} offline items...');
+    appLogger.info('Processing offline queue', context: {'count': items.length});
     final currentUserId = _supabase.auth.currentUser?.id;
-    print('SYNC: Current Auth UID: $currentUserId');
 
     for (int i = 0; i < items.length; i++) {
       final item = items[i];
       try {
-        print('SYNC: Processing offline item ${i + 1}/${items.length}: ${item.tableName} ${item.operation}');
-        print('SYNC: Item data: ${item.data}');
-        
+        appLogger.debug(
+          'Processing offline queue item',
+          context: {
+            'index': i + 1,
+            'total': items.length,
+            'table': item.tableName,
+            'operation': item.operation,
+          },
+        );
+
         if (item.data['user_id'] != currentUserId) {
-          print('WARNING: item.user_id (${item.data['user_id']}) does not match currentUserId ($currentUserId)');
+          appLogger.warning(
+            'Offline queue user mismatch',
+            context: {'item_user_id': item.data['user_id']?.toString(), 'current_user_id': currentUserId},
+          );
         }
 
         if (item.operation == 'UPSERT') {
@@ -291,18 +300,19 @@ class ContentSyncService {
            await _supabase.rpc(funcName, params: item.data);
         }
         await offlineQueueRepository.delete(item.id!);
-      } catch (e) {
-        print("Offline Sync failed for item ${item.id}: $e");
+      } catch (e, st) {
+        appLogger.error('Offline queue item failed', context: {'item_id': item.id, 'table': item.tableName}, error: e, stackTrace: st);
+        await errorReporter.capture(e, st, hint: 'ContentSyncService._processOfflineQueue');
         final es = e.toString();
         if (e is PostgrestException || es.contains('PostgrestException') || es.contains('PGRST')) {
-          print("Permanent database/schema error detected. Dropping offline queue item to unblock sync.");
+          appLogger.warning('Dropping offline queue item after permanent database/schema error', context: {'item_id': item.id});
           await offlineQueueRepository.delete(item.id!);
         } else {
           rethrow;
         }
       }
     }
-    debugPrint('SYNC: Offline queue processed successfully.');
+    appLogger.info('Offline queue processed successfully');
   }
 }
 

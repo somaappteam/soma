@@ -1,42 +1,51 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { OpenAI } from "https://esm.sh/openai@4.20.1"
 
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { errorResponse, getOpenAiClient, jsonResponse, optionsResponse } from "../_shared/openai.ts"
+
+const maxInputLength = 600
+const maxOutputLength = 1200
 
 serve(async (req) => {
-    if (req.method === 'OPTIONS') {
-        return new Response('ok', { headers: corsHeaders })
+  if (req.method === 'OPTIONS') {
+    return optionsResponse()
+  }
+
+  try {
+    const { text, target_language } = await req.json()
+
+    if (typeof text !== 'string' || text.trim().length === 0) {
+      return jsonResponse({ error: 'text is required' }, 400)
+    }
+    if (text.length > maxInputLength) {
+      return jsonResponse({ error: `text exceeds max length (${maxInputLength})` }, 400)
+    }
+    if (typeof target_language !== 'string' || target_language.trim().length === 0) {
+      return jsonResponse({ error: 'target_language is required' }, 400)
     }
 
-    try {
-        const { text, target_language } = await req.json()
-        const apiKey = Deno.env.get('OPENAI_API_KEY')
-        if (!apiKey) {
-            throw new Error('OPENAI_API_KEY not set')
-        }
+    const openai = getOpenAiClient()
 
-        const openai = new OpenAI({ apiKey: apiKey })
+    const chatCompletion = await openai.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: `You are a helpful translator. Translate text to ${target_language}. Return translated text only.`,
+        },
+        { role: 'user', content: text },
+      ],
+      model: 'gpt-4o',
+    })
 
-        const chatCompletion = await openai.chat.completions.create({
-            messages: [
-                { role: 'system', content: `You are a helpful translator. Translate the following text to ${target_language}.` },
-                { role: 'user', content: text }
-            ],
-            model: 'gpt-4o',
-        })
-
-        const reply = chatCompletion.choices[0].message.content
-
-        return new Response(JSON.stringify({ text: reply }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-    } catch (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
+    const reply = chatCompletion.choices[0].message.content?.trim() ?? ''
+    if (reply.length === 0) {
+      return jsonResponse({ error: 'empty model output' }, 502)
     }
+    if (reply.length > maxOutputLength) {
+      return jsonResponse({ error: `translated output exceeds max length (${maxOutputLength})` }, 502)
+    }
+
+    return jsonResponse({ text: reply })
+  } catch (error) {
+    return errorResponse(error)
+  }
 })

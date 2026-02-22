@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 import '../../core/widgets/glass.dart';
+import '../../data/ai_repository.dart';
 import '../../data/exchange_analytics_repository.dart';
 import '../../data/languages.dart';
 import 'exchange_session_controller.dart';
@@ -90,7 +91,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     await _track('conversation_request_accepted');
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Conversation request accepted. You can start chatting now.')),
+      SnackBar(content: Text(_tr('Conversation request accepted. You can start chatting now.', fr: 'Demande de conversation acceptée. Vous pouvez commencer à discuter.', es: 'Solicitud de conversación aceptada. Ya puedes empezar a chatear.', de: 'Konversationsanfrage akzeptiert. Du kannst jetzt chatten.'))),
     );
   }
 
@@ -100,7 +101,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     await _track('conversation_request_declined');
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Conversation request declined.')),
+      SnackBar(content: Text(_tr('Conversation request declined.', fr: 'Demande de conversation refusée.', es: 'Solicitud de conversación rechazada.', de: 'Konversationsanfrage abgelehnt.'))),
     );
   }
 
@@ -110,7 +111,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
 
     if (!_controller.requestAccepted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Accept conversation request before messaging.')),
+        SnackBar(content: Text(_tr('Accept conversation request before messaging.', fr: 'Acceptez la demande de conversation avant d'envoyer un message.', es: 'Acepta la solicitud de conversación antes de enviar mensajes.', de: 'Akzeptiere die Konversationsanfrage, bevor du Nachrichten sendest.'))),
       );
       await _track('request_required_blocked_send');
       return;
@@ -118,7 +119,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
 
     if (!_controller.isMyTurn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Wait for your partner turn before sending.')),
+        SnackBar(content: Text(_tr('Wait for your partner turn before sending.', fr: 'Attendez le tour de votre partenaire avant d'envoyer.', es: 'Espera el turno de tu compañero antes de enviar.', de: 'Warte auf den Zug deines Partners, bevor du sendest.'))),
       );
       await _track('turn_blocked_send');
       return;
@@ -221,11 +222,29 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     final text = _input.text.trim();
     if (text.isEmpty) return;
 
-    // TODO: Integrate with a real translation service. 
-    // For now, removing the hardcoded dictionary that only supported 3 words.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Translation service is temporarily unavailable for this language.')),
-    );
+    if (text.length > 600) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_tr('Draft is too long to translate (max 600 characters).', fr: 'Le brouillon est trop long à traduire (600 caractères max).', es: 'El borrador es demasiado largo para traducir (máximo 600 caracteres).', de: 'Der Entwurf ist zu lang zum Übersetzen (max. 600 Zeichen).'))),
+      );
+      return;
+    }
+
+    final target = langNameFromCode(_controller.activeLanguageCode);
+    try {
+      final translated = await aiRepository.translateText(text, target);
+      if (!mounted) return;
+      _input.text = translated.trim();
+      await _track('helper_translate_draft', data: {'target_language': target});
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_tr('Draft translated to $target.', fr: 'Brouillon traduit en $target.', es: 'Borrador traducido a $target.', de: 'Entwurf in $target übersetzt.'))),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(_tr('Could not translate draft right now. Please try again.', fr: 'Le brouillon ne peut pas être traduit pour le moment. Réessayez.', es: 'No se pudo traducir el borrador ahora mismo. Inténtalo de nuevo.', de: 'Der Entwurf konnte gerade nicht übersetzt werden. Bitte erneut versuchen.'))),
+      );
+    }
   }
 
   Future<void> _nextRound() async {
@@ -396,7 +415,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                         Expanded(
                           child: TextField(
                             controller: _input,
-                            decoration: const InputDecoration(hintText: 'Type message...'),
+                            decoration: InputDecoration(hintText: _tr('Type message...', fr: 'Saisissez un message...', es: 'Escribe un mensaje...', de: 'Nachricht eingeben...')),
                           ),
                         ),
                         const SizedBox(width: 8),
