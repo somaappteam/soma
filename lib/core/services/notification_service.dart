@@ -6,11 +6,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter/material.dart';
 import '../../main.dart'; // for navigatorKey
+import 'app_logger.dart';
+import 'error_reporter.dart';
 import '../../features/social/dm_chat_screen.dart';
 
 // ─── FCM background message handler (top-level, required by firebase_messaging) ─
@@ -27,12 +30,15 @@ const _kChannelName = 'Soma Notifications';
 const _kChannelDesc = 'Friend requests, circles, and daily reminders';
 const _kReminderId  = 1;
 
+enum NotificationInitState { idle, ready, permissionDenied, tokenRegistrationFailed }
+
 class NotificationService {
   final _plugin = FlutterLocalNotificationsPlugin();
   final _supabase = Supabase.instance.client;
 
   RealtimeChannel? _realtimeChannel;
   bool _pushEnabled = true;
+  final ValueNotifier<NotificationInitState> initState = ValueNotifier(NotificationInitState.idle);
 
   // ─────────────────────────── Initialization ─────────────────────────────────
 
@@ -44,6 +50,7 @@ class NotificationService {
     await _initLocalNotifications();
     await _initTimezone();
     _initFirebaseMessaging();
+    initState.value = NotificationInitState.ready;
 
     if (pushEnabled) {
       await scheduleReminder(reminderTime, enabled: true);
@@ -112,13 +119,14 @@ class NotificationService {
 
       // Register FCM token with Supabase (best-effort).
       _registerFcmToken();
-    } catch (e) {
-      debugPrint('NotificationService: Firebase init failed – $e');
+    } catch (e, st) {
+      appLogger.error('NotificationService Firebase init failed', error: e, stackTrace: st);
+      unawaited(errorReporter.capture(e, st, hint: 'NotificationService._initFirebaseMessaging'));
     }
   }
 
   void _handleMessageTap(RemoteMessage message) {
-    debugPrint('NotificationService: Handing notification tap: ${message.data}');
+    appLogger.debug('Handling notification tap', context: {'type': message.data['type']?.toString()});
     
     // We expect payload to contain something like: { 'type': 'dm', 'otherId': '...', 'otherName': '...' }
     final type = message.data['type'];
@@ -146,14 +154,23 @@ class NotificationService {
     try {
       await Firebase.initializeApp();
       final messaging = FirebaseMessaging.instance;
-      await messaging.requestPermission();
+      final settings = await messaging.requestPermission();
+      final status = settings.authorizationStatus;
+
+      if (status == AuthorizationStatus.denied || status == AuthorizationStatus.notDetermined) {
+        initState.value = NotificationInitState.permissionDenied;
+        appLogger.warning('Notification permission denied');
+        return;
+      }
+
       final token = await messaging.getToken();
       if (token != null) await _upsertToken(token);
 
-      // Refresh listener.
       messaging.onTokenRefresh.listen(_upsertToken);
-    } catch (e) {
-      debugPrint('NotificationService: FCM token registration failed – $e');
+    } catch (e, st) {
+      initState.value = NotificationInitState.tokenRegistrationFailed;
+      appLogger.error('FCM token registration failed', error: e, stackTrace: st);
+      await errorReporter.capture(e, st, hint: 'NotificationService._registerFcmToken');
     }
   }
 
@@ -162,9 +179,10 @@ class NotificationService {
     if (uid == null) return;
     try {
       await _supabase.from('profiles').update({'fcm_token': token}).eq('id', uid);
-      debugPrint('NotificationService: FCM token saved');
-    } catch (e) {
-      debugPrint('NotificationService: token upsert failed – $e');
+      appLogger.info('FCM token saved');
+    } catch (e, st) {
+      appLogger.error('FCM token upsert failed', error: e, stackTrace: st);
+      await errorReporter.capture(e, st, hint: 'NotificationService._upsertToken');
     }
   }
 
@@ -175,8 +193,9 @@ class NotificationService {
     try {
       await _supabase.from('profiles').update({'fcm_token': null}).eq('id', uid);
       await FirebaseMessaging.instance.deleteToken();
-    } catch (e) {
-      debugPrint('NotificationService: token clear failed – $e');
+    } catch (e, st) {
+      appLogger.error('FCM token clear failed', error: e, stackTrace: st);
+      await errorReporter.capture(e, st, hint: 'NotificationService.clearToken');
     }
   }
 
@@ -238,7 +257,7 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time, // repeats daily
     );
-    debugPrint('NotificationService: daily reminder scheduled at $timeHHmm');
+    appLogger.info('Daily reminder scheduled', context: {'time': timeHHmm});
   }
 
   // ─────────────────────────── Supabase Realtime listener ─────────────────────
@@ -271,7 +290,7 @@ class NotificationService {
         )
         .subscribe();
 
-    debugPrint('NotificationService: Realtime listener started for $uid');
+    appLogger.info('Realtime notification listener started', context: {'user_id': uid});
   }
 
   void stopRealtimeListener() {
@@ -286,6 +305,14 @@ class NotificationService {
   void setPushEnabled(bool enabled) {
     _pushEnabled = enabled;
   }
+
+  Future<bool> openSystemNotificationSettings() async {
+    return openAppSettings();
+  }
+
+  bool get hasPermissionIssue =>
+      initState.value == NotificationInitState.permissionDenied ||
+      initState.value == NotificationInitState.tokenRegistrationFailed;
 }
 
 final notificationService = NotificationService();

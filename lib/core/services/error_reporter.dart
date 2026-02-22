@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
 
+import 'app_logger.dart';
+
 // ─── Optional Sentry import ───────────────────────────────────────────────────
 // sentry_flutter is imported conditionally so the app builds even if the
 // SENTRY_DSN env var is not set (e.g. during development).
@@ -29,9 +31,12 @@ class ErrorReporter {
     StackTrace? stack, {
     String? hint,
   }) async {
-    final label = hint != null ? '[$hint] ' : '';
-    debugPrint('${label}Error: $error');
-    if (stack != null) debugPrint(stack.toString());
+    appLogger.error(
+      hint ?? 'Unhandled error',
+      error: error,
+      stackTrace: stack,
+      context: hint == null ? null : <String, Object?>{'hint': hint},
+    );
 
     // Forward to Sentry only in release builds.
     if (!kDebugMode && !kProfileMode) {

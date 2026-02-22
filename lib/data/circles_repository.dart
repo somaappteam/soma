@@ -1,4 +1,7 @@
 import 'package:flutter/foundation.dart';
+
+import '../core/services/app_logger.dart';
+import '../core/services/error_reporter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'stats_repository.dart';
 import 'achievements_repository.dart';
@@ -35,11 +38,8 @@ class CirclesRepository {
     final uid = currentUserId;
     if (uid == null) throw Exception("Not logged in");
 
-    // DEBUG: Log questions being saved
-    debugPrint('=== CirclesRepository.createCircle ===');
-    debugPrint('Questions to save: ${questions?.length ?? 0}');
-    if (questions != null && questions.isNotEmpty) {
-      debugPrint('First question to save: ${questions.first}');
+    if (kDebugMode) {
+      appLogger.debug('Creating circle', context: {'questions_count': questions?.length ?? 0});
     }
 
     // 1. Create circle
@@ -64,8 +64,7 @@ class CirclesRepository {
         .single();
 
     final circleId = response['id'] as String;
-    debugPrint('Circle created with ID: $circleId');
-    debugPrint('Response questions: ${response['questions']}');
+    appLogger.info('Circle created', context: {'circle_id': circleId});
 
     // 2. Join as Host
     await joinCircle(circleId, role: 'host', isReady: true);
@@ -99,8 +98,9 @@ class CirclesRepository {
     try {
       final stats = await statsRepository.incrementCirclesJoined();
       await achievementsRepository.checkAfterCircle(stats: stats);
-    } catch (e) {
-      debugPrint("Circles: Optional stats update failed: $e");
+    } catch (e, st) {
+      appLogger.warning('Optional stats update failed after joining circle', error: e, stackTrace: st);
+      await errorReporter.capture(e, st, hint: 'CirclesRepository.joinCircle.optionalStats');
     }
   }
 
@@ -164,8 +164,9 @@ class CirclesRepository {
     try {
       final stats = await statsRepository.incrementCirclesJoined();
       await achievementsRepository.checkAfterCircle(stats: stats);
-    } catch (e) {
-      debugPrint("Circles: Optional stats update failed: $e");
+    } catch (e, st) {
+      appLogger.warning('Optional stats update failed after joining circle', error: e, stackTrace: st);
+      await errorReporter.capture(e, st, hint: 'CirclesRepository.joinCircle.optionalStats');
     }
 
     return CircleJoinOutcome(role: role, status: status);

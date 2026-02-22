@@ -32,13 +32,13 @@ dependencies:
   flutter_markdown: ^0.7.7+1
   image_picker: ^1.1.2
   file_picker: ^8.0.7
-  sqlite3_flutter_libs: any
+  sqlite3_flutter_libs: ^0.5.39
   sqlite3: ^3.1.5
   just_audio: ^0.9.39
   record: ^6.2.0
   path_provider: ^2.1.5
   connectivity_plus: ^7.0.0
-  flutter_local_notifications: ^21.0.0-dev.1
+  flutter_local_notifications: ^19.4.0
   timezone: ^0.11.0
   flutter_timezone: ^5.0.1
   firebase_core: ^4.4.0
@@ -53,9 +53,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  flutter_driver:
-    sdk: flutter
-
   supabase: any
   flutter_launcher_icons: "^0.13.1"
   analyzer: ^10.0.1
