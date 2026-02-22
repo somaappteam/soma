@@ -598,13 +598,25 @@ class CourseCard extends StatelessWidget {
                     ),
                   ),
                   if (showDelete)
-                    InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: onDelete,
-                      child: Padding(
-                        padding: const EdgeInsets.all(6),
-                        child: Icon(Icons.delete_rounded,
-                            color: scheme.tertiary.withValues(alpha: 0.9), size: 18),
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: onDelete,
+                        child: Ink(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: scheme.error.withValues(alpha: 0.14),
+                            border: Border.all(color: scheme.error.withValues(alpha: 0.45)),
+                          ),
+                          child: Icon(
+                            Icons.delete_forever_rounded,
+                            color: scheme.error,
+                            size: 24,
+                          ),
+                        ),
                       ),
                     )
                   else

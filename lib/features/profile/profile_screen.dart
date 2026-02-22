@@ -690,6 +690,8 @@ class _GuestProfileView extends StatelessWidget {
                                   const SizedBox(height: S.xs),
                                   Text(
                                     profile.bio.isNotEmpty ? profile.bio : l10n.profileDefaultBio,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
                                     style: textTheme.bodyMedium?.copyWith(
                                       color: scheme.onSurface.withValues(alpha: 0.68),
                                       fontWeight: FontWeight.w600,
@@ -910,28 +912,23 @@ class _HeaderCard extends StatelessWidget {
               ),
               const SizedBox(width: S.sm),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "@${profile.username}",
-                      style: textTheme.titleLarge?.copyWith(
-                        color: scheme.onSurface,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 20,
-                        letterSpacing: -0.5,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 6),
-                    _Pill(
-                      text: l10n.profileGoalLabel(profile.dailyGoalMinutes),
-                      icon: Icons.timer_rounded,
-                      isSmall: true,
-                    ),
-                  ],
+                child: Text(
+                  "@${profile.username}",
+                  style: textTheme.titleLarge?.copyWith(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 20,
+                    letterSpacing: -0.5,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+              ),
+              const SizedBox(width: S.sm),
+              _Pill(
+                text: l10n.profileGoalLabel(profile.dailyGoalMinutes),
+                icon: Icons.timer_rounded,
+                isSmall: true,
               ),
             ],
           ),
@@ -1029,6 +1026,8 @@ class _ProfileSpotlightCard extends StatelessWidget {
                 const SizedBox(height: S.xxs),
                 Text(
                   bio,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: textTheme.titleMedium?.copyWith(
                     color: scheme.onSurface,
                     fontWeight: FontWeight.w900,
@@ -1708,6 +1707,8 @@ class _VisitorOverviewCard extends StatelessWidget {
           const SizedBox(height: S.sm),
           Text(
             bio,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
             style: textTheme.bodyMedium?.copyWith(
               color: scheme.onSurface.withValues(alpha: 0.86),
               fontWeight: FontWeight.w700,
@@ -2079,6 +2080,7 @@ class _Pill extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Container(
+      constraints: BoxConstraints(maxWidth: isSmall ? 170 : 220),
       padding: EdgeInsets.symmetric(
         horizontal: isSmall ? 8 : S.sm,
         vertical: isSmall ? 4 : S.xs,
@@ -2097,12 +2099,16 @@ class _Pill extends StatelessWidget {
             color: scheme.onSurface.withValues(alpha: 0.9),
           ),
           const SizedBox(width: 4),
-          Text(
-            text,
-            style: textTheme.bodySmall?.copyWith(
-              color: scheme.onSurface,
-              fontWeight: FontWeight.w800,
-              fontSize: isSmall ? 11 : 13,
+          Flexible(
+            child: Text(
+              text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: textTheme.bodySmall?.copyWith(
+                color: scheme.onSurface,
+                fontWeight: FontWeight.w800,
+                fontSize: isSmall ? 11 : 13,
+              ),
             ),
           ),
         ],

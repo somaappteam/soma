@@ -26,6 +26,7 @@ class SoloSentencesQuizScreen extends StatefulWidget {
     required this.totalQuestions,
     required this.isReview,
     this.reviewQuestions,
+    this.reviewScope = 'all',
     this.timePerQuestion,
   });
 
@@ -34,6 +35,7 @@ class SoloSentencesQuizScreen extends StatefulWidget {
   final int totalQuestions;
   final bool isReview;
   final List<Map<String, dynamic>>? reviewQuestions;
+  final String reviewScope;
   final int? timePerQuestion;
 
   @override
@@ -238,14 +240,24 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
 
   Future<void> _loadQuestions() async {
     try {
-      final dbQuestions = await quizRepository.getSentenceQuestions(
-          widget.course.id, widget.totalQuestions);
+      final dbQuestions = widget.isReview
+          ? await quizRepository.getSentenceReviewQuestions(
+              widget.course.id,
+              widget.totalQuestions,
+              scope: widget.reviewScope,
+            )
+          : await quizRepository.getSentenceQuestions(
+              widget.course.id,
+              widget.totalQuestions,
+            );
       if (mounted) {
         setState(() {
           questions = dbQuestions;
           _loading = false;
           _loadError = dbQuestions.isEmpty
-              ? 'No sentence questions are available yet for this course.'
+              ? (widget.isReview
+                  ? 'No review items yet. Play quizzes first to unlock review.'
+                  : 'No sentence questions are available yet for this course.')
               : null;
         });
         if (questions.isNotEmpty) {
@@ -310,19 +322,25 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     final q = questions[index % questions.length];
     final ok = !timedOut && selected == _correctIndex;
 
+    quizRepository.recordVocabAnswer(
+      courseId: widget.course.id,
+      question: q,
+      correct: ok,
+    );
+
     if (ok) {
       correctCount++;
       if (correctCount > 0 && correctCount % 3 == 0) {
         hapticsService.mediumImpact();
-        sfxService.risingTone();
+        sfxService.answerCorrect(isStreak: true);
       } else {
         hapticsService.mediumImpact();
-        sfxService.softClick();
+        sfxService.answerCorrect();
       }
     } else {
       mistakes.add(q);
       hapticsService.lightImpact();
-      sfxService.click();
+      sfxService.answerWrong();
     }
 
     setState(() {
@@ -629,8 +647,8 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                   ),
                   _IconGlass(
                     icon: showReading
-                        ? Icons.text_fields_rounded
-                        : Icons.text_fields_outlined,
+                        ? Icons.sort_by_alpha_rounded
+                        : Icons.sort_by_alpha_outlined,
                     onTap: () => setState(() => showReading = !showReading),
                   ),
                   const SizedBox(width: 10),
@@ -776,14 +794,15 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                                 _submit();
                               },
                         child: AnimatedScale(
-                          scale: revealed && isCorrect ? 1.02 : 1,
+                          scale: revealed && isCorrect && isSel ? 1.015 : 1,
                           duration: MotionTokens.short,
-                          curve: MotionTokens.standardCurve,
+                          curve: MotionTokens.emphasisCurve,
                           child: AnimatedContainer(
                             duration: MotionTokens.short,
                             curve: MotionTokens.standardCurve,
                             constraints: const BoxConstraints(minHeight: 72),
                             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                            clipBehavior: Clip.antiAlias,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(18),
                               color: bg,
@@ -811,6 +830,8 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                                           : TextDirection.ltr,
                                       child: Text(
                                         choices[i],
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                             color: scheme.onSurface.withValues(alpha: 0.92),
                                             fontSize: 16,
@@ -819,23 +840,38 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                 AnimatedSwitcher(
-                                   duration: MotionTokens.short,
-                                   transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: ScaleTransition(scale: anim, child: child)),
-                                   child: (revealed && isCorrect)
-                                     ? Row(
-                                         mainAxisSize: MainAxisSize.min,
-                                         key: const ValueKey('correct-reveal'),
-                                         children: [
-                                           const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
-                                           const SizedBox(width: 6),
-                                           const RewardSparkle(show: true),
-                                         ],
-                                       )
-                                     : (revealed && isSel && !isCorrect)
-                                         ? const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8), key: ValueKey('wrong-reveal'))
-                                         : const SizedBox.shrink(key: ValueKey('none')),
-                                 ),
+                                  SizedBox(
+                                    width: 64,
+                                    height: 24,
+                                    child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: AnimatedSwitcher(
+                                        duration: MotionTokens.short,
+                                        transitionBuilder: (child, anim) => FadeTransition(
+                                          opacity: anim,
+                                          child: ScaleTransition(scale: anim, child: child),
+                                        ),
+                                        child: (revealed && isCorrect)
+                                            ? Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                key: const ValueKey('correct-reveal'),
+                                                children: [
+                                                  const Icon(Icons.check_rounded, color: Color(0xFF2AFADF), size: 18),
+                                                  const SizedBox(width: 4),
+                                                  const RewardSparkle(show: true, size: 14, burst: false),
+                                                ],
+                                              )
+                                            : (revealed && isSel && !isCorrect)
+                                                ? const Icon(
+                                                    Icons.close_rounded,
+                                                    color: Color(0xFFFF4FD8),
+                                                    size: 18,
+                                                    key: ValueKey('wrong-reveal'),
+                                                  )
+                                                : const SizedBox.shrink(key: ValueKey('none')),
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),

@@ -247,6 +247,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
   void dispose() {
     if (_isCallActive) {
       rtcVoiceService.disconnect();
+      unawaited(_setGlobalCallState(active: false));
     }
     _signalSub?.cancel();
     _voiceRecordTimer?.cancel();
@@ -1006,8 +1007,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
   Future<void> _setGlobalCallState({required bool active}) async {
     await settingsRepository.updateSetting('dm_active_call', {
       'active': active,
-      'other_id': widget.otherId,
-      'other_name': widget.otherName,
+      'other_id': active ? widget.otherId : null,
+      'other_name': active ? widget.otherName : null,
+      'ended_at': active ? null : DateTime.now().toIso8601String(),
     });
   }
 
@@ -1307,6 +1309,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   Future<void> _endVoiceCall({required bool showRemoteEnded, String? message}) async {
     await rtcVoiceService.disconnect();
+    await _setGlobalCallState(active: false);
     if (!mounted) return;
     _callTimer?.cancel();
     _callSetupTimeoutTimer?.cancel();
@@ -1321,7 +1324,6 @@ class _DmChatScreenState extends State<DmChatScreen> {
       _liveCaption = null;
       _smoothedCallQualityScore = 78;
     });
-    await _setGlobalCallState(active: false);
     await showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -3029,6 +3031,34 @@ class _BubbleState extends State<_Bubble> {
   double _voiceSpeed = 1.0;
   Duration _voicePosition = Duration.zero;
   Duration _voiceDuration = Duration.zero;
+  double _swipeDx = 0;
+  bool _isSwipeDragging = false;
+
+  void _onSwipeDragUpdate(double deltaX) {
+    final next = _swipeDx + deltaX;
+    if (widget.isMe) {
+      // My messages reply with left swipe.
+      final clamped = next.clamp(-88.0, 0.0);
+      setState(() => _swipeDx = clamped);
+    } else {
+      // Incoming messages reply with right swipe.
+      final clamped = next.clamp(0.0, 88.0);
+      setState(() => _swipeDx = clamped);
+    }
+  }
+
+  void _finishSwipeGesture() {
+    const trigger = 54.0;
+    final shouldReply = widget.isMe ? _swipeDx <= -trigger : _swipeDx >= trigger;
+    setState(() {
+      _isSwipeDragging = false;
+      _swipeDx = 0;
+    });
+    if (shouldReply) {
+      HapticFeedback.selectionClick();
+      widget.onSwipeReply?.call();
+    }
+  }
 
   @override
   void initState() {
@@ -3104,36 +3134,38 @@ class _BubbleState extends State<_Bubble> {
           ),
         GestureDetector(
           onLongPress: widget.onLongPress,
-          onHorizontalDragEnd: (details) {
-            final v = details.primaryVelocity ?? 0;
-            if ((widget.isMe && v < -180) || (!widget.isMe && v > 180)) {
-              widget.onSwipeReply?.call();
-            }
-          },
+          onHorizontalDragStart: (_) => setState(() => _isSwipeDragging = true),
+          onHorizontalDragUpdate: (details) => _onSwipeDragUpdate(details.delta.dx),
+          onHorizontalDragEnd: (_) => _finishSwipeGesture(),
+          onHorizontalDragCancel: () => _finishSwipeGesture(),
           onTap: isVoice
               ? () => _handleVoiceBubbleTap(parsed.url)
               : (isFile && parsed.url != null ? () => widget.onTapFile?.call(parsed.url!) : null),
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 320),
-            padding: EdgeInsets.symmetric(
-              horizontal: isImage ? 6 : 14,
-              vertical: isImage ? 6 : 12,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: radius,
-              color: widget.isMe
-                  ? scheme.primary.withValues(alpha: 0.12)
-                  : scheme.onSurface.withValues(alpha: 0.07),
-              border: Border.all(
-                color: widget.isHighlighted
-                    ? scheme.tertiary.withValues(alpha: 0.9)
-                    : (widget.isMe
-                        ? scheme.primary.withValues(alpha: 0.24)
-                        : scheme.onSurface.withValues(alpha: 0.12)),
-                width: widget.isHighlighted ? 1.6 : 1,
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: _isSwipeDragging ? 0 : 180),
+            curve: Curves.easeOutCubic,
+            transform: Matrix4.translationValues(_swipeDx, 0, 0),
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 320),
+              padding: EdgeInsets.symmetric(
+                horizontal: isImage ? 6 : 14,
+                vertical: isImage ? 6 : 12,
               ),
-            ),
-            child: isImage
+              decoration: BoxDecoration(
+                borderRadius: radius,
+                color: widget.isMe
+                    ? scheme.primary.withValues(alpha: 0.12)
+                    : scheme.onSurface.withValues(alpha: 0.07),
+                border: Border.all(
+                  color: widget.isHighlighted
+                      ? scheme.tertiary.withValues(alpha: 0.9)
+                      : (widget.isMe
+                          ? scheme.primary.withValues(alpha: 0.24)
+                          : scheme.onSurface.withValues(alpha: 0.12)),
+                  width: widget.isHighlighted ? 1.6 : 1,
+                ),
+              ),
+              child: isImage
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: CachedNetworkImage(
@@ -3247,6 +3279,7 @@ class _BubbleState extends State<_Bubble> {
                                 ),
                             ],
                           ),
+            ),
           ),
         ),
         Padding(

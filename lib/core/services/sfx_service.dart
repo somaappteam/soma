@@ -40,6 +40,26 @@ class SfxService {
     }
   }
 
+
+  void answerCorrect({bool isStreak = false}) {
+    if (!_enabled) return;
+    if (isStreak) {
+      risingTone();
+      return;
+    }
+    SystemSound.play(SystemSoundType.alert);
+  }
+
+  void answerWrong() {
+    if (!_enabled) return;
+    SystemSound.play(SystemSoundType.click);
+    Future<void>.delayed(const Duration(milliseconds: 40), () {
+      if (_enabled) {
+        SystemSound.play(SystemSoundType.click);
+      }
+    });
+  }
+
   void sparkle() {
     if (_enabled) {
       SystemSound.play(SystemSoundType.alert);

@@ -244,11 +244,13 @@ class _CirclesScreenState extends State<CirclesScreen> {
                 ],
               ),
 
+              const SizedBox(height: 12),
+
 
               // Filters row
               Glass(
                 radius: BorderRadius.circular(18),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 child: isCompactWidth
                     ? Column(
                         children: [
