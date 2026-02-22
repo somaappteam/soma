@@ -1161,16 +1161,29 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                                       ),
                                       const SizedBox(width: 8),
                                       SizedBox(
-                                        width: 64,
-                                        height: 24,
+                                        width: 72,
+                                        height: 28,
                                         child: Align(
                                           alignment: Alignment.centerRight,
-                                          child: AnimatedSwitcher(
-                                            duration: MotionTokens.short,
-                                            transitionBuilder: (child, anim) => FadeTransition(
-                                              opacity: anim,
-                                              child: ScaleTransition(scale: anim, child: child),
-                                            ),
+                                          child: ClipRect(
+                                            child: AnimatedSwitcher(
+                                              duration: MotionTokens.short,
+                                              transitionBuilder: (child, anim) {
+                                                final slide = Tween<Offset>(
+                                                  begin: const Offset(0.16, 0),
+                                                  end: Offset.zero,
+                                                ).animate(CurvedAnimation(
+                                                  parent: anim,
+                                                  curve: Curves.easeOutCubic,
+                                                ));
+                                                return FadeTransition(
+                                                  opacity: anim,
+                                                  child: SlideTransition(
+                                                    position: slide,
+                                                    child: child,
+                                                  ),
+                                                );
+                                              },
                                             child: (showCorrect && isCorrect)
                                                 ? Row(
                                                     mainAxisSize: MainAxisSize.min,
@@ -1189,6 +1202,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                                                         key: ValueKey('wrong-reveal'),
                                                       )
                                                     : const SizedBox.shrink(key: ValueKey('none')),
+                                            ),
                                           ),
                                         ),
                                       ),

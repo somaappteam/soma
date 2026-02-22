@@ -75,43 +75,47 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isLight = Theme.of(context).brightness == Brightness.light;
+    final logoColor = isLight ? const Color(0xFF1E325A) : Colors.white;
+    final glowA = isLight
+        ? const Color(0xFF73A7FF).withValues(alpha: 0.55)
+        : T.neonA.withValues(alpha: 0.6);
+    final glowB = isLight
+        ? const Color(0xFFA8C9FF).withValues(alpha: 0.48)
+        : T.neonB.withValues(alpha: 0.4);
+
     return Scaffold(
+      backgroundColor: const Color(0xFF02071A),
       body: Center(
         child: FadeTransition(
           opacity: _fade,
           child: ScaleTransition(
             scale: _scale,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Glowing Text
-                Text(
-                  l10n.appTitle,
-                  style: GoogleFonts.orbitron(
-                    fontSize: 64,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 8,
-                    color: Colors.white,
-                    shadows: [
-                      BoxShadow(
-                        color: T.neonA.withValues(alpha: 0.6),
-                        blurRadius: 40,
-                        spreadRadius: 10,
-                      ),
-                      BoxShadow(
-                        color: T.neonB.withValues(alpha: 0.4),
-                        blurRadius: 80,
-                        spreadRadius: 20,
-                      ),
-                    ],
+            child: Text(
+              l10n.appTitle,
+              style: GoogleFonts.orbitron(
+                fontSize: 64,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 8,
+                color: logoColor,
+                shadows: [
+                  BoxShadow(
+                    color: glowA,
+                    blurRadius: 34,
+                    spreadRadius: 8,
                   ),
-                ),
-              ],
+                  BoxShadow(
+                    color: glowB,
+                    blurRadius: 70,
+                    spreadRadius: 16,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
-
   }
 }
+

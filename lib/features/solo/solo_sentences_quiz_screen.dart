@@ -841,16 +841,29 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                                   ),
                                   const SizedBox(width: 8),
                                   SizedBox(
-                                    width: 64,
-                                    height: 24,
+                                    width: 72,
+                                    height: 28,
                                     child: Align(
                                       alignment: Alignment.centerRight,
-                                      child: AnimatedSwitcher(
-                                        duration: MotionTokens.short,
-                                        transitionBuilder: (child, anim) => FadeTransition(
-                                          opacity: anim,
-                                          child: ScaleTransition(scale: anim, child: child),
-                                        ),
+                                      child: ClipRect(
+                                        child: AnimatedSwitcher(
+                                          duration: MotionTokens.short,
+                                          transitionBuilder: (child, anim) {
+                                            final slide = Tween<Offset>(
+                                              begin: const Offset(0.16, 0),
+                                              end: Offset.zero,
+                                            ).animate(CurvedAnimation(
+                                              parent: anim,
+                                              curve: Curves.easeOutCubic,
+                                            ));
+                                            return FadeTransition(
+                                              opacity: anim,
+                                              child: SlideTransition(
+                                                position: slide,
+                                                child: child,
+                                              ),
+                                            );
+                                          },
                                         child: (revealed && isCorrect)
                                             ? Row(
                                                 mainAxisSize: MainAxisSize.min,
@@ -869,6 +882,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                                                     key: ValueKey('wrong-reveal'),
                                                   )
                                                 : const SizedBox.shrink(key: ValueKey('none')),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -973,8 +987,6 @@ class _SentencePromptWidget extends StatelessWidget {
                   text: correctAnswer,
                   style: baseStyle.copyWith(
                     color: const Color(0xFF2AFADF),
-                    decoration: TextDecoration.underline,
-                    decorationColor: const Color(0xFF2AFADF),
                   ),
                 ),
             ],

@@ -217,7 +217,12 @@ class CoursesRepository {
         return xp > 0 || lastAccessed != null;
       }).toList();
 
-      return [...startedLocalCourses, ...customCourses]
+      final mergedCourses = _mergeUniqueCourses([
+        ...startedLocalCourses,
+        ...customCourses,
+      ]);
+
+      return mergedCourses
           .where((c) => !removedIds.contains(c.id))
           .map((c) {
             final isCustom = customIds.contains(c.id);
@@ -229,10 +234,20 @@ class CoursesRepository {
 
     } catch (e) {
       // Fallback
-      return [...localCourses, ..._customCourses]
+      return _mergeUniqueCourses([...localCourses, ..._customCourses])
           .where((c) => !_removedCourseIds.contains(c.id))
           .toList();
     }
+  }
+
+  List<SoloCourse> _mergeUniqueCourses(List<SoloCourse> courses) {
+    final unique = <SoloCourse>[];
+    for (final course in courses) {
+      if (!unique.any((existing) => _isSameCourse(existing, course))) {
+        unique.add(course);
+      }
+    }
+    return unique;
   }
 
   bool _isSameCourse(SoloCourse a, SoloCourse b) {
