@@ -345,6 +345,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
                 // Main card
                 Glass(
+                  depth: GlassDepth.l3,
+                  selected: true,
                   padding: const EdgeInsets.all(16),
                   radius: BorderRadius.circular(22),
                   child: Column(
@@ -491,6 +493,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
                 // Leaderboard
                 Glass(
+                  depth: GlassDepth.l3,
+                  selected: true,
                   padding: const EdgeInsets.all(14),
                   radius: BorderRadius.circular(22),
                   child: Column(

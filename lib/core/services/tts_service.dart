@@ -9,6 +9,11 @@ class TtsService {
   bool _isSpeaking = false;
   double get rate => _rate;
 
+  double _engineRate(double uiRate) {
+    // Keep 1.0x as natural speed while preserving slower/faster presets.
+    return (uiRate * 0.75).clamp(0.2, 1.0);
+  }
+
   // Maps our internal 2-letter codes to preferred BCP-47 locales for TTS.
   // TTS engines expect these regional variants; bare 2-letter codes often fail.
   static const Map<String, String> _langToBcp47 = {
@@ -90,7 +95,7 @@ class TtsService {
       }
 
       // Map UI rate to engine rate (e.g., UI 1.0 -> Engine 0.75) for natural playback.
-      await _tts.setSpeechRate(_rate * 0.75);
+      await _tts.setSpeechRate(_engineRate(_rate));
 
       _tts.setStartHandler(() {
         _isSpeaking = true;
@@ -116,7 +121,7 @@ class TtsService {
     try {
       await _ensureInit();
       // Map UI rate to engine rate (e.g., UI 1.0 -> Engine 0.75) for natural playback.
-      await _tts.setSpeechRate(rate * 0.75);
+      await _tts.setSpeechRate(_engineRate(rate));
     } catch (e) {
       debugPrint('Error setting TTS rate: $e');
     }
@@ -179,7 +184,7 @@ class TtsService {
       }
 
       // Re-apply rate — some engines reset it when the language changes.
-      await _tts.setSpeechRate(_rate);
+      await _tts.setSpeechRate(_engineRate(_rate));
 
       if (_isSpeaking) {
         await _tts.stop();

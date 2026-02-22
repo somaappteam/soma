@@ -120,7 +120,17 @@ Without this, you cannot optimize pricing quality.
 - Advanced progress analytics
 - Early access game modes
 
-## 9) Rollout order to look professional quickly
+## 9) Rollout checklist (execution guardrails)
+
+Before shipping a new pricing model, confirm:
+
+- Product copy is consistent across paywall, settings, and billing screens.
+- Pricing experiments have a clear success metric and end date.
+- Support FAQ is updated for trial, billing, and cancellation questions.
+- Instrumentation is verified in production analytics dashboards.
+- Plan entitlements are tested end-to-end for Free, Plus, and Pro users.
+
+## 10) Rollout order to look professional quickly
 
 1. **Copy/limits pass** (exact limits + consistent wording)
 2. **Billing trust pass** (trial terms, manage/restore UI)

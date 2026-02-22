@@ -18,10 +18,10 @@ class QuizRepository {
   final VocabSrsStore _srsStore = VocabSrsStore();
 
   Future<List<Map<String, dynamic>>> getVocabQuestions(String courseId, int limit,
-      {bool reverse = false}) async {
+      {bool reverse = false, Set<int>? onlyConceptIds, bool preferDue = true}) async {
     final langs = _parseCourseLangs(courseId);
     if (langs == null) return [];
-    final dueConcepts = await _srsStore.dueConceptIds(courseId);
+    final dueConcepts = preferDue ? await _srsStore.dueConceptIds(courseId) : <int>[];
 
     try {
       List<Map<String, dynamic>> sourceList;
@@ -61,7 +61,9 @@ class QuizRepository {
         final concept = _parseInt(row['concept_id']);
         if (concept == null || row['word'] == null) continue;
         if (sourceByConcept.containsKey(concept)) {
-          candidates.add(row);
+          if (onlyConceptIds == null || onlyConceptIds.contains(concept)) {
+            candidates.add(row);
+          }
         }
       }
 
@@ -148,7 +150,7 @@ class QuizRepository {
   }
 
   // Fallback or future implementation for Sentences
-  Future<List<Map<String, dynamic>>> getSentenceQuestions(String courseId, int limit) async {
+  Future<List<Map<String, dynamic>>> getSentenceQuestions(String courseId, int limit, {Set<int>? onlyConceptIds}) async {
     final langs = _parseCourseLangs(courseId);
     if (langs == null) return [];
 
@@ -190,7 +192,9 @@ class QuizRepository {
         final concept = _parseInt(row['concept_id']);
         if (concept == null || row['sentence'] == null) continue;
         if (sourceByConcept.containsKey(concept)) {
-          candidates.add(row);
+          if (onlyConceptIds == null || onlyConceptIds.contains(concept)) {
+            candidates.add(row);
+          }
         }
       }
 
@@ -259,6 +263,46 @@ class QuizRepository {
       conceptId: conceptId,
       correct: correct,
     );
+  }
+
+
+  Future<Set<int>> _reviewConceptIds(String courseId, {required String scope}) async {
+    final entries = await _srsStore.load(courseId);
+    if (entries.isEmpty) return <int>{};
+
+    if (scope == 'struggling') {
+      return entries.values
+          .where((entry) => entry.intervalDays <= 1 && entry.easeFactor < 2.5)
+          .map((entry) => entry.conceptId)
+          .toSet();
+    }
+
+    return entries.keys.toSet();
+  }
+
+  Future<List<Map<String, dynamic>>> getVocabReviewQuestions(
+    String courseId,
+    int limit, {
+    required String scope,
+  }) async {
+    final conceptIds = await _reviewConceptIds(courseId, scope: scope);
+    if (conceptIds.isEmpty) return [];
+    return getVocabQuestions(
+      courseId,
+      limit,
+      onlyConceptIds: conceptIds,
+      preferDue: false,
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getSentenceReviewQuestions(
+    String courseId,
+    int limit, {
+    required String scope,
+  }) async {
+    final conceptIds = await _reviewConceptIds(courseId, scope: scope);
+    if (conceptIds.isEmpty) return [];
+    return getSentenceQuestions(courseId, limit, onlyConceptIds: conceptIds);
   }
 
   _LangPair? _parseCourseLangs(String courseId) {
@@ -444,7 +488,7 @@ class QuizRepository {
 
   Future<List<Map<String, dynamic>>> getVocabQuestionsFromSupabase(
       String courseId, int limit,
-      {bool reverse = false}) async {
+      {bool reverse = false, Set<int>? onlyConceptIds}) async {
     final langs = _parseCourseLangs(courseId);
     if (langs == null) return [];
 
@@ -485,7 +529,9 @@ class QuizRepository {
       final candidates = <Map<String, dynamic>>[];
       targetByConcept.forEach((concept, row) {
         if (sourceByConcept.containsKey(concept)) {
-          candidates.add(row);
+          if (onlyConceptIds == null || onlyConceptIds.contains(concept)) {
+            candidates.add(row);
+          }
         }
       });
 
@@ -547,7 +593,7 @@ class QuizRepository {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getSentenceQuestionsFromSupabase(String courseId, int limit) async {
+  Future<List<Map<String, dynamic>>> getSentenceQuestionsFromSupabase(String courseId, int limit, {Set<int>? onlyConceptIds}) async {
     final langs = _parseCourseLangs(courseId);
     if (langs == null) return [];
 
@@ -586,7 +632,9 @@ class QuizRepository {
       final candidates = <Map<String, dynamic>>[];
       targetByConcept.forEach((concept, row) {
         if (sourceByConcept.containsKey(concept)) {
-          candidates.add(row);
+          if (onlyConceptIds == null || onlyConceptIds.contains(concept)) {
+            candidates.add(row);
+          }
         }
       });
 

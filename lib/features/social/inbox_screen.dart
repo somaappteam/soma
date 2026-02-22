@@ -123,6 +123,173 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
 
+  Future<void> _toggleMutedThread(String otherId, {required bool next}) async {
+    setState(() {
+      if (next) {
+        _mutedThreadIds.add(otherId);
+      } else {
+        _mutedThreadIds.remove(otherId);
+      }
+    });
+    await chatRepository.setConversationPreference(otherId, muted: next);
+  }
+
+  Future<void> _toggleArchivedThread(String otherId, {required bool next}) async {
+    setState(() {
+      if (next) {
+        _archivedThreadIds.add(otherId);
+      } else {
+        _archivedThreadIds.remove(otherId);
+      }
+    });
+    await chatRepository.setConversationPreference(otherId, archived: next);
+  }
+
+  Future<void> _togglePreviewHidden(String otherId, {required bool next}) async {
+    setState(() {
+      if (next) {
+        _hiddenPreviewThreadIds.add(otherId);
+      } else {
+        _hiddenPreviewThreadIds.remove(otherId);
+      }
+    });
+    await settingsRepository.updateSetting('dm_hide_preview_$otherId', next);
+  }
+
+  Future<void> _removeThreadFromInbox(String otherId, String name) async {
+    setState(() => _deletedThreadIds.add(otherId));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text('Removed @$name from this inbox view'),
+          action: SnackBarAction(
+            label: 'Undo',
+            onPressed: () => setState(() => _deletedThreadIds.remove(otherId)),
+          ),
+        ),
+      );
+  }
+
+
+  Future<bool> _confirmPermanentDelete(String name) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete chat permanently?'),
+        content: Text('This will permanently delete all messages with @$name.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    return result == true;
+  }
+
+  Future<void> _showThreadActionsSheet({
+    required String otherId,
+    required String name,
+    required bool isPinned,
+    required bool isMuted,
+    required bool isArchived,
+    required bool hidePreview,
+  }) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(isPinned ? Icons.push_pin_outlined : Icons.push_pin_rounded),
+              title: Text(isPinned ? 'Unpin chat' : 'Pin chat'),
+              onTap: () async {
+                Navigator.pop(context);
+                await _togglePinnedThread(otherId, next: !isPinned);
+              },
+            ),
+            ListTile(
+              leading: Icon(isMuted ? Icons.notifications_active_rounded : Icons.notifications_off_rounded),
+              title: Text(isMuted ? 'Unmute chat' : 'Mute chat'),
+              onTap: () async {
+                Navigator.pop(context);
+                await _toggleMutedThread(otherId, next: !isMuted);
+              },
+            ),
+            ListTile(
+              leading: Icon(hidePreview ? Icons.visibility_rounded : Icons.visibility_off_rounded),
+              title: Text(hidePreview ? 'Show message preview' : 'Hide message preview'),
+              onTap: () async {
+                Navigator.pop(context);
+                await _togglePreviewHidden(otherId, next: !hidePreview);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.snooze_rounded),
+              title: const Text('Snooze notifications'),
+              onTap: () async {
+                Navigator.pop(context);
+                await _showSnoozeSheet(otherId);
+              },
+            ),
+            ListTile(
+              leading: Icon(isArchived ? Icons.unarchive_rounded : Icons.archive_rounded),
+              title: Text(isArchived ? 'Move to inbox' : 'Archive chat'),
+              onTap: () async {
+                Navigator.pop(context);
+                await _toggleArchivedThread(otherId, next: !isArchived);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_forever_rounded),
+              title: const Text('Delete permanently'),
+              textColor: Theme.of(context).colorScheme.error,
+              iconColor: Theme.of(context).colorScheme.error,
+              onTap: () async {
+                Navigator.pop(context);
+                final shouldDelete = await _confirmPermanentDelete(name);
+                if (!shouldDelete) return;
+                try {
+                  await chatRepository.deleteConversation(otherId);
+                  if (!mounted) return;
+                  setState(() => _deletedThreadIds.add(otherId));
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(SnackBar(content: Text('Deleted chat with @$name')));
+                } catch (e) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context)
+                    ..hideCurrentSnackBar()
+                    ..showSnackBar(SnackBar(content: Text('Failed to delete chat: $e')));
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.remove_circle_outline_rounded),
+              title: const Text('Remove from list'),
+              onTap: () async {
+                Navigator.pop(context);
+                await _removeThreadFromInbox(otherId, name);
+              },
+            ),
+            const SizedBox(height: 6),
+          ],
+        ),
+      ),
+    );
+  }
+
+
 
   Future<void> _toggleSearchBar() async {
     HapticFeedback.selectionClick();
@@ -325,16 +492,6 @@ class _InboxScreenState extends State<InboxScreen> {
       context: context,
       showDragHandle: true,
       builder: (context) {
-        final options = [
-          _InboxFilter.all,
-          _InboxFilter.priority,
-          _InboxFilter.unread,
-          _InboxFilter.friends,
-          _InboxFilter.requests,
-          _InboxFilter.groups,
-          _InboxFilter.muted,
-          _InboxFilter.archived,
-        ];
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
@@ -343,7 +500,7 @@ class _InboxScreenState extends State<InboxScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'View options',
+                  'Inbox view',
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w900,
@@ -351,37 +508,6 @@ class _InboxScreenState extends State<InboxScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  'Smart presets',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    _OptionChip(
-                      label: 'Focus',
-                      selected: _filter == _InboxFilter.priority && _sort == _InboxSort.unreadFirst,
-                      onTap: () => _applyPreset('focus'),
-                    ),
-                    _OptionChip(
-                      label: 'Catch-up',
-                      selected: _filter == _InboxFilter.unread && _sort == _InboxSort.unreadFirst,
-                      onTap: () => _applyPreset('catchup'),
-                    ),
-                    _OptionChip(
-                      label: 'Friends-only',
-                      selected: _filter == _InboxFilter.friends && _sort == _InboxSort.latest,
-                      onTap: () => _applyPreset('friends'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 14),
                 Text(
                   'Sort',
                   style: TextStyle(
@@ -405,11 +531,6 @@ class _InboxScreenState extends State<InboxScreen> {
                       selected: _sort == _InboxSort.unreadFirst,
                       onTap: () => _setSort(_InboxSort.unreadFirst),
                     ),
-                    _OptionChip(
-                      label: 'Name',
-                      selected: _sort == _InboxSort.name,
-                      onTap: () => _setSort(_InboxSort.name),
-                    ),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -426,23 +547,18 @@ class _InboxScreenState extends State<InboxScreen> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    for (final option in options)
-                      _FilterPill(
-                        label: _filterLabel(option),
-                        selected: _filter == option,
-                        onTap: () {
-                          _setFilter(option);
-                        },
-                      ),
+                    _FilterPill(label: _filterLabel(_InboxFilter.all), selected: _filter == _InboxFilter.all, onTap: () => _setFilter(_InboxFilter.all)),
+                    _FilterPill(label: _filterLabel(_InboxFilter.unread), selected: _filter == _InboxFilter.unread, onTap: () => _setFilter(_InboxFilter.unread)),
+                    _FilterPill(label: _filterLabel(_InboxFilter.priority), selected: _filter == _InboxFilter.priority, onTap: () => _setFilter(_InboxFilter.priority)),
+                    _FilterPill(label: _filterLabel(_InboxFilter.archived), selected: _filter == _InboxFilter.archived, onTap: () => _setFilter(_InboxFilter.archived)),
                   ],
                 ),
-
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Done'),
+                  child: TextButton(
+                    onPressed: _resetViewOptions,
+                    child: const Text('Reset to default'),
                   ),
                 ),
               ],
@@ -744,21 +860,45 @@ class _InboxScreenState extends State<InboxScreen> {
                               confirmDismiss: (direction) async {
                                 if (direction == DismissDirection.startToEnd) {
                                   await _togglePinnedThread(otherId, next: !isPinned);
-                                } else {
-                                  await _showSnoozeSheet(otherId);
+                                  return false;
                                 }
-                                return false;
+
+                                final name = (t['otherName'] ?? l10n.unknown).toString();
+                                final shouldDelete = await _confirmPermanentDelete(name);
+                                if (!shouldDelete) return false;
+
+                                try {
+                                  await chatRepository.deleteConversation(otherId);
+                                  if (!mounted) return false;
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar()
+                                    ..showSnackBar(
+                                      SnackBar(content: Text('Deleted chat with @$name')),
+                                    );
+                                  return true;
+                                } catch (e) {
+                                  if (!mounted) return false;
+                                  ScaffoldMessenger.of(context)
+                                    ..hideCurrentSnackBar()
+                                    ..showSnackBar(
+                                      SnackBar(content: Text('Failed to delete chat: $e')),
+                                    );
+                                  return false;
+                                }
                               },
                               background: _SwipeActionBackground(
                                 alignment: Alignment.centerLeft,
                                 icon: isPinned ? Icons.push_pin_outlined : Icons.push_pin_rounded,
                                 label: isPinned ? 'Unpin' : 'Pin',
                               ),
-                              secondaryBackground: _SwipeActionBackground(
+                              secondaryBackground: const _SwipeActionBackground(
                                 alignment: Alignment.centerRight,
-                                icon: Icons.snooze_rounded,
-                                label: 'Snooze',
+                                icon: Icons.delete_forever_rounded,
+                                label: 'Delete',
                               ),
+                              onDismissed: (_) {
+                                setState(() => _deletedThreadIds.add(otherId));
+                              },
                                         child: _ThreadRow(
                                 otherId: otherId,
                                 name: t['otherName'] ?? l10n.unknown,
@@ -795,6 +935,14 @@ class _InboxScreenState extends State<InboxScreen> {
                                   );
                                   if (mounted) setState(() => _refreshNonce++);
                                 },
+                                onLongPress: () => _showThreadActionsSheet(
+                                  otherId: otherId,
+                                  name: (t['otherName'] ?? l10n.unknown).toString(),
+                                  isPinned: isPinned,
+                                  isMuted: isMuted,
+                                  isArchived: _archivedThreadIds.contains(otherId),
+                                  hidePreview: hidePreview,
+                                ),
                                 ),
                               ),
                             );
@@ -946,6 +1094,7 @@ class _OptionChip extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
@@ -1144,6 +1293,7 @@ class _ThreadRow extends StatelessWidget {
   final int? voiceFeedbackScore;
   final bool verifiedSeriousLearner;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   const _ThreadRow({
     required this.otherId,
@@ -1169,6 +1319,7 @@ class _ThreadRow extends StatelessWidget {
     required this.voiceFeedbackScore,
     required this.verifiedSeriousLearner,
     required this.onTap,
+    this.onLongPress,
   });
 
   @override
@@ -1179,6 +1330,7 @@ class _ThreadRow extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(

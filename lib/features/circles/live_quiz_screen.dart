@@ -57,9 +57,9 @@ class LiveQuizScreen extends StatefulWidget {
 }
 
 class _LiveQuizScreenState extends State<LiveQuizScreen> {
-  static const double _leaderChipWidth = 48;
-  static const double _leaderChipHeight = 58;
-  static const double _leaderChipSpacing = 8;
+  static const double _leaderChipWidth = 62;
+  static const double _leaderChipHeight = 84;
+  static const double _leaderChipSpacing = 10;
 
 
   late List<_Question> questions;
@@ -361,10 +361,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     if (myAnswerIndex != null) {
       if (myAnswerCorrect) {
         hapticsService.mediumImpact();
-      sfxService.softClick();
+      sfxService.answerCorrect();
       } else {
         hapticsService.lightImpact();
-      sfxService.click();
+      sfxService.answerWrong();
       }
     }
     
@@ -923,24 +923,47 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
 
                 // Leaderboard
                 Glass(
-                  radius: BorderRadius.circular(18),
-                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                  child: StreamBuilder<Map<String, bool>>(
-                    stream: presenceRepository.streamMultipleOnlineStatuses(
-                      leaders.map((l) => l.userId).whereType<String>().toList(),
-                    ),
-                    builder: (context, presenceSnapshot) {
-                      final presence = presenceSnapshot.data ?? {};
-                      return _LiveLeaderboardStrip(
-                        leaders: sortedLeaders,
-                        presence: presence,
-                        onAvatarTap: (leader) {
-                          if (leader.userId != null) {
-                            _openProfileSheet(leader.userId);
-                          }
-                        },
-                      );
-                    }
+                  depth: GlassDepth.l3,
+                  selected: true,
+                  radius: BorderRadius.circular(20),
+                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.leaderboard_rounded, color: scheme.onSurface, size: 18),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.resultsLeaderboardTitle,
+                            style: TextStyle(
+                              color: scheme.onSurface,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const Spacer(),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      StreamBuilder<Map<String, bool>>(
+                        stream: presenceRepository.streamMultipleOnlineStatuses(
+                          leaders.map((l) => l.userId).whereType<String>().toList(),
+                        ),
+                        builder: (context, presenceSnapshot) {
+                          final presence = presenceSnapshot.data ?? {};
+                          return _LiveLeaderboardStrip(
+                            leaders: sortedLeaders,
+                            presence: presence,
+                            onAvatarTap: (leader) {
+                              if (leader.userId != null) {
+                                _openProfileSheet(leader.userId);
+                              }
+                            },
+                          );
+                        }
+                      ),
+                    ],
                   ),
                 ),
                   
@@ -1085,10 +1108,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                           child: PressableScale(
                             onTap: (canPlay && !isLocked && !revealed) ? () => _select(i) : null,
                             child: AnimatedScale(
-                                scale: showCorrect && isCorrect ? 1.02 : 1,
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.easeOut,
-                                child: AnimatedOpacity(
+                              scale: showCorrect && isCorrect && isSelected ? 1.015 : 1,
+                              duration: MotionTokens.short,
+                              curve: MotionTokens.emphasisCurve,
+                              child: AnimatedOpacity(
                                   opacity: 1.0,
                                   duration: const Duration(milliseconds: 200),
                                   curve: MotionTokens.standardCurve,
@@ -1097,6 +1120,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                                     curve: MotionTokens.standardCurve,
                                     constraints: const BoxConstraints(minHeight: 72),
                                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                                    clipBehavior: Clip.antiAlias,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(18),
                                     color: bg,
@@ -1126,6 +1150,8 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                                               : TextDirection.ltr,
                                           child: Text(
                                             _choices[i],
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
                                             style: TextStyle(
                                                 color: scheme.onSurface.withValues(alpha: 0.92),
                                                 fontSize: 16,
@@ -1133,23 +1159,38 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                                           ),
                                         ),
                                       ),
-                                       const SizedBox(width: 8),
-                                       AnimatedSwitcher(
-                                        duration: MotionTokens.short,
-                                        transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: ScaleTransition(scale: anim, child: child)),
-                                        child: (showCorrect && isCorrect)
-                                          ? Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              key: const ValueKey('correct-reveal'),
-                                              children: [
-                                                const Icon(Icons.check_rounded, color: Color(0xFF2AFADF)),
-                                                const SizedBox(width: 6),
-                                                const RewardSparkle(show: true),
-                                              ],
-                                            )
-                                          : (showCorrect && isSelected && !isCorrect)
-                                              ? const Icon(Icons.close_rounded, color: Color(0xFFFF4FD8), key: ValueKey('wrong-reveal'))
-                                              : const SizedBox.shrink(key: ValueKey('none')),
+                                      const SizedBox(width: 8),
+                                      SizedBox(
+                                        width: 64,
+                                        height: 24,
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: AnimatedSwitcher(
+                                            duration: MotionTokens.short,
+                                            transitionBuilder: (child, anim) => FadeTransition(
+                                              opacity: anim,
+                                              child: ScaleTransition(scale: anim, child: child),
+                                            ),
+                                            child: (showCorrect && isCorrect)
+                                                ? Row(
+                                                    mainAxisSize: MainAxisSize.min,
+                                                    key: const ValueKey('correct-reveal'),
+                                                    children: [
+                                                      const Icon(Icons.check_rounded, color: Color(0xFF2AFADF), size: 18),
+                                                      const SizedBox(width: 4),
+                                                      const RewardSparkle(show: true, size: 14, burst: false),
+                                                    ],
+                                                  )
+                                                : (showCorrect && isSelected && !isCorrect)
+                                                    ? const Icon(
+                                                        Icons.close_rounded,
+                                                        color: Color(0xFFFF4FD8),
+                                                        size: 18,
+                                                        key: ValueKey('wrong-reveal'),
+                                                      )
+                                                    : const SizedBox.shrink(key: ValueKey('none')),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -1237,38 +1278,48 @@ class _LiveLeaderboardStrip extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final totalWidth =
-        (leaders.length * (_LiveQuizScreenState._leaderChipWidth + _LiveQuizScreenState._leaderChipSpacing)) + 16;
+    const visibleSlots = 5;
+    final totalWidth = (leaders.length * _LiveQuizScreenState._leaderChipWidth) +
+        (max(0, leaders.length - 1) * _LiveQuizScreenState._leaderChipSpacing);
+    final maxVisibleWidth = (visibleSlots * _LiveQuizScreenState._leaderChipWidth) +
+        ((visibleSlots - 1) * _LiveQuizScreenState._leaderChipSpacing);
+    final visibleWidth = min(totalWidth, maxVisibleWidth);
 
     return SizedBox(
       height: _LiveQuizScreenState._leaderChipHeight,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        clipBehavior: Clip.none,
+      child: Align(
+        alignment: Alignment.center,
         child: SizedBox(
-          width: max(MediaQuery.of(context).size.width, totalWidth),
-          child: Stack(
+          width: visibleWidth,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             clipBehavior: Clip.none,
-            children: leaders.asMap().entries.map((entry) {
-              final index = entry.key;
-              final leader = entry.value;
-              // Center the strip if items are few
-              final startOffset = max(0.0, (MediaQuery.of(context).size.width - totalWidth) / 2) + 16;
+            child: SizedBox(
+              width: totalWidth,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: leaders.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final leader = entry.value;
 
-              return AnimatedPositioned(
-                key: ValueKey('strip-${leader.userId ?? leader.name}'),
-                duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-                left: startOffset + (index * (_LiveQuizScreenState._leaderChipWidth + _LiveQuizScreenState._leaderChipSpacing)),
-                top: 0,
-                child: _CompactLeaderChip(
-                  rank: index + 1,
-                  leader: leader,
-                  isOnline: leader.userId != null && (presence[leader.userId] ?? false),
-                  onTap: onAvatarTap == null ? null : () => onAvatarTap!(leader),
-                ),
-              );
-            }).toList(),
+                  return AnimatedPositioned(
+                    key: ValueKey('strip-${leader.userId ?? leader.name}'),
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOut,
+                    left: index *
+                        (_LiveQuizScreenState._leaderChipWidth +
+                            _LiveQuizScreenState._leaderChipSpacing),
+                    top: 0,
+                    child: _CompactLeaderChip(
+                      rank: index + 1,
+                      leader: leader,
+                      isOnline: leader.userId != null && (presence[leader.userId] ?? false),
+                      onTap: onAvatarTap == null ? null : () => onAvatarTap!(leader),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
           ),
         ),
       ),
@@ -1291,19 +1342,19 @@ class _CompactLeaderChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final borderColor = leader.isMe
         ? const Color(0xFF33D6FF)
-        : Colors.white.withValues(alpha: 0.2);
-    
+        : Colors.white.withValues(alpha: 0.28);
+
     Color? statusColor;
     IconData? statusIcon;
-    
     if (leader.lastAnswer == LeaderboardAnswer.correct) {
       statusColor = const Color(0xFF2AFADF);
-      statusIcon = Icons.check;
+      statusIcon = Icons.check_rounded;
     } else if (leader.lastAnswer == LeaderboardAnswer.wrong) {
       statusColor = const Color(0xFFFF4FD8);
-      statusIcon = Icons.close;
+      statusIcon = Icons.close_rounded;
     }
 
     return SizedBox(
@@ -1314,70 +1365,120 @@ class _CompactLeaderChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
-              width: 36,
-              height: 36,
+              width: 50,
+              height: 50,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
+                  if (statusColor != null)
+                    TweenAnimationBuilder<double>(
+                      key: ValueKey('${leader.userId ?? leader.name}-pulse-${leader.lastAnswer.name}'),
+                      tween: Tween(begin: 0.84, end: 1.0),
+                      duration: const Duration(milliseconds: 380),
+                      curve: Curves.easeOutBack,
+                      builder: (context, value, child) {
+                        return Transform.scale(scale: value, child: child);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: statusColor.withValues(alpha: 0.9),
+                            width: 3,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: statusColor.withValues(alpha: 0.45),
+                              blurRadius: 14,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   Container(
+                    margin: const EdgeInsets.all(4),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: borderColor, width: 1.5),
-                      boxShadow: leader.isMe ? [
-                        BoxShadow(
-                          color: const Color(0xFF33D6FF).withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                        )
-                      ] : null,
+                      border: Border.all(color: borderColor, width: 1.8),
+                      boxShadow: leader.isMe
+                          ? [
+                              BoxShadow(
+                                color: const Color(0xFF33D6FF).withValues(alpha: 0.34),
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                              ),
+                            ]
+                          : null,
                     ),
                     child: _AvatarBubble(
                       name: leader.name,
                       heroTag: leader.userId == null ? null : "profile-avatar-${leader.userId}",
-                       muted: leader.isMuted,
-                       speaking: leader.isSpeaking,
-                       isOnline: isOnline,
-                       avatarUrl: leader.avatarUrl,
-                       size: 32,
-                     ),
+                      muted: leader.isMuted,
+                      speaking: leader.isSpeaking,
+                      isOnline: isOnline,
+                      avatarUrl: leader.avatarUrl,
+                      size: 40,
+                    ),
                   ),
                   if (statusColor != null)
                     Positioned(
-                      right: -2,
-                      bottom: -2,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          color: statusColor,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.black, width: 1.5),
+                      right: -1,
+                      top: -1,
+                      child: TweenAnimationBuilder<double>(
+                        key: ValueKey('${leader.userId ?? leader.name}-badge-${leader.lastAnswer.name}'),
+                        tween: Tween(begin: 0.7, end: 1.0),
+                        duration: const Duration(milliseconds: 320),
+                        curve: Curves.easeOutBack,
+                        builder: (context, value, child) {
+                          return Transform.scale(scale: value, child: child);
+                        },
+                        child: Container(
+                          width: 22,
+                          height: 22,
+                          decoration: BoxDecoration(
+                            color: statusColor,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: const Color(0xFF111323), width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: statusColor.withValues(alpha: 0.5),
+                                blurRadius: 8,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                          child: Icon(statusIcon, size: 15, color: const Color(0xFF111323)),
                         ),
-                        child: Icon(statusIcon, size: 10, color: Colors.black),
                       ),
                     ),
                 ],
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
             Text(
               leader.name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: leader.isMe ? const Color(0xFF33D6FF) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
-                fontWeight: leader.isMe ? FontWeight.w800 : FontWeight.w600,
-                fontSize: 9,
+                color: leader.isMe ? const Color(0xFF33D6FF) : scheme.onSurface.withValues(alpha: 0.92),
+                fontWeight: leader.isMe ? FontWeight.w800 : FontWeight.w700,
+                fontSize: 10,
+                height: 1,
               ),
             ),
-             Text(
-                '${leader.score}',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 8,
-                ),
+            const SizedBox(height: 2),
+            Text(
+              '${leader.score}',
+              style: TextStyle(
+                color: scheme.onSurface.withValues(alpha: 0.76),
+                fontWeight: FontWeight.w700,
+                fontSize: 9,
+                height: 1,
               ),
+            ),
           ],
         ),
       ),
@@ -1408,7 +1509,7 @@ class _BottomActionBar extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _CircleActionButton(
-          icon: readingEnabled ? Icons.text_fields_rounded : Icons.text_fields_outlined,
+          icon: readingEnabled ? Icons.sort_by_alpha_rounded : Icons.sort_by_alpha_outlined,
           onTap: onToggleReading,
         ),
         const SizedBox(width: 10),
@@ -1854,8 +1955,8 @@ class _VocabPromptLine extends StatelessWidget {
                           style: const TextStyle(
                             color: Color(0xFF2AFADF),
                             fontWeight: FontWeight.w900,
-                            fontSize: 18,
-                            height: 1.2,
+                            fontSize: 22,
+                            height: 1.15,
                           ),
                         ),
                         TextSpan(
@@ -1863,8 +1964,8 @@ class _VocabPromptLine extends StatelessWidget {
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w900,
-                            fontSize: 18,
-                            height: 1.2,
+                            fontSize: 22,
+                            height: 1.15,
                           ),
                         ),
                       ]
@@ -1874,8 +1975,8 @@ class _VocabPromptLine extends StatelessWidget {
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w900,
-                            fontSize: 18,
-                            height: 1.2,
+                            fontSize: 22,
+                            height: 1.15,
                           ),
                         ),
                       ],

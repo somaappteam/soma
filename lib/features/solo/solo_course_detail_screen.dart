@@ -23,6 +23,7 @@ class SoloCourseDetailScreen extends StatelessWidget {
           builder: (context, constraints) {
             final compactHeight = constraints.maxHeight < 760;
             final sectionSpacing = compactHeight ? 10.0 : 12.0;
+            final reviewTopSpacing = compactHeight ? 18.0 : 24.0;
             final topSpacing = compactHeight ? 12.0 : 18.0;
 
             return Align(
@@ -65,7 +66,7 @@ class SoloCourseDetailScreen extends StatelessWidget {
                               subtitle: l10n.soloModeSentencesSubtitle,
                               onTap: () => _go(context, SoloMode.sentences),
                             ),
-                            SizedBox(height: sectionSpacing),
+                            SizedBox(height: reviewTopSpacing),
                             Glass(
                               radius: BorderRadius.circular(22),
                               padding: const EdgeInsets.all(14),

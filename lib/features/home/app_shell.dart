@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' show clampDouble;
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -418,12 +419,53 @@ class _GlobalActiveCallOverlay extends StatefulWidget {
 }
 
 class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
+  static const String _overlayOffsetKey = 'dm_global_call_overlay_offset';
   late final Stream<Map<String, dynamic>> _settingsStream;
+  Offset _overlayOffset = const Offset(14, 16);
 
   @override
   void initState() {
     super.initState();
     _settingsStream = settingsRepository.getSettingsStream();
+    _loadOverlayOffset();
+  }
+
+  Future<void> _loadOverlayOffset() async {
+    try {
+      final settings = await settingsRepository.getSettings();
+      final raw = settings[_overlayOffsetKey];
+      if (raw is Map) {
+        final dx = double.tryParse('${raw['dx']}');
+        final dy = double.tryParse('${raw['dy']}');
+        if (dx != null && dy != null && mounted) {
+          setState(() => _overlayOffset = Offset(dx, dy));
+        }
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _persistOverlayOffset() async {
+    await settingsRepository.updateSetting(_overlayOffsetKey, {
+      'dx': _overlayOffset.dx,
+      'dy': _overlayOffset.dy,
+    });
+  }
+
+  void _onDragUpdate(DragUpdateDetails details, BoxConstraints constraints) {
+    final media = MediaQuery.of(context);
+    const pillWidth = 220.0;
+    const pillHeight = 40.0;
+    final maxX = (constraints.maxWidth - pillWidth - 8).clamp(0.0, double.infinity);
+    final maxY = (constraints.maxHeight - media.padding.bottom - pillHeight - 8).clamp(0.0, double.infinity);
+    final minY = (media.padding.top + 8);
+
+    final next = _overlayOffset + details.delta;
+    setState(() {
+      _overlayOffset = Offset(
+        clampDouble(next.dx, 8, maxX),
+        clampDouble(next.dy, minY, maxY),
+      );
+    });
   }
 
   @override
@@ -442,26 +484,32 @@ class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
         
         if (!isActive) return const SizedBox.shrink();
         
-        return Positioned(
-          right: 14,
-          top: 16,
-          child: _GlobalActiveCallPill(
-            name: name,
-            onTap: otherId == null || otherId.isEmpty
-                ? null
-                : () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => DmChatScreen(
-                          meId: authRepository.currentUser?.id ?? '',
-                          otherId: otherId,
-                          otherName: name,
-                        ),
-                      ),
-                    );
-                  },
-          ),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return Positioned(
+              left: _overlayOffset.dx,
+              top: _overlayOffset.dy,
+              child: _GlobalActiveCallPill(
+                name: name,
+                onDragUpdate: (details) => _onDragUpdate(details, constraints),
+                onDragEnd: (_) => _persistOverlayOffset(),
+                onTap: otherId == null || otherId.isEmpty
+                    ? null
+                    : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => DmChatScreen(
+                              meId: authRepository.currentUser?.id ?? '',
+                              otherId: otherId,
+                              otherName: name,
+                            ),
+                          ),
+                        );
+                      },
+              ),
+            );
+          },
         );
       },
     );
@@ -471,29 +519,46 @@ class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
 class _GlobalActiveCallPill extends StatelessWidget {
   final String name;
   final VoidCallback? onTap;
-  const _GlobalActiveCallPill({required this.name, this.onTap});
+  final GestureDragUpdateCallback? onDragUpdate;
+  final GestureDragEndCallback? onDragEnd;
+  const _GlobalActiveCallPill({
+    required this.name,
+    this.onTap,
+    this.onDragUpdate,
+    this.onDragEnd,
+  });
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
+      onPanUpdate: onDragUpdate,
+      onPanEnd: onDragEnd,
       child: Glass(
         radius: BorderRadius.circular(999),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.call_rounded, size: 16, color: scheme.primary),
-            const SizedBox(width: 6),
-            Text(
-              AppLocalizations.of(context).inCallWith(name),
-              style: TextStyle(
-                color: scheme.onSurface,
-                fontWeight: FontWeight.w800,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 220),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.call_rounded, size: 16, color: scheme.primary),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  AppLocalizations.of(context).inCallWith(name),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: scheme.onSurface,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

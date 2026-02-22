@@ -6,6 +6,7 @@ import '../core/database/database_helper.dart';
 import 'settings_repository.dart';
 import 'package:flutter/foundation.dart';
 import '../core/di/locator.dart';
+import 'languages.dart';
 
 class CoursesRepository {
   final _supabase = Supabase.instance.client;
@@ -22,6 +23,9 @@ class CoursesRepository {
 
   final List<SoloCourse> _customCourses = [];
   final Set<String> _removedCourseIds = {};
+  static final Map<String, String> _languageNamesByCode = {
+    for (final language in kLanguages) language.code.toLowerCase(): language.name,
+  };
 
   Future<void> addCustomCourse(SoloCourse course) async {
     final uid = currentUserId;
@@ -142,7 +146,8 @@ class CoursesRepository {
         localCourses = rows.map((r) => SoloCourse(
           id: r['id'] as String,
           title: r['title'] as String,
-          subtitle: "${r['source_lang'] ?? ''} → ${r['target_lang'] ?? ''}",
+          subtitle:
+              "${_languageLabel(r['source_lang'])} → ${_languageLabel(r['target_lang'])}",
           iconUrl: r['icon'] as String? ?? '',
         )).toList();
       }
@@ -205,7 +210,12 @@ class CoursesRepository {
       final customIds = customCourses.map((c) => c.id).toSet();
       
       // Filter localCourses to only those the user has actually started (has XP or in xpMap)
-      final startedLocalCourses = localCourses.where((c) => xpMap.containsKey(c.id)).toList();
+      final startedLocalCourses = localCourses.where((c) {
+        if (!xpMap.containsKey(c.id)) return false;
+        final xp = xpMap[c.id] ?? 0;
+        final lastAccessed = lastAccessedMap[c.id];
+        return xp > 0 || lastAccessed != null;
+      }).toList();
 
       return [...startedLocalCourses, ...customCourses]
           .where((c) => !removedIds.contains(c.id))
@@ -248,6 +258,12 @@ class CoursesRepository {
     }
 
     return null;
+  }
+
+  static String _languageLabel(dynamic value) {
+    final raw = value?.toString().trim() ?? '';
+    if (raw.isEmpty) return '';
+    return _languageNamesByCode[raw.toLowerCase()] ?? raw;
   }
 
   List<SoloCourse> _parseCustomCourses(dynamic raw) {
