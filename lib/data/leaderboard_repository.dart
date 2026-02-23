@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:soma/core/di/locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/di/locator.dart';
 
 class LeaderboardRepository {
   final _supabase = Supabase.instance.client;
 
   // ─────────────────────────── Global ─────────────────────────────────────────
 
-  Future<List<Map<String, dynamic>>> getGlobalLeaderboard({int limit = 50}) async {
+  Future<List<Map<String, dynamic>>> getGlobalLeaderboard({final int limit = 50}) async {
     final response = await _supabase
         .from('leaderboard')
         .select()
@@ -21,8 +21,8 @@ class LeaderboardRepository {
 
   /// Returns top XP players who are learning [language].
   Future<List<Map<String, dynamic>>> getLanguageLeaderboard(
-    String language, {
-    int limit = 50,
+    final String language, {
+    final int limit = 50,
   }) async {
     try {
       // The leaderboard view joins profiles; filter by learning_languages array.
@@ -42,7 +42,7 @@ class LeaderboardRepository {
   // ─────────────────────────── Weekly ─────────────────────────────────────────
 
   /// Returns top players active in the last 7 days, ordered by XP.
-  Future<List<Map<String, dynamic>>> getWeeklyLeaderboard({int limit = 50}) async {
+  Future<List<Map<String, dynamic>>> getWeeklyLeaderboard({final int limit = 50}) async {
     try {
       final cutoff = DateTime.now().subtract(const Duration(days: 7)).toIso8601String();
       final response = await _supabase
@@ -62,8 +62,8 @@ class LeaderboardRepository {
 
   /// Returns leaderboard entries filtered to [friendIds].
   Future<List<Map<String, dynamic>>> getFriendsLeaderboard(
-    List<String> friendIds, {
-    int limit = 50,
+    final List<String> friendIds, {
+    final int limit = 50,
   }) async {
     if (friendIds.isEmpty) return [];
     try {
@@ -82,7 +82,7 @@ class LeaderboardRepository {
 
   // ─────────────────────────── Search ─────────────────────────────────────────
 
-  Future<List<Map<String, dynamic>>> searchUsers(String query) async {
+  Future<List<Map<String, dynamic>>> searchUsers(final String query) async {
     final response = await _supabase
         .from('leaderboard')
         .select()
@@ -96,7 +96,7 @@ class LeaderboardRepository {
   // ─────────────────────────── Username lookup ────────────────────────────────
 
   /// Resolves a username to a leaderboard row (used for deep links).
-  Future<Map<String, dynamic>?> fetchByUsername(String username) async {
+  Future<Map<String, dynamic>?> fetchByUsername(final String username) async {
     try {
       final response = await _supabase
           .from('leaderboard')
@@ -112,7 +112,7 @@ class LeaderboardRepository {
 
   // ─────────────────────────── Rank ───────────────────────────────────────────
 
-  Future<int> getUserRank(int xp) async {
+  Future<int> getUserRank(final int xp) async {
     final response = await _supabase
         .from('leaderboard')
         .count(CountOption.exact)
@@ -124,7 +124,7 @@ class LeaderboardRepository {
   // ─────────────────────────── Friend IDs helper ──────────────────────────────
 
   /// Fetches accepted friend IDs for [uid] from the friendships table.
-  Future<List<String>> getFriendIds(String uid) async {
+  Future<List<String>> getFriendIds(final String uid) async {
     try {
       final rows = await _supabase
           .from('friendships')
@@ -132,7 +132,7 @@ class LeaderboardRepository {
           .or('requester_id.eq.$uid,addressee_id.eq.$uid')
           .eq('status', 'accepted');
 
-      return rows.map<String>((r) {
+      return rows.map<String>((final r) {
         final requesterId = r['requester_id'] as String;
         return requesterId == uid
             ? r['addressee_id'] as String

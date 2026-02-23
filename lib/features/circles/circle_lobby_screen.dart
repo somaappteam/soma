@@ -1,30 +1,31 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'widgets/circle_chat_sheet.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/premium_dialog.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/core/widgets/selection_controls.dart';
+import 'package:soma/data/circle_voice_service.dart';
+import 'package:soma/data/circles_repository.dart';
+import 'package:soma/data/languages.dart';
+import 'package:soma/data/notifications_repository.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/data/profile_repository.dart';
+import 'package:soma/data/profile_store.dart';
+import 'package:soma/data/quiz_repository.dart';
+import 'package:soma/data/rtc_voice_service.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/data/social_repository.dart';
+import 'package:soma/data/soma_plus_repository.dart';
+import 'package:soma/features/circles/circle_countdown_screen.dart';
+import 'package:soma/features/circles/live_quiz_screen.dart';
+import 'package:soma/features/circles/widgets/circle_chat_sheet.dart';
+import 'package:soma/features/profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/premium_dialog.dart';
-import '../../core/widgets/selection_controls.dart';
-
-import '../../core/widgets/responsive.dart';
-import 'circle_countdown_screen.dart';
-import 'live_quiz_screen.dart';
-import '../../core/theme/tokens.dart';
-import '../../data/circles_repository.dart';
-import '../../data/profile_repository.dart';
-import '../../data/social_repository.dart';
-import '../../data/notifications_repository.dart';
-import '../../data/circle_voice_service.dart';
-import '../../data/profile_store.dart';
-import '../../data/rtc_voice_service.dart';
-import '../../data/quiz_repository.dart';
-import '../../data/languages.dart';
-import '../../data/settings_repository.dart';
-import '../../data/soma_plus_repository.dart';
-import '../../data/presence_repository.dart';
-import '../profile/profile_screen.dart';
 
 class CircleLobbyScreen extends StatefulWidget {
   final String circleId;
@@ -52,13 +53,14 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   int _editQuestions = 0;
   int _editTimePerQ = 0;
   SomaSubscriptionTier _tier = SomaSubscriptionTier.free;
+  bool _isStartingGame = false;
 
   String? get _myRole {
     final uid = circlesRepository.currentUserId;
     if (uid == null) return null;
     if (participants.isNotEmpty) {
       final me = participants.firstWhere(
-        (p) => p['user_id'] == uid,
+        (final p) => p['user_id'] == uid,
         orElse: () => {},
       );
       final role = me['role']?.toString();
@@ -73,7 +75,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   bool get isPendingJoin => _myRole == 'pending';
 
   int get _playerCount => participants
-      .where((p) => p['role'] != 'spectator' && p['role'] != 'pending')
+      .where((final p) => p['role'] != 'spectator' && p['role'] != 'pending')
       .length;
 
   @override
@@ -111,11 +113,11 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   void _listenParticipants() {
     circlesRepository
         .getParticipantsStream(widget.circleId)
-        .listen((data) async {
+        .listen((final data) async {
       // 1. Fetch profiles for new user IDs
-      final userIds = data.map((e) => e['user_id'] as String).toList();
+      final userIds = data.map((final e) => e['user_id'] as String).toList();
       final newIds =
-          userIds.where((id) => !profilesCache.containsKey(id)).toList();
+          userIds.where((final id) => !profilesCache.containsKey(id)).toList();
 
       if (newIds.isNotEmpty) {
         final profiles = await profileRepository.getProfilesByIds(newIds);
@@ -133,7 +135,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
   void _listenCircleStatus() {
     _circleSub?.cancel();
-    _circleSub = circlesRepository.getCircleStream(widget.circleId).listen((data) {
+    _circleSub = circlesRepository.getCircleStream(widget.circleId).listen((final data) {
       if (!mounted || _hasNavigated) return;
       
       final newStatus = data['status']?.toString();
@@ -146,7 +148,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
           _hasNavigated = true;
           _navigateToCountdown();
         } else {
-          debugPrint("CircleLobby: Status is active but questions are missing. Waiting for questions...");
+          debugPrint('CircleLobby: Status is active but questions are missing. Waiting for questions...');
         }
         return;
       }
@@ -168,14 +170,14 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CircleCountdownScreen(
+        builder: (final _) => CircleCountdownScreen(
           seconds: 3,
           circleId: widget.circleId,
           onFinished: () {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => LiveQuizScreen(
+                builder: (final _) => LiveQuizScreen(
                   questions: List<Map<String, dynamic>>.from(circleData?['questions'] ?? []),
                   timePerQ: circleData?['time_per_q'] ?? 10,
                   role: isHost ? LiveQuizRole.host : LiveQuizRole.participant,
@@ -242,7 +244,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     await showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (_) {
+      builder: (final _) {
         return Glass(
           radius: const BorderRadius.vertical(top: Radius.circular(24)),
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
@@ -297,7 +299,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     );
   }
 
-  Future<void> _toggleRoomLock(bool value) async {
+  Future<void> _toggleRoomLock(final bool value) async {
     final l10n = AppLocalizations.of(context);
     try {
       await circlesRepository.updateCircleLock(widget.circleId, value);
@@ -355,9 +357,9 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
         timePerQ: _editTimePerQ,
       );
 
-      final courseId = "$_editSpeakLang-$_editLearnLang";
+      final courseId = '$_editSpeakLang-$_editLearnLang';
       List<Map<String, dynamic>> newQuestions = [];
-      if (_editMode == "Vocabulary") {
+      if (_editMode == 'Vocabulary') {
         newQuestions = await quizRepository.getVocabQuestionsFromSupabase(
           courseId,
           _editQuestions,
@@ -370,7 +372,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       }
 
       if (newQuestions.isEmpty) {
-        throw Exception("No questions found for $courseId.");
+        throw Exception('No questions found for $courseId.');
       }
 
       if (newQuestions.isNotEmpty) {
@@ -416,38 +418,38 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     }
   }
 
-  String _languageName(String code) {
+  String _languageName(final String code) {
     return kLanguages.firstWhere(
-      (l) => l.code == code,
+      (final l) => l.code == code,
       orElse: () => kLanguages.first,
     ).name;
   }
 
   Future<LangOption?> _pickLanguage({
-    required String title,
-    required String currentCode,
+    required final String title,
+    required final String currentCode,
   }) async {
     return showModalBottomSheet<LangOption>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (ctx) {
-        String query = "";
+      builder: (final ctx) {
+        String query = '';
         bool showSearch = false;
         final searchFocus = FocusNode();
 
         return StatefulBuilder(
-          builder: (context, setModalState) {
+          builder: (final context, final setModalState) {
             final normalized = query.trim().toLowerCase();
             final filtered = normalized.isEmpty
                 ? kLanguages
                 : kLanguages
-                    .where((e) =>
+                    .where((final e) =>
                         e.name.toLowerCase().contains(normalized) ||
                         e.code.toLowerCase().contains(normalized))
                     .toList();
             final current = kLanguages.firstWhere(
-              (l) => l.code == currentCode,
+              (final l) => l.code == currentCode,
               orElse: () => kLanguages.first,
             );
             final maxHeight = MediaQuery.of(context).size.height * 0.75;
@@ -479,7 +481,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                 final nextShow = !showSearch;
                                 setModalState(() {
                                   showSearch = nextShow;
-                                  if (!nextShow) query = "";
+                                  if (!nextShow) query = '';
                                 });
                                 if (nextShow) {
                                   Future.delayed(
@@ -515,7 +517,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                             ),
                             child: TextField(
                               focusNode: searchFocus,
-                              onChanged: (v) =>
+                              onChanged: (final v) =>
                                   setModalState(() => query = v),
                               style: const TextStyle(
                                   color: Colors.white,
@@ -523,7 +525,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                               cursorColor: Colors.white,
                               textInputAction: TextInputAction.search,
                               decoration: InputDecoration(
-                                hintText: "Search language",
+                                hintText: 'Search language',
                                 hintStyle: TextStyle(
                                     color: Colors.white.withValues(alpha: 0.5)),
                                 border: InputBorder.none,
@@ -539,14 +541,14 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 6),
                             child: Text(
-                              "No matches",
+                              'No matches',
                               style: TextStyle(
                                   color: Colors.white.withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w700),
                             ),
                           )
                         else
-                          ...filtered.map((e) {
+                          ...filtered.map((final e) {
                             final selected = e.code == current.code;
                             return InkWell(
                               borderRadius: BorderRadius.circular(16),
@@ -599,12 +601,12 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     );
   }
 
-  bool _isMutedFor(String userId) =>
+  bool _isMutedFor(final String userId) =>
       circleVoiceService.voiceFor(userId)?.muted ?? false;
-  bool _isSpeakingFor(String userId) =>
+  bool _isSpeakingFor(final String userId) =>
       circleVoiceService.voiceFor(userId)?.speaking ?? false;
 
-  void _toggleMuteFor(String userId) {
+  void _toggleMuteFor(final String userId) {
     rtcVoiceService.toggleMuted();
   }
 
@@ -619,7 +621,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     await rtcVoiceService.connect(
         circleId: widget.circleId, asSpeaker: !isSpectator, prioritySpeaker: isHost);
     _voiceSub?.cancel();
-    _voiceSub = circleVoiceService.stream.listen((_) {
+    _voiceSub = circleVoiceService.stream.listen((final _) {
       if (mounted) {
         setState(() {});
       }
@@ -651,7 +653,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       if (!mounted) return;
 
       final target = users.firstWhere(
-        (u) =>
+        (final u) =>
             (u['username'] as String?)?.toLowerCase() == username.toLowerCase(),
         orElse: () => {},
       );
@@ -673,7 +675,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       }
 
       final alreadyInCircle =
-          participants.any((p) => p['user_id']?.toString() == targetId);
+          participants.any((final p) => p['user_id']?.toString() == targetId);
       if (alreadyInCircle) {
         _toast(context, l10n.circlesUserAlreadyInCircle(username));
         return;
@@ -713,12 +715,12 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     }
   }
 
-  void _openProfileSheet(String? userId) {
+  void _openProfileSheet(final String? userId) {
     if (userId == null || userId.isEmpty) return;
     showDialog<void>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.5),
-      builder: (_) {
+      builder: (final _) {
         final size = MediaQuery.of(context).size;
         return Dialog(
           backgroundColor: Colors.transparent,
@@ -741,7 +743,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     return showDialog<String>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.55),
-      builder: (ctx) {
+      builder: (final ctx) {
         final l10n = AppLocalizations.of(ctx);
         final scheme = Theme.of(ctx).colorScheme;
         return Dialog(
@@ -829,7 +831,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     );
   }
 
-  Future<void> _confirmMemberExit({required bool spectator}) async {
+  Future<void> _confirmMemberExit({required final bool spectator}) async {
     final l10n = AppLocalizations.of(context);
     final confirmed = await showPremiumDialog(
       context: context,
@@ -864,7 +866,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) {
+      builder: (final _) {
         final height = MediaQuery.of(context).size.height * 0.75;
         return SizedBox(
           height: height,
@@ -892,7 +894,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     }
   }
 
-  Future<void> _approveJoin(String userId, {required bool hasCapacity}) async {
+  Future<void> _approveJoin(final String userId, {required final bool hasCapacity}) async {
     final l10n = AppLocalizations.of(context);
     if (!hasCapacity) {
       _toast(context, l10n.circlesFull);
@@ -911,7 +913,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     }
   }
 
-  Future<void> _declineJoin(String userId) async {
+  Future<void> _declineJoin(final String userId) async {
     final l10n = AppLocalizations.of(context);
     try {
       await circlesRepository.declineJoinRequest(
@@ -930,8 +932,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     final l10n = AppLocalizations.of(context);
     final currentId = circlesRepository.currentUserId;
     return participants
-        .where((p) => p['user_id'] != null && p['user_id'] != currentId)
-        .map((p) {
+        .where((final p) => p['user_id'] != null && p['user_id'] != currentId)
+        .map((final p) {
       final uid = p['user_id'] as String;
       final profile = profilesCache[uid];
       return _HostCandidate(
@@ -941,7 +943,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     }).toList();
   }
 
-  Future<_HostExitAction?> _promptHostExit({required bool canTransfer}) async {
+  Future<_HostExitAction?> _promptHostExit({required final bool canTransfer}) async {
     final l10n = AppLocalizations.of(context);
     return showPremiumChoiceDialog<_HostExitAction>(
       context: context,
@@ -966,13 +968,13 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     );
   }
 
-  Future<String?> _pickNewHost(List<_HostCandidate> candidates) async {
+  Future<String?> _pickNewHost(final List<_HostCandidate> candidates) async {
     if (candidates.isEmpty) return null;
     return showModalBottomSheet<String>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (ctx) {
+      builder: (final ctx) {
         final l10n = AppLocalizations.of(ctx);
         final maxHeight = MediaQuery.of(ctx).size.height * 0.65;
         return SafeArea(
@@ -1004,7 +1006,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    ...candidates.map((c) {
+                    ...candidates.map((final c) {
                       return InkWell(
                         borderRadius: BorderRadius.circular(16),
                         onTap: () => Navigator.pop(ctx, c.userId),
@@ -1061,7 +1063,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
   // Derived getters
   String get circleCode {
-    if (circleData == null) return "...";
+    if (circleData == null) return '...';
     // We can show the first few chars of UUID or a 'name'
     // Format: "NAME • 3/5"
     final current = _playerCount;
@@ -1070,7 +1072,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     Widget content;
     if (circleData == null) {
       content = const Scaffold(
@@ -1083,6 +1085,20 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
     return Stack(
       children: [
+        ...rtcVoiceService.activeRenderers.map((final renderer) => Positioned(
+              left: 0,
+              top: 0,
+              width: 1,
+              height: 1,
+              child: SizedBox(
+                width: 1,
+                height: 1,
+                child: RTCVideoView(
+                  renderer,
+                  objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                ),
+              ),
+            )),
         content,
         if (_isExiting) ...[
           const ModalBarrier(dismissible: false, color: Colors.black54),
@@ -1094,7 +1110,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     );
   }
 
-  Widget _buildLobbyContent(BuildContext context) {
+  Widget _buildLobbyContent(final BuildContext context) {
     /* 
        Refactored build method content here for cleaner structure. 
        Note: using local variables from build scope inside this method requires passing them 
@@ -1118,21 +1134,21 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     final levelRaw = circleData?['level']?.toString() ?? '';
     final levelLabel = _localizedLevelLabel(l10n, levelRaw);
     final playerParticipants = participants
-        .where((p) => p['role'] != 'spectator' && p['role'] != 'pending')
+        .where((final p) => p['role'] != 'spectator' && p['role'] != 'pending')
         .toList();
     final spectatorParticipants =
-        participants.where((p) => p['role'] == 'spectator').toList();
+        participants.where((final p) => p['role'] == 'spectator').toList();
     final pendingParticipants =
-        participants.where((p) => p['role'] == 'pending').toList();
+        participants.where((final p) => p['role'] == 'pending').toList();
 
     final participantIds = participants
-        .map((p) => p['user_id']?.toString())
+        .map((final p) => p['user_id']?.toString())
         .whereType<String>()
         .toList();
 
     return PopScope(
       canPop: !isHost,
-      onPopInvokedWithResult: (didPop, result) async {
+      onPopInvokedWithResult: (final didPop, final result) async {
         if (didPop) return;
         if (isHost) {
           await _handleHostExit();
@@ -1142,9 +1158,9 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
         body: SafeArea(
           child: StreamBuilder<Map<String, bool>>(
             stream: presenceRepository.streamMultipleOnlineStatuses(participantIds),
-            builder: (context, presenceSnapshot) {
+            builder: (final context, final presenceSnapshot) {
               final presence = presenceSnapshot.data ?? {};
-              final allReady = playerParticipants.every((p) => (p['is_ready'] == true) || p['role'] == 'host');
+              final allReady = playerParticipants.every((final p) => (p['is_ready'] == true) || p['role'] == 'host');
               
               final displayPlayers = <PlayerSlot>[];
               for (int i = 0; i < maxPlayers; i++) {
@@ -1212,7 +1228,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                             radius: BorderRadius.circular(26),
                             padding: const EdgeInsets.all(16),
                             child: LayoutBuilder(
-                              builder: (context, constraints) {
+                              builder: (final context, final constraints) {
                                 final isNarrow = constraints.maxWidth < 400;
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -1265,21 +1281,21 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                         const SizedBox(height: 10),
                                         _ModeToggle(
                                           leftLabel: l10n.soloModeVocabulary,
-                                          leftValue: "Vocabulary",
+                                          leftValue: 'Vocabulary',
                                           rightLabel: l10n.soloModeSentences,
-                                          rightValue: "Sentences",
+                                          rightValue: 'Sentences',
                                           value: _editMode,
-                                          onChanged: (value) => setState(() => _editMode = value),
+                                          onChanged: (final value) => setState(() => _editMode = value),
                                         ),
                                         const SizedBox(height: 10),
                                         _LevelPicker(
                                           level: _editLevel,
-                                          onChanged: (value) => setState(() => _editLevel = value),
+                                          onChanged: (final value) => setState(() => _editLevel = value),
                                         ),
                                         const SizedBox(height: 10),
                                         _HostSettingRow(
                                           title: l10n.circlesQuestions,
-                                          value: "$_editQuestions",
+                                          value: '$_editQuestions',
                                           onMinus: _editQuestions > 5
                                               ? () => setState(() => _editQuestions -= 5)
                                               : null,
@@ -1416,11 +1432,11 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                             child: _editingLobbySettings
                                                 ? _ModeToggle(
                                                     leftLabel: l10n.soloModeVocabulary,
-                                                    leftValue: "Vocabulary",
+                                                    leftValue: 'Vocabulary',
                                                     rightLabel: l10n.soloModeSentences,
-                                                    rightValue: "Sentences",
+                                                    rightValue: 'Sentences',
                                                     value: _editMode,
-                                                    onChanged: (value) =>
+                                                    onChanged: (final value) =>
                                                         setState(() => _editMode = value),
                                                   )
                                                 : _PillInfo(
@@ -1434,7 +1450,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                             child: _editingLobbySettings
                                                 ? _LevelPicker(
                                                     level: _editLevel,
-                                                    onChanged: (value) =>
+                                                    onChanged: (final value) =>
                                                         setState(() => _editLevel = value),
                                                   )
                                                 : _PillInfo(
@@ -1449,7 +1465,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                             child: _editingLobbySettings
                                                 ? _HostSettingRow(
                                                     title: l10n.circlesQuestions,
-                                                    value: "$_editQuestions",
+                                                    value: '$_editQuestions',
                                                     onMinus: _editQuestions > 5
                                                         ? () => setState(
                                                             () => _editQuestions -= 5)
@@ -1573,7 +1589,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                     _SectionTitle(l10n.circlesPlayers),
                                     const Spacer(),
                                       Text(
-                                        "${playerParticipants.length}/$maxPlayers",
+                                        '${playerParticipants.length}/$maxPlayers',
                                         style: TextStyle(
                                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
                                           fontWeight: FontWeight.w800,
@@ -1582,7 +1598,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                   ],
                                 ),
                                 const SizedBox(height: 12),
-                                ...displayPlayers.map((p) => Padding(
+                                ...displayPlayers.map((final p) => Padding(
                                       padding:
                                           const EdgeInsets.only(bottom: 10),
                                       child: _PlayerRow(
@@ -1634,7 +1650,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                       _SectionTitle(l10n.circlesSpectators),
                                       const Spacer(),
                                       Text(
-                                        "${spectatorParticipants.length}",
+                                        '${spectatorParticipants.length}',
                                         style: TextStyle(
                                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
                                           fontWeight: FontWeight.w800,
@@ -1646,7 +1662,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                   Wrap(
                                     spacing: 10,
                                     runSpacing: 10,
-                                    children: spectatorParticipants.map((p) {
+                                    children: spectatorParticipants.map((final p) {
                                       final uid = p['user_id'];
                                       final profile = profilesCache[uid];
                                       final name = profile?['display_name'] ??
@@ -1690,7 +1706,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                       _SectionTitle(l10n.circlesJoinRequests),
                                       const Spacer(),
                                       Text(
-                                        "${pendingParticipants.length}",
+                                        '${pendingParticipants.length}',
                                         style: TextStyle(
                                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
                                           fontWeight: FontWeight.w800,
@@ -1699,7 +1715,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                     ],
                                   ),
                                   const SizedBox(height: 12),
-                                  ...pendingParticipants.map((p) {
+                                  ...pendingParticipants.map((final p) {
                                     final uid = p['user_id']?.toString();
                                     final profile = profilesCache[uid];
                                     final name = profile?['display_name'] ??
@@ -1740,26 +1756,29 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                           // Bottom CTA
                           if (isHost) ...[
                             NeonButton(
-                              label: allReady
-                                  ? l10n.circlesStartGame
-                                  : l10n.circlesWaitingForPlayers,
-                              onTap: allReady
+                              label: _isStartingGame
+                                  ? l10n.circlesStartingGame
+                                  : (allReady
+                                      ? l10n.circlesStartGame
+                                      : l10n.circlesWaitingForPlayers),
+                              onTap: (allReady && !_isStartingGame)
                                   ? () async {
                                       if (circleData == null) return;
+                                      setState(() => _isStartingGame = true);
                                       
                                       // 1. If questions are missing, fetch them now
                                       final currentQs = circleData?['questions'] as List?;
                                       if (currentQs == null || currentQs.isEmpty) {
-                                        debugPrint("CircleLobby: Host starting but questions missing. Fetching...");
+                                        debugPrint('CircleLobby: Host starting but questions missing. Fetching...');
                                         try {
                                           final learnLang = circleData?['to_lang']?.toString() ?? 'es';
                                           final speakLang = circleData?['from_lang']?.toString() ?? 'en';
                                           final mode = circleData?['mode']?.toString() ?? 'Vocabulary';
                                           final count = circleData?['questions_count'] ?? 10;
-                                          final courseId = "$speakLang-$learnLang";
+                                          final courseId = '$speakLang-$learnLang';
 
                                           List<Map<String, dynamic>> newQs = [];
-                                          if (mode == "Vocabulary") {
+                                          if (mode == 'Vocabulary') {
                                             newQs = await quizRepository.getVocabQuestionsFromSupabase(courseId, count);
                                           } else {
                                             newQs = await quizRepository.getSentenceQuestionsFromSupabase(courseId, count);
@@ -1767,15 +1786,25 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
                                           if (newQs.isNotEmpty) {
                                             await circlesRepository.updateCircleQuestions(widget.circleId, newQs);
-                                            debugPrint("CircleLobby: Uploaded ${newQs.length} questions.");
+                                            debugPrint('CircleLobby: Uploaded ${newQs.length} questions.');
                                           }
                                         } catch (e) {
-                                          debugPrint("CircleLobby: Error pre-fetching questions: $e");
+                                          debugPrint('CircleLobby: Error pre-fetching questions: $e');
+                                          if (mounted) {
+                                            setState(() => _isStartingGame = false);
+                                          }
                                         }
                                       }
 
                                       // 2. Set status to active (this triggers navigation for everyone)
-                                      await circlesRepository.updateCircleStatus(widget.circleId, 'active');
+                                      try {
+                                        await circlesRepository.updateCircleStatus(widget.circleId, 'active');
+                                      } catch (e) {
+                                        debugPrint('CircleLobby: Error updating circle status: $e');
+                                        if (mounted) {
+                                          setState(() => _isStartingGame = false);
+                                        }
+                                      }
                                     }
                                   : () {},
                             ),
@@ -1810,7 +1839,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                       await Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => LiveQuizScreen(
+                                          builder: (final _) => LiveQuizScreen(
                                             questions:
                                                 List<Map<String, dynamic>>.from(
                                                     circleData?['questions'] ??
@@ -1847,7 +1876,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                     onTap: () async {
                                       // Identify self
                                       final me = participants.firstWhere(
-                                        (p) =>
+                                        (final p) =>
                                             p['user_id'] ==
                                             circlesRepository.currentUserId,
                                         orElse: () => {},
@@ -1882,7 +1911,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
 enum _HostExitAction { transfer, end }
 
-String _localizedLevelLabel(AppLocalizations l10n, String value) {
+String _localizedLevelLabel(final AppLocalizations l10n, final String value) {
   final trimmed = value.trim();
   if (trimmed.isEmpty) return value;
   final upper = trimmed.toUpperCase();
@@ -1943,7 +1972,7 @@ class _TopBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Row(
       children: [
         _IconGlassButton(icon: Icons.arrow_back_rounded, onTap: onBack),
@@ -1988,7 +2017,7 @@ class _IconGlassButton extends StatelessWidget {
   const _IconGlassButton({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(16),
       padding: EdgeInsets.zero,
@@ -2012,7 +2041,7 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Text(
       text,
       style: TextStyle(
@@ -2037,7 +2066,7 @@ class _PillInfo extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       height: 64,
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -2098,7 +2127,7 @@ class _EditableSelectTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: onTap,
@@ -2179,7 +2208,7 @@ class _ModeToggle extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       height: 64,
       padding: const EdgeInsets.all(6),
@@ -2227,7 +2256,7 @@ class _ModeChip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return AppSelectablePill(
       label: label,
       selected: selected,
@@ -2248,7 +2277,7 @@ class _LevelPicker extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Container(
       height: 64,
@@ -2305,7 +2334,7 @@ class _LevelChip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return AppSelectablePill(
       label: label,
       selected: selected,
@@ -2328,7 +2357,7 @@ class _QuickAction extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: onTap,
@@ -2375,7 +2404,7 @@ class _LobbyActionTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: onTap,
@@ -2437,7 +2466,7 @@ class _HostSettingRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
@@ -2500,7 +2529,7 @@ class _BooleanSettingRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
@@ -2544,7 +2573,7 @@ class _HostControlsRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
@@ -2600,7 +2629,7 @@ class _HostControlsRow extends StatelessWidget {
 
 class _PlayerTip extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
@@ -2615,7 +2644,7 @@ class _PlayerTip extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              "Tap Ready when you’re set. Host will start the match.",
+              'Tap Ready when you’re set. Host will start the match.',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w700,
@@ -2630,7 +2659,7 @@ class _PlayerTip extends StatelessWidget {
 
 class _SpectatorTip extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
       decoration: BoxDecoration(
@@ -2676,7 +2705,7 @@ class _PlayerRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final readyColor = player.isReady
         ? const Color(0xFF2AFADF)
         : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.35);
@@ -2735,7 +2764,7 @@ class _PlayerRow extends StatelessWidget {
                               Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18)),
                         ),
                         child: Text(
-                          "HOST",
+                          'HOST',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w900,
@@ -2766,8 +2795,8 @@ class _PlayerRow extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       player.isEmpty
-                          ? "Waiting for player"
-                          : (player.isReady ? "Ready" : "Not ready"),
+                          ? 'Waiting for player'
+                          : (player.isReady ? 'Ready' : 'Not ready'),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
                         fontWeight: FontWeight.w700,
@@ -2843,7 +2872,7 @@ class _MicBadge extends StatelessWidget {
   const _MicBadge({required this.muted, required this.speaking});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final color =
         muted ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92);
     final bg =
@@ -2909,7 +2938,7 @@ class _JoinRequestRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
@@ -2976,7 +3005,7 @@ class _MiniAction extends StatelessWidget {
   const _MiniAction({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final enabled = onTap != null;
     return Opacity(
       opacity: enabled ? 1 : 0.5,
@@ -3014,7 +3043,7 @@ class _AvatarDot extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final color =
         empty ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85);
 
@@ -3086,7 +3115,7 @@ class _SpectatorChip extends StatelessWidget {
   const _SpectatorChip({required this.name, required this.onTap, this.isOnline = false});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
@@ -3143,7 +3172,7 @@ class _SecondaryButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
@@ -3172,7 +3201,7 @@ class _SecondaryButton extends StatelessWidget {
 }
 
 /// small helper toast
-void _toast(BuildContext context, String msg) {
+void _toast(final BuildContext context, final String msg) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(msg),

@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/data/presence_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'presence_repository.dart';
-import '../core/di/locator.dart';
 
 class ChatRepository {
   static const int _maxContentChars = 4000;
@@ -29,14 +28,14 @@ class ChatRepository {
         .eq('user_id', uid)
         .order('last_message_at', ascending: false)
         .limit(50)
-        .map((_) {
+        .map((final _) {
           debugPrint('ChatRepository: inbox refresh stream event');
         });
   }
 
-  Future<void> sendMessage(String receiverId, String content) async {
+  Future<void> sendMessage(final String receiverId, final String content) async {
     final uid = currentUserId;
-    if (uid == null) throw Exception("Not logged in");
+    if (uid == null) throw Exception('Not logged in');
 
     final settingsRow = await _supabase
         .from('profiles')
@@ -47,9 +46,9 @@ class ChatRepository {
     final blockedSource = settings is Map<String, dynamic>
         ? settings['blocked_user_ids']
         : null;
-    final blockedIds = (blockedSource as List?)?.map((e) => e.toString()).toList() ?? [];
+    final blockedIds = (blockedSource as List?)?.map((final e) => e.toString()).toList() ?? [];
     if (blockedIds.contains(receiverId)) {
-      throw Exception("You have blocked this user.");
+      throw Exception('You have blocked this user.');
     }
 
     if (content.length > _maxContentChars) {
@@ -83,7 +82,7 @@ class ChatRepository {
   }
 
 
-  String _parseMessagePreview(String? content) {
+  String _parseMessagePreview(final String? content) {
     if (content == null || content.isEmpty) return '';
     if (!content.startsWith('{')) return content;
     try {
@@ -123,9 +122,9 @@ class ChatRepository {
     return content;
   }
 
-  Future<void> _enforceDmRateLimit(String receiverId) async {
+  Future<void> _enforceDmRateLimit(final String receiverId) async {
     final now = DateTime.now();
-    _sendTimestamps.removeWhere((t) => now.difference(t).inSeconds >= 60);
+    _sendTimestamps.removeWhere((final t) => now.difference(t).inSeconds >= 60);
 
     var allowed = _maxMessagesPerMinute;
     final uid = currentUserId;
@@ -153,7 +152,7 @@ class ChatRepository {
   }
 
   void _ensureRetryLoop() {
-    _retryTimer ??= Timer.periodic(const Duration(seconds: 12), (_) async {
+    _retryTimer ??= Timer.periodic(const Duration(seconds: 12), (final _) async {
       if (_pendingDmSends.isEmpty) {
         _retryTimer?.cancel();
         _retryTimer = null;
@@ -176,10 +175,10 @@ class ChatRepository {
   }
 
   Future<void> recordLatencyEvent({
-    required String metric,
-    required int valueMs,
-    String? peerUserId,
-    String? messageId,
+    required final String metric,
+    required final int valueMs,
+    final String? peerUserId,
+    final String? messageId,
   }) async {
     final uid = currentUserId;
     if (uid == null) return;
@@ -195,8 +194,8 @@ class ChatRepository {
   }
 
   Future<void> setTypingState({
-    required String otherUserId,
-    required bool isTyping,
+    required final String otherUserId,
+    required final bool isTyping,
   }) async {
     final uid = currentUserId;
     if (uid == null) return;
@@ -209,7 +208,7 @@ class ChatRepository {
     }, onConflict: 'user_id,other_user_id');
   }
 
-  Stream<bool> typingStream(String otherUserId) {
+  Stream<bool> typingStream(final String otherUserId) {
     final uid = currentUserId;
     if (uid == null) return const Stream.empty();
 
@@ -217,8 +216,8 @@ class ChatRepository {
         .from('dm_typing')
         .stream(primaryKey: ['user_id', 'other_user_id'])
         .eq('user_id', otherUserId)
-        .map((rows) {
-      final matches = rows.where((r) => r['other_user_id'] == uid).toList();
+        .map((final rows) {
+      final matches = rows.where((final r) => r['other_user_id'] == uid).toList();
       if (matches.isEmpty) return false;
       final row = matches.first;
       final isTyping = row['is_typing'] == true;
@@ -228,7 +227,7 @@ class ChatRepository {
     });
   }
 
-  Future<Map<String, dynamic>> getDmGateState(String otherUserId) async {
+  Future<Map<String, dynamic>> getDmGateState(final String otherUserId) async {
     final uid = currentUserId;
     if (uid == null) return {'can_chat': false, 'reason': 'not_logged_in'};
 
@@ -249,7 +248,7 @@ class ChatRepository {
     return {'can_chat': true, 'reason': null};
   }
 
-  Future<void> sendMessageRequest(String otherUserId) async {
+  Future<void> sendMessageRequest(final String otherUserId) async {
     final uid = currentUserId;
     if (uid == null) return;
     await _supabase.from('message_requests').upsert({
@@ -261,8 +260,8 @@ class ChatRepository {
   }
 
   Future<void> respondToMessageRequest({
-    required String requesterId,
-    required bool accept,
+    required final String requesterId,
+    required final bool accept,
   }) async {
     final uid = currentUserId;
     if (uid == null) return;
@@ -273,10 +272,10 @@ class ChatRepository {
   }
 
   Future<void> submitChatReport({
-    required String otherUserId,
-    required String messageId,
-    required String messagePreview,
-    String? reason,
+    required final String otherUserId,
+    required final String messageId,
+    required final String messagePreview,
+    final String? reason,
   }) async {
     final uid = currentUserId;
     if (uid == null) return;
@@ -291,8 +290,8 @@ class ChatRepository {
   }
 
   Future<void> toggleMessageReaction({
-    required String messageId,
-    required String emoji,
+    required final String messageId,
+    required final String emoji,
   }) async {
     final uid = currentUserId;
     if (uid == null) return;
@@ -303,7 +302,7 @@ class ChatRepository {
         .maybeSingle();
     final reactions = (row?['reactions'] as Map<String, dynamic>?) ?? {};
     final users = ((reactions[emoji] as List?) ?? const [])
-        .map((e) => e.toString())
+        .map((final e) => e.toString())
         .toSet();
     if (!users.add(uid)) {
       users.remove(uid);
@@ -317,7 +316,7 @@ class ChatRepository {
     await _supabase.from('messages').update({'reactions': next}).eq('id', messageId);
   }
 
-  Stream<List<Map<String, dynamic>>> getMessagesStream(String otherUserId) {
+  Stream<List<Map<String, dynamic>>> getMessagesStream(final String otherUserId) {
     final uid = currentUserId;
     if (uid == null) return const Stream.empty();
 
@@ -328,8 +327,8 @@ class ChatRepository {
         .limit(100)
         // Note: Real-time filtering by complex OR is not supported in the current stream builder.
         // We listen to the tail and rely on client-side filtering or conversation_id if available.
-        .map((rows) {
-          final filtered = rows.where((row) {
+        .map((final rows) {
+          final filtered = rows.where((final row) {
             final sId = row['sender_id'];
             final rId = row['receiver_id'];
             return (sId == uid && rId == otherUserId) || (sId == otherUserId && rId == uid);
@@ -340,7 +339,7 @@ class ChatRepository {
         });
   }
 
-  Future<void> markConversationAsRead(String otherUserId) async {
+  Future<void> markConversationAsRead(final String otherUserId) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -365,7 +364,7 @@ class ChatRepository {
     );
   }
 
-  Future<void> markConversationAsUnread(String otherUserId) async {
+  Future<void> markConversationAsUnread(final String otherUserId) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -377,19 +376,19 @@ class ChatRepository {
         .eq('is_read', true);
   }
 
-  Future<void> markAllConversationsAsRead(List<String> otherIds) async {
+  Future<void> markAllConversationsAsRead(final List<String> otherIds) async {
     for (final id in otherIds) {
       await markConversationAsRead(id);
     }
   }
 
-  Future<void> archiveConversations(List<String> otherIds) async {
+  Future<void> archiveConversations(final List<String> otherIds) async {
     for (final id in otherIds) {
       await setConversationPreference(id, archived: true);
     }
   }
 
-  Future<void> deleteConversation(String otherUserId) async {
+  Future<void> deleteConversation(final String otherUserId) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -397,7 +396,7 @@ class ChatRepository {
         'and(sender_id.eq.$uid,receiver_id.eq.$otherUserId),and(sender_id.eq.$otherUserId,receiver_id.eq.$uid)');
   }
 
-  Future<void> deleteMessageById(String messageId) async {
+  Future<void> deleteMessageById(final String messageId) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -410,7 +409,7 @@ class ChatRepository {
     debugPrint('ChatRepository: deleted message $messageId');
   }
 
-  Future<void> editMessageById(String messageId, String content) async {
+  Future<void> editMessageById(final String messageId, final String content) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -424,10 +423,10 @@ class ChatRepository {
   }
 
   Future<void> setConversationPreference(
-    String otherUserId, {
-    bool? pinned,
-    bool? muted,
-    bool? archived,
+    final String otherUserId, {
+    final bool? pinned,
+    final bool? muted,
+    final bool? archived,
   }) async {
     final uid = currentUserId;
     if (uid == null) return;
@@ -447,7 +446,7 @@ class ChatRepository {
     });
   }
 
-  Stream<Map<String, dynamic>?> streamConversation(String otherUserId) {
+  Stream<Map<String, dynamic>?> streamConversation(final String otherUserId) {
     final uid = currentUserId;
     if (uid == null) return Stream.value(null);
 
@@ -455,22 +454,22 @@ class ChatRepository {
         .from('conversations')
         .stream(primaryKey: ['user_id', 'other_user_id'])
         .eq('user_id', uid)
-        .map((event) {
-      final matches = event.where((e) => e['other_user_id'] == otherUserId);
+        .map((final event) {
+      final matches = event.where((final e) => e['other_user_id'] == otherUserId);
       return matches.isNotEmpty ? matches.first : null;
     });
   }
 
   Stream<List<Map<String, dynamic>>> getInboxThreadsStream() async* {
     yield await getInboxThreads();
-    yield* inboxRefreshStream().asyncMap((_) => getInboxThreads());
+    yield* inboxRefreshStream().asyncMap((final _) => getInboxThreads());
   }
 
   Future<List<Map<String, dynamic>>> getInboxThreads() async {
     final uid = currentUserId;
     if (uid == null) return [];
 
-    List<Map<String, dynamic>> normalizedRows = [];
+    final List<Map<String, dynamic>> normalizedRows = [];
 
     // 1. Fetch Conversations
     try {
@@ -484,7 +483,7 @@ class ChatRepository {
 
       if (conversationRows.isNotEmpty) {
         normalizedRows.addAll(
-          conversationRows.map((row) => Map<String, dynamic>.from(row)),
+          conversationRows.map((final row) => Map<String, dynamic>.from(row)),
         );
       }
     } catch (e) {
@@ -526,7 +525,7 @@ class ChatRepository {
           }
         }
         normalizedRows.addAll(derived.values);
-        normalizedRows.sort((a, b) {
+        normalizedRows.sort((final a, final b) {
           final aTime = DateTime.tryParse(a['last_message_at']?.toString() ?? '') ??
               DateTime.fromMillisecondsSinceEpoch(0);
           final bTime = DateTime.tryParse(b['last_message_at']?.toString() ?? '') ??
@@ -541,7 +540,7 @@ class ChatRepository {
     if (normalizedRows.isEmpty) return [];
 
     final otherIds = normalizedRows
-        .map((row) => row['other_user_id']?.toString())
+        .map((final row) => row['other_user_id']?.toString())
         .whereType<String>()
         .toSet()
         .toList();
@@ -697,11 +696,11 @@ class ChatRepository {
   }
 
   String _threadSummary({
-    required int unreadCount,
-    required bool isFriend,
-    required bool incomingRequest,
-    required bool outgoingRequest,
-    required String lastMessage,
+    required final int unreadCount,
+    required final bool isFriend,
+    required final bool incomingRequest,
+    required final bool outgoingRequest,
+    required final String lastMessage,
   }) {
     if (incomingRequest) return 'Incoming request · tap to respond';
     if (outgoingRequest) return 'Request pending approval';

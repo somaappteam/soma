@@ -17,13 +17,13 @@ class CardGap {
 enum LayoutDensity { compact, comfortable, spacious }
 
 class PremiumLayout {
-  static LayoutDensity densityForWidth(double width) {
+  static LayoutDensity densityForWidth(final double width) {
     if (width < 380) return LayoutDensity.compact;
     if (width >= 900) return LayoutDensity.spacious;
     return LayoutDensity.comfortable;
   }
 
-  static double listGap(LayoutDensity density) {
+  static double listGap(final LayoutDensity density) {
     switch (density) {
       case LayoutDensity.compact:
         return CardGap.compact;
@@ -34,7 +34,7 @@ class PremiumLayout {
     }
   }
 
-  static EdgeInsets screenPadding(LayoutDensity density) {
+  static EdgeInsets screenPadding(final LayoutDensity density) {
     switch (density) {
       case LayoutDensity.compact:
         return const EdgeInsets.fromLTRB(14, 12, 14, 14);
@@ -45,7 +45,7 @@ class PremiumLayout {
     }
   }
 
-  static double maxContentWidth(double width) {
+  static double maxContentWidth(final double width) {
     if (width >= 1600) return 1200;
     if (width >= 1200) return 980;
     if (width >= 900) return 860;

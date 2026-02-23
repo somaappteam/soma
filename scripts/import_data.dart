@@ -1,7 +1,8 @@
-import 'dart:io';
 import 'dart:convert';
-import 'package:supabase/supabase.dart';
+import 'dart:io';
+
 import 'package:csv/csv.dart';
+import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
 const String serviceRoleKey =
@@ -18,7 +19,7 @@ void main() async {
   print('--- Migration Completed ---');
 }
 
-Future<void> migrateVocabulary(SupabaseClient client) async {
+Future<void> migrateVocabulary(final SupabaseClient client) async {
   print('Migrating Vocabulary...');
   final file = File('C:/Users/amosl/Desktop/vocabulary .csv');
   if (!await file.exists()) {
@@ -49,9 +50,9 @@ Future<void> migrateVocabulary(SupabaseClient client) async {
     final values = fields[i];
     final row = <String, dynamic>{};
 
-    headers.forEach((index, key) {
+    headers.forEach((final index, final key) {
       if (index < values.length) {
-        var val = values[index];
+        final val = values[index];
         if (key == 'concept_id') {
           if (val is int) {
             row[key] = val;
@@ -81,7 +82,7 @@ Future<void> migrateVocabulary(SupabaseClient client) async {
   print('Vocabulary migration done.');
 }
 
-Future<void> migrateSentences(SupabaseClient client) async {
+Future<void> migrateSentences(final SupabaseClient client) async {
   print('Migrating Sentences...');
   final file = File('C:/Users/amosl/Desktop/sentences .csv');
   if (!await file.exists()) {
@@ -112,9 +113,9 @@ Future<void> migrateSentences(SupabaseClient client) async {
     final values = fields[i];
     final row = <String, dynamic>{};
 
-    headers.forEach((index, key) {
+    headers.forEach((final index, final key) {
       if (index < values.length) {
-        var val = values[index];
+        final val = values[index];
         if (key == 'concept_id') {
           if (val is int) {
             row[key] = val;
@@ -144,8 +145,8 @@ Future<void> migrateSentences(SupabaseClient client) async {
   print('Sentences migration done.');
 }
 
-Future<void> _upsert(SupabaseClient client, String table,
-    List<Map<String, dynamic>> data) async {
+Future<void> _upsert(final SupabaseClient client, final String table,
+    final List<Map<String, dynamic>> data) async {
   try {
     await client.from(table).upsert(data);
   } catch (e) {

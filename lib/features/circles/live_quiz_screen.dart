@@ -1,34 +1,34 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../core/services/haptics_service.dart';
-import '../../core/services/sfx_service.dart';
-import 'widgets/circle_chat_sheet.dart';
-import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/theme/tokens.dart';
-import '../../core/theme/motion.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/premium_dialog.dart';
-import '../../core/widgets/neon_button.dart';
 
-import '../../core/widgets/responsive.dart';
-import '../../core/widgets/pressable_scale.dart';
-import '../../core/widgets/staggered_in.dart';
-import '../../core/widgets/reward_sparkle.dart';
-import '../common/results_screen.dart';
-import '../../models/leaderboard_player.dart';
-import '../../data/circles_repository.dart';
-import '../../data/circle_chat_repository.dart';
-import '../../data/circle_voice_service.dart';
-import '../../data/settings_repository.dart';
-import '../../data/profile_repository.dart';
-import '../../data/profile_store.dart';
-import '../../data/rtc_voice_service.dart';
-import '../../data/presence_repository.dart';
-import '../../core/services/tts_service.dart';
-import '../profile/profile_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:soma/core/services/haptics_service.dart';
+import 'package:soma/core/services/sfx_service.dart';
+import 'package:soma/core/services/tts_service.dart';
+import 'package:soma/core/theme/motion.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/premium_dialog.dart';
+import 'package:soma/core/widgets/pressable_scale.dart';
+import 'package:soma/core/widgets/responsive.dart';
+
+import 'package:soma/core/widgets/staggered_in.dart';
+import 'package:soma/data/circle_voice_service.dart';
+import 'package:soma/data/circles_repository.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/data/profile_repository.dart';
+import 'package:soma/data/profile_store.dart';
+import 'package:soma/data/rtc_voice_service.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/features/circles/widgets/circle_chat_sheet.dart';
+import 'package:soma/features/common/results_screen.dart';
+import 'package:soma/features/profile/profile_screen.dart';
+import 'package:soma/l10n/gen/app_localizations.dart';
+import 'package:soma/models/leaderboard_player.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 enum LiveQuizRole { host, participant, spectator }
 
@@ -118,7 +118,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     
     if (widget.questions.isNotEmpty) {
       try {
-        questions = widget.questions.map((q) {
+        questions = widget.questions.map((final q) {
           // Robust parsing of 'correct' field - might be int or string from JSONB
           int correctIndex = 0;
           if (q['correct'] is int) {
@@ -129,7 +129,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
           
           return _Question(
             prompt: q['prompt']?.toString() ?? '',
-            choices: (q['choices'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+            choices: (q['choices'] as List?)?.map((final e) => e.toString()).toList() ?? const [],
             correctIndex: correctIndex,
             translation: q['translation']?.toString() ?? '',
             reading: q['reading']?.toString() ?? '',
@@ -138,7 +138,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
            word: q['word']?.toString() ?? '',
             gender: q['gender']?.toString() ?? '',
             correctAnswer: q['correct_answer']?.toString() ?? '',
-            choicePool: (q['choice_pool'] as List?)?.map((e) => e.toString()).toList() ?? const [],
+            choicePool: (q['choice_pool'] as List?)?.map((final e) => e.toString()).toList() ?? const [],
             targetLang: q['target_lang']?.toString() ?? widget.targetLangFallback ?? '',
             sourceLang: q['source_lang']?.toString() ?? widget.sourceLangFallback ?? '',
           );
@@ -170,13 +170,13 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     _quizChannel = Supabase.instance.client.channel('quiz_live_$circleId');
     _quizChannel?.onBroadcast(
         event: 'user_answered',
-        callback: (payload) {
+        callback: (final payload) {
           final userId = payload['user_id']?.toString();
           final index = payload['answer_index'] as int?;
           if (userId == null || index == null) return;
           _recordAnswer(userId, index, broadcast: false); // false = remote answer, don't rebroadcast
         });
-    _quizChannel?.subscribe((status, [error]) {
+    _quizChannel?.subscribe((final status, [final error]) {
       debugPrint('LiveQuiz channel status: $status');
     });
   }
@@ -184,10 +184,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
   void _listenParticipants() {
     if (widget.circleId == null) return;
     _participantsSub?.cancel();
-    _participantsSub = circlesRepository.getParticipantsStream(widget.circleId!).listen((data) async {
+    _participantsSub = circlesRepository.getParticipantsStream(widget.circleId!).listen((final data) async {
       // 1. Fetch profiles for new user IDs
-      final userIds = data.map((e) => e['user_id'] as String).toList();
-      final newIds = userIds.where((id) => !profilesCache.containsKey(id)).toList();
+      final userIds = data.map((final e) => e['user_id'] as String).toList();
+      final newIds = userIds.where((final id) => !profilesCache.containsKey(id)).toList();
       
       if (newIds.isNotEmpty) {
         final profiles = await profileRepository.getProfilesByIds(newIds);
@@ -199,7 +199,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
       if (!mounted) return;
 
       final myId = circlesRepository.currentUserId;
-      final updatedLeaders = data.map((p) {
+      final updatedLeaders = data.map((final p) {
         final uid = p['user_id']?.toString();
         final profile = profilesCache[uid];
         final role = p['role']?.toString();
@@ -231,8 +231,8 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     });
   }
 
-  bool _isMutedFor(String userId) => circleVoiceService.voiceFor(userId)?.muted ?? false;
-  bool _isSpeakingFor(String userId) => circleVoiceService.voiceFor(userId)?.speaking ?? false;
+  bool _isMutedFor(final String userId) => circleVoiceService.voiceFor(userId)?.muted ?? false;
+  bool _isSpeakingFor(final String userId) => circleVoiceService.voiceFor(userId)?.speaking ?? false;
 
 
   Future<void> _connectVoice() async {
@@ -253,10 +253,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
       // Continue without voice if it fails
     }
     _voiceSub?.cancel();
-    _voiceSub = circleVoiceService.stream.listen((voiceByUser) {
+    _voiceSub = circleVoiceService.stream.listen((final voiceByUser) {
       if (!mounted) return;
       setState(() {
-        leaders = leaders.map((l) {
+        leaders = leaders.map((final l) {
           final uid = l.userId;
           if (uid == null) return l;
           final voice = voiceByUser[uid];
@@ -307,7 +307,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     debugPrint('Starting quiz timer: ${widget.timePerQ}s');
     timer?.cancel();
     setState(() => t = widget.timePerQ);
-    timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    timer = Timer.periodic(const Duration(seconds: 1), (final _) {
       if (!mounted) return;
       if (t <= 1) {
         timer?.cancel();
@@ -318,7 +318,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     });
   }
 
-  void _select(int idx) {
+  void _select(final int idx) {
     if (revealed || (!isParticipant && !isHost)) return;
     final meKey = _currentUserKey;
     if (meKey == null || _answersByUser.containsKey(meKey)) return;
@@ -346,11 +346,11 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     }
   }
 
-  void _toggleMuteFor(String name) {
+  void _toggleMuteFor(final String name) {
     rtcVoiceService.toggleMuted();
   }
 
-  void _revealAnswer({bool timedOut = false}) async {
+  void _revealAnswer({final bool timedOut = false}) async {
     if (revealed) return;
     timer?.cancel();
     final q = questions[qIndex];
@@ -387,7 +387,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
       // We don't manually update 'leaders' here because the participant stream 
       // will trigger an update as soon as the score is written to DB.
       // But we update lastAnswer for local UI feedback
-      leaders = leaders.map((l) {
+      leaders = leaders.map((final l) {
         final key = _leaderKey(l);
         final answerIndex = _answersByUser[key];
         final didAnswer = answerIndex != null;
@@ -515,7 +515,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
       revealed = false;
       _answersByUser.clear();
       _answerTimeByUser.clear();
-      leaders = leaders.map((l) => l.copyWith(lastAnswer: LeaderboardAnswer.none)).toList();
+      leaders = leaders.map((final l) => l.copyWith(lastAnswer: LeaderboardAnswer.none)).toList();
     });
     if (questions.isNotEmpty) {
       _prepareQuestion();
@@ -540,10 +540,10 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     _scheduleQuestionAudio(q);
   }
 
-  _ChoiceSet _buildChoiceSet(_Question question) {
+  _ChoiceSet _buildChoiceSet(final _Question question) {
     if (question.choicePool.isNotEmpty && question.correctAnswer.isNotEmpty) {
       final items = question.choicePool
-          .where((value) => value.trim().isNotEmpty && value != question.correctAnswer)
+          .where((final value) => value.trim().isNotEmpty && value != question.correctAnswer)
           .toSet()
           .toList();
       items.shuffle();
@@ -554,9 +554,9 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     return _ChoiceSet(choices: question.choices, correctIndex: question.correctIndex);
   }
 
-  bool _isSentenceQuestion(_Question question) => question.fullSentence.trim().isNotEmpty;
+  bool _isSentenceQuestion(final _Question question) => question.fullSentence.trim().isNotEmpty;
 
-  void _scheduleQuestionAudio(_Question question) {
+  void _scheduleQuestionAudio(final _Question question) {
     if (_isSentenceQuestion(question)) return;
     final prompt = question.prompt.trim();
     if (prompt.isEmpty || prompt == _waitingForHostText) return;
@@ -570,7 +570,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     });
   }
 
-  Future<void> _speakSentence(_Question question, {bool withDelay = true}) {
+  Future<void> _speakSentence(final _Question question, {final bool withDelay = true}) {
     if (!_isSentenceQuestion(question)) return Future.value();
     final sentence = question.fullSentence.trim();
     if (sentence.isEmpty) return Future.value();
@@ -591,7 +591,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     return completer.future;
   }
 
-  void _onSpeakTap(_Question question) {
+  void _onSpeakTap(final _Question question) {
     if (_isSentenceQuestion(question)) {
       if (!revealed) return;
       _speakSentence(question, withDelay: false);
@@ -605,9 +605,9 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     ttsService.speak(prompt, language: lang);
   }
 
-  String _leaderKey(_Leader leader) => leader.userId ?? leader.name;
+  String _leaderKey(final _Leader leader) => leader.userId ?? leader.name;
 
-  bool _isAnsweringLeader(_Leader leader) => leader.isHost || leader.userId != null; // Host and all participants with IDs are players
+  bool _isAnsweringLeader(final _Leader leader) => leader.isHost || leader.userId != null; // Host and all participants with IDs are players
 
   bool _allParticipantsAnswered() {
     final expected = leaders
@@ -619,12 +619,12 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
   }
 
   String? get _currentUserKey {
-    final me = leaders.where((l) => l.isMe).toList();
+    final me = leaders.where((final l) => l.isMe).toList();
     if (me.isEmpty) return null;
     return _leaderKey(me.first);
   }
 
-  void _recordAnswer(String key, int index, {bool broadcast = true}) {
+  void _recordAnswer(final String key, final int index, {final bool broadcast = true}) {
     if (_answersByUser.containsKey(key)) return;
     _answersByUser[key] = index;
     _answerTimeByUser[key] = t;
@@ -632,7 +632,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     // Local UI update immediately for all participants answering
     if (mounted) {
       setState(() {
-        leaders = leaders.map((l) {
+        leaders = leaders.map((final l) {
           final lKey = _leaderKey(l);
           final ans = _answersByUser[lKey];
           if (ans != null) {
@@ -668,7 +668,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     }
     if (!mounted) return;
     // Convert local leaders to LeaderboardPlayer
-    final List<LeaderboardPlayer> finalLeaders = leaders.map((l) {
+    final List<LeaderboardPlayer> finalLeaders = leaders.map((final l) {
       return LeaderboardPlayer(
         userId: l.userId,
         name: l.name,
@@ -685,16 +685,16 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
 
     // Sort to find my rank
     final sorted = List<LeaderboardPlayer>.from(finalLeaders);
-    sorted.sort((a, b) => b.points.compareTo(a.points));
+    sorted.sort((final a, final b) => b.points.compareTo(a.points));
 
-    final meIndex = sorted.indexWhere((p) => p.isMe);
+    final meIndex = sorted.indexWhere((final p) => p.isMe);
     final me = meIndex != -1 ? sorted[meIndex] : sorted.first;
     final rank = meIndex + 1;
 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => ResultsScreen(
+        builder: (final _) => ResultsScreen(
           points: me.points,
           correct: me.correct,
           total: me.total,
@@ -711,12 +711,12 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
 
   int get parsedPlayers => leaders.length;
 
-  void _openProfileSheet(String? userId) {
+  void _openProfileSheet(final String? userId) {
     if (userId == null || userId.isEmpty) return;
     showDialog<void>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.5),
-      builder: (_) {
+      builder: (final _) {
         final size = MediaQuery.of(context).size;
         return Dialog(
           backgroundColor: Colors.transparent,
@@ -766,7 +766,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     await circleVoiceService.disconnectIfCircle(circleId);
     await rtcVoiceService.disconnectIfCircle(circleId);
     if (!mounted) return;
-    Navigator.popUntil(context, (r) => r.isFirst);
+    Navigator.popUntil(context, (final r) => r.isFirst);
   }
 
   void _openChatSheet() {
@@ -780,7 +780,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) {
+      builder: (final _) {
         final height = MediaQuery.of(context).size.height * 0.75;
         return SizedBox(
           height: height,
@@ -794,7 +794,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
 
@@ -835,7 +835,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
     
     // Sort leaders for leaderboard
     final sortedLeaders = List<_Leader>.from(leaders)
-      ..sort((a, b) => b.score.compareTo(a.score));
+      ..sort((final a, final b) => b.score.compareTo(a.score));
       
     _Leader? meLeader;
     for (final leader in sortedLeaders) {
@@ -852,10 +852,26 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
         : (isSpectator ? l10n.roleSpectator : l10n.circlesParticipant);
 
     return Scaffold(
-      body: SafeArea(
-        child: ResponsiveFrame(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
+      body: Stack(
+        children: [
+          ...rtcVoiceService.activeRenderers.map((final renderer) => Positioned(
+                left: 0,
+                top: 0,
+                width: 1,
+                height: 1,
+                child: SizedBox(
+                  width: 1,
+                  height: 1,
+                  child: RTCVideoView(
+                    renderer,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                  ),
+                ),
+              )),
+          SafeArea(
+            child: ResponsiveFrame(
+              child: LayoutBuilder(
+            builder: (final context, final constraints) {
               final compactHeight = constraints.maxHeight < 760;
               final topSpacing = compactHeight ? 10.0 : 12.0;
               final sectionSpacing = compactHeight ? 10.0 : 12.0;
@@ -894,7 +910,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                        )
                     ),
                      _Pill(
-                        text: "$myScore",
+                        text: '$myScore',
                         icon: Icons.bolt_rounded,
                         color: const Color(0xFFF9F319),
                      ),
@@ -948,14 +964,14 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                       const SizedBox(height: 10),
                       StreamBuilder<Map<String, bool>>(
                         stream: presenceRepository.streamMultipleOnlineStatuses(
-                          leaders.map((l) => l.userId).whereType<String>().toList(),
+                          leaders.map((final l) => l.userId).whereType<String>().toList(),
                         ),
-                        builder: (context, presenceSnapshot) {
+                        builder: (final context, final presenceSnapshot) {
                           final presence = presenceSnapshot.data ?? {};
                           return _LiveLeaderboardStrip(
                             leaders: sortedLeaders,
                             presence: presence,
-                            onAvatarTap: (leader) {
+                            onAvatarTap: (final leader) {
                               if (leader.userId != null) {
                                 _openProfileSheet(leader.userId);
                               }
@@ -1059,7 +1075,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                     child: _TtsControls(
                       rates: const [0.75, 1.0, 1.25],
                       selectedRate: _speechRate,
-                      onRateSelected: (rate) {
+                      onRateSelected: (final rate) {
                         setState(() => _speechRate = rate);
                         ttsService.setRate(rate);
                       },
@@ -1078,8 +1094,8 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                       padding: const EdgeInsets.fromLTRB(12, 20, 12, 20),
                       clipBehavior: Clip.none,
                       itemCount: _choices.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
-                      itemBuilder: (_, i) {
+                      separatorBuilder: (final _, final __) => const SizedBox(height: 10),
+                      itemBuilder: (final _, final i) {
                         final isSelected = selectedIndex == i;
                         final isCorrect = _correctIndex == i;
                         final showCorrect = revealed;
@@ -1168,7 +1184,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                                           child: ClipRect(
                                             child: AnimatedSwitcher(
                                               duration: MotionTokens.short,
-                                              transitionBuilder: (child, anim) {
+                                              transitionBuilder: (final child, final anim) {
                                                 final slide = Tween<Offset>(
                                                   begin: const Offset(0.16, 0),
                                                   end: Offset.zero,
@@ -1191,7 +1207,7 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
                                                     children: [
                                                       const Icon(Icons.check_rounded, color: Color(0xFF2AFADF), size: 18),
                                                       const SizedBox(width: 4),
-                                                      const RewardSparkle(show: true, size: 14, burst: false),
+                                                      const SizedBox.shrink(),
                                                     ],
                                                   )
                                                 : (showCorrect && isSelected && !isCorrect)
@@ -1251,29 +1267,12 @@ class _LiveQuizScreenState extends State<LiveQuizScreen> {
           ),
         ),
       ),
+    ],
+    ),
     );
   }
 }
 
-class _TinyGlass extends StatelessWidget {
-  final Widget child;
-  final VoidCallback? onTap;
-
-  const _TinyGlass({required this.child, this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Glass(
-      radius: BorderRadius.circular(16),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: child,
-      ),
-    );
-  }
-}
 
 class _LiveLeaderboardStrip extends StatelessWidget {
   final List<_Leader> leaders;
@@ -1287,7 +1286,7 @@ class _LiveLeaderboardStrip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (leaders.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -1312,7 +1311,7 @@ class _LiveLeaderboardStrip extends StatelessWidget {
               width: totalWidth,
               child: Stack(
                 clipBehavior: Clip.none,
-                children: leaders.asMap().entries.map((entry) {
+                children: leaders.asMap().entries.map((final entry) {
                   final index = entry.key;
                   final leader = entry.value;
 
@@ -1355,7 +1354,7 @@ class _CompactLeaderChip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final borderColor = leader.isMe
         ? const Color(0xFF33D6FF)
@@ -1390,7 +1389,7 @@ class _CompactLeaderChip extends StatelessWidget {
                       tween: Tween(begin: 0.84, end: 1.0),
                       duration: const Duration(milliseconds: 380),
                       curve: Curves.easeOutBack,
-                      builder: (context, value, child) {
+                      builder: (final context, final value, final child) {
                         return Transform.scale(scale: value, child: child);
                       },
                       child: Container(
@@ -1428,7 +1427,7 @@ class _CompactLeaderChip extends StatelessWidget {
                     ),
                     child: _AvatarBubble(
                       name: leader.name,
-                      heroTag: leader.userId == null ? null : "profile-avatar-${leader.userId}",
+                      heroTag: leader.userId == null ? null : 'profile-avatar-${leader.userId}',
                       muted: leader.isMuted,
                       speaking: leader.isSpeaking,
                       isOnline: isOnline,
@@ -1445,7 +1444,7 @@ class _CompactLeaderChip extends StatelessWidget {
                         tween: Tween(begin: 0.7, end: 1.0),
                         duration: const Duration(milliseconds: 320),
                         curve: Curves.easeOutBack,
-                        builder: (context, value, child) {
+                        builder: (final context, final value, final child) {
                           return Transform.scale(scale: value, child: child);
                         },
                         child: Container(
@@ -1518,7 +1517,7 @@ class _BottomActionBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -1554,7 +1553,7 @@ class _CircleActionButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
@@ -1600,9 +1599,9 @@ class _AvatarBubble extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final trimmed = name.trim();
-    final initial = trimmed.isNotEmpty ? trimmed.substring(0, 1).toUpperCase() : "?";
+    final initial = trimmed.isNotEmpty ? trimmed.substring(0, 1).toUpperCase() : '?';
     final avatar = Stack(
       alignment: Alignment.center,
       children: [
@@ -1633,7 +1632,7 @@ class _AvatarBubble extends StatelessWidget {
                     width: size,
                     height: size,
                     fit: BoxFit.cover,
-                    errorWidget: (_, __, ___) => Center(
+                    errorWidget: (final _, final __, final ___) => Center(
                       child: Text(
                         initial,
                         style: TextStyle(
@@ -1712,7 +1711,7 @@ class _RolePill extends StatelessWidget {
   const _RolePill({required this.icon, required this.label});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -1734,7 +1733,7 @@ class _RolePill extends StatelessWidget {
 
 class _SpectatorFooter extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(22),
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
@@ -1763,7 +1762,7 @@ class _QuizProgressBar extends StatelessWidget {
   const _QuizProgressBar({required this.progress});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       height: 10,
       decoration: BoxDecoration(
@@ -1841,7 +1840,7 @@ class _TtsControls extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final opacity = disabled ? 0.5 : 1.0;
     return Opacity(
       opacity: opacity,
@@ -1850,12 +1849,12 @@ class _TtsControls extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         child: Row(
           children: [
-            ...rates.map((rate) {
+            ...rates.map((final rate) {
               final selected = rate == selectedRate;
               return Padding(
                 padding: const EdgeInsets.only(right: 6),
                 child: _SpeedChip(
-                  label: "${rate.toStringAsFixed(rate == 1.0 ? 0 : 2)}x",
+                  label: '${rate.toStringAsFixed(rate == 1.0 ? 0 : 2)}x',
                   selected: selected,
                   onTap: disabled ? null : () => onRateSelected(rate),
                 ),
@@ -1893,7 +1892,7 @@ class _SpeedChip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
@@ -1922,7 +1921,7 @@ class _SpeedChip extends StatelessWidget {
 }
 
 // Returns true if the given 2-letter language code uses a right-to-left script.
-bool _isRtlLang(String code) {
+bool _isRtlLang(final String code) {
   const rtl = {
     'ar', 'he', 'fa', 'ur', 'ps', 'sd', 'ug', 'yi',
     'dv', 'ks', 'ku', 'ha',
@@ -1946,7 +1945,7 @@ class _VocabPromptLine extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final safeArticle = article.trim();
     final safeWord = word.trim().isNotEmpty ? word.trim() : prompt.trim();
     final hasArticle = safeArticle.isNotEmpty && word.trim().isNotEmpty
@@ -2015,10 +2014,10 @@ class _GenderChip extends StatelessWidget {
   const _GenderChip({required this.value});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final trimmed = value.trim();
     final display = trimmed.isEmpty
-        ? ""
+        ? ''
         : (trimmed.length <= 2 && !trimmed.contains(' '))
             ? trimmed.toLowerCase()
             : trimmed.substring(0, 1).toLowerCase();
@@ -2079,15 +2078,15 @@ class _Leader {
   });
 
   _Leader copyWith({
-    int? score,
-    int? correct,
-    int? total,
-    bool? isHost,
-    bool? isMuted,
-    bool? isSpeaking,
-    LeaderboardAnswer? lastAnswer,
-    String? userId,
-    String? avatarUrl,
+    final int? score,
+    final int? correct,
+    final int? total,
+    final bool? isHost,
+    final bool? isMuted,
+    final bool? isSpeaking,
+    final LeaderboardAnswer? lastAnswer,
+    final String? userId,
+    final String? avatarUrl,
   }) {
     return _Leader(
       name,
@@ -2117,7 +2116,7 @@ class _Pill extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
@@ -2151,7 +2150,7 @@ class _IconGlass extends StatelessWidget {
   const _IconGlass({required this.icon, this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(16),

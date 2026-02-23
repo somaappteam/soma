@@ -1600,6 +1600,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get circlesStartGame => 'ゲーム開始';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'プレイヤー待機中';
 
   @override

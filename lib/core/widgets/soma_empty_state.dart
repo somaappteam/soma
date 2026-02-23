@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/tokens.dart';
-import '../widgets/glass.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
 
 /// A premium illustrated empty state for when a list or feed has no content.
 ///
@@ -63,7 +63,7 @@ class _SomaEmptyStateState extends State<SomaEmptyState>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
     return Center(

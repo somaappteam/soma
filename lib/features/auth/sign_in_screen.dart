@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/premium_dialog.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/profile_store.dart';
+import 'package:soma/features/auth/sign_up_screen.dart';
+import 'package:soma/features/home/app_shell.dart';
+import 'package:soma/features/info/about_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../home/app_shell.dart';
-import '../info/about_screen.dart';
-import 'sign_up_screen.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../data/auth_repository.dart';
-import '../../data/profile_store.dart';
-import '../../core/widgets/responsive.dart';
-import '../../core/theme/tokens.dart';
-import '../../core/widgets/premium_dialog.dart';
 
 
 class SignInScreen extends StatefulWidget {
@@ -64,7 +64,7 @@ class _SignInScreenState extends State<SignInScreen> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const AppShell()),
+          MaterialPageRoute(builder: (final _) => const AppShell()),
         );
       }
     } catch (e) {
@@ -84,7 +84,7 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
 
-  Future<void> _handleOAuthSignIn(OAuthProvider provider) async {
+  Future<void> _handleOAuthSignIn(final OAuthProvider provider) async {
     final l10n = AppLocalizations.of(context);
     try {
       await authRepository.signInWithOAuth(provider);
@@ -108,7 +108,7 @@ class _SignInScreenState extends State<SignInScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const AboutScreen(view: AboutView.version),
+        builder: (final _) => const AboutScreen(view: AboutView.version),
       ),
     );
   }
@@ -119,7 +119,7 @@ class _SignInScreenState extends State<SignInScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.55),
-      builder: (_) => Dialog(
+      builder: (final _) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24),
         child: Glass(
@@ -264,7 +264,7 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
@@ -365,7 +365,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       child: InkWell(
                         onTap: () => Navigator.pushReplacement(
                           context,
-                          MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                          MaterialPageRoute(builder: (final _) => const SignUpScreen()),
                         ),
                         child: Text.rich(
                           TextSpan(
@@ -408,7 +408,7 @@ class _IconGlassButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(14),
       padding: EdgeInsets.zero,
@@ -449,7 +449,7 @@ class _GlassTextField extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
     

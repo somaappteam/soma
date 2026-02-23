@@ -1,25 +1,26 @@
 import 'dart:async';
 import 'dart:ui' show clampDouble;
+
 import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../data/settings_repository.dart';
+import 'package:soma/core/theme/motion.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/pressable_scale.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/data/achievements_repository.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/call_signaling_service.dart';
+import 'package:soma/data/leaderboard_repository.dart';
+import 'package:soma/data/profile_repository.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/features/auth/sign_in_screen.dart';
+import 'package:soma/features/auth/sign_up_screen.dart';
+import 'package:soma/features/circles/circles_screen.dart';
+import 'package:soma/features/home/home_screen.dart';
+import 'package:soma/features/profile/profile_screen.dart';
+import 'package:soma/features/social/dm_chat_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../data/auth_repository.dart';
-import '../../data/achievements_repository.dart';
-import '../../core/widgets/glass.dart';
-import '../auth/sign_in_screen.dart';
-import '../auth/sign_up_screen.dart';
-import '../circles/circles_screen.dart';
-import 'home_screen.dart';
-import '../profile/profile_screen.dart';
-import '../social/dm_chat_screen.dart';
-import '../../core/theme/motion.dart';
-import '../../core/widgets/pressable_scale.dart';
-import '../../core/widgets/responsive.dart';
-import '../../data/call_signaling_service.dart';
-import '../../data/leaderboard_repository.dart';
-import '../../data/profile_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 
 class AppShell extends StatefulWidget {
@@ -38,7 +39,7 @@ class _AppShellState extends State<AppShell> {
 
   bool get _isGuest => authRepository.currentUser == null;
 
-  void _handleNavChange(int nextIndex) {
+  void _handleNavChange(final int nextIndex) {
     if (nextIndex == 1 && _isGuest) {
       _showAuthRequiredDialog();
       return;
@@ -61,18 +62,18 @@ class _AppShellState extends State<AppShell> {
         .from('notifications')
         .stream(primaryKey: ['id'])
         .eq('user_id', uid)
-        .map((rows) => rows
-            .where((r) =>
+        .map((final rows) => rows
+            .where((final r) =>
                 r['read'] != true &&
                 (r['type']?.toString() ?? '').contains('invite'))
             .toList());
-    _inviteSub = stream.listen((unread) {
+    _inviteSub = stream.listen((final unread) {
       if (mounted) setState(() => _pendingCircleInvites = unread.length);
     });
   }
 
   void _initDeepLinks() {
-    _deepLinkSub = AppLinks().uriLinkStream.listen((uri) {
+    _deepLinkSub = AppLinks().uriLinkStream.listen((final uri) {
       // Handle soma://profile/<username>
       if (uri.scheme == 'soma' && uri.host == 'profile') {
         final username = uri.pathSegments.isNotEmpty
@@ -85,13 +86,13 @@ class _AppShellState extends State<AppShell> {
     });
   }
 
-  Future<void> _navigateToProfileByUsername(String username) async {
+  Future<void> _navigateToProfileByUsername(final String username) async {
     final row = await leaderboardRepository.fetchByUsername(username);
     final userId = row?['id']?.toString() ?? row?['user_id']?.toString();
     if (userId != null && mounted) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => ProfileScreen(userId: userId)),
+        MaterialPageRoute(builder: (final _) => ProfileScreen(userId: userId)),
       );
     }
   }
@@ -99,14 +100,30 @@ class _AppShellState extends State<AppShell> {
   void _initGlobalSignaling() {
     if (_isGuest) return;
     callSignalingService.initialize();
-    _signalSub = callSignalingService.events.listen((event) {
+    _signalSub = callSignalingService.events.listen((final event) async {
       if (event.type == CallSignalType.invite) {
         _handleGlobalInvite(event);
+      } else if (event.type == CallSignalType.accept && event.rawData['local_accept'] == true) {
+        if (!mounted) return;
+        final fromProfile = await profileRepository.fetchProfile(userId: event.fromUserId);
+        final fromName = fromProfile?.displayName ?? fromProfile?.username ?? 'Someone';
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (final _) => DmChatScreen(
+              meId: authRepository.currentUser?.id ?? '',
+              otherId: event.fromUserId,
+              otherName: fromName,
+              initialIncomingCall: true,
+            ),
+          ),
+        );
       }
     });
   }
 
-  Future<void> _handleGlobalInvite(CallSignalEvent event) async {
+  Future<void> _handleGlobalInvite(final CallSignalEvent event) async {
     // If we are already in DmChatScreen, it will handle it (or we can let AppShell handle it globally)
     // For now, let's show a global dialog if we aren't in a call.
     final settings = await settingsRepository.getTypedSettings();
@@ -130,7 +147,7 @@ class _AppShellState extends State<AppShell> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => DmChatScreen(
+          builder: (final _) => DmChatScreen(
             meId: authRepository.currentUser?.id ?? '',
             otherId: event.fromUserId,
             otherName: fromName,
@@ -146,11 +163,11 @@ class _AppShellState extends State<AppShell> {
     }
   }
 
-  Future<bool?> _showGlobalIncomingCallDialog(String name) async {
+  Future<bool?> _showGlobalIncomingCallDialog(final String name) async {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
+      builder: (final context) => Dialog(
         backgroundColor: Colors.transparent,
         child: Glass(
           radius: BorderRadius.circular(24),
@@ -198,10 +215,10 @@ class _AppShellState extends State<AppShell> {
     super.dispose();
   }
 
-  Future<void> _openAuthFlow(Widget screen) async {
+  Future<void> _openAuthFlow(final Widget screen) async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => screen),
+      MaterialPageRoute(builder: (final _) => screen),
     );
     if (mounted && !_isGuest) {
       setState(() => _index = 1);
@@ -214,7 +231,7 @@ class _AppShellState extends State<AppShell> {
     await showDialog<void>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.6),
-      builder: (ctx) => Dialog(
+      builder: (final ctx) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24),
         child: Glass(
@@ -315,7 +332,7 @@ class _AppShellState extends State<AppShell> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final pages = [
       const HomeScreen(),
       const CirclesScreen(),
@@ -326,22 +343,8 @@ class _AppShellState extends State<AppShell> {
       reverseDuration: MotionTokens.pageOut,
       switchInCurve: MotionTokens.pageInCurve,
       switchOutCurve: MotionTokens.pageOutCurve,
-      transitionBuilder: (child, animation) {
-        final slide = Tween<Offset>(
-          begin: const Offset(0, 0.04),
-          end: Offset.zero,
-        ).animate(animation);
-        final fade = Tween<double>(begin: 0.0, end: 1.0).animate(animation);
-        return FadeTransition(
-          opacity: fade,
-          child: SlideTransition(
-            position: slide,
-            child: ScaleTransition(
-              scale: Tween<double>(begin: 0.98, end: 1.0).animate(animation),
-              child: child,
-            ),
-          ),
-        );
+      transitionBuilder: (final child, final animation) {
+        return FadeTransition(opacity: animation, child: child);
       },
       child: KeyedSubtree(
         key: ValueKey(_index),
@@ -350,7 +353,7 @@ class _AppShellState extends State<AppShell> {
     );
 
     return LayoutBuilder(
-      builder: (context, constraints) {
+      builder: (final context, final constraints) {
         final isWide = constraints.maxWidth >= SomaBreakpoints.medium;
 
         final contentSlot = isWide
@@ -387,7 +390,7 @@ class _AppShellState extends State<AppShell> {
               // Achievement unlock toast — slides in from top when a new achievement is earned.
               ValueListenableBuilder(
                 valueListenable: achievementUnlockNotifier,
-                builder: (context, achievement, _) {
+                builder: (final context, final achievement, final _) {
                   if (achievement == null) return const SizedBox.shrink();
                   return Positioned(
                     top: MediaQuery.of(context).padding.top + 12,
@@ -451,7 +454,7 @@ class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
     });
   }
 
-  void _onDragUpdate(DragUpdateDetails details, BoxConstraints constraints) {
+  void _onDragUpdate(final DragUpdateDetails details, final BoxConstraints constraints) {
     final media = MediaQuery.of(context);
     const pillWidth = 220.0;
     const pillHeight = 40.0;
@@ -469,10 +472,10 @@ class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return StreamBuilder<Map<String, dynamic>>(
       stream: _settingsStream,
-      builder: (context, snapshot) {
+      builder: (final context, final snapshot) {
         final call = snapshot.data?['dm_active_call'];
         final isActive = call is Map && call['active'] == true;
         
@@ -485,21 +488,21 @@ class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
         if (!isActive) return const SizedBox.shrink();
         
         return LayoutBuilder(
-          builder: (context, constraints) {
+          builder: (final context, final constraints) {
             return Positioned(
               left: _overlayOffset.dx,
               top: _overlayOffset.dy,
               child: _GlobalActiveCallPill(
                 name: name,
-                onDragUpdate: (details) => _onDragUpdate(details, constraints),
-                onDragEnd: (_) => _persistOverlayOffset(),
+                onDragUpdate: (final details) => _onDragUpdate(details, constraints),
+                onDragEnd: (final _) => _persistOverlayOffset(),
                 onTap: otherId == null || otherId.isEmpty
                     ? null
                     : () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => DmChatScreen(
+                            builder: (final _) => DmChatScreen(
                               meId: authRepository.currentUser?.id ?? '',
                               otherId: otherId,
                               otherName: name,
@@ -529,7 +532,7 @@ class _GlobalActiveCallPill extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -572,7 +575,7 @@ class _BenefitRow extends StatelessWidget {
   const _BenefitRow({required this.label});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -608,12 +611,12 @@ class _SomaBottomNav extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return SafeArea(
       top: false,
       child: LayoutBuilder(
-        builder: (context, constraints) {
+        builder: (final context, final constraints) {
           final width = constraints.maxWidth;
           final scale = (width / 360).clamp(0.85, 1.1);
           final outerPad = EdgeInsets.fromLTRB(14 * scale, 0, 14 * scale, 14 * scale);
@@ -702,7 +705,7 @@ class _NavItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final color = selected
@@ -789,7 +792,7 @@ class _SomaSideNav extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return SafeArea(
       right: false,
@@ -846,7 +849,7 @@ class _RailItem extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final color = selected
@@ -938,7 +941,7 @@ class _AchievementToastState extends State<_AchievementToast>
 
   void _dismiss() {
     if (!mounted) return;
-    _ctrl.reverse().then((_) {
+    _ctrl.reverse().then((final _) {
       if (mounted) widget.onDismissed();
     });
   }
@@ -951,7 +954,7 @@ class _AchievementToastState extends State<_AchievementToast>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final emoji = widget.icon ?? '🏆';
 

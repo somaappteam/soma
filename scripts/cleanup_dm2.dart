@@ -55,26 +55,26 @@ void main() {
   // 3. Remove variables
   final vars = [
     "String _draftText = '';",
-    "int _callQualityScore = 78;",
-    "int _smoothedCallQualityScore = 78;",
-    "String? _pendingUndoText;",
-    "DateTime? _muteUntil;",
-    "final Set<String> _mutedKeywords = <String>{};",
-    "Duration? _disappearingWindow;",
-    "_DmThemeStyle _themeStyle = _DmThemeStyle.defaultStyle;",
-    "bool _isConversationArchived = false;",
-    "bool _autoTranslateIncoming = false;",
+    'int _callQualityScore = 78;',
+    'int _smoothedCallQualityScore = 78;',
+    'String? _pendingUndoText;',
+    'DateTime? _muteUntil;',
+    'final Set<String> _mutedKeywords = <String>{};',
+    'Duration? _disappearingWindow;',
+    '_DmThemeStyle _themeStyle = _DmThemeStyle.defaultStyle;',
+    'bool _isConversationArchived = false;',
+    'bool _autoTranslateIncoming = false;',
     "String _autoTranslateLanguage = 'English';",
-    "_CefrLevel _targetCefrLevel = _CefrLevel.b1;",
-    "_TutorPersona _tutorPersona = _TutorPersona.friendlyCoach;",
-    "_AutoCorrectMode _autoCorrectMode = _AutoCorrectMode.off;",
-    "bool _examModeEnabled = false;",
-    "final List<String> _duePracticePhrases = <String>[];",
-    "bool _dmLocked = false;",
-    "bool _dmUnlocked = false;",
-    "bool _screenshotWarningEnabled = true;",
-    "bool _hidePreviewInInbox = false;",
-    "bool _callRecordingConsent = false;"
+    '_CefrLevel _targetCefrLevel = _CefrLevel.b1;',
+    '_TutorPersona _tutorPersona = _TutorPersona.friendlyCoach;',
+    '_AutoCorrectMode _autoCorrectMode = _AutoCorrectMode.off;',
+    'bool _examModeEnabled = false;',
+    'final List<String> _duePracticePhrases = <String>[];',
+    'bool _dmLocked = false;',
+    'bool _dmUnlocked = false;',
+    'bool _screenshotWarningEnabled = true;',
+    'bool _hidePreviewInInbox = false;',
+    'bool _callRecordingConsent = false;'
   ];
   
   for (var v in vars) {
@@ -98,7 +98,7 @@ void main() {
     final regex = RegExp(r'(class\s+|Future<.*?>|String|bool|List<.*?>|void|Widget)?\s*' + method + r'(\s+extends.*?)?\s*\([^)]*\)\s*(async\s*)?\{');
     final match = regex.firstMatch(content);
     if (match != null) {
-      int start = match.start;
+      final int start = match.start;
       int braceCount = 0;
       int idx = start;
       bool foundFirstBrace = false;

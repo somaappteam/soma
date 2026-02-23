@@ -1,17 +1,17 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:soma/core/theme/app_theme.dart';
+import 'package:soma/core/theme/layout_tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/premium_screen_scaffold.dart';
+import 'package:soma/core/widgets/pressable_scale.dart';
+import 'package:soma/core/widgets/staggered_in.dart';
+import 'package:soma/data/leaderboard_repository.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/features/profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/pressable_scale.dart';
-import '../../core/widgets/staggered_in.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/theme/layout_tokens.dart';
-import '../../core/widgets/premium_screen_scaffold.dart';
-import '../../data/leaderboard_repository.dart';
-import '../../data/presence_repository.dart';
-import '../profile/profile_screen.dart';
 
 // ─── Tab definition ──────────────────────────────────────────────────────────
 
@@ -109,9 +109,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
     });
   }
 
-  Future<List<Map<String, dynamic>>> _searchAndRank(String query) async {
+  Future<List<Map<String, dynamic>>> _searchAndRank(final String query) async {
     final users = await leaderboardRepository.searchUsers(query);
-    final results = await Future.wait(users.map((u) async {
+    final results = await Future.wait(users.map((final u) async {
       final rank = await leaderboardRepository.getUserRank(u['xp'] ?? 0);
       return {...u, 'rank': rank};
     }));
@@ -119,7 +119,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   }
 
   Timer? _debounce;
-  void _onSearchChanged(String value) {
+  void _onSearchChanged(final String value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       if (mounted) {
@@ -138,7 +138,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTones = Theme.of(context).extension<AppTextToneTheme>();
@@ -164,7 +164,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
         onTap: () => Navigator.pop(context),
       ),
       body: LayoutBuilder(
-        builder: (context, constraints) {
+        builder: (final context, final constraints) {
           final density = PremiumLayout.densityForWidth(constraints.maxWidth);
           final listGap = PremiumLayout.listGap(density);
 
@@ -307,7 +307,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               Expanded(
                 child: FutureBuilder<List<Map<String, dynamic>>>(
                   future: _leaderboardFuture,
-                  builder: (context, snapshot) {
+                  builder: (final context, final snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
                           child: CircularProgressIndicator(
@@ -342,7 +342,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                     }
 
                     final userIds = data
-                        .map((u) =>
+                        .map((final u) =>
                             (u['id'] ?? u['user_id'])?.toString())
                         .whereType<String>()
                         .toList();
@@ -356,7 +356,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                     return StreamBuilder<Map<String, bool>>(
                       stream: presenceRepository
                           .streamMultipleOnlineStatuses(userIds),
-                      builder: (context, presenceSnapshot) {
+                      builder: (final context, final presenceSnapshot) {
                         final onlineStatuses =
                             presenceSnapshot.data ?? {};
                         return ListView(
@@ -368,7 +368,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                   child: _PodiumCard(players: podium)),
                               SizedBox(height: listGap),
                             ],
-                            ...List.generate(data.length, (index) {
+                            ...List.generate(data.length, (final index) {
                               final user = data[index];
                               final rank =
                                   user['rank'] ?? (index + 1);
@@ -411,7 +411,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (_) =>
+                                                builder: (final _) =>
                                                     ProfileScreen(
                                                         userId: userId),
                                               ),
@@ -480,8 +480,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                                             fit: BoxFit
                                                                 .cover,
                                                             errorBuilder:
-                                                                (_, __,
-                                                                        ___) =>
+                                                                (final _, final __,
+                                                                        final ___) =>
                                                                     Icon(
                                                               Icons
                                                                   .person,
@@ -621,7 +621,7 @@ class _PodiumCard extends StatelessWidget {
   const _PodiumCard({required this.players});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Glass(
       depth: GlassDepth.l3,
@@ -638,7 +638,7 @@ class _PodiumCard extends StatelessWidget {
                   fontSize: 16)),
           const SizedBox(height: 10),
           Row(
-            children: List.generate(players.length, (i) {
+            children: List.generate(players.length, (final i) {
               final player = players[i];
               final rank = i + 1;
               return Expanded(
@@ -698,7 +698,7 @@ class _RankTrendChip extends StatelessWidget {
   const _RankTrendChip({required this.delta});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTones = Theme.of(context).extension<AppTextToneTheme>();
     final isUp = delta > 0;
@@ -745,7 +745,7 @@ class _IconGlass extends StatelessWidget {
   const _IconGlass({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(16),

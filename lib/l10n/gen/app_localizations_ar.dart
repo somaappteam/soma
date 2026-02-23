@@ -1623,6 +1623,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get circlesStartGame => 'بدء اللعبة';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'انتظار اللاعبين';
 
   @override

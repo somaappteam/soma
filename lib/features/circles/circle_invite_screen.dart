@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/circles_repository.dart';
+import 'package:soma/features/auth/sign_in_screen.dart';
+import 'package:soma/features/auth/sign_up_screen.dart';
+import 'package:soma/features/circles/circle_lobby_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/responsive.dart';
-
-import '../../data/auth_repository.dart';
-import '../../data/circles_repository.dart';
-import '../auth/sign_in_screen.dart';
-import '../auth/sign_up_screen.dart';
-import 'circle_lobby_screen.dart';
 
 class CircleInviteScreen extends StatefulWidget {
   final String circleId;
@@ -52,7 +51,7 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => CircleLobbyScreen(circleId: widget.circleId),
+          builder: (final _) => CircleLobbyScreen(circleId: widget.circleId),
         ),
       );
       ScaffoldMessenger.of(context).showSnackBar(
@@ -73,7 +72,7 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final title = widget.circleTitle ?? l10n.circleInviteTitle;
 
@@ -82,7 +81,7 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
           child: ResponsiveFrame(
             maxWidth: 420,
             child: LayoutBuilder(
-              builder: (context, constraints) {
+              builder: (final context, final constraints) {
                 final compactHeight = constraints.maxHeight < 760;
                 final sectionSpacing = compactHeight ? 12.0 : 16.0;
 
@@ -109,7 +108,7 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        "Circle Invite",
+                        'Circle Invite',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.w900,
@@ -161,7 +160,7 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => SignInScreen(onSignedIn: _attemptJoin),
+                            builder: (final _) => SignInScreen(onSignedIn: _attemptJoin),
                           ),
                         );
                       },
@@ -176,7 +175,7 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => SignUpScreen(onSignedUp: _attemptJoin),
+                              builder: (final _) => SignUpScreen(onSignedUp: _attemptJoin),
                             ),
                           );
                         },

@@ -2,7 +2,7 @@
 import 'dart:io';
 import 'package:postgres/postgres.dart';
 
-Future<void> main(List<String> args) async {
+Future<void> main(final List<String> args) async {
   if (args.isEmpty) {
     print('Please provide the path to the SQL file.');
     exit(1);

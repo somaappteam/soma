@@ -1,12 +1,10 @@
 import 'package:flutter/foundation.dart';
-
-import 'app_logger.dart';
-
 // ─── Optional Sentry import ───────────────────────────────────────────────────
 // sentry_flutter is imported conditionally so the app builds even if the
 // SENTRY_DSN env var is not set (e.g. during development).
 // In release mode with a valid DSN this will capture errors automatically.
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:soma/core/services/app_logger.dart';
 
 /// Application-wide error reporting service.
 ///
@@ -27,9 +25,9 @@ class ErrorReporter {
 
   /// Captures [error] + [stack] and optionally a human-readable [hint].
   Future<void> capture(
-    Object error,
-    StackTrace? stack, {
-    String? hint,
+    final Object error,
+    final StackTrace? stack, {
+    final String? hint,
   }) async {
     appLogger.error(
       hint ?? 'Unhandled error',

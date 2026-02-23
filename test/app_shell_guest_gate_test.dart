@@ -4,7 +4,7 @@ import 'package:soma/features/home/app_shell.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 void main() {
-  testWidgets('guest sees value bullets when tapping circles tab', (tester) async {
+  testWidgets('guest sees value bullets when tapping circles tab', (final tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,

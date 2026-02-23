@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/pressable_scale.dart';
+import 'package:soma/features/solo/solo_setup_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/pressable_scale.dart';
-import '../../models/solo_course.dart';
-import 'solo_setup_screen.dart';
+import 'package:soma/models/solo_course.dart';
 
 enum SoloMode { vocabulary, sentences, review }
 
@@ -14,13 +13,13 @@ class SoloCourseDetailScreen extends StatelessWidget {
   final SoloCourse course;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (context, constraints) {
+          builder: (final context, final constraints) {
             final compactHeight = constraints.maxHeight < 760;
             final sectionSpacing = compactHeight ? 10.0 : 12.0;
             final reviewTopSpacing = compactHeight ? 18.0 : 24.0;
@@ -102,10 +101,10 @@ class SoloCourseDetailScreen extends StatelessWidget {
     );
   }
 
-  void _go(BuildContext context, SoloMode mode) {
+  void _go(final BuildContext context, final SoloMode mode) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => SoloSetupScreen(course: course, mode: mode)),
+      MaterialPageRoute(builder: (final _) => SoloSetupScreen(course: course, mode: mode)),
     );
   }
 }
@@ -119,7 +118,7 @@ class _ModeCard extends StatelessWidget {
   const _ModeCard({required this.icon, required this.title, required this.subtitle, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return PressableScale(
       onTap: onTap,
@@ -164,7 +163,7 @@ class _IconGlass extends StatelessWidget {
   const _IconGlass({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return PressableScale(
       onTap: onTap,

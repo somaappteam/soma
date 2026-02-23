@@ -53,9 +53,9 @@ class VocabQuestion {
 
   // ─── Factory ───────────────────────────────────────────────────────────────
 
-  factory VocabQuestion.fromMap(Map<String, dynamic> m) {
-    List<String> _list(dynamic v) =>
-        (v is List) ? v.map((e) => e.toString()).toList() : <String>[];
+  factory VocabQuestion.fromMap(final Map<String, dynamic> m) {
+    List<String> list(final dynamic v) =>
+        (v is List) ? v.map((final e) => e.toString()).toList() : <String>[];
 
     return VocabQuestion(
       conceptId: _parseInt(m['concept_id']) ?? 0,
@@ -68,12 +68,12 @@ class VocabQuestion {
       targetLang: _str(m['target_lang']),
       sourceLang: _str(m['source_lang']),
       prompt: _str(m['prompt']),
-      choices: _list(m['choices']),
+      choices: list(m['choices']),
       correct: _parseInt(m['correct']) ?? 0,
       correctAnswer: _str(m['correct_answer']),
-      targetChoices: _list(m['target_choices']),
-      nativeChoices: _list(m['native_choices']),
-      choicePool: _list(m['choice_pool']),
+      targetChoices: list(m['target_choices']),
+      nativeChoices: list(m['native_choices']),
+      choicePool: list(m['choice_pool']),
     );
   }
 
@@ -100,12 +100,12 @@ class VocabQuestion {
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
 
-  static int? _parseInt(dynamic v) {
+  static int? _parseInt(final dynamic v) {
     if (v is int) return v;
     return int.tryParse(v?.toString() ?? '');
   }
 
-  static String _str(dynamic v) {
+  static String _str(final dynamic v) {
     final s = v?.toString().trim() ?? '';
     return s.toLowerCase() == 'null' ? '' : s;
   }

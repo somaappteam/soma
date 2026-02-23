@@ -1,7 +1,8 @@
-import 'dart:io';
 import 'dart:convert';
-import 'package:supabase/supabase.dart';
+import 'dart:io';
+
 import 'package:csv/csv.dart';
+import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
 const String serviceRoleKey =
@@ -26,7 +27,7 @@ void main() async {
   print('--- Migration Completed ---');
 }
 
-Future<void> migrateVocabulary(SupabaseClient client, String filePath) async {
+Future<void> migrateVocabulary(final SupabaseClient client, final String filePath) async {
   print('Migrating Vocabulary from $filePath...');
   final file = File(filePath);
   if (!await file.exists()) {
@@ -66,10 +67,10 @@ Future<void> migrateVocabulary(SupabaseClient client, String filePath) async {
     final values = fields[i];
     final row = <String, dynamic>{};
 
-    headers.forEach((index, key) {
+    headers.forEach((final index, final key) {
       if (index < values.length) {
         // if (index < 0 || index >= values.length) return; // Safety check
-        var val = values[index];
+        final val = values[index];
         // Parse integer/bigint columns
         if (key == 'concept_id' || key == 'vocabulary_id') {
           if (val is int) {
@@ -102,7 +103,7 @@ Future<void> migrateVocabulary(SupabaseClient client, String filePath) async {
   print('Vocabulary migration done.');
 }
 
-Future<void> migrateSentences(SupabaseClient client, String filePath) async {
+Future<void> migrateSentences(final SupabaseClient client, final String filePath) async {
   print('Migrating Sentences from $filePath...');
   final file = File(filePath);
   if (!await file.exists()) {
@@ -140,9 +141,9 @@ Future<void> migrateSentences(SupabaseClient client, String filePath) async {
     final values = fields[i];
     final row = <String, dynamic>{};
 
-    headers.forEach((index, key) {
+    headers.forEach((final index, final key) {
       if (index < values.length) {
-        var val = values[index];
+        final val = values[index];
         // Parse integer columns
         if (key == 'concept_id' || key == 'sentence_id') {
           if (val is int) {
@@ -175,8 +176,8 @@ Future<void> migrateSentences(SupabaseClient client, String filePath) async {
   print('Sentences migration done.');
 }
 
-Future<void> _upsert(SupabaseClient client, String table,
-    List<Map<String, dynamic>> data) async {
+Future<void> _upsert(final SupabaseClient client, final String table,
+    final List<Map<String, dynamic>> data) async {
   if (data.isEmpty) return;
   
   try {

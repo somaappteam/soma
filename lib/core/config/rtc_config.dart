@@ -25,18 +25,17 @@ class RtcConfig {
   static const int audioChannelCount =
       int.fromEnvironment('RTC_AUDIO_CHANNEL_COUNT', defaultValue: 1);
 
-  static List<Map<String, String>> iceServers({required bool useTurn}) {
-    if (!useTurn || turnUrl.isEmpty) {
-      return stunServers;
-    }
+  static List<Map<String, String>> iceServers() {
+    final servers = [...stunServers];
 
-    return [
-      ...stunServers,
-      {
+    if (turnUrl.isNotEmpty) {
+      servers.add({
         'urls': turnUrl,
         if (turnUsername.isNotEmpty) 'username': turnUsername,
         if (turnCredential.isNotEmpty) 'credential': turnCredential,
-      },
-    ];
+      });
+    }
+
+    return servers;
   }
 }

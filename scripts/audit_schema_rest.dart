@@ -14,10 +14,10 @@ Future<void> main() async {
   try {
     final res = await client.from('circles').select().limit(1).maybeSingle();
     if (res != null) {
-      final keys = (res as Map<String, dynamic>).keys.toList();
+      final keys = (res).keys.toList();
       print('Existing columns: $keys');
       final expected = ['from_lang', 'to_lang', 'mode', 'level', 'max_players', 'questions_count', 'time_per_q', 'allow_spectators', 'is_locked'];
-      final missing = expected.where((e) => !keys.contains(e)).toList();
+      final missing = expected.where((final e) => !keys.contains(e)).toList();
       if (missing.isEmpty) {
         print('✅ All expected columns present.');
       } else {

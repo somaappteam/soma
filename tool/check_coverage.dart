@@ -1,6 +1,6 @@
 import 'dart:io';
 
-void main(List<String> args) {
+void main(final List<String> args) {
   if (args.length != 2) {
     stderr.writeln('Usage: dart run tool/check_coverage.dart <lcov_path> <minimum_percent>');
     exitCode = 64;

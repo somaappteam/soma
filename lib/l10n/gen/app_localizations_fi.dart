@@ -1637,6 +1637,9 @@ class AppLocalizationsFi extends AppLocalizations {
   String get circlesStartGame => 'Aloita Peli';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Odotetaan pelaajia';
 
   @override

@@ -20,7 +20,7 @@ void main() async {
     print('Found ${circles.length} open circles.');
 
     if (circles.isEmpty) {
-      print("No open circles to close.");
+      print('No open circles to close.');
       return;
     }
 
@@ -31,12 +31,12 @@ void main() async {
       
       print("Closing circle '$name' (ID: $circleId, status: $status)...");
       await client.from('circles').update({'status': 'ended'}).eq('id', circleId);
-      print("  -> Closed.");
+      print('  -> Closed.');
     }
 
-    print("\nDone! Closed ${circles.length} circles.");
+    print('\nDone! Closed ${circles.length} circles.');
 
   } catch (e) {
-    print("Error: $e");
+    print('Error: $e');
   }
 }

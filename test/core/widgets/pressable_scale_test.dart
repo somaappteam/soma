@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:soma/core/widgets/pressable_scale.dart';
 
 void main() {
-  testWidgets('PressableScale shrinks on tap down and restores on tap up', (WidgetTester tester) async {
+  testWidgets('PressableScale shrinks on tap down and restores on tap up', (final tester) async {
     bool tapped = false;
 
     await tester.pumpWidget(

@@ -1,16 +1,17 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:soma/data/content_sync_service.dart';
-import 'package:soma/core/database/database_helper.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite/sqflite.dart';
 import 'dart:io';
+
+import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/data/content_sync_service.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   // Setup FFI for Windows
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
 
-  print("--- Comprehensive Sync Verification ---");
+  print('--- Comprehensive Sync Verification ---');
 
   await Supabase.initialize(
     url: 'https://bnbjteedohflgkarfaxk.supabase.co',
@@ -21,7 +22,7 @@ void main() async {
   final dbHelper = DatabaseHelper.instance;
   final db = await dbHelper.database;
 
-  print("\n1. Verifying Table Presence...");
+  print('\n1. Verifying Table Presence...');
   final tables = [
     'courses',
     'vocabulary',
@@ -45,34 +46,34 @@ void main() async {
     }
   }
 
-  print("\n2. Checking Data Counts Before Sync...");
+  print('\n2. Checking Data Counts Before Sync...');
   await _printCounts(db);
 
-  print("\n3. Running Content Sync (Public Content)...");
+  print('\n3. Running Content Sync (Public Content)...');
   try {
     await contentSyncService.syncEverything();
-    print("Sync successful!");
+    print('Sync successful!');
   } catch (e) {
-    print("Sync failed: $e");
+    print('Sync failed: $e');
   }
 
-  print("\n4. Checking Data Counts After Sync...");
+  print('\n4. Checking Data Counts After Sync...');
   await _printCounts(db);
 
-  print("\n5. Verifying Repository Integrations (Dummy Check)...");
+  print('\n5. Verifying Repository Integrations (Dummy Check)...');
   // This is a simple check to see if we can query some tables
   try {
     final courses = await dbHelper.getAllCourses();
-    print("Retrieved ${courses.length} courses via DatabaseHelper.");
+    print('Retrieved ${courses.length} courses via DatabaseHelper.');
   } catch (e) {
-    print("Error querying DatabaseHelper: $e");
+    print('Error querying DatabaseHelper: $e');
   }
 
-  print("\n--- Verification Complete ---");
+  print('\n--- Verification Complete ---');
   exit(0);
 }
 
-Future<void> _printCounts(Database db) async {
+Future<void> _printCounts(final Database db) async {
   final tables = [
     'courses',
     'vocabulary',

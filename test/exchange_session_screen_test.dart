@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:soma/features/circles/exchange_session_screen.dart';
 
 void main() {
-  testWidgets('ExchangeSessionScreen renders round header', (tester) async {
+  testWidgets('ExchangeSessionScreen renders round header', (final tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: ExchangeSessionScreen(

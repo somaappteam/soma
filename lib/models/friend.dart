@@ -13,5 +13,5 @@ class Friend {
     required this.status,
   });
 
-  bool get isOnline => (subtitle ?? "").toLowerCase().contains("online");
+  bool get isOnline => (subtitle ?? '').toLowerCase().contains('online');
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/models/achievement.dart';
+import 'package:soma/models/user_stats.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/achievement.dart';
-import '../models/user_stats.dart';
-import '../core/di/locator.dart';
 
 /// Global notifier that emits an [Achievement] whenever one is newly unlocked.
 /// Listeners (e.g. [AppShell]) should show a toast and reset to null after consuming.
@@ -27,7 +27,7 @@ class AchievementsRepository {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) {
       return achievements
-          .map((row) => Achievement(
+          .map((final row) => Achievement(
                 id: row['id'].toString(),
                 title: row['title'] ?? '',
                 description: row['description'],
@@ -52,7 +52,7 @@ class AchievementsRepository {
     _unlockedCache.addAll(unlockedMap.keys);
     _cacheWarmed = true;
 
-    return achievements.map((row) {
+    return achievements.map((final row) {
       final id = row['id'].toString();
       final unlockedAtRaw = unlockedMap[id];
       return Achievement(
@@ -72,7 +72,7 @@ class AchievementsRepository {
   ///
   /// Checks the in-memory cache first to avoid redundant DB writes and duplicate
   /// toasts. If the cache is cold, warms it from Supabase before checking.
-  Future<void> unlock(String achievementId) async {
+  Future<void> unlock(final String achievementId) async {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return;
 
@@ -112,7 +112,7 @@ class AchievementsRepository {
   }
 
   /// Fetches an achievement row and pushes it onto [achievementUnlockNotifier].
-  void _emitUnlockToast(String achievementId) async {
+  void _emitUnlockToast(final String achievementId) async {
     try {
       final rows = await _supabase
           .from('achievements')
@@ -137,9 +137,9 @@ class AchievementsRepository {
   // ─────────────────────────────── Check triggers ─────────────────────────────
 
   Future<void> checkAfterQuiz({
-    required UserStats stats,
-    required int correctCount,
-    required int totalCount,
+    required final UserStats stats,
+    required final int correctCount,
+    required final int totalCount,
   }) async {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return;
@@ -195,7 +195,7 @@ class AchievementsRepository {
     }
   }
 
-  Future<void> checkAfterCircle({required UserStats stats}) async {
+  Future<void> checkAfterCircle({required final UserStats stats}) async {
     if (stats.circlesJoined >= 1) {
       await unlock('voice');
     }
@@ -214,8 +214,8 @@ class AchievementsRepository {
         _supabase.from('user_stats').select().eq('user_id', uid).maybeSingle(),
       ]);
 
-      final profileRow = results[0] as Map<String, dynamic>?;
-      final statsRow   = results[1] as Map<String, dynamic>?;
+      final profileRow = results[0];
+      final statsRow   = results[1];
 
       final totalXp      = (profileRow?['total_xp'] ?? 0) as int;
       final totalQuizzes = (statsRow?['total_quizzes'] ?? 0) as int;
@@ -249,14 +249,14 @@ class AchievementsRepository {
     }
   }
 
-  Future<void> _checkTop3(String uid) async {
+  Future<void> _checkTop3(final String uid) async {
     try {
       final top = await _supabase
           .from('leaderboard')
           .select('id')
           .order('xp', ascending: false)
           .limit(3);
-      final inTop = top.any((row) => row['id']?.toString() == uid);
+      final inTop = top.any((final row) => row['id']?.toString() == uid);
       if (inTop) await unlock('top3');
     } catch (e) {
       debugPrint('AchievementsRepository: top3 check failed – $e');

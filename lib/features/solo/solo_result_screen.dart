@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:soma/l10n/gen/app_localizations.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/reward_sparkle.dart';
-import '../../core/widgets/staggered_in.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/theme/layout_tokens.dart';
-import '../../core/widgets/premium_screen_scaffold.dart';
-import '../../core/services/haptics_service.dart';
-import '../../core/services/sfx_service.dart';
-import '../../models/solo_course.dart';
-import '../../data/quiz_repository.dart';
-import '../../data/settings_repository.dart';
-import '../../data/soma_plus_repository.dart';
-import 'solo_course_detail_screen.dart';
-import 'solo_vocab_quiz_screen.dart';
-import 'solo_sentences_quiz_screen.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:soma/core/services/haptics_service.dart';
+import 'package:soma/core/services/sfx_service.dart';
+import 'package:soma/core/theme/app_theme.dart';
+import 'package:soma/core/theme/layout_tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/premium_screen_scaffold.dart';
+import 'package:soma/core/widgets/reward_sparkle.dart';
+import 'package:soma/core/widgets/staggered_in.dart';
+import 'package:soma/data/quiz_repository.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/data/soma_plus_repository.dart';
+import 'package:soma/features/solo/solo_course_detail_screen.dart';
+import 'package:soma/features/solo/solo_sentences_quiz_screen.dart';
+import 'package:soma/features/solo/solo_vocab_quiz_screen.dart';
+import 'package:soma/l10n/gen/app_localizations.dart';
+import 'package:soma/models/solo_course.dart';
 
 class SoloResultScreen extends StatefulWidget {
   const SoloResultScreen({
@@ -30,6 +29,7 @@ class SoloResultScreen extends StatefulWidget {
     required this.points,
     this.mistakes = const [],
     required this.onPlayAgain,
+    required this.onContinue,
     required this.onReviewMistakes,
   });
 
@@ -43,6 +43,7 @@ class SoloResultScreen extends StatefulWidget {
   final List<Map<String, dynamic>> mistakes;
 
   final VoidCallback onPlayAgain;
+  final VoidCallback onContinue;
   final VoidCallback onReviewMistakes;
 
   @override
@@ -57,7 +58,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
   void initState() {
     super.initState();
     _saveProgress();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((final _) {
       _maybeShowFreePlanAd();
       _playMilestoneFeedback();
     });
@@ -84,7 +85,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) {
+      builder: (final ctx) {
         final scheme = Theme.of(ctx).colorScheme;
         return AlertDialog(
           title: const Text('Sponsored Break'),
@@ -126,13 +127,13 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
     sfxService.softClick();
   }
 
-  String _modeLabel(AppLocalizations l10n) {
+  String _modeLabel(final AppLocalizations l10n) {
     if (widget.mode == SoloMode.vocabulary) return l10n.soloModeVocabulary;
     if (widget.mode == SoloMode.sentences) return l10n.soloModeSentences;
     return l10n.soloModeReview;
   }
 
-  String _feedbackLine(AppLocalizations l10n) {
+  String _feedbackLine(final AppLocalizations l10n) {
     final p = accuracyPct;
     if (p >= 90) return l10n.soloResultsFeedbackElite;
     if (p >= 75) return l10n.soloResultsFeedbackStrong;
@@ -142,15 +143,15 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
 
   Future<void> _shareResults() async {
     final l10n = AppLocalizations.of(context);
-    final summary = "${widget.course.subtitle} • ${_modeLabel(l10n)}";
-    final stats = "${l10n.statCorrect}: ${widget.correct}/${widget.total}";
-    final points = "${l10n.pointsLabel}: +${widget.points}";
-    final accuracy = "${l10n.statAccuracy}: ${accuracyPct}%";
-    await Share.share("$summary\n$stats\n$accuracy\n$points");
+    final summary = '${widget.course.subtitle} • ${_modeLabel(l10n)}';
+    final stats = '${l10n.statCorrect}: ${widget.correct}/${widget.total}';
+    final points = '${l10n.pointsLabel}: +${widget.points}';
+    final accuracy = '${l10n.statAccuracy}: $accuracyPct%';
+    await Share.share('$summary\n$stats\n$accuracy\n$points');
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTones = Theme.of(context).extension<AppTextToneTheme>();
@@ -158,7 +159,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
 
     return PremiumScreenScaffold(
       body: LayoutBuilder(
-          builder: (context, constraints) {
+          builder: (final context, final constraints) {
             final compactHeight = constraints.maxHeight < 760;
             final blockSpacing = compactHeight ? 12.0 : 14.0;
             final buttonSpacing = compactHeight ? 8.0 : 10.0;
@@ -178,7 +179,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                           children: [
                             _IconGlass(
                               icon: Icons.close_rounded,
-                              onTap: () => Navigator.popUntil(context, (r) => r.isFirst),
+                              onTap: () => Navigator.popUntil(context, (final r) => r.isFirst),
                             ),
                             const Spacer(),
                             Text(
@@ -216,7 +217,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                                 ),
                               ),
                               Text(
-                                "${widget.course.subtitle} • ${_modeLabel(l10n)}",
+                                '${widget.course.subtitle} • ${_modeLabel(l10n)}',
                                 style: TextStyle(
                                   color: textTones?.medium ?? scheme.onSurface.withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w800,
@@ -266,7 +267,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        "+${widget.points}",
+                                        '+${widget.points}',
                                         style: TextStyle(
                                           color: scheme.onSurface,
                                           fontWeight: FontWeight.w900,
@@ -288,7 +289,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                                     Expanded(
                                       child: _StatTile(
                                         title: l10n.statCorrect,
-                                        value: "${widget.correct}",
+                                        value: '${widget.correct}',
                                         subtitle: l10n.statAnswers,
                                         icon: Icons.check_circle_rounded,
                                       ),
@@ -297,7 +298,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                                     Expanded(
                                       child: _StatTile(
                                         title: l10n.statTotal,
-                                        value: "${widget.total}",
+                                        value: '${widget.total}',
                                         subtitle: l10n.statQuestions,
                                         icon: Icons.quiz_rounded,
                                       ),
@@ -314,7 +315,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                                     Expanded(
                                       child: _StatTile(
                                         title: l10n.statAccuracy,
-                                        value: "$p%",
+                                        value: '$p%',
                                         subtitle: l10n.statRate,
                                         icon: Icons.track_changes_rounded,
                                       ),
@@ -373,7 +374,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => SoloVocabQuizScreen(
+                                  builder: (final _) => SoloVocabQuizScreen(
                                     course: widget.course,
                                     level: widget.level,
                                     totalQuestions: widget.mistakes.length,
@@ -386,7 +387,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => SoloSentencesQuizScreen(
+                                  builder: (final _) => SoloSentencesQuizScreen(
                                     course: widget.course,
                                     level: widget.level,
                                     totalQuestions: widget.mistakes.length,
@@ -406,8 +407,8 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
                       ),
                       SizedBox(height: buttonSpacing),
                       _SecondaryButton(
-                        label: l10n.backToCourse,
-                        onTap: () => Navigator.popUntil(context, (r) => r.isFirst),
+                        label: l10n.continueLabel,
+                        onTap: widget.onContinue,
                       ),
                     ],
                   ),
@@ -429,7 +430,7 @@ class _IconGlass extends StatelessWidget {
   const _IconGlass({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTones = Theme.of(context).extension<AppTextToneTheme>();
     return InkWell(
@@ -449,7 +450,7 @@ class _Badge extends StatelessWidget {
   const _Badge({required this.level});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTones = Theme.of(context).extension<AppTextToneTheme>();
     return Container(
@@ -475,7 +476,7 @@ class _AccuracyBar extends StatelessWidget {
   const _AccuracyBar({required this.percent});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTones = Theme.of(context).extension<AppTextToneTheme>();
@@ -491,7 +492,7 @@ class _AccuracyBar extends StatelessWidget {
             ),
             const Spacer(),
             Text(
-              "$clamped%",
+              '$clamped%',
               style: TextStyle(color: scheme.onSurface, fontSize: 12, fontWeight: FontWeight.w900),
             ),
           ],
@@ -536,7 +537,7 @@ class _StatTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTones = Theme.of(context).extension<AppTextToneTheme>();
     return Glass(
@@ -602,7 +603,7 @@ class _SecondaryButton extends StatelessWidget {
   const _SecondaryButton({required this.label, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTones = Theme.of(context).extension<AppTextToneTheme>();
     return InkWell(

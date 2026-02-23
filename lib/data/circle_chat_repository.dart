@@ -1,7 +1,7 @@
 import 'dart:async';
 
+import 'package:soma/core/di/locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/di/locator.dart';
 
 class CircleChatRepository {
   final _supabase = Supabase.instance.client;
@@ -10,7 +10,7 @@ class CircleChatRepository {
 
   String? get currentUserId => _supabase.auth.currentUser?.id;
 
-  Stream<List<Map<String, dynamic>>> getMessagesStream(String circleId) {
+  Stream<List<Map<String, dynamic>>> getMessagesStream(final String circleId) {
     return _supabase
         .from('chat_messages')
         .stream(primaryKey: ['id'])
@@ -19,11 +19,11 @@ class CircleChatRepository {
   }
 
   Future<void> sendMessage({
-    required String circleId,
-    required String content,
+    required final String circleId,
+    required final String content,
   }) async {
     final uid = currentUserId;
-    if (uid == null) throw Exception("Not logged in");
+    if (uid == null) throw Exception('Not logged in');
 
     final circle = await _supabase
         .from('circles')
@@ -31,7 +31,7 @@ class CircleChatRepository {
         .eq('id', circleId)
         .maybeSingle();
     final mutedIds = (circle?['chat_muted_user_ids'] as List?)
-            ?.map((e) => e.toString())
+            ?.map((final e) => e.toString())
             .toSet() ??
         <String>{};
     if (mutedIds.contains(uid)) {
@@ -53,7 +53,7 @@ class CircleChatRepository {
   }
 
   void _ensureRetryLoop() {
-    _retryTimer ??= Timer.periodic(const Duration(seconds: 12), (_) async {
+    _retryTimer ??= Timer.periodic(const Duration(seconds: 12), (final _) async {
       if (_pendingSends.isEmpty) {
         _retryTimer?.cancel();
         _retryTimer = null;
@@ -76,21 +76,21 @@ class CircleChatRepository {
     });
   }
 
-  Future<void> markRead(String messageId) async {
+  Future<void> markRead(final String messageId) async {
     try {
       await _supabase.rpc('mark_chat_message_read', params: {'message_id': messageId});
     } catch (_) {}
   }
 
-  Future<void> markReadBatch(List<String> messageIds) async {
+  Future<void> markReadBatch(final List<String> messageIds) async {
     for (final id in messageIds) {
       await markRead(id);
     }
   }
 
   Future<void> toggleReaction({
-    required String messageId,
-    required String emoji,
+    required final String messageId,
+    required final String emoji,
   }) async {
     final uid = currentUserId;
     if (uid == null) return;
@@ -102,7 +102,7 @@ class CircleChatRepository {
         .maybeSingle();
     final reactionsRaw = (row?['reactions'] as Map<String, dynamic>?) ?? {};
     final users = ((reactionsRaw[emoji] as List?) ?? const [])
-        .map((e) => e.toString())
+        .map((final e) => e.toString())
         .toSet();
     if (users.contains(uid)) {
       users.remove(uid);
@@ -123,7 +123,7 @@ class CircleChatRepository {
         .eq('id', messageId);
   }
 
-  Future<void> deleteMessage(String messageId) async {
+  Future<void> deleteMessage(final String messageId) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -134,14 +134,14 @@ class CircleChatRepository {
         .eq('sender_id', uid);
   }
 
-  Future<void> hostDeleteMessage(String messageId) async {
+  Future<void> hostDeleteMessage(final String messageId) async {
     await _supabase.from('chat_messages').delete().eq('id', messageId);
   }
 
   Future<void> setUserMutedInCircle({
-    required String circleId,
-    required String targetUserId,
-    required bool muted,
+    required final String circleId,
+    required final String targetUserId,
+    required final bool muted,
   }) async {
     final circle = await _supabase
         .from('circles')
@@ -149,7 +149,7 @@ class CircleChatRepository {
         .eq('id', circleId)
         .maybeSingle();
     final mutedIds = (circle?['chat_muted_user_ids'] as List?)
-            ?.map((e) => e.toString())
+            ?.map((final e) => e.toString())
             .toSet() ??
         <String>{};
     if (muted) {
@@ -164,8 +164,8 @@ class CircleChatRepository {
   }
 
   Future<void> setSlowMode({
-    required String circleId,
-    required int seconds,
+    required final String circleId,
+    required final int seconds,
   }) async {
     await _supabase
         .from('circles')
@@ -173,20 +173,20 @@ class CircleChatRepository {
   }
 
   Future<void> pinHighlight({
-    required String circleId,
-    required String message,
+    required final String circleId,
+    required final String message,
   }) async {
     await _supabase
         .from('circles')
         .update({'chat_highlight_text': message}).eq('id', circleId);
   }
 
-  Stream<Map<String, dynamic>?> streamCircleChatConfig(String circleId) {
+  Stream<Map<String, dynamic>?> streamCircleChatConfig(final String circleId) {
     return _supabase
         .from('circles')
         .stream(primaryKey: ['id'])
         .eq('id', circleId)
-        .map((rows) => rows.isEmpty ? null : rows.first);
+        .map((final rows) => rows.isEmpty ? null : rows.first);
   }
 }
 

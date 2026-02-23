@@ -1628,6 +1628,9 @@ class AppLocalizationsNo extends AppLocalizations {
   String get circlesStartGame => 'Start Spill';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Venter på spillere';
 
   @override

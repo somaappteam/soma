@@ -49,3 +49,5 @@ analyze*.json
 *.bak
 temp_migration/
 C
+test_machine.json
+web/splash/

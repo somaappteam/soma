@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'motion.dart';
-import 'tokens.dart';
+import 'package:soma/core/theme/motion.dart';
+import 'package:soma/core/theme/tokens.dart';
 
 @immutable
 class GlassTheme extends ThemeExtension<GlassTheme> {
@@ -16,7 +16,7 @@ class GlassTheme extends ThemeExtension<GlassTheme> {
   });
 
   @override
-  GlassTheme copyWith({Color? fill, Color? stroke, Color? shadow}) {
+  GlassTheme copyWith({final Color? fill, final Color? stroke, final Color? shadow}) {
     return GlassTheme(
       fill: fill ?? this.fill,
       stroke: stroke ?? this.stroke,
@@ -25,7 +25,7 @@ class GlassTheme extends ThemeExtension<GlassTheme> {
   }
 
   @override
-  GlassTheme lerp(ThemeExtension<GlassTheme>? other, double t) {
+  GlassTheme lerp(final ThemeExtension<GlassTheme>? other, final double t) {
     if (other is! GlassTheme) return this;
     return GlassTheme(
       fill: Color.lerp(fill, other.fill, t) ?? fill,
@@ -42,12 +42,12 @@ class AppBackgroundTheme extends ThemeExtension<AppBackgroundTheme> {
   const AppBackgroundTheme({required this.gradient});
 
   @override
-  AppBackgroundTheme copyWith({Gradient? gradient}) {
+  AppBackgroundTheme copyWith({final Gradient? gradient}) {
     return AppBackgroundTheme(gradient: gradient ?? this.gradient);
   }
 
   @override
-  AppBackgroundTheme lerp(ThemeExtension<AppBackgroundTheme>? other, double t) {
+  AppBackgroundTheme lerp(final ThemeExtension<AppBackgroundTheme>? other, final double t) {
     if (other is! AppBackgroundTheme) return this;
     return AppBackgroundTheme(
       gradient: Gradient.lerp(gradient, other.gradient, t) ?? gradient,
@@ -68,7 +68,7 @@ class AppSemanticTheme extends ThemeExtension<AppSemanticTheme> {
   });
 
   @override
-  AppSemanticTheme copyWith({Color? progress, Color? social, Color? reward}) {
+  AppSemanticTheme copyWith({final Color? progress, final Color? social, final Color? reward}) {
     return AppSemanticTheme(
       progress: progress ?? this.progress,
       social: social ?? this.social,
@@ -77,7 +77,7 @@ class AppSemanticTheme extends ThemeExtension<AppSemanticTheme> {
   }
 
   @override
-  AppSemanticTheme lerp(ThemeExtension<AppSemanticTheme>? other, double t) {
+  AppSemanticTheme lerp(final ThemeExtension<AppSemanticTheme>? other, final double t) {
     if (other is! AppSemanticTheme) return this;
     return AppSemanticTheme(
       progress: Color.lerp(progress, other.progress, t) ?? progress,
@@ -100,7 +100,7 @@ class AppTextToneTheme extends ThemeExtension<AppTextToneTheme> {
   });
 
   @override
-  AppTextToneTheme copyWith({Color? high, Color? medium, Color? muted}) {
+  AppTextToneTheme copyWith({final Color? high, final Color? medium, final Color? muted}) {
     return AppTextToneTheme(
       high: high ?? this.high,
       medium: medium ?? this.medium,
@@ -109,7 +109,7 @@ class AppTextToneTheme extends ThemeExtension<AppTextToneTheme> {
   }
 
   @override
-  AppTextToneTheme lerp(ThemeExtension<AppTextToneTheme>? other, double t) {
+  AppTextToneTheme lerp(final ThemeExtension<AppTextToneTheme>? other, final double t) {
     if (other is! AppTextToneTheme) return this;
     return AppTextToneTheme(
       high: Color.lerp(high, other.high, t) ?? high,
@@ -211,12 +211,12 @@ class AppTheme {
   }
 
   static ThemeData _baseTheme({
-    required ColorScheme scheme,
-    required Brightness brightness,
-    required GlassTheme glass,
-    required AppBackgroundTheme background,
-    required Color scaffoldBackground,
-    required AppTextToneTheme textTones,
+    required final ColorScheme scheme,
+    required final Brightness brightness,
+    required final GlassTheme glass,
+    required final AppBackgroundTheme background,
+    required final Color scaffoldBackground,
+    required final AppTextToneTheme textTones,
   }) {
     final base = ThemeData(
       brightness: brightness,
@@ -304,12 +304,12 @@ class AppTheme {
       ),
       switchTheme: SwitchThemeData(
         trackColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected)
+          (final states) => states.contains(WidgetState.selected)
               ? scheme.primary.withValues(alpha: 0.4)
               : scheme.onSurface.withValues(alpha: 0.2),
         ),
         thumbColor: WidgetStateProperty.resolveWith(
-          (states) => states.contains(WidgetState.selected) ? scheme.primary : scheme.onSurface,
+          (final states) => states.contains(WidgetState.selected) ? scheme.primary : scheme.onSurface,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -405,14 +405,14 @@ class AppTheme {
         surfaceTintColor: scheme.primary.withValues(alpha: isLight ? 0.04 : 0),
         indicatorColor: scheme.primary.withValues(alpha: isLight ? 0.20 : 0.38),
         iconTheme: WidgetStateProperty.resolveWith(
-          (states) => IconThemeData(
+          (final states) => IconThemeData(
             color: states.contains(WidgetState.selected)
                 ? scheme.primary
                 : scheme.onSurface.withValues(alpha: 0.65),
           ),
         ),
         labelTextStyle: WidgetStateProperty.resolveWith(
-          (states) => TextStyle(
+          (final states) => TextStyle(
             color: states.contains(WidgetState.selected)
                 ? scheme.primary
                 : scheme.onSurface.withValues(alpha: 0.68),
@@ -464,11 +464,11 @@ class _FastPageTransitionsBuilder extends PageTransitionsBuilder {
 
   @override
   Widget buildTransitions<R>(
-    PageRoute<R> route,
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
+    final PageRoute<R> route,
+    final BuildContext context,
+    final Animation<double> animation,
+    final Animation<double> secondaryAnimation,
+    final Widget child,
   ) {
     final curve = isLight ? MotionTokens.lightPageInCurve : MotionTokens.darkPageInCurve;
     final reverseCurve = isLight ? MotionTokens.lightPageOutCurve : MotionTokens.darkPageOutCurve;

@@ -1,10 +1,7 @@
-import 'dart:convert';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'package:shared_preferences/shared_preferences.dart';
-import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
-import 'offline_queue_repository.dart';
+import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/data/offline_queue_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 // QuizCache has been removed in favor of SQLite local storage in DatabaseHelper
 
@@ -27,7 +24,7 @@ class VocabSrsStore {
 
   String? get _uid => _supabase.auth.currentUser?.id;
 
-  Future<Map<int, SrsEntry>> load(String courseId) async {
+  Future<Map<int, SrsEntry>> load(final String courseId) async {
     final uid = _uid;
     final localItems = await _dbHelper.getUserLearnedItems(uid ?? 'guest', courseId);
 
@@ -55,7 +52,7 @@ class VocabSrsStore {
     return entries;
   }
 
-  Future<void> save(String courseId, Map<int, SrsEntry> entries) async {
+  Future<void> save(final String courseId, final Map<int, SrsEntry> entries) async {
     final uid = _uid ?? 'guest';
 
     for (final entry in entries.values) {
@@ -75,7 +72,7 @@ class VocabSrsStore {
               .from('user_learned_items')
               .upsert(item, onConflict: 'user_id, course_id, concept_id');
         } catch (e) {
-          debugPrint("Cloud SRS push failed: $e. Enqueuing.");
+          debugPrint('Cloud SRS push failed: $e. Enqueuing.');
           await offlineQueueRepository.enqueue(
             tableName: 'user_learned_items',
             operation: 'UPSERT',
@@ -86,20 +83,20 @@ class VocabSrsStore {
     }
   }
 
-  Future<List<int>> dueConceptIds(String courseId) async {
+  Future<List<int>> dueConceptIds(final String courseId) async {
     final entries = await load(courseId);
     if (entries.isEmpty) return [];
     final now = DateTime.now().millisecondsSinceEpoch;
     return entries.values
-        .where((entry) => entry.dueAtMs <= now)
-        .map((entry) => entry.conceptId)
+        .where((final entry) => entry.dueAtMs <= now)
+        .map((final entry) => entry.conceptId)
         .toList();
   }
 
   Future<void> recordResult({
-    required String courseId,
-    required int conceptId,
-    required bool correct,
+    required final String courseId,
+    required final int conceptId,
+    required final bool correct,
   }) async {
     final entries = await load(courseId);
     final existing = entries[conceptId];
@@ -151,11 +148,11 @@ class VocabSrsStore {
     await save(courseId, entries);
   }
 
-  int _dueAtMs(int intervalDays) {
+  int _dueAtMs(final int intervalDays) {
     return DateTime.now().add(Duration(days: intervalDays)).millisecondsSinceEpoch;
   }
 
-  int? _parseInt(dynamic value) {
+  int? _parseInt(final dynamic value) {
     if (value is int) return value;
     return int.tryParse(value?.toString() ?? '');
   }

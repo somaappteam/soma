@@ -1,16 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
-
-import '../core/i18n/ui_language.dart';
-import '../core/services/notification_service.dart';
-import '../models/app_settings.dart';
-import 'achievements_repository.dart';
-import 'soma_plus_repository.dart';
-import '../core/di/locator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/i18n/ui_language.dart';
+import 'package:soma/core/services/notification_service.dart';
+import 'package:soma/data/achievements_repository.dart';
+import 'package:soma/data/soma_plus_repository.dart';
+import 'package:soma/models/app_settings.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SettingsRepository {
   final _supabase = Supabase.instance.client;
@@ -47,7 +46,7 @@ class SettingsRepository {
           .single();
       _effectiveSettings = _withDefaults(resp['settings'] as Map<String, dynamic>?);
     } catch (e) {
-      debugPrint("Error fetching settings: $e");
+      debugPrint('Error fetching settings: $e');
       // Fallback to guest settings structure but empty? or keep previous?
       // For now, valid valid map
       if (_effectiveSettings.isEmpty) _effectiveSettings = Map<String, dynamic>.from(_guestSettings);
@@ -62,7 +61,7 @@ class SettingsRepository {
 
   /// Stream of the settings JSON object.
   Stream<Map<String, dynamic>> getSettingsStream() {
-    return Stream<Map<String, dynamic>>.multi((controller) {
+    return Stream<Map<String, dynamic>>.multi((final controller) {
       // Emit current cached settings immediately
       controller.add(Map<String, dynamic>.from(_effectiveSettings.isEmpty ? _guestSettings : _effectiveSettings));
       
@@ -76,7 +75,7 @@ class SettingsRepository {
   }
 
   void _initAuthListener() {
-    _supabase.auth.onAuthStateChange.listen((data) {
+    _supabase.auth.onAuthStateChange.listen((final data) {
       if (data.session != null) {
         // User logged in — switch to user stream and sweep achievements.
         _listenToUserSettings(data.session!.user.id);
@@ -96,7 +95,7 @@ class SettingsRepository {
     });
   }
 
-  void _listenToUserSettings(String uid) {
+  void _listenToUserSettings(final String uid) {
     _userSettingsSubscription?.cancel();
     
     // First, fetch latest to ensure we have data immediately
@@ -106,7 +105,7 @@ class SettingsRepository {
         .from('profiles')
         .stream(primaryKey: ['id'])
         .eq('id', uid)
-        .listen((event) {
+        .listen((final event) {
       if (event.isEmpty) return;
       final row = event.first;
       _effectiveSettings = _withDefaults(row['settings'] as Map<String, dynamic>?);
@@ -114,18 +113,18 @@ class SettingsRepository {
     });
   }
 
-  Future<void> _bootstrapUserSettings(String uid) async {
+  Future<void> _bootstrapUserSettings(final String uid) async {
     try {
       final resp = await _supabase.from('profiles').select('settings').eq('id', uid).single();
       _effectiveSettings = _withDefaults(resp['settings'] as Map<String, dynamic>?);
       _settingsController.add(_effectiveSettings);
     } catch (e) {
-      debugPrint("Error bootstrapping settings: $e");
+      debugPrint('Error bootstrapping settings: $e');
     }
   }
 
   /// Updates a specific setting key with a new value.
-  Future<void> updateSetting(String key, dynamic value) async {
+  Future<void> updateSetting(final String key, final dynamic value) async {
     final uid = currentUserId;
 
     // Update guest persistence if guest (or always? usually we want to persist guest settings locally)
@@ -162,12 +161,12 @@ class SettingsRepository {
           .update({'settings': currentSettings})
           .eq('id', uid);
     } catch (e) {
-      debugPrint("Error updating setting $key: $e");
+      debugPrint('Error updating setting $key: $e');
     }
   }
 
   // Helper to bulk update if needed
-  Future<void> updateSettings(Map<String, dynamic> newValues) async {
+  Future<void> updateSettings(final Map<String, dynamic> newValues) async {
     final uid = currentUserId;
     if (uid == null) {
       for (final entry in newValues.entries) {
@@ -195,12 +194,12 @@ class SettingsRepository {
 
       await _supabase.from('profiles').update({'settings': currentSettings}).eq('id', uid);
     } catch (e) {
-      debugPrint("Error updating settings: $e");
+      debugPrint('Error updating settings: $e');
     }
   }
 
 
-  Map<String, dynamic> _withDefaults(Map<String, dynamic>? remote) {
+  Map<String, dynamic> _withDefaults(final Map<String, dynamic>? remote) {
     final merged = Map<String, dynamic>.from(_guestSettings);
     if (remote != null) {
       merged.addAll(remote);
@@ -211,7 +210,7 @@ class SettingsRepository {
     return merged;
   }
 
-  dynamic _normalizeSettingValue(String key, dynamic value) {
+  dynamic _normalizeSettingValue(final String key, final dynamic value) {
     if (key == 'language_ui') {
       return normalizeUiLanguageCode(value?.toString());
     }
@@ -221,7 +220,7 @@ class SettingsRepository {
     return value;
   }
 
-  void _persistGuestValue(String key, dynamic value) {
+  void _persistGuestValue(final String key, final dynamic value) {
     if (value is bool) {
       _prefs?.setBool(key, value);
     } else if (value is String) {
@@ -238,7 +237,7 @@ class SettingsRepository {
 
   /// Reacts immediately to notification-related setting changes.
   void _applyNotificationSetting(
-      String key, dynamic value, Map<String, dynamic> current) {
+      final String key, final dynamic value, final Map<String, dynamic> current) {
     if (key == 'push_notifications') {
       final enabled = value == true;
       notificationService.setPushEnabled(enabled);
@@ -271,7 +270,7 @@ class SettingsRepository {
       // Initialize effective settings with guest settings initially
       _effectiveSettings = Map<String, dynamic>.from(_guestSettings);
     } catch (e) {
-      debugPrint("Error initializing settings repository: $e");
+      debugPrint('Error initializing settings repository: $e');
     }
     _initAuthListener();
     await _hydrateFromCurrentSessionIfNeeded();
@@ -307,7 +306,7 @@ class SettingsRepository {
          _settingsController.add(_effectiveSettings);
       }
     } catch (e) {
-      debugPrint("Error loading guest settings: $e");
+      debugPrint('Error loading guest settings: $e');
     }
   }
 }

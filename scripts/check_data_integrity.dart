@@ -7,21 +7,21 @@ const String serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJz
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
   
-  print("--- Checking Vocabulary Languages ---");
+  print('--- Checking Vocabulary Languages ---');
   try {
     final vocabLangs = await client.from('vocabulary').select('lang').limit(100);
-    final uniqueVocab = vocabLangs.map((e) => e['lang']).toSet();
-    print("Found Vocabulary Languages: $uniqueVocab");
+    final uniqueVocab = vocabLangs.map((final e) => e['lang']).toSet();
+    print('Found Vocabulary Languages: $uniqueVocab');
   } catch (e) {
-    print("Error checking vocab: $e");
+    print('Error checking vocab: $e');
   }
 
-  print("\n--- Checking Sentences Languages ---");
+  print('\n--- Checking Sentences Languages ---');
   try {
     final sentenceLangs = await client.from('sentences').select('lang_code').limit(100);
-    final uniqueSentences = sentenceLangs.map((e) => e['lang_code']).toSet();
-    print("Found Sentences Languages: $uniqueSentences");
+    final uniqueSentences = sentenceLangs.map((final e) => e['lang_code']).toSet();
+    print('Found Sentences Languages: $uniqueSentences');
   } catch (e) {
-    print("Error checking sentences: $e");
+    print('Error checking sentences: $e');
   }
 }

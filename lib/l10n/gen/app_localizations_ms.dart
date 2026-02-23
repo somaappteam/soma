@@ -1646,6 +1646,9 @@ class AppLocalizationsMs extends AppLocalizations {
   String get circlesStartGame => 'Mula Permainan';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Menunggu pemain';
 
   @override

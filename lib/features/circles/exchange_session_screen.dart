@@ -1,14 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/data/ai_repository.dart';
+import 'package:soma/data/exchange_analytics_repository.dart';
+import 'package:soma/data/languages.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/features/circles/exchange_session_controller.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../data/ai_repository.dart';
-import '../../data/exchange_analytics_repository.dart';
-import '../../data/languages.dart';
-import 'exchange_session_controller.dart';
-import '../../data/presence_repository.dart';
 
 class ExchangeSessionScreen extends StatefulWidget {
   final String partnerUserId;
@@ -45,10 +44,10 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     )..hydrate();
     _track('exchange_discovery_impression');
     _track('session_opened');
-    _controller.sendRequestIfNeeded().then((sent) {
+    _controller.sendRequestIfNeeded().then((final sent) {
       if (sent) _track('conversation_request_sent');
     });
-    _turnTicker = Timer.periodic(const Duration(seconds: 1), (_) async {
+    _turnTicker = Timer.periodic(const Duration(seconds: 1), (final _) async {
       final skipped = await _controller.tickTurnAndAutoSkipIfNeeded();
       if (skipped) {
         await _track('turn_timeout_autoskip');
@@ -56,12 +55,12 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     });
   }
 
-  String _normalizeCode(String raw) {
+  String _normalizeCode(final String raw) {
     return langCodeFromValue(raw) ?? 'en';
   }
 
 
-  String _tr(String en, {String? fr, String? es, String? de}) {
+  String _tr(final String en, {final String? fr, final String? es, final String? de}) {
     final code = Localizations.localeOf(context).languageCode;
     if (code == 'fr') return fr ?? en;
     if (code == 'es') return es ?? en;
@@ -77,7 +76,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     super.dispose();
   }
 
-  Future<void> _track(String event, {Map<String, dynamic>? data}) {
+  Future<void> _track(final String event, {final Map<String, dynamic>? data}) {
     return exchangeAnalyticsRepository.track(event, metadata: {
       'partner_id': widget.partnerUserId,
       'partner_name': widget.partnerName,
@@ -111,7 +110,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
 
     if (!_controller.requestAccepted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_tr('Accept conversation request before messaging.', fr: 'Acceptez la demande de conversation avant d'envoyer un message.', es: 'Acepta la solicitud de conversación antes de enviar mensajes.', de: 'Akzeptiere die Konversationsanfrage, bevor du Nachrichten sendest.'))),
+        SnackBar(content: Text(_tr('Accept conversation request before messaging.', fr: "Acceptez la demande de conversation avant d'envoyer un message.", es: 'Acepta la solicitud de conversación antes de enviar mensajes.', de: 'Akzeptiere die Konversationsanfrage, bevor du Nachrichten sendest.'))),
       );
       await _track('request_required_blocked_send');
       return;
@@ -119,7 +118,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
 
     if (!_controller.isMyTurn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_tr('Wait for your partner turn before sending.', fr: 'Attendez le tour de votre partenaire avant d'envoyer.', es: 'Espera el turno de tu compañero antes de enviar.', de: 'Warte auf den Zug deines Partners, bevor du sendest.'))),
+        SnackBar(content: Text(_tr('Wait for your partner turn before sending.', fr: "Attendez le tour de votre partenaire avant d'envoyer.", es: 'Espera el turno de tu compañero antes de enviar.', de: 'Warte auf den Zug deines Partners, bevor du sendest.'))),
       );
       await _track('turn_blocked_send');
       return;
@@ -163,11 +162,11 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                 : ['Hi! How are you?', 'I am doing well, thanks.', 'What did you do today?'];
     final selected = await showModalBottomSheet<String>(
       context: context,
-      builder: (ctx) => SafeArea(
+      builder: (final ctx) => SafeArea(
         child: ListView(
           shrinkWrap: true,
           children: options
-              .map((o) => ListTile(
+              .map((final o) => ListTile(
                     title: Text(o),
                     onTap: () => Navigator.pop(ctx, o),
                   ))
@@ -204,7 +203,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     if (!mounted) return;
     showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (final ctx) => AlertDialog(
         title: const Text('Correction suggestion'),
         content: Text(
           'Original: $original\n'
@@ -259,11 +258,11 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
   Future<void> _showSummary() async {
     final minutes = DateTime.now().difference(_controller.startedAt).inMinutes;
     final activeWords = _controller.messages
-        .where((m) => m.languageCode == _controller.activeLanguageCode)
-        .fold<int>(0, (a, b) => a + b.text.split(' ').length);
+        .where((final m) => m.languageCode == _controller.activeLanguageCode)
+        .fold<int>(0, (final a, final b) => a + b.text.split(' ').length);
     final otherWords = _controller.messages
-        .where((m) => m.languageCode != _controller.activeLanguageCode)
-        .fold<int>(0, (a, b) => a + b.text.split(' ').length);
+        .where((final m) => m.languageCode != _controller.activeLanguageCode)
+        .fold<int>(0, (final a, final b) => a + b.text.split(' ').length);
 
     await _track('session_completed', data: {
       'active_words': activeWords,
@@ -277,7 +276,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
+      builder: (final ctx) => AlertDialog(
         title: const Text('Session summary'),
         content: Text(
           '${_controller.activeLanguageCode.toUpperCase()} words: $activeWords\n'
@@ -310,7 +309,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
@@ -320,7 +319,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
             const SizedBox(width: 8),
             StreamBuilder<bool>(
               stream: presenceRepository.streamOnlineStatus(widget.partnerUserId),
-              builder: (context, snapshot) {
+              builder: (final context, final snapshot) {
                 final isOnline = snapshot.data ?? false;
                 return Container(
                   width: 10,
@@ -349,7 +348,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
       ),
       body: AnimatedBuilder(
         animation: _controller,
-        builder: (context, _) {
+        builder: (final context, final _) {
           final roundLabel = '${_controller.activeLanguageCode.toUpperCase()} round';
           return Column(
             children: [
@@ -387,7 +386,7 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                 child: ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   itemCount: _controller.messages.length,
-                  itemBuilder: (_, i) {
+                  itemBuilder: (final _, final i) {
                     final m = _controller.messages[i];
                     return Align(
                       alignment: m.from == 'You' ? Alignment.centerRight : Alignment.centerLeft,

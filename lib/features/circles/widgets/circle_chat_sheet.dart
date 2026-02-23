@@ -1,13 +1,14 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:soma/core/theme/motion.dart';
 import 'package:soma/core/theme/tokens.dart';
 import 'package:soma/core/widgets/glass.dart';
 import 'package:soma/core/widgets/pressable_scale.dart';
 import 'package:soma/data/circle_chat_repository.dart';
+import 'package:soma/data/presence_repository.dart';
 import 'package:soma/data/profile_repository.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import 'package:soma/data/presence_repository.dart';
 
 class CircleChatSheet extends StatefulWidget {
   const CircleChatSheet({
@@ -49,7 +50,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
     super.dispose();
   }
 
-  Future<void> _send({int slowModeSeconds = 0, Set<String> mutedIds = const <String>{}}) async {
+  Future<void> _send({final int slowModeSeconds = 0, final Set<String> mutedIds = const <String>{}}) async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     if (widget.meId != null && mutedIds.contains(widget.meId)) {
@@ -86,7 +87,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
     }
   }
 
-  void _queueRead(String messageId) {
+  void _queueRead(final String messageId) {
     _pendingReadIds.add(messageId);
     _readDebounce?.cancel();
     _readDebounce = Timer(const Duration(milliseconds: 400), () async {
@@ -97,7 +98,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
   }
 
   void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((final _) {
       if (!mounted || !_scroll.hasClients) return;
       _scroll.animateTo(
         _scroll.position.maxScrollExtent + 80,
@@ -107,12 +108,12 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
     });
   }
 
-  Future<void> _loadMissingProfiles(List<Map<String, dynamic>> messages) async {
+  Future<void> _loadMissingProfiles(final List<Map<String, dynamic>> messages) async {
     if (_loadingProfiles) return;
     final ids = messages
-        .map((m) => m['sender_id']?.toString())
+        .map((final m) => m['sender_id']?.toString())
         .whereType<String>()
-        .where((id) => !_profiles.containsKey(id))
+        .where((final id) => !_profiles.containsKey(id))
         .toSet()
         .toList();
     if (ids.isEmpty) return;
@@ -131,21 +132,21 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
     }
   }
 
-  String _nameFor(String senderId) {
+  String _nameFor(final String senderId) {
     final profile = _profiles[senderId];
     return profile?['username'] ?? profile?['display_name'] ?? 'User';
   }
 
   Future<void> _showMessageActions({
-    required String messageId,
-    required String senderId,
-    required bool isHost,
-    required bool isMe,
-    required String content,
+    required final String messageId,
+    required final String senderId,
+    required final bool isHost,
+    required final bool isMe,
+    required final String content,
   }) async {
     await showModalBottomSheet<void>(
       context: context,
-      builder: (context) => SafeArea(
+      builder: (final context) => SafeArea(
         child: Wrap(
           children: [
             ListTile(
@@ -211,7 +212,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -231,12 +232,12 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
       child: SafeArea(
         child: StreamBuilder<Map<String, dynamic>?>(
           stream: _chatConfigStream,
-          builder: (context, configSnapshot) {
+          builder: (final context, final configSnapshot) {
             final config = configSnapshot.data ?? const <String, dynamic>{};
             final hostId = config['host_id']?.toString();
             final isHost = hostId != null && hostId == widget.meId;
             final mutedIds = (config['chat_muted_user_ids'] as List?)
-                    ?.map((e) => e.toString())
+                    ?.map((final e) => e.toString())
                     .toSet() ??
                 <String>{};
             final slowModeSeconds = config['chat_slow_mode_seconds'] is int
@@ -263,13 +264,13 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                       if (isHost)
                         PopupMenuButton<int>(
                           icon: Icon(Icons.tune_rounded, color: mainTextColor),
-                          onSelected: (value) async {
+                          onSelected: (final value) async {
                             await circleChatRepository.setSlowMode(
                               circleId: widget.circleId,
                               seconds: value,
                             );
                           },
-                          itemBuilder: (_) => const [
+                          itemBuilder: (final _) => const [
                             PopupMenuItem(value: 0, child: Text('Slow mode off')),
                             PopupMenuItem(value: 5, child: Text('Slow mode 5s')),
                             PopupMenuItem(value: 10, child: Text('Slow mode 10s')),
@@ -308,7 +309,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                 Expanded(
                   child: StreamBuilder<List<Map<String, dynamic>>>(
                     stream: _messagesStream,
-                    builder: (context, snapshot) {
+                    builder: (final context, final snapshot) {
                       if (snapshot.hasError) {
                         return Center(
                           child: Text(
@@ -325,7 +326,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                         );
                       }
                       final messages = snapshot.data!;
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                      WidgetsBinding.instance.addPostFrameCallback((final _) {
                         _loadMissingProfiles(messages);
                         _scrollToBottom();
                       });
@@ -346,14 +347,14 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                         controller: _scroll,
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
                         itemCount: messages.length,
-                        itemBuilder: (context, index) {
+                        itemBuilder: (final context, final index) {
                           final message = messages[index];
                           final id = message['id']?.toString() ?? '';
                           final senderId = message['sender_id']?.toString() ?? '';
                           final isMe = senderId.isNotEmpty && senderId == widget.meId;
                           final senderName = _nameFor(senderId);
                           final content = message['content']?.toString() ?? '';
-                          final readBy = (message['read_by'] as List?)?.map((e) => e.toString()).toSet() ?? {};
+                          final readBy = (message['read_by'] as List?)?.map((final e) => e.toString()).toSet() ?? {};
                           final reactions = (message['reactions'] as Map<String, dynamic>?) ?? const {};
 
                           if (!isMe && widget.meId != null && !readBy.contains(widget.meId)) {
@@ -385,7 +386,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                                           const SizedBox(width: 4),
                                           StreamBuilder<bool>(
                                             stream: presenceRepository.streamOnlineStatus(senderId),
-                                            builder: (context, snapshot) {
+                                            builder: (final context, final snapshot) {
                                               if (snapshot.data == true) {
                                                 return Container(
                                                   width: 6,
@@ -421,7 +422,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                                       padding: const EdgeInsets.only(top: 4),
                                       child: Wrap(
                                         spacing: 6,
-                                        children: reactions.entries.map((entry) {
+                                        children: reactions.entries.map((final entry) {
                                           final count = (entry.value as List?)?.length ?? 0;
                                           return GestureDetector(
                                             onTap: () => circleChatRepository.toggleReaction(
@@ -488,7 +489,7 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                               border: InputBorder.none,
                             ),
                             textInputAction: TextInputAction.send,
-                            onSubmitted: (_) => _send(
+                            onSubmitted: (final _) => _send(
                               slowModeSeconds: slowModeSeconds,
                               mutedIds: mutedIds,
                             ),
@@ -538,7 +539,7 @@ class CircleChatBubble extends StatelessWidget {
   final bool isRead;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final radius = BorderRadius.only(

@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
 
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../data/social_repository.dart';
-import '../../data/presence_repository.dart';
+import 'package:flutter/material.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/data/social_repository.dart';
+import 'package:soma/features/profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../profile/profile_screen.dart';
 
 class AddFriendScreen extends StatefulWidget {
   const AddFriendScreen({super.key});
@@ -32,7 +32,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
     super.dispose();
   }
 
-  void _onSearchChanged(String query) {
+  void _onSearchChanged(final String query) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     
     if (query.trim().isEmpty) {
@@ -53,7 +53,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
           _searching = false;
         });
       } catch (e) {
-        debugPrint("Search error: $e");
+        debugPrint('Search error: $e');
         if (mounted) setState(() => _searching = false);
       }
     });
@@ -71,7 +71,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
       final users = await socialRepository.searchUsers(username);
       // Optional: approximate match logic or pick first exact
       final target = users.firstWhere(
-        (u) =>
+        (final u) =>
             (u['username'] as String).toLowerCase() == username.toLowerCase(),
         orElse: () => {},
       );
@@ -117,14 +117,14 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     return Scaffold(
       body: SafeArea(
           child: LayoutBuilder(
-            builder: (context, constraints) {
+            builder: (final context, final constraints) {
               final compactHeight = constraints.maxHeight < 760;
               final keyboardVisible = keyboardInset > 0;
               final topSpacing = compactHeight ? 12.0 : 16.0;
@@ -225,8 +225,8 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                                         shrinkWrap: true,
                                         physics: const BouncingScrollPhysics(),
                                         itemCount: _searchResults.length,
-                                        separatorBuilder: (_, __) => const SizedBox(height: 8),
-                                        itemBuilder: (context, index) {
+                                        separatorBuilder: (final _, final __) => const SizedBox(height: 8),
+                                        itemBuilder: (final context, final index) {
                                           final user = _searchResults[index];
                                           return _SearchResultRow(
                                             user: user,
@@ -234,7 +234,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (_) => ProfileScreen(userId: user['id']),
+                                                  builder: (final _) => ProfileScreen(userId: user['id']),
                                                 ),
                                               );
                                             },
@@ -288,7 +288,7 @@ class _IconGlass extends StatelessWidget {
   const _IconGlass({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
@@ -308,9 +308,9 @@ class _SearchResultRow extends StatelessWidget {
   const _SearchResultRow({required this.user, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final username = user['username'] ?? "Unknown";
+    final username = user['username'] ?? 'Unknown';
 
     return InkWell(
       onTap: onTap,
@@ -345,7 +345,7 @@ class _SearchResultRow extends StatelessWidget {
                 ),
                 StreamBuilder<bool>(
                   stream: presenceRepository.streamOnlineStatus(user['id'] ?? ''),
-                  builder: (context, snapshot) {
+                  builder: (final context, final snapshot) {
                     if (snapshot.data == true) {
                       return Positioned(
                         bottom: 0,

@@ -15,7 +15,7 @@ class SoloCourse {
     this.lastAccessed,
   });
 
-  SoloCourse copyWith({int? xp, DateTime? lastAccessed}) {
+  SoloCourse copyWith({final int? xp, final DateTime? lastAccessed}) {
     return SoloCourse(
       id: id,
       title: title,

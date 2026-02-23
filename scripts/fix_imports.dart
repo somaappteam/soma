@@ -3,7 +3,7 @@ import 'dart:io';
 
 void main() {
   final directory = Directory('lib');
-  final files = directory.listSync(recursive: true).whereType<File>().where((f) => f.path.endsWith('.dart'));
+  final files = directory.listSync(recursive: true).whereType<File>().where((final f) => f.path.endsWith('.dart'));
   
   int count = 0;
   for (final file in files) {

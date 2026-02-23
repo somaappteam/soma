@@ -86,61 +86,61 @@ const Map<String, String> _legacyNameToCode = {
   'Finnish': 'fi',
 };
 
-String normalizeUiLanguageCode(String? rawValue) {
+String normalizeUiLanguageCode(final String? rawValue) {
   final value = (rawValue ?? '').trim();
   if (value.isEmpty) return 'en';
-  if (kSupportedUiLanguages.any((language) => language.code == value)) {
+  if (kSupportedUiLanguages.any((final language) => language.code == value)) {
     return value;
   }
   return _legacyNameToCode[value] ?? 'en';
 }
 
-Locale uiLanguageToLocale(String? rawValue) {
+Locale uiLanguageToLocale(final String? rawValue) {
   return Locale(normalizeUiLanguageCode(rawValue));
 }
 
-String uiLanguageLabel(String rawValue, AppLocalizations l10n) {
+String uiLanguageLabel(final String rawValue, final AppLocalizations l10n) {
   final code = normalizeUiLanguageCode(rawValue);
   final language = kSupportedUiLanguages.firstWhere(
-    (item) => item.code == code,
+    (final item) => item.code == code,
     orElse: () => kSupportedUiLanguages.first,
   );
   return language.labelBuilder(l10n);
 }
 
-String _english(AppLocalizations l10n) => l10n.languageEnglish;
-String _spanish(AppLocalizations l10n) => l10n.languageSpanish;
-String _french(AppLocalizations l10n) => l10n.languageFrench;
-String _german(AppLocalizations l10n) => l10n.languageGerman;
-String _italian(AppLocalizations l10n) => l10n.languageItalian;
-String _portuguese(AppLocalizations l10n) => l10n.languagePortuguese;
-String _russian(AppLocalizations l10n) => l10n.languageRussian;
-String _japanese(AppLocalizations l10n) => l10n.languageJapanese;
-String _chinese(AppLocalizations l10n) => l10n.languageChinese;
-String _arabic(AppLocalizations l10n) => l10n.languageArabic;
-String _hindi(AppLocalizations l10n) => l10n.languageHindi;
-String _indonesian(AppLocalizations l10n) => l10n.languageIndonesian;
-String _bengali(AppLocalizations l10n) => l10n.languageBengali;
-String _urdu(AppLocalizations l10n) => l10n.languageUrdu;
-String _vietnamese(AppLocalizations l10n) => l10n.languageVietnamese;
-String _turkish(AppLocalizations l10n) => l10n.languageTurkish;
-String _korean(AppLocalizations l10n) => l10n.languageKorean;
-String _thai(AppLocalizations l10n) => l10n.languageThai;
-String _polish(AppLocalizations l10n) => l10n.languagePolish;
-String _ukrainian(AppLocalizations l10n) => l10n.languageUkrainian;
-String _dutch(AppLocalizations l10n) => l10n.languageDutch;
-String _persian(AppLocalizations l10n) => l10n.languagePersian;
-String _punjabi(AppLocalizations l10n) => l10n.languagePunjabi;
-String _tamil(AppLocalizations l10n) => l10n.languageTamil;
-String _telugu(AppLocalizations l10n) => l10n.languageTelugu;
-String _swahili(AppLocalizations l10n) => l10n.languageSwahili;
-String _malay(AppLocalizations l10n) => l10n.languageMalay;
-String _romanian(AppLocalizations l10n) => l10n.languageRomanian;
-String _greek(AppLocalizations l10n) => l10n.languageGreek;
-String _hungarian(AppLocalizations l10n) => l10n.languageHungarian;
-String _czech(AppLocalizations l10n) => l10n.languageCzech;
-String _swedish(AppLocalizations l10n) => l10n.languageSwedish;
-String _hebrew(AppLocalizations l10n) => l10n.languageHebrew;
-String _norwegian(AppLocalizations l10n) => l10n.languageNorwegian;
-String _danish(AppLocalizations l10n) => l10n.languageDanish;
-String _finnish(AppLocalizations l10n) => l10n.languageFinnish;
+String _english(final AppLocalizations l10n) => l10n.languageEnglish;
+String _spanish(final AppLocalizations l10n) => l10n.languageSpanish;
+String _french(final AppLocalizations l10n) => l10n.languageFrench;
+String _german(final AppLocalizations l10n) => l10n.languageGerman;
+String _italian(final AppLocalizations l10n) => l10n.languageItalian;
+String _portuguese(final AppLocalizations l10n) => l10n.languagePortuguese;
+String _russian(final AppLocalizations l10n) => l10n.languageRussian;
+String _japanese(final AppLocalizations l10n) => l10n.languageJapanese;
+String _chinese(final AppLocalizations l10n) => l10n.languageChinese;
+String _arabic(final AppLocalizations l10n) => l10n.languageArabic;
+String _hindi(final AppLocalizations l10n) => l10n.languageHindi;
+String _indonesian(final AppLocalizations l10n) => l10n.languageIndonesian;
+String _bengali(final AppLocalizations l10n) => l10n.languageBengali;
+String _urdu(final AppLocalizations l10n) => l10n.languageUrdu;
+String _vietnamese(final AppLocalizations l10n) => l10n.languageVietnamese;
+String _turkish(final AppLocalizations l10n) => l10n.languageTurkish;
+String _korean(final AppLocalizations l10n) => l10n.languageKorean;
+String _thai(final AppLocalizations l10n) => l10n.languageThai;
+String _polish(final AppLocalizations l10n) => l10n.languagePolish;
+String _ukrainian(final AppLocalizations l10n) => l10n.languageUkrainian;
+String _dutch(final AppLocalizations l10n) => l10n.languageDutch;
+String _persian(final AppLocalizations l10n) => l10n.languagePersian;
+String _punjabi(final AppLocalizations l10n) => l10n.languagePunjabi;
+String _tamil(final AppLocalizations l10n) => l10n.languageTamil;
+String _telugu(final AppLocalizations l10n) => l10n.languageTelugu;
+String _swahili(final AppLocalizations l10n) => l10n.languageSwahili;
+String _malay(final AppLocalizations l10n) => l10n.languageMalay;
+String _romanian(final AppLocalizations l10n) => l10n.languageRomanian;
+String _greek(final AppLocalizations l10n) => l10n.languageGreek;
+String _hungarian(final AppLocalizations l10n) => l10n.languageHungarian;
+String _czech(final AppLocalizations l10n) => l10n.languageCzech;
+String _swedish(final AppLocalizations l10n) => l10n.languageSwedish;
+String _hebrew(final AppLocalizations l10n) => l10n.languageHebrew;
+String _norwegian(final AppLocalizations l10n) => l10n.languageNorwegian;
+String _danish(final AppLocalizations l10n) => l10n.languageDanish;
+String _finnish(final AppLocalizations l10n) => l10n.languageFinnish;

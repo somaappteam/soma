@@ -1,10 +1,10 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'dart:io' show Platform;
 
 class SessionTracker {
   final _supabase = Supabase.instance.client;
@@ -16,7 +16,7 @@ class SessionTracker {
   Future<void> start() async {
     _deviceId ??= await _loadDeviceId();
 
-    _sub ??= _supabase.auth.onAuthStateChange.listen((data) {
+    _sub ??= _supabase.auth.onAuthStateChange.listen((final data) {
       if (data.session?.user.id != null) {
         _upsertSession(data.session!.user.id);
       }
@@ -52,11 +52,11 @@ class SessionTracker {
 
   String _generateDeviceId() {
     final rand = Random.secure();
-    final bytes = List<int>.generate(16, (_) => rand.nextInt(256));
-    return bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+    final bytes = List<int>.generate(16, (final _) => rand.nextInt(256));
+    return bytes.map((final b) => b.toRadixString(16).padLeft(2, '0')).join();
   }
 
-  Future<void> _upsertSession(String userId) async {
+  Future<void> _upsertSession(final String userId) async {
     final deviceId = _deviceId;
     if (deviceId == null) return;
 
@@ -78,7 +78,7 @@ class SessionTracker {
         'is_current': true,
       }, onConflict: 'user_id, device_id');
     } catch (e) {
-      debugPrint("Failed to upsert session: $e");
+      debugPrint('Failed to upsert session: $e');
     }
   }
 }

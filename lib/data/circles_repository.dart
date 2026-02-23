@@ -1,11 +1,10 @@
 import 'package:flutter/foundation.dart';
-
-import '../core/services/app_logger.dart';
-import '../core/services/error_reporter.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
+import 'package:soma/core/services/error_reporter.dart';
+import 'package:soma/data/achievements_repository.dart';
+import 'package:soma/data/stats_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'stats_repository.dart';
-import 'achievements_repository.dart';
-import '../core/di/locator.dart';
 
 class CirclesRepository {
   final _supabase = Supabase.instance.client;
@@ -23,20 +22,20 @@ class CirclesRepository {
 
   /// Create a new circle
   Future<String> createCircle({
-    required String name,
-    required String fromLang,
-    required String toLang,
-    required String mode,
-    required String level,
-    required int maxPlayers,
-    required int questionsCount,
-    required int timePerQ,
-    required bool allowSpectators,
-    bool isLocked = false,
-    List<Map<String, dynamic>>? questions,
+    required final String name,
+    required final String fromLang,
+    required final String toLang,
+    required final String mode,
+    required final String level,
+    required final int maxPlayers,
+    required final int questionsCount,
+    required final int timePerQ,
+    required final bool allowSpectators,
+    final bool isLocked = false,
+    final List<Map<String, dynamic>>? questions,
   }) async {
     final uid = currentUserId;
-    if (uid == null) throw Exception("Not logged in");
+    if (uid == null) throw Exception('Not logged in');
 
     if (kDebugMode) {
       appLogger.debug('Creating circle', context: {'questions_count': questions?.length ?? 0});
@@ -73,17 +72,17 @@ class CirclesRepository {
   }
 
   /// Join a circle
-  Future<void> joinCircle(String circleId,
-      {String role = 'player', bool isReady = false}) async {
+  Future<void> joinCircle(final String circleId,
+      {final String role = 'player', final bool isReady = false}) async {
     final uid = currentUserId;
-    if (uid == null) throw Exception("Not logged in");
+    if (uid == null) throw Exception('Not logged in');
 
     final circle = await getCircleDetails(circleId);
-    if (circle == null) throw Exception("Circle not found");
+    if (circle == null) throw Exception('Circle not found');
     final isLocked = circle['is_locked'] == true;
     final hostId = circle['host_id']?.toString();
     if (isLocked && hostId != uid) {
-      throw Exception("Circle is locked");
+      throw Exception('Circle is locked');
     }
 
     // Use upsert to handle case where participant already exists
@@ -109,19 +108,19 @@ class CirclesRepository {
   /// - Invite/link users should auto-join as player when there is a free player slot.
   /// - If player slots are full, they join as spectator.
   /// - If already host/player, keep role as-is.
-  Future<CircleJoinOutcome> joinCircleFromInvite(String circleId) async {
+  Future<CircleJoinOutcome> joinCircleFromInvite(final String circleId) async {
     final uid = currentUserId;
-    if (uid == null) throw Exception("Not logged in");
+    if (uid == null) throw Exception('Not logged in');
 
     final circle = await getCircleDetails(circleId);
-    if (circle == null) throw Exception("Circle not found");
+    if (circle == null) throw Exception('Circle not found');
     if (circle['is_locked'] == true && circle['host_id']?.toString() != uid) {
-      throw Exception("Circle is locked");
+      throw Exception('Circle is locked');
     }
 
     final status = (circle['status'] ?? 'lobby').toString();
     if (status == 'ended') {
-      throw Exception("Circle has ended");
+      throw Exception('Circle has ended');
     }
 
     final existing = await _supabase
@@ -173,13 +172,13 @@ class CirclesRepository {
   }
 
   /// Listen to participants in a circle
-  Stream<List<Map<String, dynamic>>> getParticipantsStream(String circleId) {
+  Stream<List<Map<String, dynamic>>> getParticipantsStream(final String circleId) {
     return _supabase
         .from('circle_participants')
         .stream(primaryKey: ['id'])
         .eq('circle_id', circleId)
         .order('joined_at', ascending: true)
-        .map((rows) {
+        .map((final rows) {
           // We might want to fetch profile details here or use a view/join logic
           // But stream join is hard.
           // For now, we return raw participant rows. UI will have to fetch/cache profiles.
@@ -188,7 +187,7 @@ class CirclesRepository {
   }
 
   /// Leave circle (if host leaves and circle not ended, circle ends)
-  Future<void> leaveCircle(String circleId) async {
+  Future<void> leaveCircle(final String circleId) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -208,10 +207,10 @@ class CirclesRepository {
       // If host leaves and circle is still open, end it
       if (isHost && isOpen) {
         await endCircle(circleId);
-        debugPrint("Host left circle $circleId - circle ended.");
+        debugPrint('Host left circle $circleId - circle ended.');
       }
     } catch (e) {
-      debugPrint("Error in leaveCircle: $e");
+      debugPrint('Error in leaveCircle: $e');
       // Still try to remove participant even if other checks fail
       try {
         await _supabase
@@ -224,34 +223,34 @@ class CirclesRepository {
   }
 
   /// Update circle status (lobby, active, ended)
-  Future<void> updateCircleStatus(String circleId, String status) async {
+  Future<void> updateCircleStatus(final String circleId, final String status) async {
     await _supabase
         .from('circles')
         .update({'status': status}).eq('id', circleId);
   }
 
   Future<void> updateCircleQuestions(
-      String circleId, List<Map<String, dynamic>> questions) async {
+      final String circleId, final List<Map<String, dynamic>> questions) async {
     await _supabase.from('circles').update({
       'questions': questions,
       'questions_count': questions.length,
     }).eq('id', circleId);
   }
 
-  Future<void> updateCircleLock(String circleId, bool isLocked) async {
+  Future<void> updateCircleLock(final String circleId, final bool isLocked) async {
     await _supabase.from('circles').update({
       'is_locked': isLocked,
     }).eq('id', circleId);
   }
 
   Future<void> updateCircleMatchSettings({
-    required String circleId,
-    required String fromLang,
-    required String toLang,
-    required String mode,
-    required String level,
-    required int questionsCount,
-    required int timePerQ,
+    required final String circleId,
+    required final String fromLang,
+    required final String toLang,
+    required final String mode,
+    required final String level,
+    required final int questionsCount,
+    required final int timePerQ,
   }) async {
     await _supabase.from('circles').update({
       'from_lang': fromLang,
@@ -264,11 +263,11 @@ class CirclesRepository {
   }
 
   Future<void> updateCircleSettings({
-    required String circleId,
-    required int maxPlayers,
-    required int questionsCount,
-    required int timePerQ,
-    required bool allowSpectators,
+    required final String circleId,
+    required final int maxPlayers,
+    required final int questionsCount,
+    required final int timePerQ,
+    required final bool allowSpectators,
   }) async {
     await _supabase.from('circles').update({
       'max_players': maxPlayers,
@@ -281,9 +280,9 @@ class CirclesRepository {
 
   /// Transfer host role to another participant
   Future<void> transferHost(
-      {required String circleId, required String newHostId}) async {
+      {required final String circleId, required final String newHostId}) async {
     final uid = currentUserId;
-    if (uid == null) throw Exception("Not logged in");
+    if (uid == null) throw Exception('Not logged in');
 
     await _supabase
         .from('circles')
@@ -303,19 +302,19 @@ class CirclesRepository {
   }
 
   /// End circle so it disappears from open lists
-  Future<void> endCircle(String circleId) async {
+  Future<void> endCircle(final String circleId) async {
     try {
-      debugPrint("Ending circle: $circleId");
+      debugPrint('Ending circle: $circleId');
       await updateCircleStatus(circleId, 'ended');
       debugPrint("Circle $circleId status set to 'ended'");
     } catch (e) {
-      debugPrint("Failed to end circle $circleId: $e");
+      debugPrint('Failed to end circle $circleId: $e');
       rethrow;
     }
   }
 
   /// Toggle Ready Status
-  Future<void> toggleReady(String circleId, bool isReady) async {
+  Future<void> toggleReady(final String circleId, final bool isReady) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -327,7 +326,7 @@ class CirclesRepository {
   }
 
   /// Request to join as player (from spectator)
-  Future<void> requestToJoin(String circleId) async {
+  Future<void> requestToJoin(final String circleId) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -340,7 +339,7 @@ class CirclesRepository {
 
   /// Approve a spectator join request
   Future<void> approveJoinRequest(
-      {required String circleId, required String userId}) async {
+      {required final String circleId, required final String userId}) async {
     await _supabase
         .from('circle_participants')
         .update({'role': 'player', 'is_ready': false})
@@ -350,7 +349,7 @@ class CirclesRepository {
 
   /// Decline a spectator join request
   Future<void> declineJoinRequest(
-      {required String circleId, required String userId}) async {
+      {required final String circleId, required final String userId}) async {
     await _supabase
         .from('circle_participants')
         .update({'role': 'spectator'})
@@ -359,7 +358,7 @@ class CirclesRepository {
   }
 
   /// Get Circle Details
-  Future<Map<String, dynamic>?> getCircleDetails(String circleId) async {
+  Future<Map<String, dynamic>?> getCircleDetails(final String circleId) async {
     final data = await _supabase
         .from('circles')
         .select('*, questions')
@@ -369,15 +368,15 @@ class CirclesRepository {
   }
 
   /// Stream of a specific circle's details (for status tracking)
-  Stream<Map<String, dynamic>> getCircleStream(String circleId) {
+  Stream<Map<String, dynamic>> getCircleStream(final String circleId) {
     return _supabase
         .from('circles')
         .stream(primaryKey: ['id'])
         .eq('id', circleId)
-        .map((rows) => rows.isNotEmpty ? rows.first : {});
+        .map((final rows) => rows.isNotEmpty ? rows.first : {});
   }
 
-  Future<void> updateParticipantScore(String circleId, int score) async {
+  Future<void> updateParticipantScore(final String circleId, final int score) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -414,12 +413,12 @@ class CirclesRepository {
         // 3. If host missing, end the circle
         if (hostParticipant == null) {
           debugPrint(
-              "Found ghost circle $circleId (Host $hostId missing). Ending it.");
+              'Found ghost circle $circleId (Host $hostId missing). Ending it.');
           await endCircle(circleId); // This sets status to 'ended'
         }
       }
     } catch (e) {
-      debugPrint("Error cleaning up ghost circles: $e");
+      debugPrint('Error cleaning up ghost circles: $e');
     }
   }
 }

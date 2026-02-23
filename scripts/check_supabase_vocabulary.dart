@@ -22,6 +22,6 @@ void main() async {
       print('\nVocabulary table is EMPTY!');
     }
   } catch (e) {
-    print("Error: $e");
+    print('Error: $e');
   }
 }

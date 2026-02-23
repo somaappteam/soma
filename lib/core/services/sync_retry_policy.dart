@@ -1,4 +1,4 @@
-import '../../data/content_sync_service.dart';
+import 'package:soma/data/content_sync_service.dart';
 
 typedef SyncRunner = Future<ContentSyncResult> Function();
 
@@ -9,9 +9,9 @@ class SyncRetryPolicy {
   static const int baseDelayMs = 700;
 
   Future<ContentSyncResult> execute({
-    required SyncRunner runSync,
-    required RetryScheduled onRetryScheduled,
-    Future<void> Function(Duration delay)? wait,
+    required final SyncRunner runSync,
+    required final RetryScheduled onRetryScheduled,
+    final Future<void> Function(Duration delay)? wait,
   }) async {
     final waiter = wait ?? Future<void>.delayed;
     ContentSyncResult? result;

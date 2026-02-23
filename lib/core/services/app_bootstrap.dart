@@ -1,17 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
+import 'package:soma/core/config/app_config.dart';
+import 'package:soma/core/services/haptics_service.dart';
+import 'package:soma/core/services/notification_service.dart';
+import 'package:soma/core/services/session_tracker.dart';
+import 'package:soma/core/services/sfx_service.dart';
+import 'package:soma/core/services/theme_mode_controller.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/data/soma_plus_repository.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../config/app_config.dart';
-import '../../data/settings_repository.dart';
-import '../../data/soma_plus_repository.dart';
-import 'haptics_service.dart';
-import 'notification_service.dart';
-import 'session_tracker.dart';
-import 'sfx_service.dart';
-import 'theme_mode_controller.dart';
 
 class AppBootstrap {
   const AppBootstrap();

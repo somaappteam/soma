@@ -1,5 +1,5 @@
-import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -13,7 +13,7 @@ class DatabaseHelper {
     return _database!;
   }
 
-  Future<Database> _initDB(String filePath) async {
+  Future<Database> _initDB(final String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
 
@@ -25,7 +25,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+  Future<void> _onUpgrade(final Database db, final int oldVersion, final int newVersion) async {
     if (oldVersion < 3) {
       await _createUserTables(db);
     }
@@ -53,7 +53,7 @@ class DatabaseHelper {
     }
   }
 
-  Future<void> _createDB(Database db, int version) async {
+  Future<void> _createDB(final Database db, final int version) async {
     const idType = 'TEXT PRIMARY KEY';
     const textType = 'TEXT NOT NULL';
 
@@ -73,7 +73,7 @@ class DatabaseHelper {
     await _createOfflineQueueTable(db);
   }
 
-  Future<void> _createContentTables(Database db) async {
+  Future<void> _createContentTables(final Database db) async {
     // Vocabulary Table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS vocabulary (
@@ -102,7 +102,7 @@ class DatabaseHelper {
     ''');
   }
 
-  Future<void> _createUserTables(Database db) async {
+  Future<void> _createUserTables(final Database db) async {
     // SRS Progress Table
     await db.execute('''
       CREATE TABLE IF NOT EXISTS user_learned_items (
@@ -160,7 +160,7 @@ class DatabaseHelper {
     ''');
   }
 
-  Future<void> _createOfflineQueueTable(Database db) async {
+  Future<void> _createOfflineQueueTable(final Database db) async {
     await db.execute('''
       CREATE TABLE IF NOT EXISTS offline_queue (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -174,7 +174,7 @@ class DatabaseHelper {
 
   // --- Content Sync Methods ---
   
-  Future<void> upsertCourse(Map<String, dynamic> course) async {
+  Future<void> upsertCourse(final Map<String, dynamic> course) async {
     final db = await instance.database;
     await db.insert(
       'courses',
@@ -189,7 +189,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> upsertVocabulary(Map<String, dynamic> vocab) async {
+  Future<void> upsertVocabulary(final Map<String, dynamic> vocab) async {
     final db = await instance.database;
     await db.insert(
       'vocabulary',
@@ -207,7 +207,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> upsertSentence(Map<String, dynamic> sentence) async {
+  Future<void> upsertSentence(final Map<String, dynamic> sentence) async {
     final db = await instance.database;
     await db.insert(
       'sentences',
@@ -229,17 +229,17 @@ class DatabaseHelper {
     return await db.query('courses');
   }
 
-  Future<List<Map<String, dynamic>>> getVocabularyByLang(String langCode) async {
+  Future<List<Map<String, dynamic>>> getVocabularyByLang(final String langCode) async {
     final db = await instance.database;
     return await db.query('vocabulary', where: 'lang_code = ?', whereArgs: [langCode]);
   }
 
-  Future<List<Map<String, dynamic>>> getSentencesByLang(String langCode) async {
+  Future<List<Map<String, dynamic>>> getSentencesByLang(final String langCode) async {
     final db = await instance.database;
     return await db.query('sentences', where: 'lang_code = ?', whereArgs: [langCode]);
   }
 
-  Future<void> upsertUserLearnedItem(Map<String, dynamic> item) async {
+  Future<void> upsertUserLearnedItem(final Map<String, dynamic> item) async {
     final db = await instance.database;
     await db.insert(
       'user_learned_items',
@@ -255,7 +255,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> upsertUserCourse(Map<String, dynamic> course) async {
+  Future<void> upsertUserCourse(final Map<String, dynamic> course) async {
     final db = await instance.database;
     await db.insert(
       'user_courses',
@@ -269,7 +269,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getUserLearnedItems(String userId, String courseId) async {
+  Future<List<Map<String, dynamic>>> getUserLearnedItems(final String userId, final String courseId) async {
     final db = await instance.database;
     return await db.query(
       'user_learned_items',
@@ -278,7 +278,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getUserCourses(String userId) async {
+  Future<List<Map<String, dynamic>>> getUserCourses(final String userId) async {
     final db = await instance.database;
     return await db.query(
       'user_courses',
@@ -287,7 +287,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> upsertUserStats(Map<String, dynamic> stats) async {
+  Future<void> upsertUserStats(final Map<String, dynamic> stats) async {
     final db = await instance.database;
     await db.insert(
       'user_stats',
@@ -308,7 +308,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<Map<String, dynamic>?> getUserStats(String userId) async {
+  Future<Map<String, dynamic>?> getUserStats(final String userId) async {
     final db = await instance.database;
     final results = await db.query(
       'user_stats',
@@ -319,7 +319,7 @@ class DatabaseHelper {
     return results.first;
   }
 
-  Future<void> upsertProfile(Map<String, dynamic> profile) async {
+  Future<void> upsertProfile(final Map<String, dynamic> profile) async {
     final db = await instance.database;
     await db.insert(
       'profiles',
@@ -338,7 +338,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<Map<String, dynamic>?> getProfile(String userId) async {
+  Future<Map<String, dynamic>?> getProfile(final String userId) async {
     final db = await instance.database;
     final results = await db.query(
       'profiles',

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:soma/core/i18n/ui_language.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/data/profile_store.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/features/auth/sign_in_screen.dart';
+import 'package:soma/features/auth/sign_up_screen.dart';
+import 'package:soma/features/home/app_shell.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import 'sign_in_screen.dart';
-import 'sign_up_screen.dart';
-import '../home/app_shell.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/theme/tokens.dart';
-import '../../data/profile_store.dart';
-import '../../data/settings_repository.dart';
-import '../../core/widgets/responsive.dart';
-import '../../core/i18n/ui_language.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -20,11 +20,11 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  Future<void> _changeLanguage(String languageCode) async {
+  Future<void> _changeLanguage(final String languageCode) async {
     await settingsRepository.updateSetting('language_ui', languageCode);
   }
 
-  List<({String value, String label})> _languageOptions(AppLocalizations l10n) {
+  List<({String value, String label})> _languageOptions(final AppLocalizations l10n) {
     return [
       for (final language in kSupportedUiLanguages)
         (value: language.code, label: language.labelBuilder(l10n)),
@@ -34,7 +34,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final languageOptions = _languageOptions(l10n);
     final isLight = Theme.of(context).brightness == Brightness.light;
@@ -61,7 +61,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              "SOMA",
+                              'SOMA',
                               textAlign: TextAlign.center,
                               style: GoogleFonts.orbitron(
                                 fontWeight: FontWeight.w800,
@@ -112,7 +112,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   onTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const SignUpScreen(),
+                                      builder: (final context) => const SignUpScreen(),
                                     ),
                                   ),
                                 ),
@@ -128,7 +128,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                     onTap: () => Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => const SignInScreen(),
+                                        builder: (final context) => const SignInScreen(),
                                       ),
                                     ),
                                     child: SizedBox(
@@ -153,7 +153,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   profileStore.loginAsGuest();
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(builder: (_) => const AppShell()),
+                                    MaterialPageRoute(builder: (final _) => const AppShell()),
                                   );
                                 },
                                 child: Text(
@@ -177,11 +177,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               right: 10,
               child: StreamBuilder<Map<String, dynamic>>(
                 stream: settingsRepository.getSettingsStream(),
-                builder: (context, snapshot) {
+                builder: (final context, final snapshot) {
                   final current = normalizeUiLanguageCode(snapshot.data?['language_ui']?.toString());
                   final currentLabel = languageOptions
                           .firstWhere(
-                            (item) => item.value == current,
+                            (final item) => item.value == current,
                             orElse: () => languageOptions.first,
                           )
                           .label;
@@ -193,7 +193,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     child: PopupMenuButton<String>(
                       tooltip: l10n.settingsUiLanguage,
                       onSelected: _changeLanguage,
-                      itemBuilder: (context) => [
+                      itemBuilder: (final context) => [
                         for (final option in languageOptions)
                           PopupMenuItem<String>(
                             value: option.value,

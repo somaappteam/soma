@@ -1632,6 +1632,9 @@ class AppLocalizationsVi extends AppLocalizations {
   String get circlesStartGame => 'Bắt đầu trò chơi';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Đang chờ người chơi';
 
   @override

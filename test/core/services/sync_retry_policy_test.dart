@@ -24,8 +24,8 @@ void main() {
           stepDurationsMs: {'offline_queue': 10},
         );
       },
-      onRetryScheduled: (attempt, _) async => scheduled.add(attempt),
-      wait: (_) async {},
+      onRetryScheduled: (final attempt, final _) async => scheduled.add(attempt),
+      wait: (final _) async {},
     );
 
     expect(result.success, isTrue);
@@ -46,8 +46,8 @@ void main() {
           stepDurationsMs: {'courses': 10},
         );
       },
-      onRetryScheduled: (_, __) async {},
-      wait: (_) async {},
+      onRetryScheduled: (final _, final __) async {},
+      wait: (final _) async {},
     );
 
     expect(result.success, isFalse);

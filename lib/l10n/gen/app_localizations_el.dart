@@ -1646,6 +1646,9 @@ class AppLocalizationsEl extends AppLocalizations {
   String get circlesStartGame => 'Έναρξη Παιχνιδιού';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Αναμονή για παίκτες';
 
   @override

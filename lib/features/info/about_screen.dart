@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/features/info/legal_data.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../core/theme/tokens.dart';
-import 'legal_data.dart';
 
 enum AboutView {
   version,
@@ -18,7 +17,7 @@ class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key, required this.view});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     
     // Determine title based on view
@@ -63,7 +62,7 @@ class AboutScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "SOMA",
+                        'SOMA',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.w900,
@@ -103,7 +102,7 @@ class AboutScreen extends StatelessWidget {
                         label: l10n.aboutOpenSource,
                         onTap: () => showLicensePage(
                           context: context,
-                          applicationName: "SOMA",
+                          applicationName: 'SOMA',
                           applicationVersion: _appVersion,
                           applicationLegalese: LegalData.attributions,
                           useRootNavigator: true,
@@ -118,11 +117,11 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  void _openLegalDoc(BuildContext context, String title, String content) {
+  void _openLegalDoc(final BuildContext context, final String title, final String content) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => _LegalDetailScreen(title: title, content: content),
+        builder: (final context) => _LegalDetailScreen(title: title, content: content),
       ),
     );
   }
@@ -135,7 +134,7 @@ class _InfoRow extends StatelessWidget {
   const _InfoRow({required this.label, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -166,7 +165,7 @@ class _LegalDetailScreen extends StatelessWidget {
   const _LegalDetailScreen({required this.title, required this.content});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),

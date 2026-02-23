@@ -1,16 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/staggered_in.dart';
-import '../../data/auth_repository.dart';
-import '../../data/chat_repository.dart';
-import '../../data/experiment_repository.dart';
-import '../../data/presence_repository.dart';
-import '../../data/settings_repository.dart';
-import 'dm_chat_screen.dart';
-import 'select_friend_screen.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/staggered_in.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/chat_repository.dart';
+import 'package:soma/data/experiment_repository.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/features/social/dm_chat_screen.dart';
+import 'package:soma/features/social/select_friend_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
 enum _InboxFilter { all, priority, unread, friends, requests, groups, muted, archived }
@@ -24,7 +23,7 @@ class InboxScreen extends StatefulWidget {
 }
 
 class _InboxScreenState extends State<InboxScreen> {
-  String query = "";
+  String query = '';
   late final Stream<List<Map<String, dynamic>>> _threadsStream;
   final Set<String> _archivedThreadIds = <String>{};
   final Set<String> _deletedThreadIds = <String>{};
@@ -88,7 +87,7 @@ class _InboxScreenState extends State<InboxScreen> {
     } catch (_) {}
   }
 
-  Future<void> _setSnooze(String otherId, Duration? duration) async {
+  Future<void> _setSnooze(final String otherId, final Duration? duration) async {
     setState(() {
       if (duration == null) {
         _snoozedUntil.remove(otherId);
@@ -102,11 +101,11 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 
-  Future<void> _showSnoozeSheet(String otherId) async {
+  Future<void> _showSnoozeSheet(final String otherId) async {
     final selected = await showModalBottomSheet<Duration?>(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
+      builder: (final context) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -123,7 +122,7 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
 
-  Future<void> _toggleMutedThread(String otherId, {required bool next}) async {
+  Future<void> _toggleMutedThread(final String otherId, {required final bool next}) async {
     setState(() {
       if (next) {
         _mutedThreadIds.add(otherId);
@@ -134,7 +133,7 @@ class _InboxScreenState extends State<InboxScreen> {
     await chatRepository.setConversationPreference(otherId, muted: next);
   }
 
-  Future<void> _toggleArchivedThread(String otherId, {required bool next}) async {
+  Future<void> _toggleArchivedThread(final String otherId, {required final bool next}) async {
     setState(() {
       if (next) {
         _archivedThreadIds.add(otherId);
@@ -145,7 +144,7 @@ class _InboxScreenState extends State<InboxScreen> {
     await chatRepository.setConversationPreference(otherId, archived: next);
   }
 
-  Future<void> _togglePreviewHidden(String otherId, {required bool next}) async {
+  Future<void> _togglePreviewHidden(final String otherId, {required final bool next}) async {
     setState(() {
       if (next) {
         _hiddenPreviewThreadIds.add(otherId);
@@ -156,7 +155,7 @@ class _InboxScreenState extends State<InboxScreen> {
     await settingsRepository.updateSetting('dm_hide_preview_$otherId', next);
   }
 
-  Future<void> _removeThreadFromInbox(String otherId, String name) async {
+  Future<void> _removeThreadFromInbox(final String otherId, final String name) async {
     setState(() => _deletedThreadIds.add(otherId));
     if (!mounted) return;
     ScaffoldMessenger.of(context)
@@ -173,10 +172,10 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
 
-  Future<bool> _confirmPermanentDelete(String name) async {
+  Future<bool> _confirmPermanentDelete(final String name) async {
     final result = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (final ctx) => AlertDialog(
         title: const Text('Delete chat permanently?'),
         content: Text('This will permanently delete all messages with @$name.'),
         actions: [
@@ -196,17 +195,17 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
   Future<void> _showThreadActionsSheet({
-    required String otherId,
-    required String name,
-    required bool isPinned,
-    required bool isMuted,
-    required bool isArchived,
-    required bool hidePreview,
+    required final String otherId,
+    required final String name,
+    required final bool isPinned,
+    required final bool isMuted,
+    required final bool isArchived,
+    required final bool hidePreview,
   }) async {
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
+      builder: (final context) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -310,7 +309,7 @@ class _InboxScreenState extends State<InboxScreen> {
     return count;
   }
 
-  Future<void> _setSort(_InboxSort next) async {
+  Future<void> _setSort(final _InboxSort next) async {
     if (_sort == next) return;
     HapticFeedback.selectionClick();
     setState(() => _sort = next);
@@ -325,7 +324,7 @@ class _InboxScreenState extends State<InboxScreen> {
     });
   }
 
-  bool _isPriorityThread(Map<String, dynamic> t) {
+  bool _isPriorityThread(final Map<String, dynamic> t) {
     final unread = (t['unreadCount'] as int?) ?? 0;
     final isFriend = t['isFriend'] == true;
     final isPinned = _pinnedThreadIds.contains(t['otherId']?.toString() ?? '');
@@ -337,7 +336,7 @@ class _InboxScreenState extends State<InboxScreen> {
     return unread > 0 || isPinned || learningSignal || (isFriend && recent);
   }
 
-  bool _isGroupThread(Map<String, dynamic> t) {
+  bool _isGroupThread(final Map<String, dynamic> t) {
     final name = (t['otherName']?.toString() ?? '').toLowerCase();
     return name.contains('group') || name.contains('&') || name.contains(',');
   }
@@ -357,7 +356,7 @@ class _InboxScreenState extends State<InboxScreen> {
     return chatRepository.getInboxThreadsStream();
   }
 
-  void _syncServerPrefs(List<Map<String, dynamic>> threads) {
+  void _syncServerPrefs(final List<Map<String, dynamic>> threads) {
     for (final t in threads) {
       final otherId = t['otherId']?.toString();
       if (otherId == null || otherId.isEmpty) continue;
@@ -393,7 +392,7 @@ class _InboxScreenState extends State<InboxScreen> {
   }
   */
 
-  Future<void> _togglePinnedThread(String otherId, {required bool next}) async {
+  Future<void> _togglePinnedThread(final String otherId, {required final bool next}) async {
     setState(() {
       if (next) {
         _pinnedThreadIds.add(otherId);
@@ -423,7 +422,7 @@ class _InboxScreenState extends State<InboxScreen> {
   }
   */
 
-  String _sortLabel(_InboxSort sort) {
+  String _sortLabel(final _InboxSort sort) {
     switch (sort) {
       case _InboxSort.unreadFirst:
         return 'Unread first';
@@ -434,7 +433,7 @@ class _InboxScreenState extends State<InboxScreen> {
     }
   }
 
-  String _filterLabel(_InboxFilter filter) {
+  String _filterLabel(final _InboxFilter filter) {
     switch (filter) {
       case _InboxFilter.all:
         return 'All';
@@ -455,7 +454,7 @@ class _InboxScreenState extends State<InboxScreen> {
     }
   }
 
-  void _setFilter(_InboxFilter next) {
+  void _setFilter(final _InboxFilter next) {
     if (_filter == next && _showArchivedOnly == (next == _InboxFilter.archived)) return;
     HapticFeedback.selectionClick();
     setState(() {
@@ -464,7 +463,7 @@ class _InboxScreenState extends State<InboxScreen> {
     });
   }
 
-  void _applyPreset(String preset) {
+  void _applyPreset(final String preset) {
     HapticFeedback.selectionClick();
     setState(() {
       switch (preset) {
@@ -491,7 +490,7 @@ class _InboxScreenState extends State<InboxScreen> {
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      builder: (context) {
+      builder: (final context) {
         return SafeArea(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
@@ -570,7 +569,7 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
@@ -611,7 +610,7 @@ class _InboxScreenState extends State<InboxScreen> {
                     onTap: () async {
                       await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const SelectFriendScreen()),
+                        MaterialPageRoute(builder: (final _) => const SelectFriendScreen()),
                       );
                       if (mounted) setState(() {});
                     },
@@ -656,7 +655,7 @@ class _InboxScreenState extends State<InboxScreen> {
                             Expanded(
                               child: TextField(
                                 autofocus: true,
-                                onChanged: (v) => setState(() => query = v),
+                                onChanged: (final v) => setState(() => query = v),
                                 style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
                                 cursorColor: scheme.onSurface,
                                 decoration: InputDecoration(
@@ -691,14 +690,14 @@ class _InboxScreenState extends State<InboxScreen> {
                   onRefresh: _refreshInbox,
                   child: StreamBuilder<List<Map<String, dynamic>>>(
                     stream: _threadsStream,
-                  builder: (context, snapshot) {
+                  builder: (final context, final snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(child: CircularProgressIndicator());
                     }
                     final threads = snapshot.data!;
                     _syncServerPrefs(threads);
 
-                    var visibleThreads = threads.where((t) {
+                    final visibleThreads = threads.where((final t) {
                       final otherId = t['otherId']?.toString();
                       if (otherId == null || _deletedThreadIds.contains(otherId)) return false;
 
@@ -727,7 +726,7 @@ class _InboxScreenState extends State<InboxScreen> {
                       return true;
                     }).toList();
 
-                    visibleThreads.sort((a, b) {
+                    visibleThreads.sort((final a, final b) {
                       final aId = a['otherId']?.toString() ?? '';
                       final bId = b['otherId']?.toString() ?? '';
                       final aPinned = _pinnedThreadIds.contains(aId);
@@ -792,7 +791,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                       onPressed: () async {
                                         await Navigator.push(
                                           context,
-                                          MaterialPageRoute(builder: (_) => const SelectFriendScreen()),
+                                          MaterialPageRoute(builder: (final _) => const SelectFriendScreen()),
                                         );
                                         if (mounted) setState(() => _refreshNonce++);
                                       },
@@ -808,14 +807,14 @@ class _InboxScreenState extends State<InboxScreen> {
                       );
                     }
 
-                    final participantIds = visibleThreads.map((t) => t['otherId']?.toString() ?? '').where((id) => id.isNotEmpty).toList();
-                    final vipThreads = visibleThreads.where((t) => _pinnedThreadIds.contains(t['otherId']?.toString() ?? '')).take(8).toList();
+                    final participantIds = visibleThreads.map((final t) => t['otherId']?.toString() ?? '').where((final id) => id.isNotEmpty).toList();
+                    final vipThreads = visibleThreads.where((final t) => _pinnedThreadIds.contains(t['otherId']?.toString() ?? '')).take(8).toList();
                     return Glass(
                       radius: BorderRadius.circular(22),
                       padding: const EdgeInsets.all(10),
                       child: StreamBuilder<Map<String, bool>>(
                         stream: presenceRepository.streamMultipleOnlineStatuses(participantIds),
-                        builder: (context, presenceSnapshot) {
+                        builder: (final context, final presenceSnapshot) {
                           final onlineStatuses = presenceSnapshot.data ?? {};
                           return Column(
                             children: [
@@ -828,7 +827,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                   duration: const Duration(milliseconds: 160),
                                   switchInCurve: Curves.easeOut,
                                   switchOutCurve: Curves.easeIn,
-                                  transitionBuilder: (child, animation) {
+                                  transitionBuilder: (final child, final animation) {
                                     final slide = Tween<Offset>(
                                       begin: const Offset(0, 0.04),
                                       end: Offset.zero,
@@ -842,8 +841,8 @@ class _InboxScreenState extends State<InboxScreen> {
                                     key: ValueKey('threads-${_filter.name}-${_sort.name}-${query.toLowerCase()}-$_showArchivedOnly'),
                                     physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                                     itemCount: visibleThreads.length,
-                                    separatorBuilder: (_, __) => const SizedBox(height: 10),
-                                    itemBuilder: (context, index) {
+                                    separatorBuilder: (final _, final __) => const SizedBox(height: 10),
+                                    itemBuilder: (final context, final index) {
                                       final t = visibleThreads[index];
                                       final otherId = t['otherId']?.toString() ?? '';
                                       final isPinned = _pinnedThreadIds.contains(otherId);
@@ -857,7 +856,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                         child: Dismissible(
                                           key: ValueKey('thread-$otherId'),
                               direction: DismissDirection.horizontal,
-                              confirmDismiss: (direction) async {
+                              confirmDismiss: (final direction) async {
                                 if (direction == DismissDirection.startToEnd) {
                                   await _togglePinnedThread(otherId, next: !isPinned);
                                   return false;
@@ -896,7 +895,7 @@ class _InboxScreenState extends State<InboxScreen> {
                                 icon: Icons.delete_forever_rounded,
                                 label: 'Delete',
                               ),
-                              onDismissed: (_) {
+                              onDismissed: (final _) {
                                 setState(() => _deletedThreadIds.add(otherId));
                               },
                                         child: _ThreadRow(
@@ -926,8 +925,8 @@ class _InboxScreenState extends State<InboxScreen> {
                                   await Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) => DmChatScreen(
-                                        meId: authRepository.currentUser?.id ?? "me",
+                                      builder: (final _) => DmChatScreen(
+                                        meId: authRepository.currentUser?.id ?? 'me',
                                         otherId: otherId,
                                         otherName: t['otherName'] ?? l10n.unknown,
                                       ),
@@ -966,7 +965,7 @@ class _InboxScreenState extends State<InboxScreen> {
   );
 }
 
-  String _fmtTime(BuildContext context, DateTime dt) {
+  String _fmtTime(final BuildContext context, final DateTime dt) {
     final l10n = AppLocalizations.of(context);
     final now = DateTime.now();
     final diff = now.difference(dt);
@@ -983,7 +982,7 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Text(
       text,
@@ -1005,13 +1004,13 @@ class _VipPinnedRow extends StatelessWidget {
   const _VipPinnedRow({required this.threads});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return SizedBox(
       height: 58,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.only(bottom: 8),
-        itemBuilder: (context, i) {
+        itemBuilder: (final context, final i) {
           final t = threads[i];
           final name = (t['otherName']?.toString() ?? 'U').trim();
           return StaggeredIn(
@@ -1041,7 +1040,7 @@ class _VipPinnedRow extends StatelessWidget {
             ),
           );
         },
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (final _, final __) => const SizedBox(width: 8),
         itemCount: threads.length,
       ),
     );
@@ -1057,7 +1056,7 @@ class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.label});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -1089,12 +1088,11 @@ class _OptionChip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
-      onLongPress: onLongPress,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(
@@ -1135,7 +1133,7 @@ class _FilterPill extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(14),
@@ -1183,7 +1181,7 @@ class _SwipeActionBackground extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
@@ -1227,7 +1225,7 @@ class _IconGlass extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -1323,7 +1321,7 @@ class _ThreadRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final highlight = unreadCount > 0;
     final scheme = Theme.of(context).colorScheme;
 
@@ -1377,7 +1375,7 @@ class _ThreadRow extends StatelessWidget {
                       ],
                       StreamBuilder<bool>(
                         stream: chatRepository.typingStream(otherId),
-                        builder: (context, snapshot) {
+                        builder: (final context, final snapshot) {
                           if (snapshot.data != true) return const SizedBox.shrink();
                           return const Padding(
                             padding: EdgeInsets.only(left: 6),
@@ -1395,7 +1393,7 @@ class _ThreadRow extends StatelessWidget {
                   const SizedBox(height: 4),
                   StreamBuilder<bool>(
                     stream: chatRepository.typingStream(otherId),
-                    builder: (context, snapshot) {
+                    builder: (final context, final snapshot) {
                       final isTyping = snapshot.data == true;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1518,7 +1516,7 @@ class _Avatar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 40,
@@ -1538,13 +1536,13 @@ class _Avatar extends StatelessWidget {
     );
   }
 
-  Widget _buildAvatarContent(BuildContext context) {
+  Widget _buildAvatarContent(final BuildContext context) {
     final url = avatarUrl?.trim() ?? '';
     if (url.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: url,
         fit: BoxFit.cover,
-        errorWidget: (_, __, ___) => _AvatarFallback(name: name),
+        errorWidget: (final _, final __, final ___) => _AvatarFallback(name: name),
       );
     }
     return _AvatarFallback(name: name);
@@ -1556,10 +1554,10 @@ class _AvatarFallback extends StatelessWidget {
   const _AvatarFallback({required this.name});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final clean = name.trim();
-    final parts = clean.split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList();
+    final parts = clean.split(RegExp(r'\s+')).where((final e) => e.isNotEmpty).toList();
     final first = parts.isNotEmpty ? parts.first[0] : '?';
     final second = parts.length > 1 ? parts[1][0] : '';
     final initials = (first + second).toUpperCase();
@@ -1584,7 +1582,7 @@ class _ActiveNowPill extends StatelessWidget {
   const _ActiveNowPill();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
       decoration: BoxDecoration(
@@ -1608,7 +1606,7 @@ class _TypingPill extends StatelessWidget {
   const _TypingPill();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(

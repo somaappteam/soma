@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import '../theme/motion.dart';
+import 'package:soma/core/theme/motion.dart';
 
 class RewardSparkle extends StatelessWidget {
   final bool show;
@@ -18,13 +18,13 @@ class RewardSparkle extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (!show) return const SizedBox.shrink();
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.6, end: 1.0),
       duration: MotionTokens.short,
       curve: MotionTokens.emphasisCurve,
-      builder: (context, value, child) {
+      builder: (final context, final value, final child) {
         return Opacity(
           opacity: value,
           child: Transform.scale(
@@ -39,7 +39,7 @@ class RewardSparkle extends StatelessWidget {
               height: size * 1.9,
               child: Stack(
                 alignment: Alignment.center,
-                children: List.generate(3, (index) {
+                children: List.generate(3, (final index) {
                   final angle = (index * 2 * math.pi) / 3;
                   final offset = Offset(math.cos(angle), math.sin(angle)) * (size * 0.32);
                   return Transform.translate(

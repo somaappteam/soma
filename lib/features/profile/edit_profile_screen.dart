@@ -1,14 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/core/widgets/selection_controls.dart';
+import 'package:soma/data/profile_repository.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
+import 'package:soma/models/user_profile.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/theme/tokens.dart';
-import '../../data/profile_repository.dart';
-import '../../models/user_profile.dart';
-import '../../core/widgets/responsive.dart';
-import '../../core/widgets/selection_controls.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final UserProfile? initialProfile; // optional in case we create fresh
@@ -40,7 +40,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (widget.initialProfile != null) {
       draft = widget.initialProfile!.copy();
     } else {
-      draft = UserProfile(displayName: "", username: "", bio: "", location: "", dailyGoalMinutes: 10);
+      draft = UserProfile(displayName: '', username: '', bio: '', location: '', dailyGoalMinutes: 10);
     }
 
     usernameCtrl = TextEditingController(text: draft.username);
@@ -77,7 +77,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final choice = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
-      builder: (ctx) {
+      builder: (final ctx) {
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -118,7 +118,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final ctrl = TextEditingController(text: _avatarUrl ?? '');
     final url = await showDialog<String>(
       context: context,
-      builder: (ctx) {
+      builder: (final ctx) {
         return AlertDialog(
           title: const Text('Profile photo URL'),
           content: TextField(
@@ -213,7 +213,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
@@ -321,8 +321,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 _GlassTextField(
                                   controller: usernameCtrl,
                                   hint: l10n.editProfileUsernameHint,
-                                  validator: (v) {
-                                    final s = (v ?? "").trim();
+                                  validator: (final v) {
+                                    final s = (v ?? '').trim();
                                     if (s.isEmpty) return l10n.editProfileUsernameRequired;
                                     if (s.length < 3) return l10n.editProfileUsernameTooShort;
                                     final ok = RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(s);
@@ -337,8 +337,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                   controller: bioCtrl,
                                   hint: l10n.editProfileBioHint,
                                   maxLines: 3,
-                                  validator: (v) {
-                                    final s = (v ?? "").trim();
+                                  validator: (final v) {
+                                    final s = (v ?? '').trim();
                                     if (s.length > 120) return l10n.editProfileBioTooLong;
                                     return null;
                                   },
@@ -349,7 +349,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 _GlassTextField(
                                   controller: locationCtrl,
                                   hint: l10n.editProfileLocationHint,
-                                  validator: (v) => null,
+                                  validator: (final v) => null,
                                 ),
                               ],
                             ),
@@ -424,7 +424,7 @@ class _SmallIconButton extends StatelessWidget {
   const _SmallIconButton({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(14),
       padding: EdgeInsets.zero,
@@ -454,7 +454,7 @@ class _Avatar extends StatelessWidget {
   const _Avatar({this.imageUrl});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       width: 56,
       height: 56,
@@ -480,9 +480,9 @@ class _Avatar extends StatelessWidget {
           ? CachedNetworkImage(
               imageUrl: imageUrl!,
               fit: BoxFit.cover,
-              errorWidget: (_, __, ___) => Center(
+              errorWidget: (final _, final __, final ___) => Center(
                 child: Text(
-                  "🙂",
+                  '🙂',
                   style: TextStyle(
                     fontSize: 22,
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
@@ -492,7 +492,7 @@ class _Avatar extends StatelessWidget {
             )
           : Center(
               child: Text(
-                "🙂",
+                '🙂',
                 style: TextStyle(
                   fontSize: 22,
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
@@ -509,7 +509,7 @@ class _ChipButton extends StatelessWidget {
   const _ChipButton({required this.label, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,
@@ -548,7 +548,7 @@ class _FieldLabel extends StatelessWidget {
   const _FieldLabel(this.text);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
@@ -580,7 +580,7 @@ class _GlassTextField extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
@@ -629,7 +629,7 @@ class _GoalChip extends StatelessWidget {
   const _GoalChip({required this.min, required this.selected, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return ConstrainedBox(
       constraints: const BoxConstraints(minWidth: 72),

@@ -4,24 +4,66 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_callkit_incoming/entities/entities.dart';
+import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:soma/core/services/app_logger.dart';
+import 'package:soma/core/services/error_reporter.dart';
+import 'package:soma/features/social/dm_chat_screen.dart';
+import 'package:soma/main.dart'; // for navigatorKey
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:flutter/material.dart';
-import '../../main.dart'; // for navigatorKey
-import 'app_logger.dart';
-import 'error_reporter.dart';
-import '../../features/social/dm_chat_screen.dart';
 
 // ─── FCM background message handler (top-level, required by firebase_messaging) ─
 @pragma('vm:entry-point')
-Future<void> _fcmBackgroundHandler(RemoteMessage message) async {
-  // Firebase is already initialized by the OS at this point.
-  // flutter_local_notifications cannot show UI in a killed background isolate,
-  // but FCM itself shows the notification via the system tray.
+Future<void> _fcmBackgroundHandler(final RemoteMessage message) async {
+  await Firebase.initializeApp();
+  if (message.data['push_type'] == 'call') {
+    final callerName = message.data['caller_name'] ?? 'Someone';
+    final callerId = message.data['caller_id'];
+    
+    final callParams = CallKitParams(
+      id: message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString(),
+      nameCaller: callerName,
+      appName: 'Soma',
+      avatar: '',
+      handle: 'Incoming Call',
+      type: 0,
+      duration: 30000,
+      textAccept: 'Accept',
+      textDecline: 'Decline',
+      extra: <String, dynamic>{'caller_id': callerId},
+      headers: <String, dynamic>{'apiKey': 'v1_test', 'platform': 'flutter'},
+      android: const AndroidParams(
+        isCustomNotification: true,
+        isShowLogo: false,
+        ringtonePath: 'system_ringtone_default',
+        backgroundColor: '#000000',
+        actionColor: '#4CAF50',
+      ),
+      ios: const IOSParams(
+        iconName: 'AppIcon',
+        handleType: 'generic',
+        supportsVideo: false,
+        maximumCallGroups: 2,
+        maximumCallsPerCallGroup: 1,
+        audioSessionMode: 'default',
+        audioSessionActive: true,
+        audioSessionPreferredSampleRate: 44100.0,
+        audioSessionPreferredIOBufferDuration: 0.005,
+        supportsDTMF: true,
+        supportsHolding: true,
+        supportsGrouping: false,
+        supportsUngrouping: false,
+        ringtonePath: 'system_ringtone_default',
+      ),
+    );
+    await FlutterCallkitIncoming.showCallkitIncoming(callParams);
+  }
 }
 
 // ─── Android notification channel ───────────────────────────────────────────
@@ -42,13 +84,19 @@ class NotificationService {
 
   // ─────────────────────────── Initialization ─────────────────────────────────
 
-  Future<void> initialize({bool pushEnabled = true, String reminderTime = '20:00'}) async {
+  Future<void> initialize({final bool pushEnabled = true, final String reminderTime = '20:00'}) async {
     if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) return;
 
     _pushEnabled = pushEnabled;
 
     await _initLocalNotifications();
     await _initTimezone();
+    try {
+      await Firebase.initializeApp();
+    } catch (e) {
+      appLogger.error('Firebase initialization failed during early bootstrap', error: e);
+    }
+
     _initFirebaseMessaging();
     initState.value = NotificationInitState.ready;
 
@@ -65,7 +113,7 @@ class NotificationService {
       requestSoundPermission: true,
     );
     const settings = InitializationSettings(android: androidSettings, iOS: iosSettings);
-    await _plugin.initialize(settings: settings);
+    await _plugin.initialize(settings);
 
     // Create Android notification channel.
     if (Platform.isAndroid) {
@@ -97,8 +145,14 @@ class NotificationService {
       FirebaseMessaging.onBackgroundMessage(_fcmBackgroundHandler);
 
       // Handle foreground FCM messages — show as local notification.
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      FirebaseMessaging.onMessage.listen((final message) async {
         if (!_pushEnabled) return;
+
+        if (message.data['push_type'] == 'call') {
+          await _fcmBackgroundHandler(message);
+          return;
+        }
+
         final title = message.notification?.title ?? message.data['title']?.toString();
         final body  = message.notification?.body  ?? message.data['body']?.toString();
         if (title != null) showNotification(title: title, body: body ?? '');
@@ -106,12 +160,12 @@ class NotificationService {
 
       // ─── Deep Linking (Tap Handling) ───────────────────────────────────────
       // 1. App in background/foreground, but not terminated:
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      FirebaseMessaging.onMessageOpenedApp.listen((final message) {
         _handleMessageTap(message);
       });
 
       // 2. App was terminated and opened via FCM:
-      FirebaseMessaging.instance.getInitialMessage().then((message) {
+      FirebaseMessaging.instance.getInitialMessage().then((final message) {
         if (message != null) {
           _handleMessageTap(message);
         }
@@ -125,24 +179,26 @@ class NotificationService {
     }
   }
 
-  void _handleMessageTap(RemoteMessage message) {
+  void _handleMessageTap(final RemoteMessage message) {
     appLogger.debug('Handling notification tap', context: {'type': message.data['type']?.toString()});
     
     // We expect payload to contain something like: { 'type': 'dm', 'otherId': '...', 'otherName': '...' }
-    final type = message.data['type'];
-    if (type == 'dm') {
-      final otherId = message.data['otherId']?.toString();
-      final otherName = message.data['otherName']?.toString();
+    final type = message.data['type'] ?? message.data['push_type'];
+    if (type == 'dm' || type == 'call') {
+      final otherId = message.data['otherId']?.toString() ?? message.data['caller_id']?.toString();
+      final otherName = message.data['otherName']?.toString() ?? message.data['caller_name']?.toString();
+      final isCall = type == 'call' || message.data['push_type'] == 'call';
       final meId = _supabase.auth.currentUser?.id;
 
       if (otherId != null && meId != null) {
         // Use GlobalKey to navigate
         navigatorKey.currentState?.push(
           MaterialPageRoute(
-            builder: (_) => DmChatScreen(
+            builder: (final _) => DmChatScreen(
               meId: meId,
               otherId: otherId,
               otherName: otherName ?? 'Chat',
+              initialIncomingCall: isCall,
             ),
           ),
         );
@@ -152,7 +208,7 @@ class NotificationService {
 
   Future<void> _registerFcmToken() async {
     try {
-      await Firebase.initializeApp();
+      // Firebase.initializeApp() is now called earlier in initialize()
       final messaging = FirebaseMessaging.instance;
       final settings = await messaging.requestPermission();
       final status = settings.authorizationStatus;
@@ -174,7 +230,7 @@ class NotificationService {
     }
   }
 
-  Future<void> _upsertToken(String token) async {
+  Future<void> _upsertToken(final String token) async {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return;
     try {
@@ -201,7 +257,7 @@ class NotificationService {
 
   // ─────────────────────────── Show local notification ────────────────────────
 
-  Future<void> showNotification({required String title, required String body}) async {
+  Future<void> showNotification({required final String title, required final String body}) async {
     if (!_pushEnabled) return;
     const androidDetails = AndroidNotificationDetails(
       _kChannelId,
@@ -213,18 +269,18 @@ class NotificationService {
     const iosDetails = DarwinNotificationDetails();
     const details = NotificationDetails(android: androidDetails, iOS: iosDetails);
     await _plugin.show(
-      id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
-      title: title,
-      body: body,
-      notificationDetails: details,
+      DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      title,
+      body,
+      details,
     );
   }
 
   // ─────────────────────────── Daily reminder ──────────────────────────────────
 
   /// Schedules (or cancels) a daily reminder at [timeHHmm] (e.g. `'20:00'`).
-  Future<void> scheduleReminder(String timeHHmm, {required bool enabled}) async {
-    await _plugin.cancel(id: _kReminderId);
+  Future<void> scheduleReminder(final String timeHHmm, {required final bool enabled}) async {
+    await _plugin.cancel(_kReminderId);
     if (!enabled || timeHHmm.isEmpty || !_pushEnabled) return;
 
     final parts = timeHHmm.split(':');
@@ -248,15 +304,32 @@ class NotificationService {
     const iosDetails = DarwinNotificationDetails();
     const details = NotificationDetails(android: androidDetails, iOS: iosDetails);
 
-    await _plugin.zonedSchedule(
-      id: _kReminderId,
-      title: '🧠 Time to practice!',
-      body: 'Keep your streak alive — a quick quiz is waiting.',
-      scheduledDate: scheduled,
-      notificationDetails: details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time, // repeats daily
-    );
+    try {
+      await _plugin.zonedSchedule(
+        _kReminderId,
+        '🧠 Time to practice!',
+        'Keep your streak alive — a quick quiz is waiting.',
+        scheduled,
+        details,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        matchDateTimeComponents: DateTimeComponents.time, // repeats daily
+      );
+    } catch (e) {
+      // Fallback to inexact if exact is not permitted
+      if (e.toString().contains('exact_alarms_not_permitted')) {
+        await _plugin.zonedSchedule(
+          _kReminderId,
+          '🧠 Time to practice!',
+          'Keep your streak alive — a quick quiz is waiting.',
+          scheduled,
+          details,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          matchDateTimeComponents: DateTimeComponents.time,
+        );
+      } else {
+        rethrow;
+      }
+    }
     appLogger.info('Daily reminder scheduled', context: {'time': timeHHmm});
   }
 
@@ -280,7 +353,7 @@ class NotificationService {
             column: 'user_id',
             value: uid,
           ),
-          callback: (payload) {
+          callback: (final payload) {
             if (!_pushEnabled) return;
             final row = payload.newRecord;
             final title = row['title']?.toString() ?? 'New notification';
@@ -302,7 +375,7 @@ class NotificationService {
 
   // ─────────────────────────── Push toggle ────────────────────────────────────
 
-  void setPushEnabled(bool enabled) {
+  void setPushEnabled(final bool enabled) {
     _pushEnabled = enabled;
   }
 

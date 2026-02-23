@@ -39,7 +39,7 @@ dependencies:
   path_provider: ^2.1.5
   connectivity_plus: ^7.0.0
   flutter_local_notifications: ^19.4.0
-  timezone: ^0.11.0
+  timezone: 0.10.1
   flutter_timezone: ^5.0.1
   firebase_core: ^4.4.0
   firebase_messaging: ^16.1.1
@@ -48,6 +48,7 @@ dependencies:
   get_it: ^9.2.1
   cached_network_image: ^3.4.1
   flutter_animate: ^4.5.2
+  flutter_callkit_incoming: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -56,12 +57,21 @@ dev_dependencies:
   supabase: any
   flutter_launcher_icons: "^0.13.1"
   analyzer: ^10.0.1
+  flutter_native_splash: ^2.4.4
 
 flutter_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/logo.jpeg"
   min_sdk_android: 21
+
+flutter_native_splash:
+  color: "#02071A"
+  image: "assets/logo.jpeg"
+  android_12:
+    color: "#02071A"
+    image: "assets/logo.jpeg"
+  fullscreen: true
 
 flutter:
   generate: true

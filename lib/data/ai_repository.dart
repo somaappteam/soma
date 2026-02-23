@@ -1,12 +1,11 @@
 import 'dart:async';
 
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../core/di/locator.dart';
-import '../core/services/app_logger.dart';
-
 abstract class EdgeFunctionInvoker {
-  Future<FunctionResponse> invoke(String name, {Object? body});
+  Future<FunctionResponse> invoke(final String name, {final Object? body});
 }
 
 class SupabaseEdgeFunctionInvoker implements EdgeFunctionInvoker {
@@ -15,7 +14,7 @@ class SupabaseEdgeFunctionInvoker implements EdgeFunctionInvoker {
   SupabaseEdgeFunctionInvoker(this._supabase);
 
   @override
-  Future<FunctionResponse> invoke(String name, {Object? body}) {
+  Future<FunctionResponse> invoke(final String name, {final Object? body}) {
     return _supabase.functions.invoke(name, body: body);
   }
 }
@@ -28,17 +27,17 @@ class AiRepository {
   static const int _maxAttempts = 3;
   static const Duration _requestTimeout = Duration(seconds: 8);
 
-  Future<String> polishText(String text) async {
+  Future<String> polishText(final String text) async {
     final res = await _invokeWithRetry('ai-polish', body: {'text': text});
     return _readTextResponse(res.data, field: 'text');
   }
 
-  Future<String> rewriteText(String text, String style) async {
+  Future<String> rewriteText(final String text, final String style) async {
     final res = await _invokeWithRetry('ai-rewrite', body: {'text': text, 'style': style});
     return _readTextResponse(res.data, field: 'text');
   }
 
-  Future<String> translateText(String text, String targetLanguage) async {
+  Future<String> translateText(final String text, final String targetLanguage) async {
     final res = await _invokeWithRetry(
       'ai-translate',
       body: {'text': text, 'target_language': targetLanguage},
@@ -50,7 +49,7 @@ class AiRepository {
     return translated;
   }
 
-  Future<Map<String, dynamic>> analyzePronunciation(String transcript) async {
+  Future<Map<String, dynamic>> analyzePronunciation(final String transcript) async {
     final res = await _invokeWithRetry('ai-pronunciation', body: {'transcript': transcript});
     final data = res.data;
     if (data is! Map<String, dynamic>) {
@@ -66,7 +65,7 @@ class AiRepository {
     return data;
   }
 
-  Future<FunctionResponse> _invokeWithRetry(String name, {required Map<String, Object?> body}) async {
+  Future<FunctionResponse> _invokeWithRetry(final String name, {required final Map<String, Object?> body}) async {
     Object? lastError;
 
     for (var attempt = 1; attempt <= _maxAttempts; attempt++) {
@@ -91,7 +90,7 @@ class AiRepository {
     throw Exception('Unknown AI invocation failure: $lastError');
   }
 
-  bool _isTransient(Object error) {
+  bool _isTransient(final Object error) {
     final lower = error.toString().toLowerCase();
     return error is TimeoutException ||
         lower.contains('socketexception') ||
@@ -101,7 +100,7 @@ class AiRepository {
         lower.contains('504');
   }
 
-  String _readTextResponse(dynamic data, {required String field}) {
+  String _readTextResponse(final dynamic data, {required final String field}) {
     if (data is! Map<String, dynamic>) {
       throw const FormatException('Unexpected AI response payload');
     }

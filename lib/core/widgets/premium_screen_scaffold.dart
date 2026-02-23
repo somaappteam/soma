@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/layout_tokens.dart';
+import 'package:soma/core/theme/layout_tokens.dart';
 
 class PremiumScreenScaffold extends StatelessWidget {
   final Widget body;
@@ -27,10 +27,10 @@ class PremiumScreenScaffold extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return LayoutBuilder(
-      builder: (context, constraints) {
+      builder: (final context, final constraints) {
         final density = PremiumLayout.densityForWidth(constraints.maxWidth);
         final resolvedPadding = padding ?? PremiumLayout.screenPadding(density);
         final resolvedMaxWidth = maxContentWidth ?? PremiumLayout.maxContentWidth(constraints.maxWidth);

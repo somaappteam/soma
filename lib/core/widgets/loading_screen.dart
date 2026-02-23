@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/tokens.dart';
+import 'package:soma/core/theme/tokens.dart';
 
 
 class LoadingScreen extends StatelessWidget {
@@ -7,7 +7,7 @@ class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key, this.message});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Scaffold(
       body: Center(
           child: Column(

@@ -1651,6 +1651,9 @@ class AppLocalizationsTa extends AppLocalizations {
   String get circlesStartGame => 'விளையாட்டைத் துவங்கு';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'வீரர்களுக்காகக் காத்திருக்கிறது';
 
   @override

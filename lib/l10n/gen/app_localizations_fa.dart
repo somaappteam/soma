@@ -1631,6 +1631,9 @@ class AppLocalizationsFa extends AppLocalizations {
   String get circlesStartGame => 'شروع بازی';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'در انتظار بازیکنان';
 
   @override

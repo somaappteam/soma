@@ -1,12 +1,10 @@
-import 'package:flutter/foundation.dart';
+import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/core/services/app_logger.dart';
+import 'package:soma/core/services/error_reporter.dart';
+import 'package:soma/data/app_analytics_repository.dart';
+import 'package:soma/data/offline_queue_repository.dart';
+import 'package:soma/data/settings_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../core/database/database_helper.dart';
-import '../core/services/app_logger.dart';
-import '../core/services/error_reporter.dart';
-import 'app_analytics_repository.dart';
-import 'settings_repository.dart';
-import 'offline_queue_repository.dart';
 
 class ContentSyncResult {
   final Duration duration;
@@ -108,10 +106,10 @@ class ContentSyncService {
   }
 
   Future<void> _runStep(
-    String name,
-    Future<void> Function() action,
-    List<String> failedSteps,
-    Map<String, int> stepDurationsMs,
+    final String name,
+    final Future<void> Function() action,
+    final List<String> failedSteps,
+    final Map<String, int> stepDurationsMs,
   ) async {
     final startedAt = DateTime.now();
     try {
@@ -126,10 +124,10 @@ class ContentSyncService {
   }
 
   Future<List<Map<String, dynamic>>> _selectWithCursor({
-    required String table,
-    String? cursor,
-    String? userFilterColumn,
-    String? userFilterValue,
+    required final String table,
+    final String? cursor,
+    final String? userFilterColumn,
+    final String? userFilterValue,
   }) async {
     dynamic query = _supabase.from(table).select();
     if (userFilterColumn != null && userFilterValue != null) {
@@ -153,7 +151,7 @@ class ContentSyncService {
     return List<Map<String, dynamic>>.from(response);
   }
 
-  String? _latestUpdatedAt(List<Map<String, dynamic>> rows) {
+  String? _latestUpdatedAt(final List<Map<String, dynamic>> rows) {
     DateTime? latest;
     for (final row in rows) {
       final raw = row['updated_at']?.toString();
@@ -167,14 +165,14 @@ class ContentSyncService {
     return latest?.toIso8601String();
   }
 
-  Future<void> _persistCursor(String key, List<Map<String, dynamic>> rows) async {
+  Future<void> _persistCursor(final String key, final List<Map<String, dynamic>> rows) async {
     final latest = _latestUpdatedAt(rows);
     if (latest != null) {
       await settingsRepository.updateSetting(key, latest);
     }
   }
 
-  Future<void> _syncCourses(String? cursor) async {
+  Future<void> _syncCourses(final String? cursor) async {
     final response = await _selectWithCursor(table: 'courses', cursor: cursor);
     for (final row in response) {
       await _dbHelper.upsertCourse(row);
@@ -183,7 +181,7 @@ class ContentSyncService {
     appLogger.debug('Courses synced', context: {'count': response.length});
   }
 
-  Future<void> _syncVocabulary(String? cursor) async {
+  Future<void> _syncVocabulary(final String? cursor) async {
     final response = await _selectWithCursor(table: 'vocabulary', cursor: cursor);
     for (final row in response) {
       await _dbHelper.upsertVocabulary(row);
@@ -192,7 +190,7 @@ class ContentSyncService {
     appLogger.debug('Vocabulary synced', context: {'count': response.length});
   }
 
-  Future<void> _syncSentences(String? cursor) async {
+  Future<void> _syncSentences(final String? cursor) async {
     final response = await _selectWithCursor(table: 'sentences', cursor: cursor);
     for (final row in response) {
       await _dbHelper.upsertSentence(row);
@@ -201,7 +199,7 @@ class ContentSyncService {
     appLogger.debug('Sentences synced', context: {'count': response.length});
   }
 
-  Future<void> _syncProfile(String userId, String? cursor) async {
+  Future<void> _syncProfile(final String userId, final String? cursor) async {
     final profileRows = await _selectWithCursor(
       table: 'profiles',
       cursor: cursor,
@@ -216,7 +214,7 @@ class ContentSyncService {
     }
   }
 
-  Future<void> _syncUserProgress(String userId, Map<String, dynamic> settings) async {
+  Future<void> _syncUserProgress(final String userId, final Map<String, dynamic> settings) async {
     final coursesResp = await _selectWithCursor(
       table: 'user_courses',
       cursor: settings['sync_cursor_user_courses']?.toString(),
@@ -245,7 +243,7 @@ class ContentSyncService {
     appLogger.debug('User progress synced', context: {'user_id': userId});
   }
 
-  Future<void> _syncUserStats(String userId, String? cursor) async {
+  Future<void> _syncUserStats(final String userId, final String? cursor) async {
     final statsResp = await _selectWithCursor(
       table: 'user_stats',
       cursor: cursor,

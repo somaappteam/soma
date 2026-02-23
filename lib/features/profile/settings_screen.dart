@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:soma/core/i18n/ui_language.dart';
+import 'package:soma/core/services/haptics_service.dart';
+import 'package:soma/core/services/theme_mode_controller.dart';
+import 'package:soma/core/theme/spacing.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/premium_dialog.dart';
+import 'package:soma/core/widgets/selection_controls.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/profile_store.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/data/soma_plus_repository.dart';
+import 'package:soma/features/auth/welcome_screen.dart';
+import 'package:soma/features/info/about_screen.dart';
+import 'package:soma/features/profile/edit_profile_screen.dart';
+import 'package:soma/features/profile/privacy_settings_screen.dart';
+import 'package:soma/features/profile/security_settings_screen.dart';
+import 'package:soma/features/profile/soma_plus_plans_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/glass.dart';
-import '../../features/info/about_screen.dart';
-import '../../data/settings_repository.dart';
-import '../../data/auth_repository.dart';
-import 'edit_profile_screen.dart';
-import 'privacy_settings_screen.dart';
-import 'security_settings_screen.dart';
-import 'soma_plus_plans_screen.dart';
-import '../../data/profile_store.dart';
-import '../auth/welcome_screen.dart';
-import '../../core/services/theme_mode_controller.dart';
-import '../../core/i18n/ui_language.dart';
-import '../../core/theme/spacing.dart';
-import '../../core/services/haptics_service.dart';
-import '../../core/widgets/premium_dialog.dart';
-import '../../core/widgets/selection_controls.dart';
-import '../../data/soma_plus_repository.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -35,11 +35,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _guestSfx = true;
   bool _guestHaptics = true;
   bool _guestNotifications = true;
-  String _guestThemeMode = "System";
-  String _guestLanguageUi = "en";
+  String _guestThemeMode = 'System';
+  String _guestLanguageUi = 'en';
   int _guestTimerSeconds = 15;
-  String _guestDifficulty = "Adaptive";
-  String _guestDailyReminder = "20:00";
+  String _guestDifficulty = 'Adaptive';
+  String _guestDailyReminder = '20:00';
   SomaSubscriptionTier _guestTier = SomaSubscriptionTier.free;
 
   @override
@@ -82,50 +82,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
   }
 
-  Future<void> _pickTimerSeconds({required int current, required ValueChanged<int> onSelected}) async {
+  Future<void> _pickTimerSeconds({required final int current, required final ValueChanged<int> onSelected}) async {
     final options = [10, 15, 20, 25, 30];
     final result = await showModalBottomSheet<int>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => _BottomSheetList<int>(
+      builder: (final ctx) => _BottomSheetList<int>(
         title: AppLocalizations.of(context).settingsDefaultTimerPerQuestion,
         options: options,
         current: current,
-        labelBuilder: (value) => "${value}s",
+        labelBuilder: (final value) => '${value}s',
       ),
     );
     if (result != null) onSelected(result);
   }
 
-  Future<void> _pickDifficulty({required String current, required ValueChanged<String> onSelected}) async {
+  Future<void> _pickDifficulty({required final String current, required final ValueChanged<String> onSelected}) async {
     final options = <_BottomSheetOption<String>>[
-      const _BottomSheetOption(value: "Adaptive", label: "Adaptive"),
-      const _BottomSheetOption(value: "Easy", label: "Easy"),
-      const _BottomSheetOption(value: "Medium", label: "Medium"),
-      const _BottomSheetOption(value: "Hard", label: "Hard"),
+      const _BottomSheetOption(value: 'Adaptive', label: 'Adaptive'),
+      const _BottomSheetOption(value: 'Easy', label: 'Easy'),
+      const _BottomSheetOption(value: 'Medium', label: 'Medium'),
+      const _BottomSheetOption(value: 'Hard', label: 'Hard'),
     ];
     final result = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => _BottomSheetList<String>(
+      builder: (final ctx) => _BottomSheetList<String>(
         title: AppLocalizations.of(context).settingsMatchDifficulty,
-        options: options.map((o) => o.value).toList(),
+        options: options.map((final o) => o.value).toList(),
         current: current,
-        labelBuilder: (value) => options.firstWhere((o) => o.value == value).label,
+        labelBuilder: (final value) => options.firstWhere((final o) => o.value == value).label,
       ),
     );
     if (result != null) onSelected(result);
   }
 
-  Future<void> _pickDailyReminder({required String current, required ValueChanged<String> onSelected}) async {
-    final options = ["08:00", "12:00", "17:00", "20:00", "22:00"];
+  Future<void> _pickDailyReminder({required final String current, required final ValueChanged<String> onSelected}) async {
+    final options = ['08:00', '12:00', '17:00', '20:00', '22:00'];
     final result = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => _BottomSheetList<String>(
+      builder: (final ctx) => _BottomSheetList<String>(
         title: AppLocalizations.of(context).settingsDailyReminder,
         options: options,
         current: current,
@@ -149,7 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       }
     } catch (e) {
       // Ignore errors if no email client is installed
-      debugPrint("Could not launch email: $e");
+      debugPrint('Could not launch email: $e');
     }
   }
 
@@ -160,7 +160,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       context: context,
       backgroundColor: scheme.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => Padding(
+      builder: (final ctx) => Padding(
         padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -172,7 +172,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: S.xs),
             Text(
-              "Reach us any time for help, feedback, or account support.",
+              'Reach us any time for help, feedback, or account support.',
               style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: S.md),
@@ -182,7 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
                 child: Text(
-                  "somaapp.team@gmail.com",
+                  'somaapp.team@gmail.com',
                   style: TextStyle(
                     color: scheme.primary, 
                     fontWeight: FontWeight.w800,
@@ -201,7 +201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   foregroundColor: scheme.onSurface,
                   side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.4)),
                 ),
-                child: const Text("Close"),
+                child: const Text('Close'),
               ),
             ),
           ],
@@ -212,7 +212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
 
 
-  Widget _buildAccountCenter(BuildContext context) {
+  Widget _buildAccountCenter(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(22),
@@ -265,7 +265,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildTrustFooter(BuildContext context) {
+  Widget _buildTrustFooter(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final now = DateTime.now();
     final hh = now.hour.toString().padLeft(2, '0');
@@ -286,17 +286,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  String _formatTime(String value) {
+  String _formatTime(final String value) {
     final parts = value.split(':');
     if (parts.length != 2) return value;
     final hour = int.tryParse(parts[0]) ?? 0;
     final minute = parts[1];
-    final period = hour >= 12 ? "PM" : "AM";
+    final period = hour >= 12 ? 'PM' : 'AM';
     final normalized = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
-    return "$normalized:$minute $period";
+    return '$normalized:$minute $period';
   }
 
-  Widget _buildGuestSettings(BuildContext context) {
+  Widget _buildGuestSettings(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final themeItems = <_DropdownItem>[
       _DropdownItem('System', l10n.themeSystem),
@@ -307,11 +307,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       for (final language in kSupportedUiLanguages)
         _DropdownItem(language.code, language.labelBuilder(l10n)),
     ];
-    final guestThemeValue = themeItems.any((item) => item.value == _guestThemeMode)
+    final guestThemeValue = themeItems.any((final item) => item.value == _guestThemeMode)
         ? _guestThemeMode
         : themeItems.first.value;
     final normalizedGuestLanguage = normalizeUiLanguageCode(_guestLanguageUi);
-    final guestLanguageValue = languageItems.any((item) => item.value == normalizedGuestLanguage)
+    final guestLanguageValue = languageItems.any((final item) => item.value == normalizedGuestLanguage)
         ? normalizedGuestLanguage
         : languageItems.first.value;
     return ListView(
@@ -329,7 +329,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const SomaPlusPlansScreen()),
+                MaterialPageRoute(builder: (final _) => const SomaPlusPlansScreen()),
               );
               if (!mounted) return;
               await _loadGuestSettings();
@@ -348,7 +348,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.translate_rounded,
                 label: l10n.settingsShowTranslationLine,
                 value: _guestShowTranslation,
-                onChanged: (v) {
+                onChanged: (final v) {
                   setState(() => _guestShowTranslation = v);
                   settingsRepository.updateSetting('show_translation', v);
                 },
@@ -358,7 +358,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.text_fields_rounded,
                 label: l10n.settingsShowReadingLine,
                 value: _guestShowReading,
-                onChanged: (v) {
+                onChanged: (final v) {
                   setState(() => _guestShowReading = v);
                   settingsRepository.updateSetting('show_reading', v);
                 },
@@ -367,10 +367,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _NavRow(
                 icon: Icons.timer_rounded,
                 label: l10n.settingsDefaultTimerPerQuestion,
-                trailingText: "${_guestTimerSeconds}s",
+                trailingText: '${_guestTimerSeconds}s',
                 onTap: () => _pickTimerSeconds(
                   current: _guestTimerSeconds,
-                  onSelected: (value) {
+                  onSelected: (final value) {
                     setState(() => _guestTimerSeconds = value);
                     settingsRepository.updateSetting('default_timer_s', value);
                   },
@@ -380,12 +380,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _NavRow(
                 icon: Icons.bar_chart_rounded,
                 label: l10n.settingsMatchDifficulty,
-                trailingText: _guestDifficulty == "Adaptive"
+                trailingText: _guestDifficulty == 'Adaptive'
                     ? l10n.settingsMatchDifficultyAdaptive
                     : _guestDifficulty,
                 onTap: () => _pickDifficulty(
                   current: _guestDifficulty,
-                  onSelected: (value) {
+                  onSelected: (final value) {
                     setState(() => _guestDifficulty = value);
                     settingsRepository.updateSetting('match_difficulty', value);
                   },
@@ -406,7 +406,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.music_note_rounded,
                 label: l10n.settingsMusic,
                 value: _guestMusic,
-                onChanged: (v) {
+                onChanged: (final v) {
                   setState(() => _guestMusic = v);
                   settingsRepository.updateSetting('bg_music', v);
                 },
@@ -416,7 +416,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.volume_up_rounded,
                 label: l10n.settingsSoundEffects,
                 value: _guestSfx,
-                onChanged: (v) {
+                onChanged: (final v) {
                   setState(() => _guestSfx = v);
                   settingsRepository.updateSetting('sfx_enabled', v);
                 },
@@ -426,7 +426,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.vibration_rounded,
                 label: l10n.settingsHaptics,
                 value: _guestHaptics,
-                onChanged: (v) {
+                onChanged: (final v) {
                   setState(() => _guestHaptics = v);
                   settingsRepository.updateSetting('haptics_enabled', v);
                 },
@@ -446,7 +446,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.notifications_rounded,
                 label: l10n.settingsPushNotifications,
                 value: _guestNotifications,
-                onChanged: (v) {
+                onChanged: (final v) {
                   setState(() => _guestNotifications = v);
                   settingsRepository.updateSetting('push_notifications', v);
                 },
@@ -458,7 +458,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 trailingText: _formatTime(_guestDailyReminder),
                 onTap: () => _pickDailyReminder(
                   current: _guestDailyReminder,
-                  onSelected: (value) {
+                  onSelected: (final value) {
                     setState(() => _guestDailyReminder = value);
                     settingsRepository.updateSetting('daily_reminder', value);
                   },
@@ -480,7 +480,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 label: l10n.settingsTheme,
                 value: guestThemeValue,
                 items: themeItems,
-                onChanged: (v) {
+                onChanged: (final v) {
                   setState(() => _guestThemeMode = v);
                   settingsRepository.updateSetting('theme_mode', v);
                   themeModeController.setModeFromSetting(v);
@@ -492,7 +492,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 label: l10n.settingsUiLanguage,
                 value: guestLanguageValue,
                 items: languageItems,
-                onChanged: (v) {
+                onChanged: (final v) {
                   setState(() => _guestLanguageUi = v);
                   settingsRepository.updateSetting('language_ui', v);
                 },
@@ -518,13 +518,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.info_rounded,
                 label: l10n.settingsVersion,
                 trailingText: _appVersion,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen(view: AboutView.version))),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const AboutScreen(view: AboutView.version))),
               ),
               _DividerSoft(),
               _NavRow(
                 icon: Icons.description_rounded,
                 label: l10n.settingsTermsPrivacy,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen(view: AboutView.termsAndPrivacy))),
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const AboutScreen(view: AboutView.termsAndPrivacy))),
               ),
               _DividerSoft(),
               _NavRow(
@@ -541,7 +541,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isGuest = authRepository.currentUser == null;
     final themeItems = <_DropdownItem>[
@@ -568,7 +568,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Expanded(
                   child: isGuest ? _buildGuestSettings(context) : StreamBuilder<Map<String, dynamic>>(
                     stream: _settingsStream,
-                    builder: (context, snapshot) {
+                    builder: (final context, final snapshot) {
                       final data = snapshot.data ?? {};
                        
                       final showTranslation = data['show_translation'] ?? true;
@@ -580,16 +580,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                        
                       final notifications = data['push_notifications'] ?? true;
                       final timerSeconds = (data['default_timer_s'] as num?)?.toInt() ?? 15;
-                      final difficulty = data['match_difficulty']?.toString() ?? "Adaptive";
-                      final dailyReminder = data['daily_reminder']?.toString() ?? "20:00";
+                      final difficulty = data['match_difficulty']?.toString() ?? 'Adaptive';
+                      final dailyReminder = data['daily_reminder']?.toString() ?? '20:00';
                        
-                      final themeMode = data['theme_mode'] ?? "System";
+                      final themeMode = data['theme_mode'] ?? 'System';
                       final languageUi = normalizeUiLanguageCode(data['language_ui']?.toString());
                       final subscriptionTier = SomaPlusRepository.parseTier(data['plus_plan']?.toString());
-                      final themeModeValue = themeItems.any((item) => item.value == themeMode)
+                      final themeModeValue = themeItems.any((final item) => item.value == themeMode)
                           ? themeMode
                           : themeItems.first.value;
-                      final languageUiValue = languageItems.any((item) => item.value == languageUi)
+                      final languageUiValue = languageItems.any((final item) => item.value == languageUi)
                           ? languageUi
                           : languageItems.first.value;
 
@@ -613,7 +613,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => const SomaPlusPlansScreen(),
+                                    builder: (final _) => const SomaPlusPlansScreen(),
                                   ),
                                 );
                               },
@@ -633,7 +633,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (_) => const EditProfileScreen()),
+                                      MaterialPageRoute(builder: (final _) => const EditProfileScreen()),
                                     );
                                   },
                                 ),
@@ -644,7 +644,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (_) => const PrivacySettingsScreen()),
+                                      MaterialPageRoute(builder: (final _) => const PrivacySettingsScreen()),
                                     );
                                   },
                                 ),
@@ -655,7 +655,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (_) => const SecuritySettingsScreen()),
+                                      MaterialPageRoute(builder: (final _) => const SecuritySettingsScreen()),
                                     );
                                   },
                                 ),
@@ -675,35 +675,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   icon: Icons.translate_rounded,
                                   label: l10n.settingsShowTranslationLine,
                                   value: showTranslation,
-                                  onChanged: (v) => settingsRepository.updateSetting('show_translation', v),
+                                  onChanged: (final v) => settingsRepository.updateSetting('show_translation', v),
                                 ),
                                 _DividerSoft(),
                                 _ToggleRow(
                                   icon: Icons.text_fields_rounded,
                                   label: l10n.settingsShowReadingLine,
                                   value: showReading,
-                                  onChanged: (v) => settingsRepository.updateSetting('show_reading', v),
+                                  onChanged: (final v) => settingsRepository.updateSetting('show_reading', v),
                                 ),
                                 _DividerSoft(),
                                 _NavRow(
                                   icon: Icons.timer_rounded,
                                   label: l10n.settingsDefaultTimerPerQuestion,
-                                  trailingText: "${timerSeconds}s",
+                                  trailingText: '${timerSeconds}s',
                                   onTap: () => _pickTimerSeconds(
                                     current: timerSeconds,
-                                    onSelected: (value) => settingsRepository.updateSetting('default_timer_s', value),
+                                    onSelected: (final value) => settingsRepository.updateSetting('default_timer_s', value),
                                   ),
                                 ),
                                 _DividerSoft(),
                                 _NavRow(
                                   icon: Icons.bar_chart_rounded,
                                   label: l10n.settingsMatchDifficulty,
-                                  trailingText: difficulty == "Adaptive"
+                                  trailingText: difficulty == 'Adaptive'
                                       ? l10n.settingsMatchDifficultyAdaptive
                                       : difficulty,
                                   onTap: () => _pickDifficulty(
                                     current: difficulty,
-                                    onSelected: (value) => settingsRepository.updateSetting('match_difficulty', value),
+                                    onSelected: (final value) => settingsRepository.updateSetting('match_difficulty', value),
                                   ),
                                 ),
                               ],
@@ -722,21 +722,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   icon: Icons.music_note_rounded,
                                   label: l10n.settingsMusic,
                                   value: music,
-                                  onChanged: (v) => settingsRepository.updateSetting('bg_music', v),
+                                  onChanged: (final v) => settingsRepository.updateSetting('bg_music', v),
                                 ),
                                 _DividerSoft(),
                                 _ToggleRow(
                                   icon: Icons.volume_up_rounded,
                                   label: l10n.settingsSoundEffects,
                                   value: sfx,
-                                  onChanged: (v) => settingsRepository.updateSetting('sfx_enabled', v),
+                                  onChanged: (final v) => settingsRepository.updateSetting('sfx_enabled', v),
                                 ),
                                 _DividerSoft(),
                                 _ToggleRow(
                                   icon: Icons.vibration_rounded,
                                   label: l10n.settingsHaptics,
                                   value: haptics,
-                                  onChanged: (v) => settingsRepository.updateSetting('haptics_enabled', v),
+                                  onChanged: (final v) => settingsRepository.updateSetting('haptics_enabled', v),
                                 ),
                               ],
                             ),
@@ -754,7 +754,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   icon: Icons.notifications_rounded,
                                   label: l10n.settingsPushNotifications,
                                   value: notifications,
-                                  onChanged: (v) => settingsRepository.updateSetting('push_notifications', v),
+                                  onChanged: (final v) => settingsRepository.updateSetting('push_notifications', v),
                                 ),
                                 _DividerSoft(),
                                 _NavRow(
@@ -763,7 +763,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   trailingText: _formatTime(dailyReminder),
                                   onTap: () => _pickDailyReminder(
                                     current: dailyReminder,
-                                    onSelected: (value) => settingsRepository.updateSetting('daily_reminder', value),
+                                    onSelected: (final value) => settingsRepository.updateSetting('daily_reminder', value),
                                   ),
                                 ),
                               ],
@@ -783,7 +783,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   label: l10n.settingsTheme,
                                   value: themeModeValue,
                                   items: themeItems,
-                                  onChanged: (v) {
+                                  onChanged: (final v) {
                                     settingsRepository.updateSetting('theme_mode', v);
                                     themeModeController.setModeFromSetting(v);
                                   },
@@ -794,7 +794,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   label: l10n.settingsUiLanguage,
                                   value: languageUiValue,
                                   items: languageItems,
-                                  onChanged: (v) => settingsRepository.updateSetting('language_ui', v),
+                                  onChanged: (final v) => settingsRepository.updateSetting('language_ui', v),
                                 ),
                               ],
                             ),
@@ -818,13 +818,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     icon: Icons.info_rounded,
                                     label: l10n.settingsVersion,
                                     trailingText: _appVersion,
-                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen(view: AboutView.version))),
+                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const AboutScreen(view: AboutView.version))),
                                 ),
                                 _DividerSoft(),
                                 _NavRow(
                                     icon: Icons.description_rounded,
                                     label: l10n.settingsTermsPrivacy,
-                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen(view: AboutView.termsAndPrivacy))),
+                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const AboutScreen(view: AboutView.termsAndPrivacy))),
                                 ),
                                 _DividerSoft(),
                                 _NavRow(
@@ -847,7 +847,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 final confirmed = await showPremiumDialog(
                                   context: context,
                                   title: l10n.settingsLogout,
-                                  body: "You can sign back in at any time to continue your progress.",
+                                  body: 'You can sign back in at any time to continue your progress.',
                                   confirmText: l10n.settingsLogout,
                                   cancelText: l10n.cancel,
                                   destructive: true,
@@ -857,8 +857,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 profileStore.reset();
                                 if (!context.mounted) return;
                                 Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-                                  (route) => false,
+                                  MaterialPageRoute(builder: (final _) => const WelcomeScreen()),
+                                  (final route) => false,
                                 );
                               },
                             ),
@@ -886,7 +886,7 @@ class _TopBar extends StatelessWidget {
   const _TopBar({required this.title, required this.onBack});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Row(
       children: [
@@ -916,7 +916,7 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Text(
       text,
@@ -932,7 +932,7 @@ class _SectionTitle extends StatelessWidget {
 
 class _DividerSoft extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Divider(height: 1, thickness: 1, color: scheme.onSurface.withValues(alpha: 0.08));
   }
@@ -952,7 +952,7 @@ class _NavRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: () {
@@ -1008,7 +1008,7 @@ class _ToggleRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.xs),
@@ -1028,7 +1028,7 @@ class _ToggleRow extends StatelessWidget {
           ),
           AppNeonSwitch(
             value: value,
-            onChanged: (next) {
+            onChanged: (final next) {
               hapticsService.selectionClick();
               onChanged(next);
             },
@@ -1055,7 +1055,7 @@ class _DropdownRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.xs),
@@ -1080,12 +1080,12 @@ class _DropdownRow extends StatelessWidget {
             iconEnabledColor: scheme.onSurface.withValues(alpha: 0.8),
             style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
             items: items
-                .map((e) => DropdownMenuItem<String>(
+                .map((final e) => DropdownMenuItem<String>(
                       value: e.value,
                       child: Text(e.label),
                     ))
                 .toList(),
-            onChanged: (v) {
+            onChanged: (final v) {
               if (v != null) onChanged(v);
             },
           ),
@@ -1121,7 +1121,7 @@ class _BottomSheetList<T> extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return SafeArea(
       child: Padding(
@@ -1135,7 +1135,7 @@ class _BottomSheetList<T> extends StatelessWidget {
               style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900, fontSize: 18),
             ),
             const SizedBox(height: 12),
-            ...options.map((value) {
+            ...options.map((final value) {
               final selected = value == current;
               return ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -1171,7 +1171,7 @@ class _DangerRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,

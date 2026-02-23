@@ -1634,6 +1634,9 @@ class AppLocalizationsCs extends AppLocalizations {
   String get circlesStartGame => 'Spustit Hru';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Čekání na hráče';
 
   @override

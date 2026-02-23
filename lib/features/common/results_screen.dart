@@ -1,23 +1,23 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/premium_dialog.dart';
+import 'package:soma/core/widgets/staggered_in.dart';
+import 'package:soma/data/circle_voice_service.dart';
+import 'package:soma/data/circles_repository.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/data/profile_store.dart';
+import 'package:soma/data/quiz_repository.dart';
+import 'package:soma/data/rtc_voice_service.dart';
+import 'package:soma/features/circles/circle_countdown_screen.dart';
+import 'package:soma/features/circles/circle_lobby_screen.dart';
+import 'package:soma/features/circles/live_quiz_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/premium_dialog.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/staggered_in.dart';
-import '../../core/theme/tokens.dart';
-import '../../models/leaderboard_player.dart';
-import '../../data/circle_voice_service.dart';
-import '../../data/profile_store.dart';
-import '../../data/rtc_voice_service.dart';
-import '../../data/circles_repository.dart';
-import '../../data/quiz_repository.dart';
-import '../../data/presence_repository.dart';
-import '../circles/circle_countdown_screen.dart';
-import '../circles/circle_lobby_screen.dart';
-import '../circles/live_quiz_screen.dart';
-
+import 'package:soma/models/leaderboard_player.dart';
 
 class ResultsScreen extends StatefulWidget {
   const ResultsScreen({
@@ -66,7 +66,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
   void _listenCircleStatus() {
     if (widget.circleId == null) return;
     _circleSub?.cancel();
-    _circleSub = circlesRepository.getCircleStream(widget.circleId!).listen((data) {
+    _circleSub =
+        circlesRepository.getCircleStream(widget.circleId!).listen((final data) {
       if (!mounted) return;
       final status = data['status']?.toString();
       if (status == 'active' && !_isNavigatingToQuiz && !_isHostMe) {
@@ -76,24 +77,25 @@ class _ResultsScreenState extends State<ResultsScreen> {
     });
   }
 
-  void _onRematchStarted(Map<String, dynamic> circleData) {
+  void _onRematchStarted(final Map<String, dynamic> circleData) {
     if (_isNavigatingToQuiz) return;
     _isNavigatingToQuiz = true;
 
-    final questions = List<Map<String, dynamic>>.from(circleData['questions'] ?? []);
+    final questions =
+        List<Map<String, dynamic>>.from(circleData['questions'] ?? []);
     final timePerQ = circleData['time_per_q'] ?? 10;
 
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => CircleCountdownScreen(
+        builder: (final _) => CircleCountdownScreen(
           seconds: 3,
           circleId: widget.circleId,
           onFinished: () {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => LiveQuizScreen(
+                builder: (final _) => LiveQuizScreen(
                   questions: questions,
                   timePerQ: timePerQ,
                   role: LiveQuizRole.participant,
@@ -123,14 +125,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
     final profile = profileStore.profile;
     final name = profile.displayName.isNotEmpty
         ? profile.displayName
-        : (profile.username.isNotEmpty ? profile.username : l10n.userFallbackName);
+        : (profile.username.isNotEmpty
+            ? profile.username
+            : l10n.userFallbackName);
 
     await circleVoiceService.connect(circleId: circleId, name: name);
-    final isSpectator = widget.leaderboard.every((p) => !p.isMe);
-    await rtcVoiceService.connect(circleId: circleId, asSpeaker: !isSpectator, prioritySpeaker: _isHostMe);
+    final isSpectator = widget.leaderboard.every((final p) => !p.isMe);
+    await rtcVoiceService.connect(
+        circleId: circleId,
+        asSpeaker: !isSpectator,
+        prioritySpeaker: _isHostMe);
   }
+
   bool get _isHostMe {
-    final me = widget.leaderboard.where((p) => p.isMe).toList();
+    final me = widget.leaderboard.where((final p) => p.isMe).toList();
     if (me.isEmpty) return false;
     return me.first.isHost;
   }
@@ -151,15 +159,20 @@ class _ResultsScreenState extends State<ResultsScreen> {
       final fromLang = circle['from_lang']?.toString() ?? '';
       final toLang = circle['to_lang']?.toString() ?? '';
       final mode = circle['mode']?.toString() ?? '';
-      final questionsCount = circle['questions_count'] is int ? circle['questions_count'] as int : 10;
-      final timePerQ = circle['time_per_q'] is int ? circle['time_per_q'] as int : 10;
+      final questionsCount = circle['questions_count'] is int
+          ? circle['questions_count'] as int
+          : 10;
+      final timePerQ =
+          circle['time_per_q'] is int ? circle['time_per_q'] as int : 10;
 
-      final courseId = "solo_${fromLang}_$toLang";
+      final courseId = 'solo_${fromLang}_$toLang';
       List<Map<String, dynamic>> quizQuestions = [];
-      if (mode == "Vocabulary") {
-        quizQuestions = await quizRepository.getVocabQuestions(courseId, questionsCount);
+      if (mode == 'Vocabulary') {
+        quizQuestions =
+            await quizRepository.getVocabQuestions(courseId, questionsCount);
       } else {
-        quizQuestions = await quizRepository.getSentenceQuestions(courseId, questionsCount);
+        quizQuestions =
+            await quizRepository.getSentenceQuestions(courseId, questionsCount);
       }
 
       if (quizQuestions.isEmpty) {
@@ -167,7 +180,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
         if (existing is List) {
           quizQuestions = existing
               .whereType<Map>()
-              .map((e) => Map<String, dynamic>.from(e))
+              .map((final e) => Map<String, dynamic>.from(e))
               .toList();
         }
       }
@@ -183,14 +196,14 @@ class _ResultsScreenState extends State<ResultsScreen> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => CircleCountdownScreen(
+          builder: (final _) => CircleCountdownScreen(
             seconds: 3,
             circleId: circleId,
             onFinished: () {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => LiveQuizScreen(
+                  builder: (final _) => LiveQuizScreen(
                     questions: quizQuestions,
                     timePerQ: timePerQ,
                     role: LiveQuizRole.host,
@@ -221,7 +234,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
     super.dispose();
   }
 
-  double get accuracy => widget.total == 0 ? 0 : (widget.correct / widget.total);
+  double get accuracy =>
+      widget.total == 0 ? 0 : (widget.correct / widget.total);
 
   Future<void> _goBackToLobby() async {
     final circleId = widget.circleId;
@@ -234,8 +248,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => CircleLobbyScreen(circleId: circleId)),
-      (route) => route.isFirst,
+      MaterialPageRoute(builder: (final _) => CircleLobbyScreen(circleId: circleId)),
+      (final route) => route.isFirst,
     );
   }
 
@@ -248,7 +262,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
     final l10n = AppLocalizations.of(context);
     final isHost = _isHostMe;
-    final isSpectator = widget.leaderboard.every((p) => !p.isMe);
+    final isSpectator = widget.leaderboard.every((final p) => !p.isMe);
     final confirmed = await showPremiumDialog(
       context: context,
       title: l10n.circlesLeavePromptTitle,
@@ -271,10 +285,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
     await circleVoiceService.disconnectIfCircle(circleId);
     await rtcVoiceService.disconnectIfCircle(circleId);
     if (!mounted) return;
-    Navigator.popUntil(context, (r) => r.isFirst);
+    Navigator.popUntil(context, (final r) => r.isFirst);
   }
 
-  String _placeLabel(AppLocalizations l10n) {
+  String _placeLabel(final AppLocalizations l10n) {
     if (widget.rank == 1) return l10n.resultsPlaceFirst;
     if (widget.rank == 2) return l10n.resultsPlaceSecond;
     if (widget.rank == 3) return l10n.resultsPlaceThird;
@@ -282,330 +296,379 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final pct = (accuracy * 100).round();
     final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final compactHeight = constraints.maxHeight < 760;
-              final blockSpacing = compactHeight ? 12.0 : 16.0;
-              final rowSpacing = compactHeight ? 10.0 : 12.0;
-
-              return Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 820),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-                    child: ListView(
-                      physics: const BouncingScrollPhysics(),
-                      children: [
-                // Top bar
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back_ios_new_rounded, color: scheme.onSurface),
-                      onPressed: widget.circleId != null ? _confirmExitCircle : () => Navigator.pop(context),
+        child: Stack(
+          children: [
+            ...rtcVoiceService.activeRenderers.map((final renderer) => Positioned(
+                  left: 0,
+                  top: 0,
+                  width: 1,
+                  height: 1,
+                  child: SizedBox(
+                    width: 1,
+                    height: 1,
+                    child: RTCVideoView(
+                      renderer,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                     ),
-                    const Spacer(),
-                    IconButton(
-                      icon: Icon(Icons.close_rounded, color: scheme.onSurface),
-                      onPressed: widget.circleId != null ? _confirmExitCircle : () => Navigator.popUntil(context, (r) => r.isFirst),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 8),
-
-                // Title
-                Text(
-                  l10n.resultsMatchTitle,
-                  style: TextStyle(
-                    color: scheme.onSurface,
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.2,
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  l10n.resultsNiceWork(widget.playerName),
-                  style: TextStyle(
-                    color: scheme.onSurface.withValues(alpha: 0.72),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                )),
+            LayoutBuilder(
+              builder: (final context, final constraints) {
+                final compactHeight = constraints.maxHeight < 760;
+                final blockSpacing = compactHeight ? 12.0 : 16.0;
+                final rowSpacing = compactHeight ? 10.0 : 12.0;
 
-                SizedBox(height: blockSpacing),
-
-                // Main card
-                Glass(
-                  depth: GlassDepth.l3,
-                  selected: true,
-                  padding: const EdgeInsets.all(16),
-                  radius: BorderRadius.circular(22),
-                  child: Column(
-                    children: [
-                      // Place + points
-                      Row(
+                return Align(
+                  alignment: Alignment.topCenter,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 820),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 18, vertical: 16),
+                      child: ListView(
+                        physics: const BouncingScrollPhysics(),
                         children: [
-                          _Badge(rank: widget.rank),
-                          const SizedBox(width: 12),
-                          Expanded(
+                          // Top bar
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.arrow_back_ios_new_rounded,
+                                    color: scheme.onSurface),
+                                onPressed: widget.circleId != null
+                                    ? _confirmExitCircle
+                                    : () => Navigator.pop(context),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon: Icon(Icons.close_rounded,
+                                    color: scheme.onSurface),
+                                onPressed: widget.circleId != null
+                                    ? _confirmExitCircle
+                                    : () => Navigator.popUntil(
+                                        context, (final r) => r.isFirst),
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          // Title
+                          Text(
+                            l10n.resultsMatchTitle,
+                            style: TextStyle(
+                              color: scheme.onSurface,
+                              fontSize: 28,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            l10n.resultsNiceWork(widget.playerName),
+                            style: TextStyle(
+                              color: scheme.onSurface.withValues(alpha: 0.72),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+
+                          SizedBox(height: blockSpacing),
+
+                          // Main card
+                          Glass(
+                            depth: GlassDepth.l3,
+                            selected: true,
+                            padding: const EdgeInsets.all(16),
+                            radius: BorderRadius.circular(22),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  _placeLabel(l10n),
-                                  style: TextStyle(
-                                    color: scheme.onSurface,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w800,
-                                  ),
+                                // Place + points
+                                Row(
+                                  children: [
+                                    _Badge(rank: widget.rank),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            _placeLabel(l10n),
+                                            style: TextStyle(
+                                              color: scheme.onSurface,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w800,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            l10n.resultsOutOfPlayers(
+                                                widget.playersCount),
+                                            style: TextStyle(
+                                              color: scheme.onSurface
+                                                  .withValues(alpha: 0.62),
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          l10n.pointsLabel,
+                                          style: TextStyle(
+                                            color: scheme.onSurface
+                                                .withValues(alpha: 0.7),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          '+${widget.points}',
+                                          style: TextStyle(
+                                            color: scheme.onSurface,
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.w900,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  l10n.resultsOutOfPlayers(widget.playersCount),
-                                  style: TextStyle(
-                                    color: scheme.onSurface.withValues(alpha: 0.62),
-                                    fontSize: 12,
+
+                                SizedBox(height: compactHeight ? 12 : 14),
+
+                                // Accuracy bar
+                                _AccuracyBar(percent: pct),
+
+                                SizedBox(height: compactHeight ? 12 : 14),
+
+                                // Stats row
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _StatTile(
+                                        title: l10n.statCorrect,
+                                        value: '${widget.correct}',
+                                        subtitle: l10n.statAnswers,
+                                        icon: Icons.check_circle_rounded,
+                                      ),
+                                    ),
+                                    SizedBox(width: rowSpacing),
+                                    Expanded(
+                                      child: _StatTile(
+                                        title: l10n.statTotal,
+                                        value: '${widget.total}',
+                                        subtitle: l10n.statQuestions,
+                                        icon: Icons.quiz_rounded,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                SizedBox(height: compactHeight ? 10 : 12),
+
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _StatTile(
+                                        title: l10n.statAccuracy,
+                                        value: '$pct%',
+                                        subtitle: l10n.statRate,
+                                        icon: Icons.track_changes_rounded,
+                                      ),
+                                    ),
+                                    SizedBox(width: rowSpacing),
+                                    Expanded(
+                                      child: _StatTile(
+                                        title: l10n.statRank,
+                                        value: '#${widget.rank}',
+                                        subtitle: l10n.statPosition,
+                                        icon: Icons.emoji_events_rounded,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(height: blockSpacing),
+
+                          // Optional: a small highlight card
+                          Glass(
+                            padding: const EdgeInsets.all(14),
+                            radius: BorderRadius.circular(18),
+                            child: Row(
+                              children: [
+                                Icon(Icons.auto_awesome_rounded,
+                                    color: scheme.onSurface),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    widget.rank == 1
+                                        ? l10n.resultsHighlightChampion
+                                        : (pct >= 80
+                                            ? l10n.resultsHighlightGreatAccuracy
+                                            : l10n.resultsHighlightKeepGoing),
+                                    style: TextStyle(
+                                      color: scheme.onSurface
+                                          .withValues(alpha: 0.85),
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                l10n.pointsLabel,
-                                style: TextStyle(
-                                  color: scheme.onSurface.withValues(alpha: 0.7),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
+
+                          SizedBox(height: blockSpacing),
+
+                          // Leaderboard
+                          Glass(
+                            depth: GlassDepth.l3,
+                            selected: true,
+                            padding: const EdgeInsets.all(14),
+                            radius: BorderRadius.circular(22),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(Icons.leaderboard_rounded,
+                                        color: scheme.onSurface),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      l10n.resultsLeaderboardTitle,
+                                      style: TextStyle(
+                                        color: scheme.onSurface,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      l10n.resultsPlayersCount(
+                                          widget.leaderboard.length),
+                                      style: TextStyle(
+                                        color: scheme.onSurface
+                                            .withValues(alpha: 0.58),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "+${widget.points}",
-                                style: TextStyle(
-                                  color: scheme.onSurface,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w900,
+                                SizedBox(height: compactHeight ? 10 : 12),
+                                StreamBuilder<Map<String, VoicePresence>>(
+                                  stream: circleVoiceService.stream,
+                                  builder: (final context, final snapshot) {
+                                    final voiceByUser = snapshot.data ??
+                                        const <String, VoicePresence>{};
+                                    final sorted =
+                                        _sortedLeaderboard(widget.leaderboard);
+
+                                    return Column(
+                                      children:
+                                          sorted.asMap().entries.map((final entry) {
+                                        final i = entry.key; // 0-based
+                                        final p = entry.value;
+                                        final rank = i + 1;
+                                        final voice = p.userId != null
+                                            ? voiceByUser[p.userId]
+                                            : null;
+                                        final muted = voice?.muted ?? p.isMuted;
+                                        final speaking =
+                                            voice?.speaking ?? p.isSpeaking;
+
+                                        return StaggeredIn(
+                                          index: i,
+                                          child: Padding(
+                                            padding: EdgeInsets.only(
+                                                bottom: i == sorted.length - 1
+                                                    ? 0
+                                                    : 10),
+                                            child: _LeaderboardRow(
+                                              rank: rank,
+                                              name: p.name,
+                                              points: p.points,
+                                              accuracyPct: p.accuracyPct,
+                                              isMe: p.isMe,
+                                              isHost: p.isHost,
+                                              isMuted: muted,
+                                              isSpeaking: speaking,
+                                              lastAnswer: p.lastAnswer,
+                                              userId: p.userId,
+                                              onToggleMute: p.isMe
+                                                  ? rtcVoiceService.toggleMuted
+                                                  : null,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    );
+                                  },
                                 ),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(height: compactHeight ? 14 : 18),
+
+                          // Bottom buttons
+                          if (widget.circleId != null) ...[
+                            NeonButton(
+                              label: 'Back to ${l10n.circlesLobbyTitle}',
+                              onTap: _goBackToLobby,
+                            ),
+                            if (_isHostMe) ...[
+                              SizedBox(height: compactHeight ? 8 : 10),
+                              _SecondaryButton(
+                                label: l10n.resultsRematch,
+                                onTap: () {
+                                  if (_startingRematch) return;
+                                  _startRematch();
+                                },
                               ),
                             ],
-                          ),
+                            SizedBox(height: compactHeight ? 12 : 14),
+                          ] else ...[
+                            NeonButton(
+                              label: l10n.resultsBackToCircles,
+                              onTap: widget.onPlayAgain ??
+                                  () => Navigator.pop(context),
+                            ),
+                            SizedBox(height: compactHeight ? 8 : 10),
+                            _SecondaryButton(
+                              label: l10n.resultsPlayAgain,
+                              onTap: widget.onPlayAgain ??
+                                  () => Navigator.pop(context),
+                            ),
+                            SizedBox(height: compactHeight ? 12 : 14),
+                          ],
                         ],
                       ),
-
-                      SizedBox(height: compactHeight ? 12 : 14),
-
-                      // Accuracy bar
-                      _AccuracyBar(percent: pct),
-
-                      SizedBox(height: compactHeight ? 12 : 14),
-
-                      // Stats row
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _StatTile(
-                              title: l10n.statCorrect,
-                              value: "${widget.correct}",
-                              subtitle: l10n.statAnswers,
-                              icon: Icons.check_circle_rounded,
-                            ),
-                          ),
-                          SizedBox(width: rowSpacing),
-                          Expanded(
-                            child: _StatTile(
-                              title: l10n.statTotal,
-                              value: "${widget.total}",
-                              subtitle: l10n.statQuestions,
-                              icon: Icons.quiz_rounded,
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      SizedBox(height: compactHeight ? 10 : 12),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _StatTile(
-                              title: l10n.statAccuracy,
-                              value: "$pct%",
-                              subtitle: l10n.statRate,
-                              icon: Icons.track_changes_rounded,
-                            ),
-                          ),
-                          SizedBox(width: rowSpacing),
-                          Expanded(
-                            child: _StatTile(
-                              title: l10n.statRank,
-                              value: "#${widget.rank}",
-                              subtitle: l10n.statPosition,
-                              icon: Icons.emoji_events_rounded,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: blockSpacing),
-
-                // Optional: a small highlight card
-                Glass(
-                  padding: const EdgeInsets.all(14),
-                  radius: BorderRadius.circular(18),
-                  child: Row(
-                    children: [
-                      Icon(Icons.auto_awesome_rounded, color: scheme.onSurface),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          widget.rank == 1
-                              ? l10n.resultsHighlightChampion
-                              : (pct >= 80
-                                  ? l10n.resultsHighlightGreatAccuracy
-                                  : l10n.resultsHighlightKeepGoing),
-                          style: TextStyle(
-                            color: scheme.onSurface.withValues(alpha: 0.85),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: blockSpacing),
-
-                // Leaderboard
-                Glass(
-                  depth: GlassDepth.l3,
-                  selected: true,
-                  padding: const EdgeInsets.all(14),
-                  radius: BorderRadius.circular(22),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.leaderboard_rounded, color: scheme.onSurface),
-                          const SizedBox(width: 10),
-                          Text(
-                            l10n.resultsLeaderboardTitle,
-                            style: TextStyle(
-                              color: scheme.onSurface,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                          const Spacer(),
-                          Text(
-                            l10n.resultsPlayersCount(widget.leaderboard.length),
-                            style: TextStyle(
-                              color: scheme.onSurface.withValues(alpha: 0.58),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: compactHeight ? 10 : 12),
-
-                      StreamBuilder<Map<String, VoicePresence>>(
-                        stream: circleVoiceService.stream,
-                        builder: (context, snapshot) {
-                          final voiceByUser = snapshot.data ?? const <String, VoicePresence>{};
-                          final sorted = _sortedLeaderboard(widget.leaderboard);
-
-                          return Column(
-                            children: sorted.asMap().entries.map((entry) {
-                              final i = entry.key; // 0-based
-                              final p = entry.value;
-                              final rank = i + 1;
-                              final voice = p.userId != null ? voiceByUser[p.userId] : null;
-                              final muted = voice?.muted ?? p.isMuted;
-                              final speaking = voice?.speaking ?? p.isSpeaking;
-
-                              return StaggeredIn(
-                                index: i,
-                                child: Padding(
-                                  padding: EdgeInsets.only(bottom: i == sorted.length - 1 ? 0 : 10),
-                                  child: _LeaderboardRow(
-                                    rank: rank,
-                                    name: p.name,
-                                    points: p.points,
-                                    accuracyPct: p.accuracyPct,
-                                    isMe: p.isMe,
-                                    isHost: p.isHost,
-                                    isMuted: muted,
-                                    isSpeaking: speaking,
-                                    lastAnswer: p.lastAnswer,
-                                    userId: p.userId,
-                                    onToggleMute: p.isMe ? rtcVoiceService.toggleMuted : null,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(height: compactHeight ? 14 : 18),
-
-                // Bottom buttons
-                if (widget.circleId != null) ...[
-                  NeonButton(
-                    label: "Back to ${l10n.circlesLobbyTitle}",
-                    onTap: _goBackToLobby,
-                  ),
-                  if (_isHostMe) ...[
-                    SizedBox(height: compactHeight ? 8 : 10),
-                    _SecondaryButton(
-                      label: l10n.resultsRematch,
-                      onTap: () {
-                        if (_startingRematch) return;
-                        _startRematch();
-                      },
                     ),
-                  ],
-                  SizedBox(height: compactHeight ? 12 : 14),
-                ] else ...[
-                  NeonButton(
-                    label: l10n.resultsBackToCircles,
-                    onTap: widget.onPlayAgain ?? () => Navigator.pop(context),
                   ),
-                  SizedBox(height: compactHeight ? 8 : 10),
-                  _SecondaryButton(
-                    label: l10n.resultsPlayAgain,
-                    onTap: widget.onPlayAgain ?? () => Navigator.pop(context),
-                  ),
-                  SizedBox(height: compactHeight ? 12 : 14),
-                ],
-              ],
+                );
+              },
             ),
-          ),
-                ),
-              );
-            },
-          ),
+          ],
         ),
+      ),
     );
   }
 }
@@ -615,7 +678,7 @@ class _Badge extends StatelessWidget {
   final int rank;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final icon = rank == 1
         ? Icons.emoji_events_rounded
         : rank == 2
@@ -630,7 +693,11 @@ class _Badge extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18)),
+        border: Border.all(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.18)),
       ),
       child: Icon(icon, color: Theme.of(context).colorScheme.onSurface),
     );
@@ -642,7 +709,7 @@ class _AccuracyBar extends StatelessWidget {
   final int percent;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final clamped = percent.clamp(0, 100);
     return Column(
@@ -652,12 +719,21 @@ class _AccuracyBar extends StatelessWidget {
           children: [
             Text(
               l10n.statAccuracy,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700),
             ),
             const Spacer(),
             Text(
-              "$clamped%",
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12, fontWeight: FontWeight.w800),
+              '$clamped%',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800),
             ),
           ],
         ),
@@ -666,7 +742,8 @@ class _AccuracyBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           child: Container(
             height: 10,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
             child: Align(
               alignment: Alignment.centerLeft,
               child: FractionallySizedBox(
@@ -699,7 +776,7 @@ class _StatTile extends StatelessWidget {
   final IconData icon;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(18),
@@ -711,10 +788,18 @@ class _StatTile extends StatelessWidget {
             height: 38,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18)),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.08),
+              border: Border.all(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.18)),
             ),
-            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
+            child: Icon(icon,
+                color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -742,7 +827,10 @@ class _StatTile extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.58),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.58),
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),
@@ -762,7 +850,7 @@ class _SecondaryButton extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -770,8 +858,13 @@ class _SecondaryButton extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.16)),
         ),
         alignment: Alignment.center,
         child: Text(
@@ -787,9 +880,9 @@ class _SecondaryButton extends StatelessWidget {
   }
 }
 
-List<LeaderboardPlayer> _sortedLeaderboard(List<LeaderboardPlayer> list) {
+List<LeaderboardPlayer> _sortedLeaderboard(final List<LeaderboardPlayer> list) {
   final copy = List<LeaderboardPlayer>.from(list);
-  copy.sort((a, b) {
+  copy.sort((final a, final b) {
     // Sort by points desc, then accuracy desc
     final byPoints = b.points.compareTo(a.points);
     if (byPoints != 0) return byPoints;
@@ -826,7 +919,7 @@ class _LeaderboardRow extends StatelessWidget {
   final String? userId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Container(
       height: 60,
@@ -897,7 +990,10 @@ class _LeaderboardRow extends StatelessWidget {
                               ? l10n.statusWrong
                               : l10n.statusNone,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.62),
                         fontWeight: FontWeight.w700,
                         fontSize: 11.5,
                       ),
@@ -913,7 +1009,7 @@ class _LeaderboardRow extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                "$points",
+                '$points',
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
@@ -924,7 +1020,10 @@ class _LeaderboardRow extends StatelessWidget {
               Text(
                 l10n.pointsAbbrev,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.58),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.58),
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                 ),
@@ -943,20 +1042,25 @@ class _RowRankChip extends StatelessWidget {
   const _RowRankChip({required this.rank});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       width: 34,
       height: 34,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
+        border: Border.all(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.16)),
       ),
       alignment: Alignment.center,
       child: Text(
-        "#$rank",
+        '#$rank',
         style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.82),
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.82),
           fontWeight: FontWeight.w900,
           fontSize: 11,
         ),
@@ -972,9 +1076,10 @@ class _RowAvatarBubble extends StatelessWidget {
   const _RowAvatarBubble({required this.name, this.userId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final trimmed = name.trim();
-    final initial = trimmed.isNotEmpty ? trimmed.substring(0, 1).toUpperCase() : "?";
+    final initial =
+        trimmed.isNotEmpty ? trimmed.substring(0, 1).toUpperCase() : '?';
     return Stack(
       children: [
         Container(
@@ -998,7 +1103,7 @@ class _RowAvatarBubble extends StatelessWidget {
         if (userId != null)
           StreamBuilder<bool>(
             stream: presenceRepository.streamOnlineStatus(userId!),
-            builder: (context, snapshot) {
+            builder: (final context, final snapshot) {
               if (snapshot.data == true) {
                 return Positioned(
                   bottom: 0,
@@ -1029,10 +1134,14 @@ class _RowVoiceBadge extends StatelessWidget {
   const _RowVoiceBadge({required this.muted, required this.speaking});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final onSurface = Theme.of(context).colorScheme.onSurface;
-    final color = muted ? onSurface.withValues(alpha: 0.55) : onSurface.withValues(alpha: 0.92);
-    final bg = muted ? onSurface.withValues(alpha: 0.08) : onSurface.withValues(alpha: 0.12);
+    final color = muted
+        ? onSurface.withValues(alpha: 0.55)
+        : onSurface.withValues(alpha: 0.92);
+    final bg = muted
+        ? onSurface.withValues(alpha: 0.08)
+        : onSurface.withValues(alpha: 0.12);
 
     return Stack(
       alignment: Alignment.center,
@@ -1084,7 +1193,7 @@ class _RowAnswerIndicator extends StatelessWidget {
   const _RowAnswerIndicator({required this.result});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final isCorrect = result == LeaderboardAnswer.correct;
     final isWrong = result == LeaderboardAnswer.wrong;
     final color = isCorrect
@@ -1104,8 +1213,10 @@ class _RowAnswerIndicator extends StatelessWidget {
       height: 18,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.black.withValues(alpha: isCorrect || isWrong ? 0.12 : 0.06),
-        border: Border.all(color: color.withValues(alpha: isCorrect || isWrong ? 0.8 : 0.4)),
+        color:
+            Colors.black.withValues(alpha: isCorrect || isWrong ? 0.12 : 0.06),
+        border: Border.all(
+            color: color.withValues(alpha: isCorrect || isWrong ? 0.8 : 0.4)),
       ),
       child: Center(
         child: Icon(icon, size: 12, color: color),
@@ -1120,13 +1231,15 @@ class _RowTag extends StatelessWidget {
   const _RowTag({required this.label});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
+        border: Border.all(
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
       ),
       child: Text(
         label,

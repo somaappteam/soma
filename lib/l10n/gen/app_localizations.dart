@@ -3130,6 +3130,12 @@ abstract class AppLocalizations {
   /// **'Start game'**
   String get circlesStartGame;
 
+  /// No description provided for @circlesStartingGame.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting game...'**
+  String get circlesStartingGame;
+
   /// No description provided for @circlesWaitingForPlayers.
   ///
   /// In en, this message translates to:

@@ -1,19 +1,20 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/data/circles_repository.dart';
+import 'package:soma/data/courses_repository.dart';
+import 'package:soma/data/languages.dart';
+import 'package:soma/features/circles/circle_lobby_screen.dart';
+import 'package:soma/features/circles/create_circle_screen.dart';
+import 'package:soma/features/social/friends_screen.dart';
+import 'package:soma/features/social/inbox_screen.dart';
+import 'package:soma/features/solo/add_course_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../social/friends_screen.dart';
-import '../social/inbox_screen.dart';
-import 'create_circle_screen.dart';
-import 'circle_lobby_screen.dart';
-import '../../core/theme/tokens.dart';
-import '../solo/add_course_screen.dart';
-import '../../data/circles_repository.dart';
-import '../../data/courses_repository.dart';
-import '../../data/languages.dart';
-import '../../models/solo_course.dart';
-import '../../core/widgets/responsive.dart';
+import 'package:soma/models/solo_course.dart';
 
 class CirclesScreen extends StatefulWidget {
   const CirclesScreen({super.key});
@@ -23,10 +24,10 @@ class CirclesScreen extends StatefulWidget {
 }
 
 class _CirclesScreenState extends State<CirclesScreen> {
-  static const _courseAll = "__all__";
-  static const _courseAdd = "__add__";
-  static const _modeAll = "all";
-  static const _levelAll = "all";
+  static const _courseAll = '__all__';
+  static const _courseAdd = '__add__';
+  static const _modeAll = 'all';
+  static const _levelAll = 'all';
 
   String _selectedCourseId = _courseAll;
   String _selectedMode = _modeAll;
@@ -42,9 +43,9 @@ class _CirclesScreenState extends State<CirclesScreen> {
     _openCirclesStream = circlesRepository.getOpenCircles();
 
     // Subscribe to course changes for the filter
-    _coursesSub = coursesRepository.getUserCoursesStream().listen((courses) {
+    _coursesSub = coursesRepository.getUserCoursesStream().listen((final courses) {
        if (!mounted) return;
-       final selectedExists = _selectedCourseId == _courseAll || courses.any((c) => c.id == _selectedCourseId);
+       final selectedExists = _selectedCourseId == _courseAll || courses.any((final c) => c.id == _selectedCourseId);
        setState(() {
          _courses = courses;
          if (!selectedExists) {
@@ -63,7 +64,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
   Future<void> _openAddCourse() async {
     final created = await Navigator.push<SoloCourse>(
       context,
-      MaterialPageRoute(builder: (_) => const AddCourseScreen()),
+      MaterialPageRoute(builder: (final _) => const AddCourseScreen()),
     );
 
     if (created != null) {
@@ -74,50 +75,50 @@ class _CirclesScreenState extends State<CirclesScreen> {
 
   List<_CourseOption> _buildCourseOptions() {
     final options = _courses.map(_CourseOption.fromCourse).toList();
-    options.sort((a, b) => a.label.toLowerCase().compareTo(b.label.toLowerCase()));
+    options.sort((final a, final b) => a.label.toLowerCase().compareTo(b.label.toLowerCase()));
     return options;
   }
 
-  String _courseLabel(List<_CourseOption> options, AppLocalizations l10n) {
+  String _courseLabel(final List<_CourseOption> options, final AppLocalizations l10n) {
     if (_selectedCourseId == _courseAll) return l10n.circlesAllCourses;
-    final match = options.where((o) => o.id == _selectedCourseId).toList();
+    final match = options.where((final o) => o.id == _selectedCourseId).toList();
     if (match.isEmpty) return l10n.circlesAllCourses;
     return match.first.label;
   }
 
-  String _modeLabel(AppLocalizations l10n) {
+  String _modeLabel(final AppLocalizations l10n) {
     if (_selectedMode == _modeAll) return l10n.circlesAllModes;
     return _modeLabelForValue(l10n, _selectedMode);
   }
 
-  String _levelLabel(AppLocalizations l10n) {
+  String _levelLabel(final AppLocalizations l10n) {
     if (_selectedLevel == _levelAll) return l10n.circlesAllLevels;
     return _levelLabelForValue(l10n, _selectedLevel);
   }
 
-  String _modeLabelForValue(AppLocalizations l10n, String value) {
-    if (value.toLowerCase() == "vocabulary") return l10n.soloModeVocabulary;
-    if (value.toLowerCase() == "sentences") return l10n.soloModeSentences;
-    if (value.toLowerCase() == "review") return l10n.soloModeReview;
+  String _modeLabelForValue(final AppLocalizations l10n, final String value) {
+    if (value.toLowerCase() == 'vocabulary') return l10n.soloModeVocabulary;
+    if (value.toLowerCase() == 'sentences') return l10n.soloModeSentences;
+    if (value.toLowerCase() == 'review') return l10n.soloModeReview;
     return value;
   }
 
-  bool _matchesMode(String? mode) {
+  bool _matchesMode(final String? mode) {
     if (_selectedMode == _modeAll) return true;
     if (mode == null) return false;
     return mode.toLowerCase() == _selectedMode.toLowerCase();
   }
 
-  bool _matchesLevel(String? level) {
+  bool _matchesLevel(final String? level) {
     if (_selectedLevel == _levelAll) return true;
     if (level == null) return false;
     final normalized = normalizeLevelCode(level);
     return normalized != null && normalized == _selectedLevel;
   }
 
-  bool _matchesCourse(Map<String, dynamic> data, _CourseOption option) {
-    final fromRaw = data['from_lang']?.toString() ?? "";
-    final toRaw = data['to_lang']?.toString() ?? "";
+  bool _matchesCourse(final Map<String, dynamic> data, final _CourseOption option) {
+    final fromRaw = data['from_lang']?.toString() ?? '';
+    final toRaw = data['to_lang']?.toString() ?? '';
     final fromCode = langCodeFromValue(fromRaw);
     final toCode = langCodeFromValue(toRaw);
 
@@ -130,12 +131,12 @@ class _CirclesScreenState extends State<CirclesScreen> {
     return fromLabel == option.fromName.toLowerCase() && toLabel == option.toName.toLowerCase();
   }
 
-  Future<void> _selectCourseFilter(List<_CourseOption> options) async {
+  Future<void> _selectCourseFilter(final List<_CourseOption> options) async {
     final l10n = AppLocalizations.of(context);
     final items = <_FilterOption>[
       _FilterOption(label: l10n.circlesAllCourses, value: _courseAll, icon: Icons.all_inclusive_rounded),
       ...options.map(
-        (o) => _FilterOption(label: o.label, value: o.id, icon: Icons.translate_rounded),
+        (final o) => _FilterOption(label: o.label, value: o.id, icon: Icons.translate_rounded),
       ),
       _FilterOption(
         label: l10n.circlesAddNewCourse,
@@ -165,8 +166,8 @@ class _CirclesScreenState extends State<CirclesScreen> {
     final l10n = AppLocalizations.of(context);
     final items = <_FilterOption>[
       _FilterOption(label: l10n.circlesAllModes, value: _modeAll, icon: Icons.all_inclusive_rounded),
-      _FilterOption(label: l10n.soloModeVocabulary, value: "Vocabulary", icon: Icons.view_list_rounded),
-      _FilterOption(label: l10n.soloModeSentences, value: "Sentences", icon: Icons.chat_bubble_rounded),
+      _FilterOption(label: l10n.soloModeVocabulary, value: 'Vocabulary', icon: Icons.view_list_rounded),
+      _FilterOption(label: l10n.soloModeSentences, value: 'Sentences', icon: Icons.chat_bubble_rounded),
     ];
 
     final result = await _pickFilterOption(
@@ -183,9 +184,9 @@ class _CirclesScreenState extends State<CirclesScreen> {
     final l10n = AppLocalizations.of(context);
     final items = <_FilterOption>[
       _FilterOption(label: l10n.circlesAllLevels, value: _levelAll, icon: Icons.all_inclusive_rounded),
-      _FilterOption(label: l10n.levelBeginner, value: "A", icon: Icons.rocket_launch_rounded),
-      _FilterOption(label: l10n.levelIntermediate, value: "B", icon: Icons.trending_up_rounded),
-      _FilterOption(label: l10n.levelAdvanced, value: "C", icon: Icons.auto_awesome_rounded),
+      _FilterOption(label: l10n.levelBeginner, value: 'A', icon: Icons.rocket_launch_rounded),
+      _FilterOption(label: l10n.levelIntermediate, value: 'B', icon: Icons.trending_up_rounded),
+      _FilterOption(label: l10n.levelAdvanced, value: 'C', icon: Icons.auto_awesome_rounded),
     ];
 
     final result = await _pickFilterOption(
@@ -199,8 +200,8 @@ class _CirclesScreenState extends State<CirclesScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    debugPrint("CirclesScreen.build called");
+  Widget build(final BuildContext context) {
+    debugPrint('CirclesScreen.build called');
     final l10n = AppLocalizations.of(context);
     final isCompactWidth = MediaQuery.sizeOf(context).width < 380;
     
@@ -234,12 +235,12 @@ class _CirclesScreenState extends State<CirclesScreen> {
                   const Spacer(),
                   _SmallIconButton(
                     icon: Icons.people_rounded,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FriendsScreen())),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const FriendsScreen())),
                   ),
                   const SizedBox(width: 10),
                   _SmallIconButton(
                     icon: Icons.mail_rounded,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const InboxScreen())),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const InboxScreen())),
                   ),
                 ],
               ),
@@ -313,7 +314,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
               Expanded(
                 child: StreamBuilder<List<Map<String, dynamic>>>(
                   stream: _openCirclesStream,
-                  builder: (context, snapshot) {
+                  builder: (final context, final snapshot) {
                     if (!snapshot.hasData) {
                       return const Center(
                         child: CircularProgressIndicator(color: Color(0xFF2AFADF)),
@@ -322,7 +323,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
                     
                     final rooms = snapshot.data!;
 
-                    final filtered = rooms.where((data) {
+                    final filtered = rooms.where((final data) {
                       if (!_matchesMode(data['mode']?.toString())) return false;
                       if (!_matchesLevel(data['level']?.toString())) return false;
                       if (selectedCourseOption != null && !_matchesCourse(data, selectedCourseOption)) return false;
@@ -345,8 +346,8 @@ class _CirclesScreenState extends State<CirclesScreen> {
                     return ListView.separated(
                       physics: const BouncingScrollPhysics(),
                       itemCount: filtered.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (context, i) {
+                      separatorBuilder: (final _, final __) => const SizedBox(height: 12),
+                      itemBuilder: (final context, final i) {
                         try {
                           final data = filtered[i];
                           final circleId = data['id']?.toString() ?? '';
@@ -383,7 +384,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => CircleLobbyScreen(circleId: room.id),
+                                    builder: (final _) => CircleLobbyScreen(circleId: room.id),
                                   ),
                                 );
                               } catch (e) {
@@ -399,7 +400,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
                             },
                           );
                         } catch (e, stack) {
-                          debugPrint("Error building circle card at index $i: $e\n$stack");
+                          debugPrint('Error building circle card at index $i: $e\n$stack');
                           return const SizedBox.shrink();
                         }
                       },
@@ -418,7 +419,7 @@ class _CirclesScreenState extends State<CirclesScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const CreateCircleScreen(),
+                        builder: (final context) => const CreateCircleScreen(),
                       ),
                     );
                   },
@@ -479,11 +480,11 @@ class _CourseOption {
     required this.toCode,
   });
 
-  factory _CourseOption.fromCourse(SoloCourse course) {
-    final parts = course.subtitle.split("?");
+  factory _CourseOption.fromCourse(final SoloCourse course) {
+    final parts = course.subtitle.split('?');
     final fromName = parts.isNotEmpty ? parts.first.trim() : course.subtitle.trim();
-    final toName = parts.length > 1 ? parts[1].trim() : "";
-    final label = toName.isEmpty ? fromName : "$fromName ? $toName";
+    final toName = parts.length > 1 ? parts[1].trim() : '';
+    final label = toName.isEmpty ? fromName : '$fromName ? $toName';
     return _CourseOption(
       id: course.id,
       label: label,
@@ -527,11 +528,11 @@ class _CircleCardState extends State<CircleCard> {
   bool _isJoining = false;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final modeLabel = widget.room.mode.toLowerCase() == "vocabulary"
+    final modeLabel = widget.room.mode.toLowerCase() == 'vocabulary'
         ? l10n.soloModeVocabulary
-        : widget.room.mode.toLowerCase() == "sentences"
+        : widget.room.mode.toLowerCase() == 'sentences'
             ? l10n.soloModeSentences
             : widget.room.mode;
     final levelLabel = _levelLabelForValue(l10n, widget.room.level);
@@ -590,10 +591,10 @@ class _CircleCardState extends State<CircleCard> {
             children: [
               _Pill(
                   icon: Icons.people_rounded,
-                  label: "${widget.room.players}/${widget.room.maxPlayers}"),
+                  label: '${widget.room.players}/${widget.room.maxPlayers}'),
               _Pill(
                   icon: Icons.visibility_rounded,
-                  label: "${widget.room.spectators}"),
+                  label: '${widget.room.spectators}'),
               _Pill(
                   icon: Icons.help_rounded,
                   label: l10n.questionsShort(widget.room.questions)),
@@ -640,7 +641,7 @@ class _SmallIconButton extends StatelessWidget {
   const _SmallIconButton({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(14),
       padding: EdgeInsets.zero,
@@ -668,7 +669,7 @@ class _FilterChip extends StatelessWidget {
   const _FilterChip({required this.label, required this.icon, required this.onTap, this.compact = false});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final content = InkWell(
       borderRadius: BorderRadius.circular(14),
       onTap: onTap,
@@ -713,16 +714,16 @@ class _FilterChip extends StatelessWidget {
 }
 
 Future<String?> _pickFilterOption(
-  BuildContext context, {
-  required String title,
-  required List<_FilterOption> items,
-  required String current,
+  final BuildContext context, {
+  required final String title,
+  required final List<_FilterOption> items,
+  required final String current,
 }) async {
   return showModalBottomSheet<String>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder: (ctx) {
+    builder: (final ctx) {
       final maxHeight = MediaQuery.of(context).size.height * 0.7;
       return SafeArea(
         child: Padding(
@@ -753,7 +754,7 @@ Future<String?> _pickFilterOption(
                     ],
                   ),
                   const SizedBox(height: 10),
-                  ...items.map((item) {
+                  ...items.map((final item) {
                     final selected = !item.isAction && item.value == current;
                     final textColor = item.isAction
                         ? Theme.of(context).colorScheme.primary
@@ -813,55 +814,55 @@ Future<String?> _pickFilterOption(
   );
 }
 
-LangOption? _findLangByCode(String code) {
+LangOption? _findLangByCode(final String code) {
   for (final lang in kLanguages) {
     if (lang.code.toLowerCase() == code.toLowerCase()) return lang;
   }
   return null;
 }
 
-LangOption? _findLangByName(String name) {
+LangOption? _findLangByName(final String name) {
   for (final lang in kLanguages) {
     if (lang.name.toLowerCase() == name.toLowerCase()) return lang;
   }
   return null;
 }
 
-String? langCodeFromValue(String value) {
+String? langCodeFromValue(final String value) {
   if (value.isEmpty) return null;
   return _findLangByCode(value)?.code ?? _findLangByName(value)?.code;
 }
 
-String langLabel(String value) {
+String langLabel(final String value) {
   if (value.isEmpty) return value;
   return _findLangByCode(value)?.name ?? _findLangByName(value)?.name ?? value;
 }
 
-String? normalizeLevelCode(String value) {
+String? normalizeLevelCode(final String value) {
   final trimmed = value.trim();
   if (trimmed.isEmpty) return null;
   final upper = trimmed.toUpperCase();
-  if (upper == "A" || upper == "B" || upper == "C") return upper;
+  if (upper == 'A' || upper == 'B' || upper == 'C') return upper;
   final lower = trimmed.toLowerCase();
-  if (lower == "beginner") return "A";
-  if (lower == "intermediate") return "B";
-  if (lower == "advanced") return "C";
+  if (lower == 'beginner') return 'A';
+  if (lower == 'intermediate') return 'B';
+  if (lower == 'advanced') return 'C';
   return null;
 }
 
-String _levelLabelForValue(AppLocalizations l10n, String value) {
+String _levelLabelForValue(final AppLocalizations l10n, final String value) {
   final normalized = normalizeLevelCode(value);
-  if (normalized == "A") return l10n.levelBeginner;
-  if (normalized == "B") return l10n.levelIntermediate;
-  if (normalized == "C") return l10n.levelAdvanced;
+  if (normalized == 'A') return l10n.levelBeginner;
+  if (normalized == 'B') return l10n.levelIntermediate;
+  if (normalized == 'C') return l10n.levelAdvanced;
   return value;
 }
 
-String levelLabel(String value) {
+String levelLabel(final String value) {
   final normalized = normalizeLevelCode(value);
-  if (normalized == "A") return "Beginner";
-  if (normalized == "B") return "Intermediate";
-  if (normalized == "C") return "Advanced";
+  if (normalized == 'A') return 'Beginner';
+  if (normalized == 'B') return 'Intermediate';
+  if (normalized == 'C') return 'Advanced';
   return value;
 }
 
@@ -870,7 +871,7 @@ class _LiveDot extends StatelessWidget {
   const _LiveDot({required this.live});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       width: 12,
       height: 12,
@@ -905,7 +906,7 @@ class _Pill extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
@@ -948,7 +949,7 @@ class _ActionButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
 

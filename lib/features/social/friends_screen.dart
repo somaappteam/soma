@@ -1,18 +1,18 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../models/friend.dart';
-import '../../data/social_repository.dart';
-import '../../data/auth_repository.dart';
-import '../../data/settings_repository.dart';
-import '../../data/presence_repository.dart';
-import 'add_friend_screen.dart';
-import 'dm_chat_screen.dart';
-import '../profile/profile_screen.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/data/social_repository.dart';
+import 'package:soma/features/profile/profile_screen.dart';
+import 'package:soma/features/social/add_friend_screen.dart';
+import 'package:soma/features/social/dm_chat_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
+import 'package:soma/models/friend.dart';
 
 class FriendsScreen extends StatefulWidget {
   const FriendsScreen({super.key});
@@ -27,7 +27,7 @@ enum FriendSortOption { recent, onlineFirst, name }
 
 
 class _FriendsScreenState extends State<FriendsScreen> {
-  String query = "";
+  String query = '';
   FriendViewFilter _filter = FriendViewFilter.all;
   FriendSortOption _sort = FriendSortOption.recent;
   Set<String> _favoriteFriendIds = <String>{};
@@ -47,11 +47,11 @@ class _FriendsScreenState extends State<FriendsScreen> {
     super.dispose();
   }
 
-  void _updateOnlineSubscription(List<String> ids) {
+  void _updateOnlineSubscription(final List<String> ids) {
     if (listEquals(ids, _currentFriendIds)) return;
     _currentFriendIds = ids;
     _onlineSub?.cancel();
-    _onlineSub = presenceRepository.streamMultipleOnlineStatuses(ids).listen((statuses) {
+    _onlineSub = presenceRepository.streamMultipleOnlineStatuses(ids).listen((final statuses) {
       if (!mounted) return;
       setState(() => _onlineStatuses = statuses);
     });
@@ -60,15 +60,15 @@ class _FriendsScreenState extends State<FriendsScreen> {
   Future<void> _loadFavorites() async {
     final settings = await settingsRepository.getSettings();
     final ids = (settings['favorite_friend_ids'] as List?)
-            ?.map((e) => e.toString())
-            .where((e) => e.isNotEmpty)
+            ?.map((final e) => e.toString())
+            .where((final e) => e.isNotEmpty)
             .toSet() ??
         <String>{};
     if (!mounted) return;
     setState(() => _favoriteFriendIds = ids);
   }
 
-  Future<void> _toggleFavorite(String friendId) async {
+  Future<void> _toggleFavorite(final String friendId) async {
     final next = Set<String>.from(_favoriteFriendIds);
     if (next.contains(friendId)) {
       next.remove(friendId);
@@ -80,24 +80,24 @@ class _FriendsScreenState extends State<FriendsScreen> {
     _trackUiEvent('favorite_toggle', {'friendId': friendId, 'favorited': next.contains(friendId)});
   }
 
-  void _trackUiEvent(String event, [Map<String, dynamic>? extras]) {
+  void _trackUiEvent(final String event, [final Map<String, dynamic>? extras]) {
     debugPrint('[friends_ui] $event ${extras ?? const <String, dynamic>{}}');
   }
 
   // Simplified handling for mapping friendship ID
-  Future<void> _accept(String friendshipId) async {
+  Future<void> _accept(final String friendshipId) async {
     await socialRepository.acceptFriendRequest(friendshipId);
   }
 
-  Future<void> _decline(String friendshipId) async {
+  Future<void> _decline(final String friendshipId) async {
     await socialRepository.declineFriendRequest(friendshipId);
   }
 
-  Future<void> _cancelOutgoing(String friendshipId) async {
+  Future<void> _cancelOutgoing(final String friendshipId) async {
     final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (final ctx) => AlertDialog(
         title: Text('Cancel request?'),
         content: Text('You can send a new friend request later.'),
         actions: [
@@ -110,11 +110,11 @@ class _FriendsScreenState extends State<FriendsScreen> {
     await socialRepository.cancelFriendRequest(friendshipId);
   }
 
-  Future<void> _removeFriend(String friendUserId) async {
+  Future<void> _removeFriend(final String friendUserId) async {
     final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (final ctx) => AlertDialog(
         title: Text('Remove friend?'),
         content: Text("You will no longer appear in each other's friends list."),
         actions: [
@@ -127,14 +127,14 @@ class _FriendsScreenState extends State<FriendsScreen> {
     await socialRepository.removeFriend(friendUserId);
   }
 
-  Future<void> _acceptAll(List<Friend> incoming) async {
+  Future<void> _acceptAll(final List<Friend> incoming) async {
     for (final f in incoming) {
       await _accept(f.id);
     }
     _trackUiEvent('accept_all', {'count': incoming.length});
   }
 
-  Future<void> _declineAll(List<Friend> incoming) async {
+  Future<void> _declineAll(final List<Friend> incoming) async {
     for (final f in incoming) {
       await _decline(f.id);
     }
@@ -152,7 +152,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
 
@@ -184,7 +184,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                         await Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => const AddFriendScreen()),
+                              builder: (final _) => const AddFriendScreen()),
                         );
                         if (!mounted) return;
                       },
@@ -206,7 +206,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
-                          onChanged: (v) => setState(() => query = v),
+                          onChanged: (final v) => setState(() => query = v),
                           style: TextStyle(
                               color: scheme.onSurface, fontWeight: FontWeight.w700),
                           cursorColor: scheme.onSurface,
@@ -221,7 +221,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                       ),
                       if (query.isNotEmpty)
                         GestureDetector(
-                          onTap: () => setState(() => query = ""),
+                          onTap: () => setState(() => query = ''),
                           child: Icon(Icons.close_rounded,
                               color: scheme.onSurface.withValues(alpha: 0.7)),
                         ),
@@ -234,14 +234,14 @@ class _FriendsScreenState extends State<FriendsScreen> {
                 Expanded(
                   child: StreamBuilder<List<Map<String, dynamic>>>(
                     stream: socialRepository.getFriendsStream(),
-                    builder: (context, friendsSnapshot) {
+                    builder: (final context, final friendsSnapshot) {
                       return StreamBuilder<List<Map<String, dynamic>>>(
                         stream: socialRepository.getIncomingRequestsStream(),
-                        builder: (context, incomingSnapshot) {
+                        builder: (final context, final incomingSnapshot) {
                           return StreamBuilder<List<Map<String, dynamic>>>(
                             stream:
                                 socialRepository.getOutgoingRequestsStream(),
-                            builder: (context, outgoingSnapshot) {
+                            builder: (final context, final outgoingSnapshot) {
                               if (friendsSnapshot.connectionState ==
                                   ConnectionState.waiting) {
                                 return const Center(
@@ -254,7 +254,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                               final outgoingData = outgoingSnapshot.data ?? [];
 
                               final friends = friendsData
-                                  .map((data) => Friend(
+                                  .map((final data) => Friend(
                                         id: data['id'],
                                         username: data['username'] ?? l10n.genericUser,
                                         subtitle:
@@ -263,9 +263,9 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                       ))
                                   .toList();
                               
-                              _updateOnlineSubscription(friends.map((f) => f.id).toList());
+                              _updateOnlineSubscription(friends.map((final f) => f.id).toList());
 
-                              final incoming = incomingData.map((data) {
+                              final incoming = incomingData.map((final data) {
                                 final requester = data['requester'] ?? {};
                                 return Friend(
                                   id: data['id'].toString(),
@@ -275,7 +275,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                 );
                               }).toList();
 
-                              final outgoing = outgoingData.map((data) {
+                              final outgoing = outgoingData.map((final data) {
                                 final addressee = data['addressee'] ?? {};
                                 return Friend(
                                   id: data['id'].toString(),
@@ -285,14 +285,14 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                 );
                               }).toList();
 
-                              final filtered = friends.where((f) {
+                              final filtered = friends.where((final f) {
                                 final q = query.trim().toLowerCase();
                                 if (q.isEmpty) return true;
                                 return f.username.toLowerCase().contains(q) ||
                                     (f.subtitle ?? '').toLowerCase().contains(q);
                               }).toList();
 
-                              filtered.sort((a, b) {
+                              filtered.sort((final a, final b) {
                                 final q = query.trim().toLowerCase();
                                 final aFav = _favoriteFriendIds.contains(a.id) ? 0 : 1;
                                 final bFav = _favoriteFriendIds.contains(b.id) ? 0 : 1;
@@ -318,7 +318,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                 return a.username.toLowerCase().compareTo(b.username.toLowerCase());
                               });
 
-                              final visibleFriends = filtered.where((f) {
+                              final visibleFriends = filtered.where((final f) {
                                 final isOnline = _onlineStatuses[f.id] == true;
                                 return switch (_filter) {
                                   FriendViewFilter.all => true,
@@ -334,7 +334,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                 children: [
                                   _FriendsOverviewCard(
                                     friendsCount: friends.length,
-                                    onlineCount: friends.where((f) => _onlineStatuses[f.id] == true).length,
+                                    onlineCount: friends.where((final f) => _onlineStatuses[f.id] == true).length,
                                     requestsCount: totalRequests,
                                   ),
                                   const SizedBox(height: 12),
@@ -379,11 +379,11 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                     alignment: Alignment.centerRight,
                                     child: PopupMenuButton<FriendSortOption>(
                                       initialValue: _sort,
-                                      onSelected: (next) {
+                                      onSelected: (final next) {
                                         _trackUiEvent('sort_change', {'value': next.name});
                                         setState(() => _sort = next);
                                       },
-                                      itemBuilder: (_) => const [
+                                      itemBuilder: (final _) => const [
                                         PopupMenuItem(
                                           value: FriendSortOption.recent,
                                           child: Text('Sort: Recent activity'),
@@ -451,7 +451,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                       radius: BorderRadius.circular(22),
                                       padding: const EdgeInsets.all(12),
                                       child: Column(
-                                        children: incoming.map((f) {
+                                        children: incoming.map((final f) {
                                           return _RequestRow(
                                             friend: f,
                                             onAccept: () => _accept(f.id),
@@ -469,7 +469,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                       radius: BorderRadius.circular(22),
                                       padding: const EdgeInsets.all(12),
                                       child: Column(
-                                        children: outgoing.map((f) {
+                                        children: outgoing.map((final f) {
                                           return _PendingRow(
                                             friend: f,
                                             onCancel: () =>
@@ -515,7 +515,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                       radius: BorderRadius.circular(22),
                                       padding: const EdgeInsets.all(12),
                                       child: Column(
-                                        children: visibleFriends.where((f) => _onlineStatuses[f.id] == true).map((f) {
+                                        children: visibleFriends.where((final f) => _onlineStatuses[f.id] == true).map((final f) {
                                           return _FriendRow(
                                             friend: f,
                                             isFavorite: _favoriteFriendIds.contains(f.id),
@@ -524,7 +524,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (_) => ProfileScreen(userId: f.id),
+                                                  builder: (final _) => ProfileScreen(userId: f.id),
                                                 ),
                                               );
                                             },
@@ -532,10 +532,10 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (_) => DmChatScreen(
+                                                  builder: (final _) => DmChatScreen(
                                             meId: socialRepository.currentUserId ?? 
                                                         authRepository.currentUser?.id ??
-                                                        "me",
+                                                        'me',
                                                     otherId: f.id,
                                                     otherName: f.username,
                                                   ),
@@ -548,7 +548,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                         }).toList(),
                                       ),
                                     ),
-                                   if (_filter != FriendViewFilter.requests && visibleFriends.any((f) => _onlineStatuses[f.id] != true)) ...[
+                                   if (_filter != FriendViewFilter.requests && visibleFriends.any((final f) => _onlineStatuses[f.id] != true)) ...[
                                      const SizedBox(height: 14),
                                      _SectionTitle('Recently active'),
                                      const SizedBox(height: 10),
@@ -556,7 +556,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                        radius: BorderRadius.circular(22),
                                        padding: const EdgeInsets.all(12),
                                        child: Column(
-                                         children: visibleFriends.where((f) => _onlineStatuses[f.id] != true).map((f) {
+                                         children: visibleFriends.where((final f) => _onlineStatuses[f.id] != true).map((final f) {
                                            return _FriendRow(
                                              friend: f,
                                              isFavorite: _favoriteFriendIds.contains(f.id),
@@ -565,7 +565,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                                Navigator.push(
                                                  context,
                                                  MaterialPageRoute(
-                                                   builder: (_) => ProfileScreen(userId: f.id),
+                                                   builder: (final _) => ProfileScreen(userId: f.id),
                                                  ),
                                                );
                                              },
@@ -573,8 +573,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                                Navigator.push(
                                                  context,
                                                  MaterialPageRoute(
-                                                   builder: (_) => DmChatScreen(
-                                                     meId: socialRepository.currentUserId ?? authRepository.currentUser?.id ?? "me",
+                                                   builder: (final _) => DmChatScreen(
+                                                     meId: socialRepository.currentUserId ?? authRepository.currentUser?.id ?? 'me',
                                                      otherId: f.id,
                                                      otherName: f.username,
                                                    ),
@@ -619,7 +619,7 @@ class _FriendsOverviewCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(22),
@@ -671,7 +671,7 @@ class _OverviewMetric extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.all(10),
@@ -717,7 +717,7 @@ class _FilterChip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(14),
@@ -753,7 +753,7 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Text(
       text,
@@ -773,7 +773,7 @@ class _IconGlass extends StatelessWidget {
   const _IconGlass({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -793,7 +793,7 @@ class _AvatarDot extends StatelessWidget {
   const _AvatarDot({required this.online, required this.username});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 40,
@@ -854,7 +854,7 @@ class _FriendRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -939,7 +939,7 @@ class _RequestRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -981,7 +981,7 @@ class _PendingRow extends StatelessWidget {
   const _PendingRow({required this.friend, required this.onCancel});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -1010,7 +1010,7 @@ class _PendingRow extends StatelessWidget {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    "Request sent",
+                    'Request sent',
                     style: TextStyle(
                       color: scheme.onSurface.withValues(alpha: 0.60),
                       fontWeight: FontWeight.w700,
@@ -1034,7 +1034,7 @@ class _MiniAction extends StatelessWidget {
   const _MiniAction({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(14),

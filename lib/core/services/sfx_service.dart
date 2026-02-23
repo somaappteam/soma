@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-import '../../data/settings_repository.dart';
+import 'package:soma/data/settings_repository.dart';
 
 class SfxService {
   bool _enabled = true;
@@ -12,7 +12,7 @@ class SfxService {
     final settings = await settingsRepository.getSettings();
     _enabled = settings['sfx_enabled'] ?? true;
     _subscription?.cancel();
-    _subscription = settingsRepository.getSettingsStream().listen((settings) {
+    _subscription = settingsRepository.getSettingsStream().listen((final settings) {
       final next = settings['sfx_enabled'];
       if (next is bool) {
         _enabled = next;
@@ -41,7 +41,7 @@ class SfxService {
   }
 
 
-  void answerCorrect({bool isStreak = false}) {
+  void answerCorrect({final bool isStreak = false}) {
     if (!_enabled) return;
     if (isStreak) {
       risingTone();

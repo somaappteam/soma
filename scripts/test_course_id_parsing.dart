@@ -15,7 +15,7 @@ void main() async {
   _testParse('solo_fr_en');
 }
 
-void _testParse(String id) {
+void _testParse(final String id) {
   print('Testing ID: "$id"');
   final res = _parseCourseLangs(id);
   if (res != null) {
@@ -31,7 +31,7 @@ class _LangPair {
   _LangPair({required this.source, required this.target});
 }
 
-_LangPair? _parseCourseLangs(String courseId) {
+_LangPair? _parseCourseLangs(final String courseId) {
   if (courseId.contains('-')) {
     final parts = courseId.split('-');
     if (parts.length == 2) {

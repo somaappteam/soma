@@ -1,5 +1,5 @@
+import 'package:soma/core/di/locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/di/locator.dart';
 
 class UserSession {
   final String id;
@@ -18,7 +18,7 @@ class UserSession {
     required this.isCurrent,
   });
 
-  factory UserSession.fromRow(Map<String, dynamic> row) {
+  factory UserSession.fromRow(final Map<String, dynamic> row) {
     final rawSeen = row['last_seen'];
     final lastSeen = rawSeen is DateTime
         ? rawSeen
@@ -46,10 +46,10 @@ class SessionRepository {
         .stream(primaryKey: ['id'])
         .eq('user_id', uid)
         .order('last_seen', ascending: false)
-        .map((rows) => rows.map(UserSession.fromRow).toList());
+        .map((final rows) => rows.map(UserSession.fromRow).toList());
   }
 
-  Future<void> endCurrentSession(String deviceId) async {
+  Future<void> endCurrentSession(final String deviceId) async {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return;
 

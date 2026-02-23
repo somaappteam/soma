@@ -45,9 +45,9 @@ class SentenceQuestion {
 
   // ─── Factory ───────────────────────────────────────────────────────────────
 
-  factory SentenceQuestion.fromMap(Map<String, dynamic> m) {
-    List<String> _list(dynamic v) =>
-        (v is List) ? v.map((e) => e.toString()).toList() : <String>[];
+  factory SentenceQuestion.fromMap(final Map<String, dynamic> m) {
+    List<String> list(final dynamic v) =>
+        (v is List) ? v.map((final e) => e.toString()).toList() : <String>[];
 
     return SentenceQuestion(
       conceptId: _parseInt(m['concept_id']) ?? 0,
@@ -55,10 +55,10 @@ class SentenceQuestion {
       fullSentence: _str(m['full_sentence']),
       translation: _str(m['translation']),
       reading: _str(m['reading']),
-      choices: _list(m['choices']),
+      choices: list(m['choices']),
       correct: _parseInt(m['correct']) ?? 0,
       correctAnswer: _str(m['correct_answer']),
-      choicePool: _list(m['choice_pool']),
+      choicePool: list(m['choice_pool']),
       targetLang: _str(m['target_lang']),
       sourceLang: _str(m['source_lang']),
     );
@@ -82,12 +82,12 @@ class SentenceQuestion {
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
 
-  static int? _parseInt(dynamic v) {
+  static int? _parseInt(final dynamic v) {
     if (v is int) return v;
     return int.tryParse(v?.toString() ?? '');
   }
 
-  static String _str(dynamic v) {
+  static String _str(final dynamic v) {
     final s = v?.toString().trim() ?? '';
     return s.toLowerCase() == 'null' ? '' : s;
   }

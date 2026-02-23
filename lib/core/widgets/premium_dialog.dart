@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../theme/tokens.dart';
-import 'glass.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
 
 class PremiumDialogAction<ValueType> {
   final String label;
@@ -18,18 +18,18 @@ class PremiumDialogAction<ValueType> {
 }
 
 Future<bool?> showPremiumDialog({
-  required BuildContext context,
-  required String title,
-  required String body,
-  required String confirmText,
-  String? cancelText,
-  bool destructive = false,
+  required final BuildContext context,
+  required final String title,
+  required final String body,
+  required final String confirmText,
+  final String? cancelText,
+  final bool destructive = false,
 }) {
   final scheme = Theme.of(context).colorScheme;
   return showDialog<bool>(
     context: context,
     barrierColor: Colors.black.withValues(alpha: 0.55),
-    builder: (_) => Dialog(
+    builder: (final _) => Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -101,16 +101,16 @@ Future<bool?> showPremiumDialog({
 }
 
 Future<ResultType?> showPremiumChoiceDialog<ResultType>({
-  required BuildContext context,
-  required String title,
-  required String body,
-  required List<PremiumDialogAction<ResultType>> actions,
+  required final BuildContext context,
+  required final String title,
+  required final String body,
+  required final List<PremiumDialogAction<ResultType>> actions,
 }) {
   final scheme = Theme.of(context).colorScheme;
   return showDialog<ResultType>(
     context: context,
     barrierColor: Colors.black.withValues(alpha: 0.60),
-    builder: (ctx) => Dialog(
+    builder: (final ctx) => Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -144,7 +144,7 @@ Future<ResultType?> showPremiumChoiceDialog<ResultType>({
               spacing: 10,
               runSpacing: 10,
               alignment: WrapAlignment.end,
-              children: actions.map((action) {
+              children: actions.map((final action) {
                 final foreground = action.destructive
                     ? (action.isPrimary ? scheme.onError : scheme.error)
                     : action.isPrimary

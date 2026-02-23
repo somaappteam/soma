@@ -1660,6 +1660,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get circlesStartGame => 'Démarrer le jeu';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'En attente de joueurs';
 
   @override

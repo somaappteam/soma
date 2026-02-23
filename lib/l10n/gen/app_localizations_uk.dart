@@ -1641,6 +1641,9 @@ class AppLocalizationsUk extends AppLocalizations {
   String get circlesStartGame => 'Почати гру';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Очікування гравців';
 
   @override

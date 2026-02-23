@@ -1,32 +1,28 @@
-import 'dart:math';
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../core/services/haptics_service.dart';
+import 'package:flutter/material.dart';
+import 'package:soma/core/services/haptics_service.dart';
+import 'package:soma/core/theme/layout_tokens.dart';
+import 'package:soma/core/theme/spacing.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/premium_screen_scaffold.dart';
+import 'package:soma/core/widgets/pressable_scale.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/core/widgets/staggered_in.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/courses_repository.dart';
+import 'package:soma/data/notifications_repository.dart';
+import 'package:soma/data/notifications_store.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/data/profile_store.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/data/social_repository.dart';
+import 'package:soma/features/profile/profile_screen.dart';
+import 'package:soma/features/social/notifications/notifications_screen.dart';
+import 'package:soma/features/solo/add_course_screen.dart';
+import 'package:soma/features/solo/solo_course_detail_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/pressable_scale.dart';
-import '../../core/widgets/staggered_in.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import '../../models/solo_course.dart';
-import '../solo/solo_course_detail_screen.dart';
-import '../solo/add_course_screen.dart';
-import '../social/notifications/notifications_screen.dart';
-import '../../data/profile_store.dart';
-import '../../data/courses_repository.dart';
-import '../../data/notifications_repository.dart';
-import '../../data/notifications_store.dart';
-import '../../data/auth_repository.dart';
-import '../../data/settings_repository.dart';
-import '../../data/social_repository.dart';
-import '../../data/presence_repository.dart';
-import '../../data/profile_repository.dart';
-import '../../core/theme/motion.dart';
-import '../../core/widgets/responsive.dart';
-import '../../core/theme/spacing.dart';
-import '../../core/theme/layout_tokens.dart';
-import '../../core/widgets/premium_screen_scaffold.dart';
-import '../profile/profile_screen.dart';
+import 'package:soma/models/solo_course.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -75,13 +71,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // _syncCoursesIfNeeded removed as stream handles updates
 
-  Future<void> _confirmDeleteCourse(SoloCourse course) async {
+  Future<void> _confirmDeleteCourse(final SoloCourse course) async {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final result = await showDialog<bool>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.55),
-      builder: (ctx) {
+      builder: (final ctx) {
         return Dialog(
           backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.symmetric(horizontal: 24),
@@ -178,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _buildWelcomeRow({required bool editing}) {
+  Widget _buildWelcomeRow({required final bool editing}) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     return Row(
@@ -215,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCourseList(List<SoloCourse> courses, {required bool editing, required double listGap}) {
+  Widget _buildCourseList(final List<SoloCourse> courses, {required final bool editing, required final double listGap}) {
     final l10n = AppLocalizations.of(context);
     // If courses is empty, the ListView.separated below will correctly handle it
     // by rendering just the AddCourseButton (count = 0 + 1).
@@ -223,13 +219,13 @@ class _HomeScreenState extends State<HomeScreen> {
     return ListView.separated(
               physics: const BouncingScrollPhysics(),
               itemCount: editing ? courses.length : courses.length + 1,
-              separatorBuilder: (_, __) => SizedBox(height: listGap),
-              itemBuilder: (context, i) {
+              separatorBuilder: (final _, final __) => SizedBox(height: listGap),
+              itemBuilder: (final context, final i) {
         if (!editing && i == courses.length) {
           return StaggeredIn(
             index: i,
             child: _AddCourseButton(
-              onAdded: (newCourse) {
+              onAdded: (final newCourse) {
                 _reloadCourses();
               },
             ),
@@ -237,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         final c = courses[i];
-        final parts = c.subtitle.split("→");
+        final parts = c.subtitle.split('→');
         final fallback = l10n.unknown;
         final fromLang = parts.isNotEmpty ? parts.first.trim() : fallback;
         final toLang = parts.length > 1 ? parts[1].trim() : fallback;
@@ -252,13 +248,13 @@ class _HomeScreenState extends State<HomeScreen> {
             xp: c.xp,
             time: timeLabel,
             progress: progress,
-            heroTag: "course-card-${c.id}",
+            heroTag: 'course-card-${c.id}',
             onTap: editing
                 ? null
                 : () async {
                     await Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => SoloCourseDetailScreen(course: c)),
+                      MaterialPageRoute(builder: (final _) => SoloCourseDetailScreen(course: c)),
                     );
                     _reloadCourses();
                   },
@@ -270,13 +266,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  double _progressForCourse(int xp) {
+  double _progressForCourse(final int xp) {
     const maxXp = 1000;
     return (xp / maxXp).clamp(0.0, 1.0);
   }
 
-  String _formatElapsed(DateTime? lastAccessed) {
-    if (lastAccessed == null) return "00:00:00";
+  String _formatElapsed(final DateTime? lastAccessed) {
+    if (lastAccessed == null) return '00:00:00';
     final diff = DateTime.now().difference(lastAccessed);
     final hours = diff.inHours;
     final minutes = diff.inMinutes.remainder(60);
@@ -285,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isGuest = authRepository.currentUser == null;
     
@@ -299,12 +295,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     // Profile Pic + Username
                     StreamBuilder<Map<String, bool>>(
                       stream: presenceRepository.streamMultipleOnlineStatuses([authRepository.currentUser?.id].whereType<String>().toList()),
-                      builder: (context, presenceSnapshot) {
+                      builder: (final context, final presenceSnapshot) {
                         final isOnline = presenceSnapshot.data?[authRepository.currentUser?.id] ?? false;
                         
                         return AnimatedBuilder(
                           animation: profileStore,
-                          builder: (context, _) {
+                          builder: (final context, final _) {
                             final p = profileStore.profile;
                             final hasAvatar = p.avatarUrl != null && p.avatarUrl!.isNotEmpty;
                             final username = p.username.isNotEmpty ? p.username : l10n.guestUsername;
@@ -333,7 +329,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: !hasAvatar
                                           ? Center(
                                               child: Text(
-                                                username.isNotEmpty ? username[0].toUpperCase() : "?",
+                                                username.isNotEmpty ? username[0].toUpperCase() : '?',
                                                 style: TextStyle(
                                                   color: Theme.of(context).colorScheme.onSurface,
                                                   fontWeight: FontWeight.w700,
@@ -377,16 +373,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (isGuest)
                       AnimatedBuilder(
                         animation: notificationsStore,
-                        builder: (context, _) {
+                        builder: (final context, final _) {
                           final count = notificationsStore.items
-                              .where((n) => !n.isRead && (n.type == NotifType.course || n.type == NotifType.system))
+                              .where((final n) => !n.isRead && (n.type == NotifType.course || n.type == NotifType.system))
                               .length;
                           return _BellWithBadge(
                             count: count,
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                                MaterialPageRoute(builder: (final _) => const NotificationsScreen()),
                               );
                             },
                           );
@@ -395,14 +391,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     else
                       StreamBuilder<List<Map<String, dynamic>>>(
                         stream: notificationsRepository.getNotificationsStream(),
-                        builder: (context, snapshot) {
-                          final count = snapshot.data?.where((n) => !(n['is_read'] as bool? ?? false)).length ?? 0;
+                        builder: (final context, final snapshot) {
+                          final count = snapshot.data?.where((final n) => !(n['is_read'] as bool? ?? false)).length ?? 0;
                           return _BellWithBadge(
                             count: count,
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                                MaterialPageRoute(builder: (final _) => const NotificationsScreen()),
                               );
                             },
                           );
@@ -428,7 +424,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: StreamBuilder<List<SoloCourse>>(
                     stream: _coursesStream,
-                    builder: (context, snapshot) {
+                    builder: (final context, final snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const _CoursesSkeleton();
                       }
@@ -456,7 +452,7 @@ class _SmallIconButton extends StatelessWidget {
   const _SmallIconButton({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(14),
@@ -481,14 +477,14 @@ class _CoursesSkeleton extends StatelessWidget {
   const _CoursesSkeleton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final density = PremiumLayout.densityForWidth(MediaQuery.of(context).size.width);
     final listGap = PremiumLayout.listGap(density);
     return ListView.separated(
       physics: const BouncingScrollPhysics(),
       itemCount: 3,
-      separatorBuilder: (_, __) => SizedBox(height: listGap),
-      itemBuilder: (context, index) => const _SkeletonCard(),
+      separatorBuilder: (final _, final __) => SizedBox(height: listGap),
+      itemBuilder: (final context, final index) => const _SkeletonCard(),
     );
   }
 }
@@ -497,13 +493,13 @@ class _SkeletonCard extends StatelessWidget {
   const _SkeletonCard();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.3, end: 0.7),
       duration: const Duration(milliseconds: 900),
       curve: Curves.easeInOut,
-      builder: (context, value, child) {
+      builder: (final context, final value, final child) {
         final base = scheme.onSurface.withValues(alpha: 0.08 + (0.06 * value));
         return Container(
           height: 96,
@@ -535,7 +531,7 @@ class _SkeletonLine extends StatelessWidget {
   const _SkeletonLine({required this.width, required this.color});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       width: width,
       height: 10,
@@ -572,7 +568,7 @@ class CourseCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final card = Glass(
@@ -590,7 +586,7 @@ class CourseCard extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      "$fromLang  →  $toLang",
+                      '$fromLang  →  $toLang',
                       style: textTheme.titleMedium?.copyWith(
                         color: scheme.onSurface,
                         fontWeight: FontWeight.w800,
@@ -666,7 +662,7 @@ class CourseCard extends StatelessWidget {
 
               Row(
                 children: [
-                  _Pill(icon: Icons.bolt_rounded, label: "+$xp"),
+                  _Pill(icon: Icons.bolt_rounded, label: '+$xp'),
                   const Spacer(),
                   _Pill(icon: Icons.timer_rounded, label: time),
                 ],
@@ -694,7 +690,7 @@ class _Pill extends StatelessWidget {
   const _Pill({required this.icon, required this.label});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
@@ -725,7 +721,7 @@ class _Pill extends StatelessWidget {
 
 class _FlagDot extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       width: 18,
       height: 18,
@@ -754,7 +750,7 @@ class _AddCourseButton extends StatelessWidget {
   const _AddCourseButton({required this.onAdded});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     return NeonButton(
@@ -762,12 +758,12 @@ class _AddCourseButton extends StatelessWidget {
       onTap: () async {
         final created = await Navigator.push<SoloCourse>(
           context,
-          MaterialPageRoute(builder: (_) => const AddCourseScreen()),
+          MaterialPageRoute(builder: (final _) => const AddCourseScreen()),
         );
 
         if (created != null) {
           final existingCourses = await coursesRepository.getUserCourses();
-          final duplicate = existingCourses.any((course) => _isSameCourse(course, created));
+          final duplicate = existingCourses.any((final course) => _isSameCourse(course, created));
           if (duplicate) {
             if (!context.mounted) return;
             ScaffoldMessenger.of(context)
@@ -789,14 +785,14 @@ class _AddCourseButton extends StatelessWidget {
     );
   }
 
-  bool _isSameCourse(SoloCourse a, SoloCourse b) {
+  bool _isSameCourse(final SoloCourse a, final SoloCourse b) {
     if (a.id == b.id) return true;
     final aPair = _coursePairKey(a);
     final bPair = _coursePairKey(b);
     return aPair != null && aPair == bPair;
   }
 
-  String? _coursePairKey(SoloCourse course) {
+  String? _coursePairKey(final SoloCourse course) {
     final idMatch = RegExp(r'^solo_([a-z]{2,})_([a-z]{2,})(?:_\d+)?$').firstMatch(
       course.id.toLowerCase(),
     );
@@ -824,7 +820,7 @@ class _BellWithBadge extends StatelessWidget {
   const _BellWithBadge({required this.count, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Stack(
       clipBehavior: Clip.none,
@@ -849,7 +845,7 @@ class _BellWithBadge extends StatelessWidget {
                 border: Border.all(color: scheme.onSurface.withValues(alpha: 0.2)),
               ),
               child: Text(
-                count > 99 ? "99+" : "$count",
+                count > 99 ? '99+' : '$count',
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w900,
@@ -865,26 +861,26 @@ class _BellWithBadge extends StatelessWidget {
 
 class _ActiveFriendsStrip extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
 
     return StreamBuilder<List<Map<String, dynamic>>>(
       stream: socialRepository.getFriendsStream(),
-      builder: (context, friendsSnapshot) {
+      builder: (final context, final friendsSnapshot) {
         final friends = friendsSnapshot.data ?? [];
         if (friends.isEmpty) return const SizedBox.shrink();
 
         final friendIds = friends
-            .map((f) => f['id']?.toString())
+            .map((final f) => f['id']?.toString())
             .whereType<String>()
             .toList();
 
         return StreamBuilder<Map<String, bool>>(
           stream: presenceRepository.streamMultipleOnlineStatuses(friendIds),
-          builder: (context, presenceSnapshot) {
+          builder: (final context, final presenceSnapshot) {
             final onlineStatuses = presenceSnapshot.data ?? {};
-            final onlineFriends = friends.where((f) => onlineStatuses[f['id']?.toString()] == true).toList();
+            final onlineFriends = friends.where((final f) => onlineStatuses[f['id']?.toString()] == true).toList();
 
             if (onlineFriends.isEmpty) return const SizedBox.shrink();
 
@@ -894,7 +890,7 @@ class _ActiveFriendsStrip extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Text(
-                    "Active Now",
+                    'Active Now',
                     style: TextStyle(
                       color: scheme.onSurface,
                       fontWeight: FontWeight.w900,
@@ -909,11 +905,11 @@ class _ActiveFriendsStrip extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     scrollDirection: Axis.horizontal,
                     itemCount: onlineFriends.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 14),
-                    itemBuilder: (context, index) {
+                    separatorBuilder: (final _, final __) => const SizedBox(width: 14),
+                    itemBuilder: (final context, final index) {
                       final f = onlineFriends[index];
                       final avatarUrl = f['avatar_url']?.toString();
-                      final username = f['username']?.toString() ?? "";
+                      final username = f['username']?.toString() ?? '';
                       final userId = f['id']?.toString();
 
                       return GestureDetector(
@@ -921,7 +917,7 @@ class _ActiveFriendsStrip extends StatelessWidget {
                             ? null
                             : () => Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (_) => ProfileScreen(userId: userId)),
+                                  MaterialPageRoute(builder: (final _) => ProfileScreen(userId: userId)),
                                 ),
                         child: Column(
                           children: [
@@ -946,7 +942,7 @@ class _ActiveFriendsStrip extends StatelessWidget {
                                   child: (avatarUrl == null || avatarUrl.isEmpty)
                                       ? Center(
                                           child: Text(
-                                            username.isNotEmpty ? username[0].toUpperCase() : "?",
+                                            username.isNotEmpty ? username[0].toUpperCase() : '?',
                                             style: TextStyle(
                                               color: scheme.onSurface,
                                               fontWeight: FontWeight.w700,

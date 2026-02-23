@@ -1632,6 +1632,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get circlesStartGame => 'Starta Spel';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Väntar på spelare';
 
   @override

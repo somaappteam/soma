@@ -24,7 +24,7 @@ Future<void> main() async {
   }
 }
 
-Future<void> _migrateVocabulary(SupabaseClient client) async {
+Future<void> _migrateVocabulary(final SupabaseClient client) async {
   final file = File('assets/vocabulary.csv');
   if (!await file.exists()) {
     print('Vocabulary CSV not found!');
@@ -52,7 +52,7 @@ Future<void> _migrateVocabulary(SupabaseClient client) async {
     print('Processing chunk $i to ${i + chunkSize}...');
     final chunk = dataRows.sublist(i, i + chunkSize > dataRows.length ? dataRows.length : i + chunkSize);
     
-    final maps = chunk.map((row) {
+    final maps = chunk.map((final row) {
       if (row.length < 10) return null;
       return {
         'voca_id': row[0],
@@ -75,7 +75,7 @@ Future<void> _migrateVocabulary(SupabaseClient client) async {
   print('\nVocabulary migration done.');
 }
 
-Future<void> _migrateSentences(SupabaseClient client) async {
+Future<void> _migrateSentences(final SupabaseClient client) async {
   final file = File('assets/sentences.csv');
   if (!await file.exists()) {
     print('Sentences CSV not found!');
@@ -103,7 +103,7 @@ Future<void> _migrateSentences(SupabaseClient client) async {
     print('Processing chunk $i to ${i + chunkSize}...');
     final chunk = dataRows.sublist(i, i + chunkSize > dataRows.length ? dataRows.length : i + chunkSize);
     
-    final maps = chunk.map((row) {
+    final maps = chunk.map((final row) {
       if (row.length < 9) return null;
       return {
         'sentence_id': row[0],

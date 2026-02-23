@@ -1,12 +1,12 @@
 import 'dart:math';
 
-import 'settings_repository.dart';
-import '../core/di/locator.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/data/settings_repository.dart';
 
 class ExperimentRepository {
   final Random _random = Random();
 
-  Future<String> variant(String key, {List<String> buckets = const ['A', 'B']}) async {
+  Future<String> variant(final String key, {final List<String> buckets = const ['A', 'B']}) async {
     final settings = await settingsRepository.getSettings();
     final exp = (settings['experiments'] as Map<String, dynamic>?) ?? {};
     final existing = exp[key]?.toString();

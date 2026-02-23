@@ -1,12 +1,12 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:async';
-import '../models/solo_course.dart';
 
-import '../core/database/database_helper.dart';
-import 'settings_repository.dart';
 import 'package:flutter/foundation.dart';
-import '../core/di/locator.dart';
-import 'languages.dart';
+import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/data/languages.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/models/solo_course.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CoursesRepository {
   final _supabase = Supabase.instance.client;
@@ -27,10 +27,10 @@ class CoursesRepository {
     for (final language in kLanguages) language.code.toLowerCase(): language.name,
   };
 
-  Future<void> addCustomCourse(SoloCourse course) async {
+  Future<void> addCustomCourse(final SoloCourse course) async {
     final uid = currentUserId;
     if (uid == null) {
-      if (!_customCourses.any((c) => _isSameCourse(c, course))) {
+      if (!_customCourses.any((final c) => _isSameCourse(c, course))) {
         _customCourses.add(course);
       }
       _removedCourseIds.remove(course.id);
@@ -41,7 +41,7 @@ class CoursesRepository {
     try {
       final settings = await settingsRepository.getSettings();
       final customCourses = _parseCustomCourses(settings[_customCoursesKey]);
-      if (!customCourses.any((c) => _isSameCourse(c, course))) {
+      if (!customCourses.any((final c) => _isSameCourse(c, course))) {
         customCourses.add(course);
       }
 
@@ -57,21 +57,21 @@ class CoursesRepository {
         _removedCoursesKey: removedIds.toList(),
       });
     } catch (e) {
-      if (!_customCourses.any((c) => _isSameCourse(c, course))) {
+      if (!_customCourses.any((final c) => _isSameCourse(c, course))) {
         _customCourses.add(course);
       }
       _removedCourseIds.remove(course.id);
-      debugPrint("Error saving custom course: $e");
+      debugPrint('Error saving custom course: $e');
     }
 
     _revision++;
   }
 
-  Future<void> removeCourse(String courseId) async {
+  Future<void> removeCourse(final String courseId) async {
     final uid = currentUserId;
     if (uid == null) {
       _removedCourseIds.add(courseId);
-      _customCourses.removeWhere((c) => c.id == courseId);
+      _customCourses.removeWhere((final c) => c.id == courseId);
       _revision++;
       return;
     }
@@ -82,9 +82,9 @@ class CoursesRepository {
       final removedIds = _parseRemovedIds(settings[_removedCoursesKey]);
       final progress = _parseCustomProgress(settings[_customProgressKey]);
 
-      final wasCustom = customCourses.any((c) => c.id == courseId);
+      final wasCustom = customCourses.any((final c) => c.id == courseId);
       if (wasCustom) {
-        customCourses.removeWhere((c) => c.id == courseId);
+        customCourses.removeWhere((final c) => c.id == courseId);
         progress.remove(courseId);
       } else {
         removedIds.add(courseId);
@@ -97,8 +97,8 @@ class CoursesRepository {
       });
     } catch (e) {
       _removedCourseIds.add(courseId);
-      _customCourses.removeWhere((c) => c.id == courseId);
-      debugPrint("Error removing course: $e");
+      _customCourses.removeWhere((final c) => c.id == courseId);
+      debugPrint('Error removing course: $e');
     }
 
     _revision++;
@@ -113,7 +113,7 @@ class CoursesRepository {
     final controller = StreamController<List<SoloCourse>>();
 
     // Initial fetch
-    getUserCourses().then((c) {
+    getUserCourses().then((final c) {
       if (!controller.isClosed) controller.add(c);
     });
 
@@ -121,10 +121,10 @@ class CoursesRepository {
     final s1 = _supabase.from('user_courses').stream(primaryKey: ['id']).eq('user_id', uid);
     final s2 = _supabase.from('profiles').stream(primaryKey: ['id']).eq('id', uid);
 
-    final sub1 = s1.listen((_) async {
+    final sub1 = s1.listen((final _) async {
       if (!controller.isClosed) controller.add(await getUserCourses());
     });
-    final sub2 = s2.listen((_) async {
+    final sub2 = s2.listen((final _) async {
       if (!controller.isClosed) controller.add(await getUserCourses());
     });
 
@@ -143,7 +143,7 @@ class CoursesRepository {
     try {
       final rows = await _dbHelper.getAllCourses();
       if (rows.isNotEmpty) {
-        localCourses = rows.map((r) => SoloCourse(
+        localCourses = rows.map((final r) => SoloCourse(
           id: r['id'] as String,
           title: r['title'] as String,
           subtitle:
@@ -152,7 +152,7 @@ class CoursesRepository {
         )).toList();
       }
     } catch (e) {
-      debugPrint("Error fetching local courses: $e");
+      debugPrint('Error fetching local courses: $e');
     }
 
     // Removed fallback: We want empty list if user has no courses.
@@ -164,7 +164,7 @@ class CoursesRepository {
     // If not logged in, return only custom courses (start empty for new guests)
     if (uid == null) {
       return [..._customCourses]
-          .where((c) => !_removedCourseIds.contains(c.id))
+          .where((final c) => !_removedCourseIds.contains(c.id))
           .toList();
     }
 
@@ -207,10 +207,10 @@ class CoursesRepository {
         }
       }
 
-      final customIds = customCourses.map((c) => c.id).toSet();
+      final customIds = customCourses.map((final c) => c.id).toSet();
       
       // Filter localCourses to only those the user has actually started (has XP or in xpMap)
-      final startedLocalCourses = localCourses.where((c) {
+      final startedLocalCourses = localCourses.where((final c) {
         if (!xpMap.containsKey(c.id)) return false;
         final xp = xpMap[c.id] ?? 0;
         final lastAccessed = lastAccessedMap[c.id];
@@ -223,8 +223,8 @@ class CoursesRepository {
       ]);
 
       return mergedCourses
-          .where((c) => !removedIds.contains(c.id))
-          .map((c) {
+          .where((final c) => !removedIds.contains(c.id))
+          .map((final c) {
             final isCustom = customIds.contains(c.id);
             final xp = isCustom ? (customProgress[c.id] ?? c.xp) : (xpMap[c.id] ?? c.xp);
             final lastAccessed = isCustom ? null : lastAccessedMap[c.id];
@@ -235,29 +235,29 @@ class CoursesRepository {
     } catch (e) {
       // Fallback
       return _mergeUniqueCourses([...localCourses, ..._customCourses])
-          .where((c) => !_removedCourseIds.contains(c.id))
+          .where((final c) => !_removedCourseIds.contains(c.id))
           .toList();
     }
   }
 
-  List<SoloCourse> _mergeUniqueCourses(List<SoloCourse> courses) {
+  List<SoloCourse> _mergeUniqueCourses(final List<SoloCourse> courses) {
     final unique = <SoloCourse>[];
     for (final course in courses) {
-      if (!unique.any((existing) => _isSameCourse(existing, course))) {
+      if (!unique.any((final existing) => _isSameCourse(existing, course))) {
         unique.add(course);
       }
     }
     return unique;
   }
 
-  bool _isSameCourse(SoloCourse a, SoloCourse b) {
+  bool _isSameCourse(final SoloCourse a, final SoloCourse b) {
     if (a.id == b.id) return true;
     final aPair = _coursePairKey(a);
     final bPair = _coursePairKey(b);
     return aPair != null && aPair == bPair;
   }
 
-  String? _coursePairKey(SoloCourse course) {
+  String? _coursePairKey(final SoloCourse course) {
     final idMatch = RegExp(r'^solo_([a-z]{2,})_([a-z]{2,})(?:_\d+)?$').firstMatch(course.id.toLowerCase());
     if (idMatch != null) {
       return '${idMatch.group(1)}->${idMatch.group(2)}';
@@ -275,18 +275,18 @@ class CoursesRepository {
     return null;
   }
 
-  static String _languageLabel(dynamic value) {
+  static String _languageLabel(final dynamic value) {
     final raw = value?.toString().trim() ?? '';
     if (raw.isEmpty) return '';
     return _languageNamesByCode[raw.toLowerCase()] ?? raw;
   }
 
-  List<SoloCourse> _parseCustomCourses(dynamic raw) {
+  List<SoloCourse> _parseCustomCourses(final dynamic raw) {
     if (raw is! List) return [];
     return raw
         .whereType<Map>()
-        .map((item) => Map<String, dynamic>.from(item))
-        .map((item) {
+        .map((final item) => Map<String, dynamic>.from(item))
+        .map((final item) {
           final id = item['id']?.toString() ?? '';
           if (id.isEmpty) return null;
           final title = item['title']?.toString() ?? 'Custom Course';
@@ -303,10 +303,10 @@ class CoursesRepository {
         .toList();
   }
 
-  Map<String, int> _parseCustomProgress(dynamic raw) {
+  Map<String, int> _parseCustomProgress(final dynamic raw) {
     if (raw is! Map) return {};
     final map = <String, int>{};
-    raw.forEach((key, value) {
+    raw.forEach((final key, final value) {
       final id = key.toString();
       final xp = value is int ? value : int.tryParse(value?.toString() ?? '');
       if (xp != null) map[id] = xp;
@@ -314,12 +314,12 @@ class CoursesRepository {
     return map;
   }
 
-  Set<String> _parseRemovedIds(dynamic raw) {
+  Set<String> _parseRemovedIds(final dynamic raw) {
     if (raw is! List) return {};
-    return raw.map((e) => e.toString()).where((e) => e.isNotEmpty).toSet();
+    return raw.map((final e) => e.toString()).where((final e) => e.isNotEmpty).toSet();
   }
 
-  Map<String, dynamic> _courseToJson(SoloCourse course) {
+  Map<String, dynamic> _courseToJson(final SoloCourse course) {
     return {
       'id': course.id,
       'title': course.title,

@@ -1640,6 +1640,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get circlesStartGame => 'Начать игру';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Ожидание игроков';
 
   @override

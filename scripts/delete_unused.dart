@@ -41,7 +41,7 @@ void main() {
 
   final nodesToRemove = <AstNode>[];
 
-  result.unit.visitChildren(_Visitor((node) {
+  result.unit.visitChildren(_Visitor((final node) {
     if (node is MethodDeclaration) {
       if (methodsToRemove.contains(node.name.lexeme)) {
         nodesToRemove.add(node);
@@ -50,7 +50,7 @@ void main() {
   }));
 
   // Sort nodes in reverse order so we can delete from end to start without affecting offsets
-  nodesToRemove.sort((a, b) => b.offset.compareTo(a.offset));
+  nodesToRemove.sort((final a, final b) => b.offset.compareTo(a.offset));
 
   var newContent = content;
   for (final node in nodesToRemove) {
@@ -67,7 +67,7 @@ class _Visitor extends RecursiveAstVisitor<void> {
   _Visitor(this.onNode);
 
   @override
-  void visitMethodDeclaration(MethodDeclaration node) {
+  void visitMethodDeclaration(final MethodDeclaration node) {
     onNode(node);
     super.visitMethodDeclaration(node);
   }

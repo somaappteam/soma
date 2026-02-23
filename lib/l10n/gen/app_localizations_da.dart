@@ -1633,6 +1633,9 @@ class AppLocalizationsDa extends AppLocalizations {
   String get circlesStartGame => 'Start Spil';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Venter på spillere';
 
   @override

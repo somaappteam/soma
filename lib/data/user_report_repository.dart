@@ -1,10 +1,10 @@
+import 'package:soma/core/di/locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/di/locator.dart';
 
 class UserReportRepository {
   final _supabase = Supabase.instance.client;
 
-  Future<bool> hasReported(String reportedUserId) async {
+  Future<bool> hasReported(final String reportedUserId) async {
     final reporterId = _supabase.auth.currentUser?.id;
     if (reporterId == null || reportedUserId.isEmpty) return false;
 
@@ -18,7 +18,7 @@ class UserReportRepository {
     return row != null;
   }
 
-  Future<void> reportUser(String reportedUserId) async {
+  Future<void> reportUser(final String reportedUserId) async {
     final reporterId = _supabase.auth.currentUser?.id;
     if (reporterId == null || reportedUserId.isEmpty) {
       throw StateError('Cannot report user without an authenticated reporter.');
@@ -30,7 +30,7 @@ class UserReportRepository {
     }, onConflict: 'reporter_id,reported_user_id');
   }
 
-  Future<void> removeReport(String reportedUserId) async {
+  Future<void> removeReport(final String reportedUserId) async {
     final reporterId = _supabase.auth.currentUser?.id;
     if (reporterId == null || reportedUserId.isEmpty) {
       throw StateError('Cannot remove report without an authenticated reporter.');

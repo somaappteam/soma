@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:soma/core/theme/spacing.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/circles_repository.dart';
+import 'package:soma/data/notifications_repository.dart';
+import 'package:soma/data/notifications_store.dart';
+import 'package:soma/data/social_repository.dart';
+import 'package:soma/features/circles/circle_lobby_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../../core/widgets/glass.dart';
-import '../../../data/notifications_store.dart';
-import '../../../data/notifications_repository.dart';
-import '../../../data/auth_repository.dart';
-import '../../../core/widgets/responsive.dart';
-import '../../../core/theme/spacing.dart';
-
-import '../../../data/circles_repository.dart';
-import '../../../data/social_repository.dart';
-import '../../circles/circle_lobby_screen.dart';
 
 enum NotificationsTab { all, courses, social, circles, system }
 
@@ -30,7 +29,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   NotificationsTab tab = NotificationsTab.all;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isGuest = authRepository.currentUser == null;
     final tabs = isGuest
@@ -46,7 +45,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             _TabItem(NotificationsTab.circles, l10n.notificationsTabCircles),
             _TabItem(NotificationsTab.system, l10n.notificationsTabSystem),
           ];
-    final activeTab = tabs.any((t) => t.value == tab) ? tab : tabs.first.value;
+    final activeTab = tabs.any((final t) => t.value == tab) ? tab : tabs.first.value;
 
     return Scaffold(
       body: SafeArea(
@@ -110,7 +109,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   _Tabs(
                     value: activeTab,
                     tabs: tabs,
-                    onChanged: (v) => setState(() => tab = v),
+                    onChanged: (final v) => setState(() => tab = v),
                   ),
                   const SizedBox(height: S.sm),
                   Expanded(
@@ -118,7 +117,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ? _buildGuestNotifications(context, activeTab)
                         : StreamBuilder<List<Map<String, dynamic>>>(
                             stream: notificationsRepository.getNotificationsStream(),
-                            builder: (context, snapshot) {
+                            builder: (final context, final snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return const _NotificationsSkeleton();
                               }
@@ -130,7 +129,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               }
 
                               final items = (snapshot.data ?? []).map(_mapNotification).toList();
-                              final filtered = items.where((n) {
+                              final filtered = items.where((final n) {
                                 switch (activeTab) {
                                   case NotificationsTab.courses:
                                     return n.type == NotifType.course;
@@ -155,8 +154,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                               return ListView.separated(
                                 physics: const BouncingScrollPhysics(),
                                 itemCount: filtered.length,
-                                separatorBuilder: (_, __) => const SizedBox(height: S.sm),
-                                itemBuilder: (_, i) {
+                                separatorBuilder: (final _, final __) => const SizedBox(height: S.sm),
+                                itemBuilder: (final _, final i) {
                                   final n = filtered[i];
 
                                   return Dismissible(
@@ -186,7 +185,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                                               .withValues(alpha: 0.92),
                                         ),
                                       ),
-                                    onDismissed: (_) {
+                                    onDismissed: (final _) {
                                       notificationsRepository.deleteNotification(n.id);
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(content: Text(l10n.notificationsDeleted)),
@@ -212,7 +211,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  String _tabDescription(BuildContext context, NotificationsTab tab) {
+  String _tabDescription(final BuildContext context, final NotificationsTab tab) {
     final l10n = AppLocalizations.of(context);
     switch (tab) {
       case NotificationsTab.courses:
@@ -228,15 +227,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Widget _buildGuestNotifications(BuildContext context, NotificationsTab activeTab) {
+  Widget _buildGuestNotifications(final BuildContext context, final NotificationsTab activeTab) {
     final l10n = AppLocalizations.of(context);
     return AnimatedBuilder(
       animation: notificationsStore,
-      builder: (context, _) {
+      builder: (final context, final _) {
         final items = notificationsStore.items
-            .where((n) => n.type == NotifType.course || n.type == NotifType.system)
+            .where((final n) => n.type == NotifType.course || n.type == NotifType.system)
             .toList();
-        final filtered = items.where((n) {
+        final filtered = items.where((final n) {
           switch (activeTab) {
             case NotificationsTab.courses:
               return n.type == NotifType.course;
@@ -257,8 +256,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return ListView.separated(
           physics: const BouncingScrollPhysics(),
           itemCount: filtered.length,
-          separatorBuilder: (_, __) => const SizedBox(height: S.sm),
-          itemBuilder: (_, i) {
+          separatorBuilder: (final _, final __) => const SizedBox(height: S.sm),
+          itemBuilder: (final _, final i) {
             final n = filtered[i];
 
             return Dismissible(
@@ -279,7 +278,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92),
                 ),
               ),
-              onDismissed: (_) {
+              onDismissed: (final _) {
                 notificationsStore.delete(n.id);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(l10n.notificationsDeleted)),
@@ -298,7 +297,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  AppNotification _mapNotification(Map<String, dynamic> row) {
+  AppNotification _mapNotification(final Map<String, dynamic> row) {
     final l10n = AppLocalizations.of(context);
     final metadataRaw = row['metadata'];
     final metadata = metadataRaw is Map
@@ -352,7 +351,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  NotifType _parseType(String? raw) {
+  NotifType _parseType(final String? raw) {
     switch (raw?.toLowerCase()) {
       case 'course':
         return NotifType.course;
@@ -366,7 +365,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  DateTime _parseTime(dynamic raw) {
+  DateTime _parseTime(final dynamic raw) {
     if (raw is DateTime) return raw;
     if (raw is String) {
       return DateTime.tryParse(raw) ?? DateTime.now();
@@ -374,7 +373,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return DateTime.now();
   }
 
-  Future<void> _handlePrimary(BuildContext context, AppNotification n) async {
+  Future<void> _handlePrimary(final BuildContext context, final AppNotification n) async {
     final l10n = AppLocalizations.of(context);
     await notificationsRepository.markAsRead(n.id);
     if (n.type == NotifType.social && n.socialAction == SocialAction.friendRequest) {
@@ -409,7 +408,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => CircleLobbyScreen(circleId: n.circleId!),
+            builder: (final _) => CircleLobbyScreen(circleId: n.circleId!),
           ),
         );
         final label = outcome.role == 'player'
@@ -434,7 +433,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Future<void> _handlePrimaryGuest(BuildContext context, AppNotification n) async {
+  Future<void> _handlePrimaryGuest(final BuildContext context, final AppNotification n) async {
     final l10n = AppLocalizations.of(context);
     notificationsStore.markRead(n.id);
     final label = n.type == NotifType.system
@@ -447,7 +446,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Future<void> _handleSecondary(BuildContext context, AppNotification n) async {
+  Future<void> _handleSecondary(final BuildContext context, final AppNotification n) async {
     final l10n = AppLocalizations.of(context);
     if (n.type == NotifType.social && n.socialAction == SocialAction.friendRequest) {
       try {
@@ -494,13 +493,13 @@ class _Tabs extends StatelessWidget {
   const _Tabs({required this.value, required this.onChanged, required this.tabs});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Glass(
       radius: BorderRadius.circular(999),
       padding: const EdgeInsets.all(S.xs),
       child: Row(
-        children: tabs.map((t) {
+        children: tabs.map((final t) {
           final selected = t.value == value;
           return Expanded(
             child: InkWell(
@@ -551,7 +550,7 @@ class _NotifCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final icon = _iconFor(n.type);
     final label = _labelFor(context, n.type);
     final scheme = Theme.of(context).colorScheme;
@@ -645,7 +644,7 @@ class _NotifCard extends StatelessWidget {
     );
   }
 
-  static IconData _iconFor(NotifType t) {
+  static IconData _iconFor(final NotifType t) {
     switch (t) {
       case NotifType.course:
         return Icons.school_rounded;
@@ -658,7 +657,7 @@ class _NotifCard extends StatelessWidget {
     }
   }
 
-  static String _labelFor(BuildContext context, NotifType t) {
+  static String _labelFor(final BuildContext context, final NotifType t) {
     final l10n = AppLocalizations.of(context);
     switch (t) {
       case NotifType.course:
@@ -672,7 +671,7 @@ class _NotifCard extends StatelessWidget {
     }
   }
 
-  static String _fmtTime(BuildContext context, DateTime dt) {
+  static String _fmtTime(final BuildContext context, final DateTime dt) {
     final l10n = AppLocalizations.of(context);
     final now = DateTime.now();
     final diff = now.difference(dt);
@@ -690,7 +689,7 @@ class _ActionRow extends StatelessWidget {
   const _ActionRow({required this.n, required this.onPrimary, this.onSecondary});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     if (n.type == NotifType.social && n.socialAction == SocialAction.friendRequest) {
       return Row(
@@ -734,7 +733,7 @@ class _ChipButton extends StatelessWidget {
   const _ChipButton({required this.label, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(999),
@@ -764,7 +763,7 @@ class _IconBubble extends StatelessWidget {
   const _IconBubble({required this.icon, required this.isRead});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 44,
@@ -785,7 +784,7 @@ class _NotificationsEmptyState extends StatelessWidget {
   const _NotificationsEmptyState({required this.title, required this.subtitle});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Glass(
@@ -825,12 +824,12 @@ class _NotificationsSkeleton extends StatelessWidget {
   const _NotificationsSkeleton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return ListView.separated(
       physics: const BouncingScrollPhysics(),
       itemCount: 4,
-      separatorBuilder: (_, __) => const SizedBox(height: S.sm),
-      itemBuilder: (context, index) => const _NotificationsSkeletonCard(),
+      separatorBuilder: (final _, final __) => const SizedBox(height: S.sm),
+      itemBuilder: (final context, final index) => const _NotificationsSkeletonCard(),
     );
   }
 }
@@ -839,13 +838,13 @@ class _NotificationsSkeletonCard extends StatelessWidget {
   const _NotificationsSkeletonCard();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.3, end: 0.7),
       duration: const Duration(milliseconds: 900),
       curve: Curves.easeInOut,
-      builder: (context, value, child) {
+      builder: (final context, final value, final child) {
         final base = scheme.onSurface.withValues(alpha: 0.08 + (0.06 * value));
         return Container(
           padding: const EdgeInsets.all(S.sm),
@@ -890,7 +889,7 @@ class _SkeletonLine extends StatelessWidget {
   const _SkeletonLine({required this.width, required this.color});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       width: width,
       height: 10,

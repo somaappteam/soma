@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'notifications_repository.dart';
+import 'package:soma/data/notifications_repository.dart';
 
 enum NotifType { system, course, social, circle }
 
@@ -57,7 +57,7 @@ class NotificationsStore extends ChangeNotifier {
   VoidCallback? _disposeListener;
 
   List<AppNotification> get items => List.unmodifiable(_items);
-  int get unreadCount => _items.where((n) => !n.isRead).length;
+  int get unreadCount => _items.where((final n) => !n.isRead).length;
 
   NotificationsStore() {
     _init();
@@ -67,8 +67,8 @@ class NotificationsStore extends ChangeNotifier {
     if (_initialized) return;
     _initialized = true;
 
-    final sub = notificationsRepository.getNotificationsStream().listen((rows) {
-      _items = rows.map((row) {
+    final sub = notificationsRepository.getNotificationsStream().listen((final rows) {
+      _items = rows.map((final row) {
         final metadataRaw = row['metadata'];
         final metadata = metadataRaw is Map
             ? Map<String, dynamic>.from(metadataRaw)
@@ -108,7 +108,7 @@ class NotificationsStore extends ChangeNotifier {
     };
   }
 
-  DateTime _parseTime(dynamic raw) {
+  DateTime _parseTime(final dynamic raw) {
     if (raw is DateTime) return raw;
     if (raw is String) {
       return DateTime.tryParse(raw) ?? DateTime.now();
@@ -116,7 +116,7 @@ class NotificationsStore extends ChangeNotifier {
     return DateTime.now();
   }
 
-  NotifType _parseType(String? type) {
+  NotifType _parseType(final String? type) {
     switch (type) {
       case 'social': return NotifType.social;
       case 'circle': return NotifType.circle;
@@ -125,7 +125,7 @@ class NotificationsStore extends ChangeNotifier {
     }
   }
 
-  void markRead(String id) {
+  void markRead(final String id) {
     notificationsRepository.markAsRead(id);
   }
 
@@ -133,20 +133,20 @@ class NotificationsStore extends ChangeNotifier {
     notificationsRepository.markAllAsRead();
   }
 
-  void delete(String id) {
+  void delete(final String id) {
     notificationsRepository.deleteNotification(id);
   }
 
-  void acceptFriendRequest(String notifId) {
+  void acceptFriendRequest(final String notifId) {
     // Logic will be handled via SocialRepository or by clicking the notification
     markRead(notifId);
   }
 
-  void declineFriendRequest(String notifId) {
+  void declineFriendRequest(final String notifId) {
     markRead(notifId);
   }
 
-  void joinCircle(String notifId) {
+  void joinCircle(final String notifId) {
     markRead(notifId);
   }
 

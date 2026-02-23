@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/language_picker_sheet.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/premium_dialog.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/core/widgets/selection_controls.dart';
+import 'package:soma/data/circles_repository.dart';
+import 'package:soma/data/languages.dart';
+import 'package:soma/data/quiz_repository.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/data/soma_plus_repository.dart';
+import 'package:soma/features/circles/circle_lobby_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/language_picker_sheet.dart';
-import '../../core/widgets/selection_controls.dart';
-import '../../core/widgets/premium_dialog.dart';
-import 'circle_lobby_screen.dart';
-import '../../core/theme/tokens.dart';
-import '../../data/circles_repository.dart';
-import '../../core/widgets/responsive.dart';
-
-import '../../data/languages.dart';
-import '../../data/quiz_repository.dart';
-import '../../data/settings_repository.dart';
-import '../../data/soma_plus_repository.dart';
 
 class CreateCircleScreen extends StatefulWidget {
   const CreateCircleScreen({super.key});
@@ -24,11 +22,11 @@ class CreateCircleScreen extends StatefulWidget {
 
 class _CreateCircleScreenState extends State<CreateCircleScreen> {
   // Basic setup
-  String speakLang = "en";
-  String learnLang = "es";
-  String level = "A";
-  String mode = "Vocabulary"; // Vocabulary | Sentences
-  String circleName = "";
+  String speakLang = 'en';
+  String learnLang = 'es';
+  String level = 'A';
+  String mode = 'Vocabulary'; // Vocabulary | Sentences
+  String circleName = '';
 
   // Room limits
   int maxPlayers = 5; // 1..5
@@ -58,11 +56,11 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    String langName(String code) {
+    String langName(final String code) {
       return kLanguages.firstWhere(
-        (l) => l.code == code,
+        (final l) => l.code == code,
         orElse: () => kLanguages.first,
       ).name;
     }
@@ -73,7 +71,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
       body: SafeArea(
           child: ResponsiveFrame(
             child: LayoutBuilder(
-              builder: (context, constraints) {
+              builder: (final context, final constraints) {
                 final compactHeight = constraints.maxHeight < 760;
                 final sectionSpacing = compactHeight ? 12.0 : 14.0;
                 final rowSpacing = compactHeight ? 8.0 : 10.0;
@@ -119,7 +117,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                   border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
                                 ),
                                 child: TextField(
-                                  onChanged: (value) => setState(() => circleName = value),
+                                  onChanged: (final value) => setState(() => circleName = value),
                                   style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w700),
                                   cursorColor: Theme.of(context).colorScheme.primary,
                                   textInputAction: TextInputAction.done,
@@ -148,7 +146,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                           context,
                                           title: l10n.chooseYourLanguage,
                                           items: kLanguages,
-                                          current: kLanguages.firstWhere((l) => l.code == speakLang),
+                                          current: kLanguages.firstWhere((final l) => l.code == speakLang),
                                         );
                                         if (v != null) setState(() => speakLang = v.code);
                                       },
@@ -165,7 +163,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                           context,
                                           title: l10n.chooseLearningLanguage,
                                           items: kLanguages,
-                                          current: kLanguages.firstWhere((l) => l.code == learnLang),
+                                          current: kLanguages.firstWhere((final l) => l.code == learnLang),
                                         );
                                         if (v != null) setState(() => learnLang = v.code);
                                       },
@@ -180,11 +178,11 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                               const SizedBox(height: 10),
                               _SegmentedNeon(
                                 leftLabel: l10n.soloModeVocabulary,
-                                leftValue: "Vocabulary",
+                                leftValue: 'Vocabulary',
                                 rightLabel: l10n.soloModeSentences,
-                                rightValue: "Sentences",
+                                rightValue: 'Sentences',
                                 value: mode,
-                                onChanged: (v) => setState(() => mode = v),
+                                onChanged: (final v) => setState(() => mode = v),
                               ),
 
                               SizedBox(height: sectionSpacing),
@@ -196,24 +194,24 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                   Expanded(
                                     child: _LevelChip(
                                       label: l10n.levelBeginner,
-                                      selected: level == "A",
-                                      onTap: () => setState(() => level = "A"),
+                                      selected: level == 'A',
+                                      onTap: () => setState(() => level = 'A'),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: _LevelChip(
                                       label: l10n.levelIntermediate,
-                                      selected: level == "B",
-                                      onTap: () => setState(() => level = "B"),
+                                      selected: level == 'B',
+                                      onTap: () => setState(() => level = 'B'),
                                     ),
                                   ),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: _LevelChip(
                                       label: l10n.levelAdvanced,
-                                      selected: level == "C",
-                                      onTap: () => setState(() => level = "C"),
+                                      selected: level == 'C',
+                                      onTap: () => setState(() => level = 'C'),
                                     ),
                                   ),
                                 ],
@@ -255,7 +253,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                               _StepperRow(
                                 title: l10n.circlesPlayers,
                                 subtitle: l10n.circlesPlayersRange,
-                                valueText: "$maxPlayers",
+                                valueText: '$maxPlayers',
                                 onMinus: maxPlayers > 1 ? () => setState(() => maxPlayers--) : null,
                                 onPlus: maxPlayers < 5 ? () => setState(() => maxPlayers++) : null,
                               ),
@@ -264,7 +262,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                               _StepperRow(
                                 title: l10n.circlesQuestions,
                                 subtitle: l10n.circlesQuestionsSubtitle,
-                                valueText: "$questions",
+                                valueText: '$questions',
                                 onMinus: questions > 5 ? () => setState(() => questions -= 5) : null,
                                 onPlus: questions < 50 ? () => setState(() => questions += 5) : null,
                               ),
@@ -287,7 +285,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 title: l10n.circlesAllowSpectators,
                                 subtitle: l10n.circlesAllowSpectatorsSubtitle,
                                 value: allowSpectators,
-                                onChanged: (v) => setState(() => allowSpectators = v),
+                                onChanged: (final v) => setState(() => allowSpectators = v),
                               ),
                               SizedBox(height: rowSpacing),
 
@@ -295,7 +293,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 title: l10n.circlesLiveVoiceChat,
                                 subtitle: l10n.circlesLiveVoiceChatSubtitle,
                                 value: enableVoice,
-                                onChanged: (v) => setState(() => enableVoice = v),
+                                onChanged: (final v) => setState(() => enableVoice = v),
                               ),
                               SizedBox(height: rowSpacing),
 
@@ -303,7 +301,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 title: l10n.circlesLiveTextChat,
                                 subtitle: l10n.circlesLiveTextChatSubtitle,
                                 value: enableChat,
-                                onChanged: (v) => setState(() => enableChat = v),
+                                onChanged: (final v) => setState(() => enableChat = v),
                               ),
                               const SizedBox(height: 10),
 
@@ -311,7 +309,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                                 title: 'Private Circle (Plus/Pro)',
                                 subtitle: 'Only invited users can join this circle',
                                 value: isPrivateCircle,
-                                onChanged: (v) async {
+                                onChanged: (final v) async {
                                   if (v && _tier == SomaSubscriptionTier.free) {
                                     await showPremiumDialog(
                                       context: context,
@@ -358,23 +356,23 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                             
                             try {
                               // Fetch questions from Supabase-backed CSV tables
-                              String courseId = "$speakLang-$learnLang"; 
+                              final String courseId = '$speakLang-$learnLang'; 
                               
                               List<Map<String, dynamic>> quizQuestions = [];
                               try {
-                                debugPrint("Fetching questions for $courseId (Mode: $mode)...");
-                                if (mode == "Vocabulary") {
+                                debugPrint('Fetching questions for $courseId (Mode: $mode)...');
+                                if (mode == 'Vocabulary') {
                                   quizQuestions = await quizRepository.getVocabQuestionsFromSupabase(courseId, questions);
                                 } else {
                                   quizQuestions = await quizRepository.getSentenceQuestionsFromSupabase(courseId, questions);
                                 }
                                 
                                 if (quizQuestions.isEmpty) {
-                                  throw Exception("No questions found for $courseId. Please try another language pair.");
+                                  throw Exception('No questions found for $courseId. Please try another language pair.');
                                 }
-                                debugPrint("Fetched ${quizQuestions.length} questions.");
+                                debugPrint('Fetched ${quizQuestions.length} questions.');
                               } catch (e) {
-                                debugPrint("Error fetching questions: $e");
+                                debugPrint('Error fetching questions: $e');
                                 rethrow; // Propagate to outer catch to show SnackBar
                               }
                               
@@ -406,7 +404,7 @@ class _CreateCircleScreenState extends State<CreateCircleScreen> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => CircleLobbyScreen(circleId: circleId),
+                                  builder: (final context) => CircleLobbyScreen(circleId: circleId),
                                 ),
                               );
                             } catch (e) {
@@ -463,7 +461,7 @@ class _TopBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Row(
       children: [
         _IconGlassButton(icon: Icons.arrow_back_rounded, onTap: onBack),
@@ -490,7 +488,7 @@ class _IconGlassButton extends StatelessWidget {
   const _IconGlassButton({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(16),
       padding: EdgeInsets.zero,
@@ -514,7 +512,7 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Text(
       text,
       style: TextStyle(
@@ -541,7 +539,7 @@ class _SelectTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(18),
       onTap: onTap,
@@ -609,7 +607,7 @@ class _SegmentedNeon extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(18),
       padding: const EdgeInsets.all(8),
@@ -648,7 +646,7 @@ class _SegButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return AppSelectablePill(
       label: label,
       selected: selected,
@@ -671,7 +669,7 @@ class _LevelChip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return AppSelectablePill(
       label: label,
       selected: selected,
@@ -699,7 +697,7 @@ class _StepperRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       decoration: BoxDecoration(
@@ -762,7 +760,7 @@ class _MiniBtn extends StatelessWidget {
   const _MiniBtn({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final disabled = onTap == null;
     return InkWell(
       borderRadius: BorderRadius.circular(14),
@@ -797,7 +795,7 @@ class _ToggleRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       decoration: BoxDecoration(
@@ -841,16 +839,16 @@ class _ToggleRow extends StatelessWidget {
 /// ---------- Picker helper ----------
 
 Future<LangOption?> _pickFrom(
-  BuildContext context, {
-  required String title,
-  required List<LangOption> items,
-  required LangOption current,
+  final BuildContext context, {
+  required final String title,
+  required final List<LangOption> items,
+  required final LangOption current,
 }) async {
   return showModalBottomSheet<LangOption>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder: (ctx) => LanguagePickerSheet(
+    builder: (final ctx) => LanguagePickerSheet(
       title: title,
       searchHint: 'Search language',
       noMatchesText: 'No matches',
@@ -868,7 +866,7 @@ class _PresetChip extends StatelessWidget {
   const _PresetChip({required this.label, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(999),
       onTap: onTap,

@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:soma/core/di/locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/di/locator.dart';
 
 class ExchangeAnalyticsRepository {
   final _supabase = Supabase.instance.client;
 
-  Future<void> track(String event, {Map<String, dynamic>? metadata}) async {
+  Future<void> track(final String event, {final Map<String, dynamic>? metadata}) async {
     final uid = _supabase.auth.currentUser?.id;
     final payload = {
       'event_name': event,

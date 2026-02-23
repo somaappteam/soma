@@ -1635,6 +1635,9 @@ class AppLocalizationsHu extends AppLocalizations {
   String get circlesStartGame => 'Játék Indítása';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Várakozás játékosokra';
 
   @override

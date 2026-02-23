@@ -1639,6 +1639,9 @@ class AppLocalizationsSw extends AppLocalizations {
   String get circlesStartGame => 'Anza Mchezo';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Inasubiri wachezaji';
 
   @override

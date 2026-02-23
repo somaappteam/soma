@@ -2,35 +2,35 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
+import 'package:soma/core/services/haptics_service.dart';
+import 'package:soma/core/theme/motion.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/data/ai_repository.dart';
+import 'package:soma/data/call_signaling_service.dart';
+import 'package:soma/data/chat_repository.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/data/profile_repository.dart';
+import 'package:soma/data/rtc_voice_service.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/data/soma_plus_repository.dart';
+import 'package:soma/data/user_report_repository.dart';
+import 'package:soma/features/profile/profile_screen.dart';
+import 'package:soma/l10n/gen/app_localizations.dart';
+import 'package:soma/models/user_profile.dart';
+import 'package:soma/models/user_stats.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../core/theme/tokens.dart';
-import '../../core/theme/motion.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../core/services/haptics_service.dart';
-import '../../data/rtc_voice_service.dart';
-import '../../data/chat_repository.dart';
-import '../../data/presence_repository.dart';
-import '../../data/profile_repository.dart';
-import '../../data/settings_repository.dart';
-import '../../data/soma_plus_repository.dart';
-import '../../data/user_report_repository.dart';
-import '../../data/ai_repository.dart';
-import '../../models/user_stats.dart';
-import '../../models/user_profile.dart';
-import '../profile/profile_screen.dart';
-import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../data/call_signaling_service.dart';
 
 enum DmCallState { idle, ringingOutgoing, ringingIncoming, connecting, connected }
 enum _DmMenuAction {
@@ -128,9 +128,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
   bool _showUnreadOnly = false;
   bool _showLinksOnly = false;
   bool _showMentionsOnly = false;
-  bool _autoTranslateIncoming = false;
-  String _autoTranslateLanguage = 'English';
-  bool _examModeEnabled = false;
+  final bool _autoTranslateIncoming = false;
+  final String _autoTranslateLanguage = 'English';
+  final bool _examModeEnabled = false;
   String? _lastFailedTextMessage;
   bool _noiseSuppressionEnabled = true;
 
@@ -146,7 +146,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   String get _myUserId => chatRepository.currentUserId ?? widget.meId;
 
-  String _normalizeUsernameToken(String raw) {
+  String _normalizeUsernameToken(final String raw) {
     final compact = raw.replaceAll(RegExp(r'\s+'), '').trim().toLowerCase();
     final safe = compact.replaceAll(RegExp(r'[^a-z0-9_]'), '');
     return safe;
@@ -187,7 +187,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _initDmCallSignaling();
     
     if (widget.initialIncomingCall) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((final _) {
         _startVoiceCall(sendInvite: false, incoming: true);
       });
     }
@@ -195,7 +195,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _rtcTelemetrySub = rtcVoiceService.telemetryStream.listen(_onRtcTelemetry);
     _loadCallChipOffset();
 
-    _conversationSub = chatRepository.streamConversation(widget.otherId).listen((conv) {
+    _conversationSub = chatRepository.streamConversation(widget.otherId).listen((final conv) {
       if (!mounted || conv == null) return;
       setState(() {
         _isConversationPinned = conv['is_pinned'] == true;
@@ -205,7 +205,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
     // NEW: Mark as read when new messages arrive
     // NEW: Mark as read when new messages arrive
-    _messagesStream.listen((messages) {
+    _messagesStream.listen((final messages) {
       if (!mounted || messages.isEmpty) return;
       final recent = messages.last;
       debugPrint('DmChatScreen: checking unread. Last msg sender: ${recent['sender_id']}, is_read: ${recent['is_read']}');
@@ -217,10 +217,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
     
     // NEW: Listen to settings for block updates
-    _settingsSub = settingsRepository.getSettingsStream().listen((settings) {
+    _settingsSub = settingsRepository.getSettingsStream().listen((final settings) {
       if (!mounted) return;
       final blocked = (settings['blocked_user_ids'] as List?)
-          ?.map((e) => e.toString())
+          ?.map((final e) => e.toString())
           .contains(widget.otherId) ?? false;
       if (blocked != _isOtherBlocked) {
         setState(() => _isOtherBlocked = blocked);
@@ -231,7 +231,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       if (!mounted) return;
       setState(() => _isComposerFocused = _composerFocus.hasFocus);
     });
-    _draftVoicePlayer.playerStateStream.listen((state) {
+    _draftVoicePlayer.playerStateStream.listen((final state) {
       if (!mounted) return;
       final isPlaying = state.playing;
       if (_isPlayingDraftVoice != isPlaying) {
@@ -317,7 +317,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   
 
-  Future<void> _sendText(String text) async {
+  Future<void> _sendText(final String text) async {
     if (!_ensureCanSendInDm()) return;
     if (text.isEmpty) return;
     if (text.length > _maxTextChars) {
@@ -424,14 +424,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
   
 
 
-  void _onTypingChanged(bool hasText) {
+  void _onTypingChanged(final bool hasText) {
     _typingDebounce?.cancel();
     _typingDebounce = Timer(const Duration(milliseconds: 450), () {
       _setTypingState(hasText);
     });
   }
 
-  void _setTypingState(bool value, {bool immediate = false}) {
+  void _setTypingState(final bool value, {final bool immediate = false}) {
     if (!immediate && _typingStateSent == value) return;
     _typingStateSent = value;
     chatRepository.setTypingState(otherUserId: widget.otherId, isTyping: value);
@@ -450,7 +450,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
   }
 
-  Future<void> _saveDraft(String text) async {
+  Future<void> _saveDraft(final String text) async {
     final settings = await settingsRepository.getSettings();
     final drafts = Map<String, dynamic>.from((settings['chat_drafts'] as Map<String, dynamic>?) ?? {});
     if (text.trim().isEmpty) {
@@ -469,7 +469,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     if (scoped is! List) return;
     if (!mounted) return;
     setState(() {
-      _pinnedMessageIds = scoped.map((e) => e.toString()).toSet();
+      _pinnedMessageIds = scoped.map((final e) => e.toString()).toSet();
     });
   }
 
@@ -480,7 +480,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     await settingsRepository.updateSetting('chat_pinned_message_ids', raw);
   }
 
-  Future<void> _togglePinMessage(String messageId) async {
+  Future<void> _togglePinMessage(final String messageId) async {
     setState(() {
       if (_pinnedMessageIds.contains(messageId)) {
         _pinnedMessageIds.remove(messageId);
@@ -511,7 +511,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final action = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
+      builder: (final context) => SafeArea(
         child: Wrap(
           children: [
             ListTile(leading: const Icon(Icons.mic_rounded), title: const Text('Voice message'), onTap: () => Navigator.pop(context, 'voice')),
@@ -555,7 +555,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
     final payload = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Send location card'),
         content: SingleChildScrollView(
           child: Column(
@@ -638,7 +638,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
     final payload = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Send contact card'),
         content: SingleChildScrollView(
           child: Column(
@@ -697,7 +697,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   
 
-  Future<void> _sendMessagePayload(Map<String, dynamic> payload) async {
+  Future<void> _sendMessagePayload(final Map<String, dynamic> payload) async {
     if (!_ensureCanSendInDm()) return;
     if (_disappearingWindow != null) {
       payload['expires_at'] = DateTime.now().add(_disappearingWindow!).toIso8601String();
@@ -716,7 +716,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     });
   }
 
-  Future<void> _jumpToMessageById(String? messageId) async {
+  Future<void> _jumpToMessageById(final String? messageId) async {
     if (messageId == null || messageId.isEmpty) return;
     final idx = _lastVisibleMessageIds.indexOf(messageId);
     if (idx < 0 || !_scroll.hasClients) return;
@@ -733,7 +733,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     });
   }
 
-  String _deliveryStatus({required bool isMe, required bool isRead, required DateTime createdAt}) {
+  String _deliveryStatus({required final bool isMe, required final bool isRead, required final DateTime createdAt}) {
     if (!isMe) return '';
     if (isRead) return 'Read';
     if (DateTime.now().difference(createdAt).inSeconds < 4) return 'Sent';
@@ -750,7 +750,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
 
 
-  void _handleMenuAction(_DmMenuAction action) {
+  void _handleMenuAction(final _DmMenuAction action) {
     switch (action) {
       case _DmMenuAction.togglePin:
         chatRepository.setConversationPreference(widget.otherId, pinned: !_isConversationPinned);
@@ -812,12 +812,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
     return {...settings, ...reset};
   }
 
-  int _intValue(dynamic value) => (value as num?)?.toInt() ?? 0;
+  int _intValue(final dynamic value) => (value as num?)?.toInt() ?? 0;
 
   Future<bool> _canUseFreeQuota({
-    required String key,
-    required int limit,
-    required String limitMessage,
+    required final String key,
+    required final int limit,
+    required final String limitMessage,
   }) async {
     if (_planTier != SomaSubscriptionTier.free) return true;
     final state = await _dailyQuotaState();
@@ -833,7 +833,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     return true;
   }
 
-  Future<void> _incrementFreeQuota(String key) async {
+  Future<void> _incrementFreeQuota(final String key) async {
     if (_planTier != SomaSubscriptionTier.free) return;
     final state = await _dailyQuotaState();
     final count = _intValue(state[key]);
@@ -847,7 +847,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   bool get _isCallActive => _callState != DmCallState.idle;
 
-  String _formatCallDuration(int seconds) {
+  String _formatCallDuration(final int seconds) {
     final mm = (seconds ~/ 60).toString().padLeft(2, '0');
     final ss = (seconds % 60).toString().padLeft(2, '0');
     return '$mm:$ss';
@@ -877,7 +877,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _outgoingRingTimer?.cancel();
     SystemSound.play(SystemSoundType.alert);
     hapticsService.selectionClick();
-    _outgoingRingTimer = Timer.periodic(const Duration(milliseconds: 1600), (timer) {
+    _outgoingRingTimer = Timer.periodic(const Duration(milliseconds: 1600), (final timer) {
       if (!mounted || !_isOutgoingDialing) {
         timer.cancel();
         return;
@@ -896,7 +896,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _incomingRingTimer?.cancel();
     SystemSound.play(SystemSoundType.alert);
     hapticsService.mediumImpact();
-    _incomingRingTimer = Timer.periodic(const Duration(milliseconds: 1600), (_) {
+    _incomingRingTimer = Timer.periodic(const Duration(milliseconds: 1600), (final _) {
       if (!mounted || _callState != DmCallState.ringingIncoming) return;
       SystemSound.play(SystemSoundType.alert);
       hapticsService.mediumImpact();
@@ -918,11 +918,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
   void _toggleSpeakerOutput() {
     final next = !_isSpeakerOn;
-    rtcVoiceService.setSpeakerEnabled(next).then((_) {
+    rtcVoiceService.setSpeakerEnabled(next).then((final _) {
       if (!mounted) return;
       hapticsService.selectionClick();
       setState(() => _isSpeakerOn = next);
-    }).catchError((_) {
+    }).catchError((final _) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Unable to switch audio output right now.')),
@@ -930,7 +930,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     });
   }
 
-  void _onFloatingChipDragUpdate(DragUpdateDetails details, BoxConstraints constraints) {
+  void _onFloatingChipDragUpdate(final DragUpdateDetails details, final BoxConstraints constraints) {
     final next = _floatingChipOffset + details.delta;
     final maxX = (constraints.maxWidth - 170).clamp(0, double.infinity).toDouble();
     final maxY = (constraints.maxHeight - 220).clamp(0, double.infinity).toDouble();
@@ -963,7 +963,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     });
   }
 
-  DmCallState? _nextStateFor(DmCallState from, String event) {
+  DmCallState? _nextStateFor(final DmCallState from, final String event) {
     switch (from) {
       case DmCallState.idle:
         return event == 'invite' ? DmCallState.ringingIncoming : null;
@@ -985,9 +985,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
   }
 
-  bool _canTransition(String event) => _nextStateFor(_callState, event) != null;
+  bool _canTransition(final String event) => _nextStateFor(_callState, event) != null;
 
-  void _onRtcTelemetry(Map<String, dynamic> data) {
+  void _onRtcTelemetry(final Map<String, dynamic> data) {
     final retries = (data['turnRetries'] as num?)?.toInt() ?? 0;
     final buffered = (data['candidateBuffered'] as num?)?.toInt() ?? 0;
     final peers = (data['peerCount'] as num?)?.toInt() ?? 0;
@@ -1004,7 +1004,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     });
   }
 
-  Future<void> _setGlobalCallState({required bool active}) async {
+  Future<void> _setGlobalCallState({required final bool active}) async {
     await settingsRepository.updateSetting('dm_active_call', {
       'active': active,
       'other_id': active ? widget.otherId : null,
@@ -1014,13 +1014,13 @@ class _DmChatScreenState extends State<DmChatScreen> {
   }
 
   void _initDmCallSignaling() {
-    _signalSub = callSignalingService.events.listen((event) {
+    _signalSub = callSignalingService.events.listen((final event) {
       if (event.fromUserId != widget.otherId) return;
       _handleDmCallSignal(event);
     });
   }
 
-  Future<void> _handleDmCallSignal(CallSignalEvent event) async {
+  Future<void> _handleDmCallSignal(final CallSignalEvent event) async {
     final type = event.type;
     final data = event.rawData;
 
@@ -1053,6 +1053,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
       if (_callState == DmCallState.ringingOutgoing) {
         setState(() => _callState = DmCallState.connecting);
         _startCallSetupTimeout();
+      } else if (_callState == DmCallState.ringingIncoming) {
+        // This handles cases where we tap Answer on a native CallKit UI
+        // which triggers a local 'accept' signal.
+        await _startVoiceCall(sendInvite: false, incoming: true);
       }
       return;
     }
@@ -1090,7 +1094,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final responseFuture = showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => Dialog(
+      builder: (final context) => Dialog(
         backgroundColor: Colors.transparent,
         insetPadding: const EdgeInsets.symmetric(horizontal: 24),
         child: Glass(
@@ -1176,7 +1180,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     return response == true;
   }
 
-  void _onRtcConnectionState(bool connected) {
+  void _onRtcConnectionState(final bool connected) {
     if (!mounted) return;
     setState(() => _isRtcConnected = connected);
     if (!connected) return;
@@ -1201,7 +1205,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       _isRtcConnected = true;
       _liveCaption = 'Live caption: call connected.';
     });
-    _callTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+    _callTimer = Timer.periodic(const Duration(seconds: 1), (final _) {
       if (!mounted || _callState != DmCallState.connected) return;
       setState(() {
         _callElapsedSeconds += 1;
@@ -1220,7 +1224,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
       final retryWithRelay = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (final context) => AlertDialog(
           title: const Text('Call connection issue'),
           content: const Text('Unable to connect quickly. Retry using relay (TURN)?'),
           actions: [
@@ -1237,7 +1241,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
       );
 
       if (retryWithRelay == true) {
-        await rtcVoiceService.forceTurnRelay();
+        // TODO: Implement forceTurnRelay in RtcVoiceService if needed.
+        // For now, we just retry connect which will use TURN if available.
+        await rtcVoiceService.connect(circleId: _dmVoiceChannelId(), asSpeaker: true, prioritySpeaker: true);
         _startCallSetupTimeout();
       } else {
         await _emitDmCallSignal(CallSignalType.end);
@@ -1246,14 +1252,14 @@ class _DmChatScreenState extends State<DmChatScreen> {
     });
   }
 
-  Future<void> _emitDmCallSignal(CallSignalType type) async {
+  Future<void> _emitDmCallSignal(final CallSignalType type) async {
     await callSignalingService.sendSignal(
       toUserId: widget.otherId,
       type: type,
     );
   }
 
-  Future<bool> _startVoiceCall({required bool sendInvite, bool incoming = false}) async {
+  Future<bool> _startVoiceCall({required final bool sendInvite, final bool incoming = false}) async {
     final l10n = AppLocalizations.of(context);
     try {
       final success = await rtcVoiceService.connect(circleId: _dmVoiceChannelId(), asSpeaker: true, prioritySpeaker: true);
@@ -1307,7 +1313,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
   }
 
-  Future<void> _endVoiceCall({required bool showRemoteEnded, String? message}) async {
+  Future<void> _endVoiceCall({required final bool showRemoteEnded, final String? message}) async {
     await rtcVoiceService.disconnect();
     await _setGlobalCallState(active: false);
     if (!mounted) return;
@@ -1326,7 +1332,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     });
     await showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Call summary'),
         content: Text('Duration: ${_formatCallDuration(_callElapsedSeconds)}\nQuality: $_callQualityLabel\nCaptions: ${_liveCaption ?? 'n/a'}'),
         actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Done'))],
@@ -1440,7 +1446,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
     final shouldEnd = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('End voice call?'),
         content: Text('You are currently in an active call (${_formatCallDuration(_callElapsedSeconds)}).'),
         actions: [
@@ -1496,7 +1502,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     _amplitudeSub?.cancel();
     _amplitudeSub = _voiceRecorder
         .onAmplitudeChanged(const Duration(milliseconds: 100))
-        .listen((amp) {
+        .listen((final amp) {
       if (!mounted) return;
       // Normalize dBFS (-160 to 0) to 0.0 - 1.0
       // Typical speech might be around -30 to -10 dBFS
@@ -1507,7 +1513,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
       });
     });
 
-    _voiceRecordTimer = Timer.periodic(const Duration(seconds: 1), (timer) async {
+    _voiceRecordTimer = Timer.periodic(const Duration(seconds: 1), (final timer) async {
       if (!mounted) {
         timer.cancel();
         return;
@@ -1522,7 +1528,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     });
   }
 
-  Future<void> _stopVoiceRecording({bool hitLimit = false}) async {
+  Future<void> _stopVoiceRecording({final bool hitLimit = false}) async {
     _voiceRecordTimer?.cancel();
     _amplitudeSub?.cancel();
     final duration = _voiceRecordElapsedSeconds;
@@ -1555,7 +1561,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
   }
 
-  List<double> _resampleWaveform(List<double> input, int targetSize) {
+  List<double> _resampleWaveform(final List<double> input, final int targetSize) {
     if (input.isEmpty) return List.filled(targetSize, 0.2);
     if (input.length <= targetSize) return input; // Or pad if needed, but usually fine
 
@@ -1596,7 +1602,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     await _draftVoicePlayer.play();
   }
 
-  Future<void> _deleteDraftVoice({bool retainSnackbar = false, String? message}) async {
+  Future<void> _deleteDraftVoice({final bool retainSnackbar = false, final String? message}) async {
     final path = _draftVoicePath;
     await _draftVoicePlayer.stop();
     if (path != null && path.isNotEmpty) {
@@ -1620,7 +1626,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
 
 
-  Future<void> _pickAndSendImage({bool fromCamera = false}) async {
+  Future<void> _pickAndSendImage({final bool fromCamera = false}) async {
     if (!_ensureCanSendInDm()) return;
     final uid = _myUserId;
     try {
@@ -1754,7 +1760,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
   }
 
-  Future<Uint8List?> _readPickedFileBytes(PlatformFile file) async {
+  Future<Uint8List?> _readPickedFileBytes(final PlatformFile file) async {
     if (file.bytes != null && file.bytes!.isNotEmpty) {
       return file.bytes!;
     }
@@ -1767,7 +1773,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     return Uint8List.fromList(chunks);
   }
 
-  String _docContentType(String extension) {
+  String _docContentType(final String extension) {
     return switch (extension) {
       'pdf' => 'application/pdf',
       'doc' => 'application/msword',
@@ -1777,7 +1783,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     };
   }
 
-  Future<void> _openFileUrl(String url) async {
+  Future<void> _openFileUrl(final String url) async {
     final uri = Uri.tryParse(url);
     if (uri == null) return;
     final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -1788,12 +1794,12 @@ class _DmChatScreenState extends State<DmChatScreen> {
     }
   }
 
-  Future<void> _editTextMessage(_ChatMessage msg) async {
+  Future<void> _editTextMessage(final _ChatMessage msg) async {
     final initial = msg.payload.text ?? '';
     final editor = TextEditingController(text: initial);
     final updated = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Edit message'),
         content: TextField(
           controller: editor,
@@ -1836,10 +1842,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
   }
 
-  Future<void> _confirmAndDeleteMessage(String messageId) async {
+  Future<void> _confirmAndDeleteMessage(final String messageId) async {
     final shouldDelete = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Unsend message?'),
         content: const Text('This removes the message from the chat.'),
         actions: [
@@ -1863,11 +1869,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
   }
 
-  Future<void> _showMessageActions(_ChatMessage msg) async {
+  Future<void> _showMessageActions(final _ChatMessage msg) async {
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
+      builder: (final context) => SafeArea(
         child: Wrap(
           children: [
             ListTile(
@@ -1925,7 +1931,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                 title: const Text('Translate transcript'),
                 onTap: () {
                   Navigator.pop(context);
-                  final translated = '[${_autoTranslateLanguage}] ${msg.payload.transcript!}';
+                  final translated = '[$_autoTranslateLanguage] ${msg.payload.transcript!}';
                   setState(() {
                     _controller.text = translated;
                     _controller.selection = TextSelection.fromPosition(TextPosition(offset: translated.length));
@@ -1975,7 +1981,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       try {
                         final reason = await showModalBottomSheet<String>(
                           context: context,
-                          builder: (_) => SafeArea(
+                          builder: (final _) => SafeArea(
                             child: Wrap(
                               children: [
                                 for (final r in const [
@@ -2019,7 +2025,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       Navigator.pop(context);
                       final settings = await settingsRepository.getSettings();
                       final blockedIds = (settings['blocked_user_ids'] as List?)
-                              ?.map((e) => e.toString())
+                              ?.map((final e) => e.toString())
                               .toList() ??
                           [];
                       if (!blockedIds.contains(widget.otherId)) {
@@ -2045,12 +2051,26 @@ class _DmChatScreenState extends State<DmChatScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
+            ...rtcVoiceService.activeRenderers.map((final renderer) => Positioned(
+                  left: 0,
+                  top: 0,
+                  width: 1,
+                  height: 1,
+                  child: SizedBox(
+                    width: 1,
+                    height: 1,
+                    child: RTCVideoView(
+                      renderer,
+                      objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                    ),
+                  ),
+                )),
             Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
@@ -2060,7 +2080,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                 _showOnlineIndicator
                     ? StreamBuilder<bool>(
                         stream: _onlineStream,
-                        builder: (context, snapshot) {
+                        builder: (final context, final snapshot) {
                           return _TopBar(
                             title: _displayUsernameToken,
                             avatarUrl: _otherProfile?.avatarUrl,
@@ -2070,7 +2090,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => ProfileScreen(userId: widget.otherId),
+                                  builder: (final _) => ProfileScreen(userId: widget.otherId),
                                 ),
                               );
                             },
@@ -2095,7 +2115,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => ProfileScreen(userId: widget.otherId),
+                              builder: (final _) => ProfileScreen(userId: widget.otherId),
                             ),
                           );
                         },
@@ -2117,7 +2137,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       radius: BorderRadius.circular(12),
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       child: TextField(
-                        onChanged: (v) => setState(() => _searchQuery = v.trim().toLowerCase()),
+                        onChanged: (final v) => setState(() => _searchQuery = v.trim().toLowerCase()),
                         decoration: const InputDecoration(
                           isDense: true,
                           border: InputBorder.none,
@@ -2150,25 +2170,25 @@ class _DmChatScreenState extends State<DmChatScreen> {
                       FilterChip(
                         label: const Text('Pinned'),
                         selected: _showPinnedOnly,
-                        onSelected: (v) => setState(() => _showPinnedOnly = v),
+                        onSelected: (final v) => setState(() => _showPinnedOnly = v),
                       ),
                       const SizedBox(width: 6),
                       FilterChip(
                         label: const Text('Unread'),
                         selected: _showUnreadOnly,
-                        onSelected: (v) => setState(() => _showUnreadOnly = v),
+                        onSelected: (final v) => setState(() => _showUnreadOnly = v),
                       ),
                       const SizedBox(width: 6),
                       FilterChip(
                         label: const Text('Links'),
                         selected: _showLinksOnly,
-                        onSelected: (v) => setState(() => _showLinksOnly = v),
+                        onSelected: (final v) => setState(() => _showLinksOnly = v),
                       ),
                       const SizedBox(width: 6),
                       FilterChip(
                         label: const Text('@Mentions'),
                         selected: _showMentionsOnly,
-                        onSelected: (v) => setState(() => _showMentionsOnly = v),
+                        onSelected: (final v) => setState(() => _showMentionsOnly = v),
                       ),
                     ],
                   ),
@@ -2181,10 +2201,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
                   Expanded(
                     child: StreamBuilder<List<Map<String, dynamic>>>(
                       stream: _messagesStream,
-                      builder: (context, snapshot) {
+                      builder: (final context, final snapshot) {
                         if (snapshot.hasError) {
                           return Center(
-                              child: Text("Error: ${snapshot.error}",
+                              child: Text('Error: ${snapshot.error}',
                                   style: TextStyle(color: theme.colorScheme.onSurface)));
                         }
                         if (!snapshot.hasData) {
@@ -2197,9 +2217,9 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         var visibleMsgs = _searchQuery.isEmpty
                             ? msgs
                             : msgs
-                                .where((m) => (m['content']?.toString().toLowerCase() ?? '').contains(_searchQuery))
+                                .where((final m) => (m['content']?.toString().toLowerCase() ?? '').contains(_searchQuery))
                                 .toList();
-                        visibleMsgs = visibleMsgs.where((m) {
+                        visibleMsgs = visibleMsgs.where((final m) {
                           final payload = _MessagePayload.parse(m['content']?.toString() ?? '');
                           final text = payload.text ?? payload.fileName ?? '';
                           if (payload.expiresAt != null && payload.expiresAt!.isBefore(DateTime.now())) return false;
@@ -2211,11 +2231,11 @@ class _DmChatScreenState extends State<DmChatScreen> {
                         }).toList();
                         if (_showPinnedOnly) {
                           visibleMsgs = visibleMsgs
-                              .where((m) => _pinnedMessageIds.contains(m['id']?.toString() ?? ''))
+                              .where((final m) => _pinnedMessageIds.contains(m['id']?.toString() ?? ''))
                               .toList();
                         }
 
-                        _lastVisibleMessageIds = visibleMsgs.map((m) => m['id']?.toString() ?? '').toList();
+                        _lastVisibleMessageIds = visibleMsgs.map((final m) => m['id']?.toString() ?? '').toList();
 
                         if (visibleMsgs.isEmpty) {
                           return Center(
@@ -2227,7 +2247,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                           );
                         }
 
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                        WidgetsBinding.instance.addPostFrameCallback((final _) {
                           if (_scroll.hasClients) {
                             _scroll.animateTo(
                               _scroll.position.maxScrollExtent,
@@ -2242,7 +2262,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                           padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
                           physics: const BouncingScrollPhysics(),
                           itemCount: visibleMsgs.length,
-                          itemBuilder: (context, i) {
+                          itemBuilder: (final context, final i) {
                             final m = visibleMsgs[i];
                             final isMe = (m['sender_id']?.toString() ?? '') == _myUserId;
                             final dt = DateTime.tryParse(m['created_at']?.toString() ?? '')?.toLocal() ?? DateTime.now();
@@ -2266,7 +2286,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                                 onTapReplySource: _jumpToMessageById,
                                 replyToMessageId: payload.replyToMessageId,
                                 onTapFile: _openFileUrl,
-                                onReact: (emoji) => chatRepository.toggleMessageReaction(messageId: m['id'].toString(), emoji: emoji),
+                                onReact: (final emoji) => chatRepository.toggleMessageReaction(messageId: m['id'].toString(), emoji: emoji),
                                 editedAt: _messageEditTimes[m['id']?.toString() ?? ''],
                                 deliveryStatus: _deliveryStatus(isMe: isMe, isRead: readAt != null, createdAt: dt),
                                 isHighlighted: _jumpHighlightMessageId == (m['id']?.toString() ?? ''),
@@ -2382,7 +2402,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
                   ),
                 StreamBuilder<bool>(
                   stream: _typingStream,
-                  builder: (context, snapshot) {
+                  builder: (final context, final snapshot) {
                     if (snapshot.data != true) return const SizedBox.shrink();
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 6),
@@ -2466,7 +2486,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
             if (_isCallActive && _callPanelMinimized)
               Positioned.fill(
                 child: LayoutBuilder(
-                  builder: (context, constraints) {
+                  builder: (final context, final constraints) {
                     const chipWidth = 170.0;
                     final defaultLeft = (constraints.maxWidth - chipWidth - 14).clamp(0.0, constraints.maxWidth);
                     final defaultTop = (constraints.maxHeight - 150).clamp(0.0, constraints.maxHeight);
@@ -2478,13 +2498,13 @@ class _DmChatScreenState extends State<DmChatScreen> {
                           top: (defaultTop + _floatingChipOffset.dy)
                               .clamp(0.0, (constraints.maxHeight - 70).clamp(0.0, constraints.maxHeight)),
                           child: GestureDetector(
-                            onPanUpdate: (details) =>
+                            onPanUpdate: (final details) =>
                                 _onFloatingChipDragUpdate(details, constraints),
-                            onPanEnd: (_) => _persistCallChipOffset(),
+                            onPanEnd: (final _) => _persistCallChipOffset(),
                             onLongPress: () async {
                               final action = await showModalBottomSheet<String>(
                                 context: context,
-                                builder: (context) => SafeArea(
+                                builder: (final context) => SafeArea(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -2547,7 +2567,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (final context) => AlertDialog(
         title: const Text('Unblock user?'),
         content: const Text('You will be able to message this user again.'),
         actions: [
@@ -2567,7 +2587,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
 
     final settings = await settingsRepository.getSettings();
     final blockedIds = (settings['blocked_user_ids'] as List?)
-            ?.map((e) => e.toString())
+            ?.map((final e) => e.toString())
             .toList() ??
         [];
     blockedIds.remove(widget.otherId);
@@ -2599,7 +2619,7 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
   }
 
-  Future<void> _respondIncomingRequest(bool accept) async {
+  Future<void> _respondIncomingRequest(final bool accept) async {
     await chatRepository.respondToMessageRequest(
       requesterId: widget.otherId,
       accept: accept,
@@ -2611,10 +2631,10 @@ class _DmChatScreenState extends State<DmChatScreen> {
     );
   }
 
-  String _fmtTime(DateTime dt) {
+  String _fmtTime(final DateTime dt) {
     final hh = dt.hour.toString().padLeft(2, '0');
     final mm = dt.minute.toString().padLeft(2, '0');
-    return "$hh:$mm";
+    return '$hh:$mm';
   }
 }
 
@@ -2654,7 +2674,7 @@ class _VoiceCallPanel extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final active = state == DmCallState.connected;
@@ -2791,7 +2811,7 @@ class _FloatingCallChip extends StatelessWidget {
   const _FloatingCallChip({required this.subtitle, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
@@ -2852,7 +2872,7 @@ class _TopBar extends StatelessWidget {
   final bool isConversationMuted;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
       child: Row(
@@ -2886,7 +2906,7 @@ class _TopBar extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "@$title",
+                            '@$title',
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
@@ -2938,7 +2958,7 @@ class _TopBar extends StatelessWidget {
           const SizedBox(width: 8),
           PopupMenuButton<_DmMenuAction>(
             onSelected: onMenuSelected,
-            itemBuilder: (context) => [
+            itemBuilder: (final context) => [
               PopupMenuItem(
                 value: _DmMenuAction.togglePin,
                 child: Text(isConversationPinned ? 'Unpin thread' : 'Pin thread'),
@@ -3034,7 +3054,7 @@ class _BubbleState extends State<_Bubble> {
   double _swipeDx = 0;
   bool _isSwipeDragging = false;
 
-  void _onSwipeDragUpdate(double deltaX) {
+  void _onSwipeDragUpdate(final double deltaX) {
     final next = _swipeDx + deltaX;
     if (widget.isMe) {
       // My messages reply with left swipe.
@@ -3064,15 +3084,15 @@ class _BubbleState extends State<_Bubble> {
   void initState() {
     super.initState();
     _voicePlayer = AudioPlayer();
-    _voicePlayer.positionStream.listen((p) {
+    _voicePlayer.positionStream.listen((final p) {
       if (!mounted) return;
       setState(() => _voicePosition = p);
     });
-    _voicePlayer.durationStream.listen((d) {
+    _voicePlayer.durationStream.listen((final d) {
       if (!mounted || d == null) return;
       setState(() => _voiceDuration = d);
     });
-    _voicePlayer.playerStateStream.listen((state) {
+    _voicePlayer.playerStateStream.listen((final state) {
       if (!mounted) return;
       final playing = state.playing;
       if (_isPlayingVoice != playing) {
@@ -3091,7 +3111,7 @@ class _BubbleState extends State<_Bubble> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final align = widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start;
     final radius = BorderRadius.only(
       topLeft: const Radius.circular(18),
@@ -3134,9 +3154,9 @@ class _BubbleState extends State<_Bubble> {
           ),
         GestureDetector(
           onLongPress: widget.onLongPress,
-          onHorizontalDragStart: (_) => setState(() => _isSwipeDragging = true),
-          onHorizontalDragUpdate: (details) => _onSwipeDragUpdate(details.delta.dx),
-          onHorizontalDragEnd: (_) => _finishSwipeGesture(),
+          onHorizontalDragStart: (final _) => setState(() => _isSwipeDragging = true),
+          onHorizontalDragUpdate: (final details) => _onSwipeDragUpdate(details.delta.dx),
+          onHorizontalDragEnd: (final _) => _finishSwipeGesture(),
           onHorizontalDragCancel: () => _finishSwipeGesture(),
           onTap: isVoice
               ? () => _handleVoiceBubbleTap(parsed.url)
@@ -3171,7 +3191,7 @@ class _BubbleState extends State<_Bubble> {
                     child: CachedNetworkImage(
                       imageUrl: imageUrl ?? '',
                       fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) => Padding(
+                      errorWidget: (final _, final __, final ___) => Padding(
                         padding: const EdgeInsets.all(10),
                         child: Text(
                           'Image unavailable',
@@ -3197,7 +3217,7 @@ class _BubbleState extends State<_Bubble> {
                         onToggleSpeed: _toggleVoiceSpeed,
                         progressMs: _voicePosition.inMilliseconds,
                         durationMs: (_voiceDuration.inMilliseconds <= 0 ? (parsed.duration ?? 0) * 1000 : _voiceDuration.inMilliseconds),
-                        onSeek: (ms) => _voicePlayer.seek(Duration(milliseconds: ms.round())),
+                        onSeek: (final ms) => _voicePlayer.seek(Duration(milliseconds: ms.round())),
                         transcript: parsed.transcript,
                       )
                     : isFile
@@ -3335,7 +3355,7 @@ class _BubbleState extends State<_Bubble> {
             padding: const EdgeInsets.only(top: 4),
             child: Wrap(
               spacing: 6,
-              children: widget.reactions.entries.map((entry) {
+              children: widget.reactions.entries.map((final entry) {
                 final count = (entry.value as List?)?.length ?? 0;
                 return GestureDetector(
                   onTap: () => widget.onReact?.call(entry.key),
@@ -3369,7 +3389,7 @@ class _BubbleState extends State<_Bubble> {
   }
 
 
-  Future<void> _handleVoiceBubbleTap(String? url) async {
+  Future<void> _handleVoiceBubbleTap(final String? url) async {
     if (!_isVoiceExpanded) {
       setState(() => _isVoiceExpanded = true);
     }
@@ -3384,7 +3404,7 @@ class _BubbleState extends State<_Bubble> {
     _voicePlayer.setSpeed(next);
   }
 
-  Future<void> _toggleVoicePlayback(String? url) async {
+  Future<void> _toggleVoicePlayback(final String? url) async {
     if (url == null || url.isEmpty) return;
     try {
       if (_voicePlayer.playing) {
@@ -3402,7 +3422,7 @@ class _BubbleState extends State<_Bubble> {
     }
   }
 
-  String _formatBytes(int bytes) {
+  String _formatBytes(final int bytes) {
     if (bytes < 1024) return '$bytes B';
     final kb = bytes / 1024;
     if (kb < 1024) return '${kb.toStringAsFixed(1)} KB';
@@ -3444,7 +3464,7 @@ class _PremiumVoiceBubbleContent extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     if (!isExpanded) {
       return InkWell(
@@ -3616,7 +3636,7 @@ class _Waveform extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final data = bars.isEmpty
         ? const [0.35, 0.5, 0.75, 0.42, 0.6, 0.88, 0.48, 0.7, 0.56, 0.8, 0.38, 0.62]
         : bars;
@@ -3660,7 +3680,7 @@ class _PackMessageCardState extends State<_PackMessageCard> {
   bool _rsvpAccepted = false;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final payload = widget.payload;
     return Container(
@@ -3698,7 +3718,7 @@ class _PackMessageCardState extends State<_PackMessageCard> {
                 dense: true,
                 contentPadding: EdgeInsets.zero,
                 value: _checkedItems.contains(i),
-                onChanged: (_) => setState(() {
+                onChanged: (final _) => setState(() {
                   if (_checkedItems.contains(i)) {
                     _checkedItems.remove(i);
                   } else {
@@ -3793,7 +3813,7 @@ class _PinnedMomentsStrip extends StatelessWidget {
   const _PinnedMomentsStrip({required this.messageIds, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (messageIds.isEmpty) return const SizedBox.shrink();
     final theme = Theme.of(context);
     return SizedBox(
@@ -3801,7 +3821,7 @@ class _PinnedMomentsStrip extends StatelessWidget {
       child: ListView.separated(
         padding: const EdgeInsets.fromLTRB(14, 0, 14, 8),
         scrollDirection: Axis.horizontal,
-        itemBuilder: (context, i) {
+        itemBuilder: (final context, final i) {
           final id = messageIds[i];
           return ActionChip(
             avatar: const Icon(Icons.auto_awesome_rounded, size: 14),
@@ -3810,7 +3830,7 @@ class _PinnedMomentsStrip extends StatelessWidget {
             onPressed: () => onTap(id),
           );
         },
-        separatorBuilder: (_, __) => const SizedBox(width: 6),
+        separatorBuilder: (final _, final __) => const SizedBox(width: 6),
         itemCount: messageIds.length,
       ),
     );
@@ -3854,7 +3874,7 @@ class _MessagePayload {
     this.transliteration,
   });
 
-  static _MessagePayload parse(String raw) {
+  static _MessagePayload parse(final String raw) {
     try {
       final map = jsonDecode(raw);
       if (map is Map<String, dynamic>) {
@@ -3871,10 +3891,10 @@ class _MessagePayload {
           replyToMessageId: map['reply_to_message_id']?.toString(),
           transcript: map['transcript']?.toString(),
           label: map['label']?.toString(),
-          items: ((map['items'] as List?) ?? (map['options'] as List?) ?? const []).map((e) => e.toString()).toList(),
+          items: ((map['items'] as List?) ?? (map['options'] as List?) ?? const []).map((final e) => e.toString()).toList(),
           translatedText: map['translated_text']?.toString(),
           transliteration: map['transliteration']?.toString(),
-          waveform: (map['waveform'] as List?)?.map((e) => double.tryParse('$e') ?? 0.3).toList() ?? const [],
+          waveform: (map['waveform'] as List?)?.map((final e) => double.tryParse('$e') ?? 0.3).toList() ?? const [],
           expiresAt: DateTime.tryParse(map['expires_at']?.toString() ?? ''),
         );
       }
@@ -3904,7 +3924,7 @@ class _ChatMessage {
     required this.payload,
   });
 
-  factory _ChatMessage.fromRow(Map<String, dynamic> row, {required bool isMe}) {
+  factory _ChatMessage.fromRow(final Map<String, dynamic> row, {required final bool isMe}) {
     final raw = row['content']?.toString() ?? '';
     final payload = _MessagePayload.parse(raw);
     final preview = switch (payload.type) {
@@ -3974,7 +3994,7 @@ class _InputBar extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final recordMm = (recordingSeconds ~/ 60).toString().padLeft(2, '0');
     final recordSs = (recordingSeconds % 60).toString().padLeft(2, '0');
@@ -4085,16 +4105,16 @@ class _InputBar extends StatelessWidget {
                     cursorColor: scheme.primary,
                     minLines: 1,
                     maxLines: isComposerFocused ? 6 : 4,
-                    onChanged: (v) {
+                    onChanged: (final v) {
                       onTypingChanged(v.trim().isNotEmpty);
                       onTextChanged(v);
                     },
-                    onSubmitted: (_) {
+                    onSubmitted: (final _) {
                       onSend();
                       onTypingChanged(false);
                     },
                     decoration: InputDecoration(
-                      hintText: "Message…",
+                      hintText: 'Message…',
                       hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
                       border: InputBorder.none,
                       isDense: true,
@@ -4106,7 +4126,7 @@ class _InputBar extends StatelessWidget {
                   duration: MotionTokens.medium,
                   switchInCurve: Curves.easeOut,
                   switchOutCurve: Curves.easeIn,
-                  transitionBuilder: (child, animation) => SizeTransition(
+                  transitionBuilder: (final child, final animation) => SizeTransition(
                     sizeFactor: animation,
                     axis: Axis.horizontal,
                     axisAlignment: -1,
@@ -4260,7 +4280,7 @@ class _DmToolsSectionHeader extends StatelessWidget {
   const _DmToolsSectionHeader({required this.title});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 6),
@@ -4298,7 +4318,7 @@ class _MessageRequestOverlay extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
       child: Glass(
@@ -4361,7 +4381,7 @@ class _BlockedOverlay extends StatelessWidget {
   const _BlockedOverlay({required this.onUnblock});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
@@ -4369,7 +4389,7 @@ class _BlockedOverlay extends StatelessWidget {
       child: Column(
         children: [
           Text(
-            "You have blocked this user",
+            'You have blocked this user',
              style: TextStyle(
               color: scheme.onSurface.withValues(alpha: 0.7),
               fontWeight: FontWeight.w600,
@@ -4384,7 +4404,7 @@ class _BlockedOverlay extends StatelessWidget {
                 side: BorderSide(color: scheme.error),
                 foregroundColor: scheme.error,
               ),
-              child: const Text("Unblock"),
+              child: const Text('Unblock'),
             ),
           ),
         ],
@@ -4399,7 +4419,7 @@ class _IconGlass extends StatelessWidget {
   const _IconGlass({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
@@ -4415,7 +4435,7 @@ class _IconGlass extends StatelessWidget {
 class _ReplaySheet extends StatefulWidget {
   final List<Map<String, dynamic>> messages;
   final String otherName;
-  const _ReplaySheet({super.key, required this.messages, required this.otherName});
+  const _ReplaySheet({required this.messages, required this.otherName});
 
   @override
   State<_ReplaySheet> createState() => _ReplaySheetState();
@@ -4437,7 +4457,7 @@ class _ReplaySheetState extends State<_ReplaySheet> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (widget.messages.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -4508,10 +4528,10 @@ class _WeeklyReportCard extends StatelessWidget {
   final UserStats stats;
   final int messagesSent;
 
-  const _WeeklyReportCard({super.key, required this.stats, required this.messagesSent});
+  const _WeeklyReportCard({required this.stats, required this.messagesSent});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     String grade = 'B';
     if (messagesSent > 50 && stats.totalCorrect > 20) {
       grade = 'A+';
@@ -4550,7 +4570,7 @@ class _WeeklyReportCard extends StatelessWidget {
     );
   }
 
-  Widget _statRow(BuildContext context, String label, String value) {
+  Widget _statRow(final BuildContext context, final String label, final String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(

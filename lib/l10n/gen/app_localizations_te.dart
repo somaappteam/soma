@@ -1646,6 +1646,9 @@ class AppLocalizationsTe extends AppLocalizations {
   String get circlesStartGame => 'గేమ్ ప్రారంభించండి';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'ప్లేయర్ల కోసం వేచి ఉంది';
 
   @override

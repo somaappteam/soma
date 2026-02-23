@@ -1633,6 +1633,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get circlesStartGame => 'Start game';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Waiting for players';
 
   @override

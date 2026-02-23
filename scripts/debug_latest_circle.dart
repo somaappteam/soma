@@ -7,7 +7,7 @@ Future<void> main() async {
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
   final client = Supabase.instance.client;
 
-  print("Fetching latest circle...");
+  print('Fetching latest circle...');
 
   try {
     final response = await client
@@ -17,7 +17,7 @@ Future<void> main() async {
         .limit(1);
 
     if (response.isEmpty) {
-      print("No circles found.");
+      print('No circles found.');
       return;
     }
 
@@ -28,18 +28,18 @@ Future<void> main() async {
     
     final questions = circle['questions'];
     if (questions == null) {
-      print("Questions field is NULL");
+      print('Questions field is NULL');
     } else if (questions is List) {
-      print("Questions Count: ${questions.length}");
+      print('Questions Count: ${questions.length}');
       if (questions.isNotEmpty) {
         print("First Question Sample: ${questions.first['prompt']}");
       }
     } else {
-      print("Questions field is of type: ${questions.runtimeType}");
-      print("Value: $questions");
+      print('Questions field is of type: ${questions.runtimeType}');
+      print('Value: $questions');
     }
 
   } catch (e) {
-    print("Error fetching circle: $e");
+    print('Error fetching circle: $e');
   }
 }

@@ -1,11 +1,13 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/data/circle_voice_service.dart';
+import 'package:soma/data/profile_store.dart';
+import 'package:soma/data/rtc_voice_service.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../data/circle_voice_service.dart';
-import '../../data/profile_store.dart';
-import '../../data/rtc_voice_service.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/responsive.dart';
 
 
 class CircleCountdownScreen extends StatefulWidget {
@@ -33,7 +35,7 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
   void initState() {
     super.initState();
     _t = widget.seconds;
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (final _) {
       if (!mounted) return;
       if (_t <= 1) {
         _timer?.cancel();
@@ -51,12 +53,28 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: SafeArea(
-          child: ResponsiveFrame(
+        child: Stack(
+          children: [
+            ...rtcVoiceService.activeRenderers.map((final renderer) => Positioned(
+                  left: 0,
+                  top: 0,
+                  width: 1,
+                  height: 1,
+                  child: SizedBox(
+                    width: 1,
+                    height: 1,
+                    child: RTCVideoView(
+                      renderer,
+                      objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                    ),
+                  ),
+                )),
+            ResponsiveFrame(
             alignment: Alignment.center,
             maxWidth: 420,
             child: Center(
@@ -76,7 +94,7 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
                     ),
                     const SizedBox(height: 14),
                     Text(
-                      "$_t",
+                      '$_t',
                       style: TextStyle(
                         color: scheme.onSurface,
                         fontWeight: FontWeight.w900,
@@ -98,7 +116,7 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
                     if (widget.circleId != null)
                       StreamBuilder<Map<String, VoicePresence>>(
                         stream: circleVoiceService.stream,
-                        builder: (context, snapshot) {
+                        builder: (final context, final snapshot) {
                           final me = circleVoiceService.me;
                           return _MicToggleButton(
                             muted: me?.muted ?? false,
@@ -113,7 +131,9 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
                 ),
               ),
             ),
-          ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -146,7 +166,7 @@ class _GlowBar extends StatelessWidget {
   const _GlowBar({required this.progress});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       height: 10,
       width: 220,
@@ -193,7 +213,7 @@ class _MicToggleButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final color = muted ? onSurface.withValues(alpha: 0.6) : onSurface;

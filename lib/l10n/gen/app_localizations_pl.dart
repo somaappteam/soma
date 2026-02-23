@@ -1647,6 +1647,9 @@ class AppLocalizationsPl extends AppLocalizations {
   String get circlesStartGame => 'Rozpocznij Grę';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Czekanie na Graczy';
 
   @override

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/language_picker_sheet.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/data/languages.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/theme/tokens.dart';
-import '../../core/widgets/language_picker_sheet.dart';
-import '../../models/solo_course.dart';
-import '../../core/widgets/responsive.dart';
-
-import '../../data/languages.dart';
+import 'package:soma/models/solo_course.dart';
 
 class AddCourseScreen extends StatefulWidget {
   const AddCourseScreen({super.key});
@@ -22,12 +20,12 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
   @override
   void initState() {
     super.initState();
-    speak = kLanguages.firstWhere((l) => l.code == "en");
-    learn = kLanguages.firstWhere((l) => l.code == "es");
+    speak = kLanguages.firstWhere((final l) => l.code == 'en');
+    learn = kLanguages.firstWhere((final l) => l.code == 'es');
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final valid = speak.code != learn.code;
     final scheme = Theme.of(context).colorScheme;
@@ -36,7 +34,7 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
       body: SafeArea(
           child: ResponsiveFrame(
             child: LayoutBuilder(
-              builder: (context, constraints) {
+              builder: (final context, final constraints) {
                 final compactHeight = constraints.maxHeight < 760;
                 final sectionSpacing = compactHeight ? 14.0 : 18.0;
                 final bottomSpacing = compactHeight ? 8.0 : 10.0;
@@ -135,12 +133,12 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
                       borderRadius: BorderRadius.circular(26),
                       onTap: valid
                           ? () {
-                              final id = "solo_${speak.code}_${learn.code}";
+                              final id = 'solo_${speak.code}_${learn.code}';
                               final course = SoloCourse(
                                 id: id,
                                 title: l10n.soloCourseTitle,
-                                subtitle: "${speak.name} → ${learn.name}",
-                                iconUrl: "",
+                                subtitle: '${speak.name} → ${learn.name}',
+                                iconUrl: '',
                               );
                               Navigator.pop(context, course);
                             }
@@ -188,7 +186,7 @@ class _SelectTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(18),
@@ -241,17 +239,17 @@ class _SelectTile extends StatelessWidget {
 }
 
 Future<LangOption?> _pickLanguage(
-  BuildContext context, {
-  required String title,
-  required List<LangOption> items,
-  required LangOption current,
+  final BuildContext context, {
+  required final String title,
+  required final List<LangOption> items,
+  required final LangOption current,
 }) async {
   final l10n = AppLocalizations.of(context);
   return showModalBottomSheet<LangOption>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    builder: (ctx) => LanguagePickerSheet(
+    builder: (final ctx) => LanguagePickerSheet(
       title: title,
       searchHint: l10n.searchLanguage,
       noMatchesText: l10n.noMatches,

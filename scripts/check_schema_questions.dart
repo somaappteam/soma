@@ -21,16 +21,16 @@ Future<void> main() async {
     if (response.isNotEmpty) {
       final val = response.first['questions'];
       if (val == null) {
-        print("But the value is NULL in the first row.");
+        print('But the value is NULL in the first row.');
       } else {
-        print("And it contains data: $val");
+        print('And it contains data: $val');
       }
     } else {
-      print("Table is empty, but query succeeded.");
+      print('Table is empty, but query succeeded.');
     }
   } catch (e) {
     print("Error querying 'questions' column: $e");
-    if (e.toString().contains("does not exist") || e.toString().contains("42703")) {
+    if (e.toString().contains('does not exist') || e.toString().contains('42703')) {
       print("CONFIRMED: Column 'questions' DOES NOT EXIST.");
     }
   }

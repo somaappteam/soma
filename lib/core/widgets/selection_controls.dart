@@ -19,7 +19,7 @@ class AppSelectablePill extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedFill = isDark
@@ -66,7 +66,7 @@ class AppNeonSwitch extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedThumb = isDark ? const Color(0xFF36F4E8) : scheme.onPrimary;
@@ -83,13 +83,13 @@ class AppNeonSwitch extends StatelessWidget {
     return Switch(
       value: value,
       onChanged: onChanged,
-      thumbColor: WidgetStateProperty.resolveWith((states) {
+      thumbColor: WidgetStateProperty.resolveWith((final states) {
         if (states.contains(WidgetState.selected)) {
           return selectedThumb;
         }
         return unselectedThumb;
       }),
-      trackColor: WidgetStateProperty.resolveWith((states) {
+      trackColor: WidgetStateProperty.resolveWith((final states) {
         if (states.contains(WidgetState.selected)) {
           return selectedTrack;
         }

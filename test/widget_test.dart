@@ -10,7 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:soma/main.dart';
 
 void main() {
-  testWidgets('App shows splash logo', (WidgetTester tester) async {
+  testWidgets('App shows splash logo', (final tester) async {
     await tester.pumpWidget(const App());
     expect(find.text('SOMA'), findsOneWidget);
   });

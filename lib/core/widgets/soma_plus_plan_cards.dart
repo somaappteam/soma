@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../theme/spacing.dart';
-import 'glass.dart';
-import '../../data/soma_plus_repository.dart';
+import 'package:soma/core/theme/spacing.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/data/soma_plus_repository.dart';
 
 class SomaPlusPlanCards extends StatelessWidget {
   final SomaSubscriptionTier currentTier;
@@ -15,7 +15,7 @@ class SomaPlusPlanCards extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Column(
       children: [
         for (final plan in kSomaSubscriptionPlans) ...[
@@ -43,7 +43,7 @@ class _PlanCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isHighlighted = plan.highlighted;
 

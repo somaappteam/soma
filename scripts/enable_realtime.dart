@@ -1,6 +1,5 @@
 
 import 'package:postgres/postgres.dart';
-import 'dart:io';
 
 Future<void> main() async {
   final endpoint = Endpoint(
@@ -22,7 +21,7 @@ Future<void> main() async {
 
     if (checkResult.isEmpty) {
       print('Profiles not in supabase_realtime. Enabling...');
-      await conn.execute("ALTER PUBLICATION supabase_realtime ADD TABLE profiles");
+      await conn.execute('ALTER PUBLICATION supabase_realtime ADD TABLE profiles');
       print('✅ Realtime enabled for profiles');
     } else {
       print('✅ Realtime already enabled for profiles');
@@ -35,7 +34,7 @@ Future<void> main() async {
       );
       if (res.isEmpty) {
         print('Enabling Realtime for $table...');
-        await conn.execute("ALTER PUBLICATION supabase_realtime ADD TABLE $table");
+        await conn.execute('ALTER PUBLICATION supabase_realtime ADD TABLE $table');
         print('✅ Enabled for $table');
       }
     }

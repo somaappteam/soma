@@ -1,5 +1,5 @@
-import '../core/i18n/ui_language.dart';
-import '../data/soma_plus_repository.dart';
+import 'package:soma/core/i18n/ui_language.dart';
+import 'package:soma/data/soma_plus_repository.dart';
 
 class AppSettings {
   final bool showTranslation;
@@ -51,7 +51,7 @@ class AppSettings {
         dmActiveCall: {'active': false},
       );
 
-  factory AppSettings.fromMap(Map<String, dynamic>? source) {
+  factory AppSettings.fromMap(final Map<String, dynamic>? source) {
     final merged = Map<String, dynamic>.from(AppSettings.defaults().toMap())
       ..addAll(source ?? const {});
 

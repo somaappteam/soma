@@ -3,10 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/data/settings_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'settings_repository.dart';
-import '../core/di/locator.dart';
 
 // ─── Product IDs (must match App Store Connect / Play Console) ───────────────
 const kIapPlusMonthly  = 'soma_plus_monthly';
@@ -265,7 +264,7 @@ class SomaPlusState {
   bool get isPlus => tier == SomaSubscriptionTier.plus;
   bool get isPro => tier == SomaSubscriptionTier.pro;
 
-  bool hasTierOrHigher(SomaSubscriptionTier minimumTier) {
+  bool hasTierOrHigher(final SomaSubscriptionTier minimumTier) {
     const order = {
       SomaSubscriptionTier.free: 0,
       SomaSubscriptionTier.plus: 1,
@@ -285,7 +284,7 @@ class SomaPlusRepository {
 
   ValueListenable<SomaPlusState> get state => _stateNotifier;
 
-  static DmPlanLimits dmLimitsForTier(SomaSubscriptionTier tier) {
+  static DmPlanLimits dmLimitsForTier(final SomaSubscriptionTier tier) {
     switch (tier) {
       case SomaSubscriptionTier.pro:
         return const DmPlanLimits(
@@ -317,7 +316,7 @@ class SomaPlusRepository {
     _stateNotifier.value = _fromSettings(settings);
 
     _subscription?.cancel();
-    _subscription = settingsRepository.getSettingsStream().listen((settings) {
+    _subscription = settingsRepository.getSettingsStream().listen((final settings) {
       _stateNotifier.value = _fromSettings(settings);
     });
 
@@ -325,7 +324,7 @@ class SomaPlusRepository {
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       _iapSub?.cancel();
       _iapSub = InAppPurchase.instance.purchaseStream
-          .listen(_onPurchaseUpdate, onError: (e) {
+          .listen(_onPurchaseUpdate, onError: (final e) {
         debugPrint('SomaPlusRepository: IAP stream error – $e');
       });
     }
@@ -341,7 +340,7 @@ class SomaPlusRepository {
 
   bool get isSomaPlus => _stateNotifier.value.isActive && !_stateNotifier.value.isExpired;
 
-  static SomaSubscriptionTier parseTier(String? rawValue) {
+  static SomaSubscriptionTier parseTier(final String? rawValue) {
     final value = (rawValue ?? '').trim().toLowerCase();
     switch (value) {
       case 'plus':
@@ -353,7 +352,7 @@ class SomaPlusRepository {
     }
   }
 
-  static String serializeTier(SomaSubscriptionTier tier) {
+  static String serializeTier(final SomaSubscriptionTier tier) {
     switch (tier) {
       case SomaSubscriptionTier.plus:
         return 'plus';
@@ -365,7 +364,7 @@ class SomaPlusRepository {
     }
   }
 
-  Future<void> startTrial({int days = 7}) async {
+  Future<void> startTrial({final int days = 7}) async {
     final now = DateTime.now();
     final expires = now.add(Duration(days: days));
     await settingsRepository.updateSettings({
@@ -376,7 +375,7 @@ class SomaPlusRepository {
     });
   }
 
-  Future<void> setTier(SomaSubscriptionTier tier, {DateTime? expiresAt}) async {
+  Future<void> setTier(final SomaSubscriptionTier tier, {final DateTime? expiresAt}) async {
     await settingsRepository.updateSettings({
       'plus_plan': serializeTier(tier),
       'plus_enabled': tier != SomaSubscriptionTier.free,
@@ -392,7 +391,7 @@ class SomaPlusRepository {
     });
   }
 
-  SomaPlusState _fromSettings(Map<String, dynamic> settings) {
+  SomaPlusState _fromSettings(final Map<String, dynamic> settings) {
     final tier = parseTier(settings['plus_plan']?.toString());
     final enabled = settings['plus_enabled'] == true;
     final trialStartedAt =
@@ -415,7 +414,7 @@ class SomaPlusRepository {
   // ─────────────────────────── In-App Purchase ─────────────────────────────────
 
   /// Initiates a purchase for the given [productId].
-  Future<void> purchaseProduct(String productId) async {
+  Future<void> purchaseProduct(final String productId) async {
     if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) {
       debugPrint('SomaPlusRepository: IAP not supported on this platform');
       return;
@@ -447,7 +446,7 @@ class SomaPlusRepository {
   }
 
   Future<void> _onPurchaseUpdate(
-      List<PurchaseDetails> purchaseDetailsList) async {
+      final List<PurchaseDetails> purchaseDetailsList) async {
     for (final purchase in purchaseDetailsList) {
       switch (purchase.status) {
         case PurchaseStatus.purchased:
@@ -466,7 +465,7 @@ class SomaPlusRepository {
     }
   }
 
-  Future<void> _verifyPurchaseWithServer(PurchaseDetails purchase) async {
+  Future<void> _verifyPurchaseWithServer(final PurchaseDetails purchase) async {
     try {
       final receiptData = Platform.isIOS
           ? (purchase.verificationData.serverVerificationData)

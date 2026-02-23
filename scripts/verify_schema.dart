@@ -19,7 +19,7 @@ void main() async {
   print('--- Verification Complete ---');
 }
 
-Future<void> _checkCounts(SupabaseClient client) async {
+Future<void> _checkCounts(final SupabaseClient client) async {
   print('\n[Row Counts]');
   try {
     final vocabCount = await client.from('vocabulary').count();
@@ -33,12 +33,12 @@ Future<void> _checkCounts(SupabaseClient client) async {
 }
 
 Future<void> _checkConceptIntegrity(
-    SupabaseClient client, String table, String labelField) async {
+    final SupabaseClient client, final String table, final String labelField) async {
   print('\n[Integrity Check: $table]');
   try {
     // Fetch a sample of concept_ids
     final response = await client.from(table).select('concept_id').limit(100);
-    final concepts = (response as List).map((e) => e['concept_id']).toSet();
+    final concepts = (response as List).map((final e) => e['concept_id']).toSet();
 
     if (concepts.isEmpty) {
       print('No data found to check integrity.');
@@ -62,7 +62,7 @@ Future<void> _checkConceptIntegrity(
           .select(selectQuery)
           .eq('concept_id', cid);
       
-      final languages = (rows as List).map((r) => r['lang'] ?? r['lang_code']).toList();
+      final languages = (rows as List).map((final r) => r['lang'] ?? r['lang_code']).toList();
       print('Concept ID $cid has ${languages.length} entries: $languages');
       
       if (languages.length > 1) {

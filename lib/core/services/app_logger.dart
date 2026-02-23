@@ -7,28 +7,28 @@ enum AppLogLevel { debug, info, warning, error }
 class AppLogger {
   const AppLogger();
 
-  void debug(String message, {Map<String, Object?>? context}) {
+  void debug(final String message, {final Map<String, Object?>? context}) {
     _log(AppLogLevel.debug, message, context: context);
   }
 
-  void info(String message, {Map<String, Object?>? context}) {
+  void info(final String message, {final Map<String, Object?>? context}) {
     _log(AppLogLevel.info, message, context: context);
   }
 
-  void warning(String message, {Map<String, Object?>? context}) {
-    _log(AppLogLevel.warning, message, context: context);
+  void warning(final String message, {final Map<String, Object?>? context, final Object? error, final StackTrace? stackTrace}) {
+    _log(AppLogLevel.warning, message, context: context, error: error, stackTrace: stackTrace);
   }
 
-  void error(String message, {Map<String, Object?>? context, Object? error, StackTrace? stackTrace}) {
+  void error(final String message, {final Map<String, Object?>? context, final Object? error, final StackTrace? stackTrace}) {
     _log(AppLogLevel.error, message, context: context, error: error, stackTrace: stackTrace);
   }
 
   void _log(
-    AppLogLevel level,
-    String message, {
-    Map<String, Object?>? context,
-    Object? error,
-    StackTrace? stackTrace,
+    final AppLogLevel level,
+    final String message, {
+    final Map<String, Object?>? context,
+    final Object? error,
+    final StackTrace? stackTrace,
   }) {
     if (kReleaseMode && level == AppLogLevel.debug) return;
 
@@ -45,11 +45,11 @@ class AppLogger {
     }
   }
 
-  Map<String, Object?> _sanitizeContext(Map<String, Object?> context) {
-    return context.map((key, value) => MapEntry(key, _sanitizeValue(key, value)));
+  Map<String, Object?> _sanitizeContext(final Map<String, Object?> context) {
+    return context.map((final key, final value) => MapEntry(key, _sanitizeValue(key, value)));
   }
 
-  Object? _sanitizeValue(String key, Object? value) {
+  Object? _sanitizeValue(final String key, final Object? value) {
     final lowerKey = key.toLowerCase();
     const sensitiveKeys = <String>{
       'token',

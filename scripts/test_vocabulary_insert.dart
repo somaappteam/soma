@@ -37,6 +37,6 @@ void main() async {
     print('Cleaned up');
 
   } catch (e) {
-    print("Error: $e");
+    print('Error: $e');
   }
 }

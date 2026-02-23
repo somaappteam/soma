@@ -1638,6 +1638,9 @@ class AppLocalizationsBn extends AppLocalizations {
   String get circlesStartGame => 'গেম শুরু করুন';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'খেলোয়াড়দের জন্য অপেক্ষা করছে';
 
   @override

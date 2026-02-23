@@ -1,7 +1,6 @@
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/data/experiment_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import 'experiment_repository.dart';
-import '../core/di/locator.dart';
 
 class NotificationsRepository {
   final _supabase = Supabase.instance.client;
@@ -18,14 +17,14 @@ class NotificationsRepository {
         .order('created_at', ascending: false);
   }
 
-  Future<void> markAsRead(String notificationId) async {
+  Future<void> markAsRead(final String notificationId) async {
     await _supabase
         .from('notifications')
         .update({'is_read': true})
         .eq('id', notificationId);
   }
 
-  Future<void> deleteNotification(String notificationId) async {
+  Future<void> deleteNotification(final String notificationId) async {
     await _supabase
         .from('notifications')
         .delete()
@@ -43,11 +42,11 @@ class NotificationsRepository {
   }
 
   Future<void> sendCircleInvite({
-    required String toUserId,
-    required String circleId,
-    required String circleTitle,
-    required String fromUserId,
-    required String fromUserName,
+    required final String toUserId,
+    required final String circleId,
+    required final String circleTitle,
+    required final String fromUserId,
+    required final String fromUserName,
   }) async {
     await _supabase.from('notifications').insert({
       'user_id': toUserId,
@@ -66,10 +65,10 @@ class NotificationsRepository {
   }
 
   Future<void> sendFriendRequestNotification({
-    required String toUserId,
-    required String fromUserId,
-    required String fromUserName,
-    String? friendshipId,
+    required final String toUserId,
+    required final String fromUserId,
+    required final String fromUserName,
+    final String? friendshipId,
   }) async {
     final variant = await experimentRepository.variant(
       'notif_copy_friend_request',

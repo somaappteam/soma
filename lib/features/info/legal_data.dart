@@ -1,6 +1,6 @@
 
 class LegalData {
-  static const String privacyPolicy = """
+  static const String privacyPolicy = '''
 # Privacy Policy
 
 **Last Updated:** February 2026
@@ -33,9 +33,9 @@ You may update your account information or delete your account at any time throu
 
 ## 7. Contact Us
 If you have any questions about this Privacy Policy, please contact us at: somaapp.team@gmail.com
-""";
+''';
 
-  static const String termsOfService = """
+  static const String termsOfService = '''
 # Terms of Service
 
 **Last Updated:** February 2026
@@ -63,9 +63,9 @@ In no event shall Soma be liable for any indirect, incidental, special, conseque
 
 ## 8. Changes to Terms
 We reserve the right to modify these terms at any time. We will provide notice of any material changes.
-""";
+''';
 
-  static const String attributions = """
+  static const String attributions = '''
 ## Data Sources & Attributions
 
 **Vocabulary Frequency Data**
@@ -77,5 +77,5 @@ www.wordfrequency.info
 **Example Sentences**
 Sentences provided by Tatoeba (tatoeba.org).
 Used under the Creative Commons Attribution 2.0 France License (CC-BY 2.0 FR).
-""";
+''';
 }

@@ -1,10 +1,10 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import '../services/haptics_service.dart';
-import '../services/sfx_service.dart';
-import '../theme/motion.dart';
-import '../theme/tokens.dart';
+import 'package:soma/core/services/haptics_service.dart';
+import 'package:soma/core/services/sfx_service.dart';
+import 'package:soma/core/theme/motion.dart';
+import 'package:soma/core/theme/tokens.dart';
 
 enum NeonButtonStyle { vibrant, subtle }
 
@@ -42,7 +42,7 @@ class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateM
   }
 
   @override
-  void didUpdateWidget(covariant NeonButton oldWidget) {
+  void didUpdateWidget(covariant final NeonButton oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.style != widget.style || oldWidget.onTap != widget.onTap) {
       _configurePulse();
@@ -72,7 +72,7 @@ class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateM
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final enabled = widget.onTap != null;
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
@@ -93,7 +93,7 @@ class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateM
             },
       child: AnimatedBuilder(
         animation: _pulse,
-        builder: (context, child) {
+        builder: (final context, final child) {
           final glowStrength = isSubtle
               ? 0.02
               : (lerpDouble(0.08, 0.16, _pulse.value) ?? 0.12);

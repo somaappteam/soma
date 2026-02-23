@@ -5,11 +5,10 @@ import 'package:flutter/foundation.dart'
     show TargetPlatform, debugPrint, defaultTargetPlatform, kIsWeb;
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:soma/core/config/rtc_config.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/circle_voice_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../core/config/rtc_config.dart';
-import 'auth_repository.dart';
-import 'circle_voice_service.dart';
 
 class RtcVoiceService {
   RtcVoiceService._();
@@ -19,7 +18,6 @@ class RtcVoiceService {
   final SupabaseClient _client = Supabase.instance.client;
 
   final Map<String, RTCPeerConnection> _peers = {};
-  final Map<String, bool> _peerUsingTurn = {};
   final Map<String, RTCIceConnectionState> _peerIceStates = {};
   final Map<String, bool> _hasRemoteDescription = {};
   final Map<String, List<RTCIceCandidate>> _pendingCandidates = {};
@@ -47,7 +45,6 @@ class RtcVoiceService {
   DateTime? _ephemeralTurnExpiresAt;
 
   int _connectAttempts = 0;
-  int _turnRetries = 0;
   int _candidateBufferedCount = 0;
   int _meshLimitSkips = 0;
 
@@ -55,11 +52,12 @@ class RtcVoiceService {
   Stream<Map<String, dynamic>> get telemetryStream => _telemetryStream.stream;
   bool get isMuted => _muted;
   bool get isSpeakerEnabled => _asSpeaker;
+  List<RTCVideoRenderer> get activeRenderers => _renderers.values.toList();
 
   Future<bool> connect({
-    required String circleId,
-    required bool asSpeaker,
-    bool prioritySpeaker = false,
+    required final String circleId,
+    required final bool asSpeaker,
+    final bool prioritySpeaker = false,
   }) async {
     if (!await _ensurePermissions()) return false;
 
@@ -89,7 +87,7 @@ class RtcVoiceService {
     _signalChannel!
         .onBroadcast(
           event: 'signal',
-          callback: (payload) => _onSignal(payload),
+          callback: (final payload) => _onSignal(payload),
         )
         .subscribe();
 
@@ -136,7 +134,7 @@ class RtcVoiceService {
         : null;
   }
 
-  Future<void> _onSignal(dynamic rawPayload) async {
+  Future<void> _onSignal(final dynamic rawPayload) async {
     final data = _extractSignalData(rawPayload);
     if (data == null) return;
 
@@ -164,7 +162,7 @@ class RtcVoiceService {
           _emitTelemetry('auto_demoted_speaker');
         }
 
-        await _peerFor(from, useTurn: false);
+        await _peerFor(from);
         if (_shouldCreateOffer(from)) {
           await _createAndSendOffer(from);
         }
@@ -173,7 +171,7 @@ class RtcVoiceService {
         _closePeer(from);
         break;
       case 'offer':
-        final pc = await _peerFor(from, useTurn: data['useTurn'] == true);
+        final pc = await _peerFor(from);
         final sdp = data['sdp']?.toString();
         if (sdp == null) return;
         await pc.setRemoteDescription(RTCSessionDescription(sdp, 'offer'));
@@ -184,11 +182,10 @@ class RtcVoiceService {
         await _sendSignal(from, {
           'type': 'answer',
           'sdp': answer.sdp,
-          'useTurn': _peerUsingTurn[from] == true,
         });
         break;
       case 'answer':
-        final pc = await _peerFor(from, useTurn: data['useTurn'] == true);
+        final pc = await _peerFor(from);
         final sdp = data['sdp']?.toString();
         if (sdp == null) return;
         await pc.setRemoteDescription(RTCSessionDescription(sdp, 'answer'));
@@ -196,7 +193,7 @@ class RtcVoiceService {
         await _flushPendingCandidates(from, pc);
         break;
       case 'candidate':
-        final pc = await _peerFor(from, useTurn: data['useTurn'] == true);
+        final pc = await _peerFor(from);
         final candidate = data['candidate']?.toString();
         final sdpMid = data['sdpMid']?.toString();
         final sdpMLineIndex = data['sdpMLineIndex'] is int
@@ -212,15 +209,12 @@ class RtcVoiceService {
           _emitTelemetry('candidate_buffered');
         }
         break;
-      case 'restart-turn':
-        await _retryPeerWithTurn(from, requestRemoteOffer: true);
-        break;
     }
   }
 
   Future<void> _flushPendingCandidates(
-    String peerId,
-    RTCPeerConnection pc,
+    final String peerId,
+    final RTCPeerConnection pc,
   ) async {
     final pending = _pendingCandidates.remove(peerId);
     if (pending == null || pending.isEmpty) return;
@@ -229,7 +223,7 @@ class RtcVoiceService {
     }
   }
 
-  Map<String, dynamic>? _extractSignalData(dynamic rawPayload) {
+  Map<String, dynamic>? _extractSignalData(final dynamic rawPayload) {
     if (rawPayload is Map<String, dynamic>) {
       if (rawPayload['payload'] is Map) {
         return Map<String, dynamic>.from(rawPayload['payload'] as Map);
@@ -248,26 +242,18 @@ class RtcVoiceService {
     return null;
   }
 
-  bool _shouldCreateOffer(String peerId) {
+  bool _shouldCreateOffer(final String peerId) {
     final me = _userId;
     if (me == null) return false;
     return me.compareTo(peerId) < 0;
   }
 
-  Future<RTCPeerConnection> _peerFor(
-    String peerId, {
-    required bool useTurn,
-  }) async {
-    if (_peers.containsKey(peerId) && (_peerUsingTurn[peerId] == true || !useTurn)) {
+  Future<RTCPeerConnection> _peerFor(final String peerId) async {
+    if (_peers.containsKey(peerId)) {
       return _peers[peerId]!;
     }
 
-    if (useTurn && _peerUsingTurn[peerId] != true) {
-      await _retryPeerWithTurn(peerId, requestRemoteOffer: false);
-      if (_peers.containsKey(peerId)) return _peers[peerId]!;
-    }
-
-    return _createPeer(peerId, useTurn: useTurn);
+    return _createPeer(peerId);
   }
 
   Future<void> _maybeRefreshEphemeralTurnCredentials() async {
@@ -306,11 +292,7 @@ class RtcVoiceService {
     }
   }
 
-  Future<List<Map<String, String>>> _iceServersFor({required bool useTurn}) async {
-    if (!useTurn) {
-      return RtcConfig.stunServers;
-    }
-
+  Future<List<Map<String, String>>> _iceServersFor() async {
     await _maybeRefreshEphemeralTurnCredentials();
 
     final ephemeralUrl = _ephemeralTurnUrl ?? '';
@@ -327,18 +309,17 @@ class RtcVoiceService {
       ];
     }
 
-    return RtcConfig.iceServers(useTurn: true);
+    return RtcConfig.iceServers();
   }
 
-  Future<RTCPeerConnection> _createPeer(String peerId, {required bool useTurn}) async {
+  Future<RTCPeerConnection> _createPeer(final String peerId) async {
     final config = <String, dynamic>{
-      'iceServers': await _iceServersFor(useTurn: useTurn),
+      'iceServers': await _iceServersFor(),
       'sdpSemantics': 'unified-plan',
     };
 
     final pc = await createPeerConnection(config);
     _peers[peerId] = pc;
-    _peerUsingTurn[peerId] = useTurn;
     _hasRemoteDescription[peerId] = false;
     _peerIceStates[peerId] = RTCIceConnectionState.RTCIceConnectionStateNew;
 
@@ -349,37 +330,27 @@ class RtcVoiceService {
 
     _emitTelemetry('peer_created');
 
-    pc.onIceCandidate = (candidate) async {
+    pc.onIceCandidate = (final candidate) async {
       if (candidate.candidate == null) return;
       await _sendSignal(peerId, {
         'type': 'candidate',
         'candidate': candidate.candidate,
         'sdpMid': candidate.sdpMid,
         'sdpMLineIndex': candidate.sdpMLineIndex,
-        'useTurn': _peerUsingTurn[peerId] == true,
       });
     };
 
-    pc.onIceConnectionState = (state) async {
+    pc.onIceConnectionState = (final state) async {
       _peerIceStates[peerId] = state;
       _emitConnectionState();
 
       if ((state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
-              state == RTCIceConnectionState.RTCIceConnectionStateCompleted) &&
-          _peerUsingTurn[peerId] == true) {
-        _emitTelemetry('turn_connected_peer');
-      }
-
-      if (state == RTCIceConnectionState.RTCIceConnectionStateFailed &&
-          _peerUsingTurn[peerId] != true) {
-        _turnRetries += 1;
-        _emitTelemetry('turn_retry');
-        await _retryPeerWithTurn(peerId, requestRemoteOffer: false);
-        await _sendSignal(peerId, {'type': 'restart-turn'});
+              state == RTCIceConnectionState.RTCIceConnectionStateCompleted)) {
+        // Connected!
       }
     };
 
-    pc.onTrack = (event) async {
+    pc.onTrack = (final event) async {
       debugPrint('Voice track received from $peerId: ${event.track.kind}');
       if (event.streams.isNotEmpty) {
         final stream = event.streams[0];
@@ -398,8 +369,8 @@ class RtcVoiceService {
     return pc;
   }
 
-  Future<void> _createAndSendOffer(String peerId) async {
-    final pc = await _peerFor(peerId, useTurn: _peerUsingTurn[peerId] == true);
+  Future<void> _createAndSendOffer(final String peerId) async {
+    final pc = await _peerFor(peerId);
     final offer = await pc.createOffer({
       'offerToReceiveAudio': true,
       'offerToReceiveVideo': false,
@@ -409,11 +380,10 @@ class RtcVoiceService {
     await _sendSignal(peerId, {
       'type': 'offer',
       'sdp': offer.sdp,
-      'useTurn': _peerUsingTurn[peerId] == true,
     });
   }
 
-  Future<void> _sendSignal(String? to, Map<String, dynamic> payload) async {
+  Future<void> _sendSignal(final String? to, final Map<String, dynamic> payload) async {
     final channel = _signalChannel;
     final me = _userId;
     if (channel == null || me == null) return;
@@ -428,45 +398,20 @@ class RtcVoiceService {
     );
   }
 
-  Future<void> _retryPeerWithTurn(
-    String peerId, {
-    required bool requestRemoteOffer,
-  }) async {
-    _closePeer(peerId);
-    await _createPeer(peerId, useTurn: true);
-
-    if (requestRemoteOffer) return;
-
-    if (_shouldCreateOffer(peerId)) {
-      await _createAndSendOffer(peerId);
-    }
-  }
-
-  Future<void> forceTurnRelay() async {
-    final peerIds = _peers.keys.toList(growable: false);
-    for (final peerId in peerIds) {
-      if (_peerUsingTurn[peerId] == true) continue;
-      _turnRetries += 1;
-      _emitTelemetry('turn_retry_manual');
-      await _retryPeerWithTurn(peerId, requestRemoteOffer: false);
-      await _sendSignal(peerId, {'type': 'restart-turn'});
-    }
-  }
-
-  Future<void> setMuted(bool muted) async {
+  Future<void> setMuted(final bool muted) async {
     _muted = muted;
     _applyMutedToTrack();
     circleVoiceService.setMuted(muted);
   }
 
-  Future<void> setSpeakerEnabled(bool enabled) async {
+  Future<void> setSpeakerEnabled(final bool enabled) async {
     _asSpeaker = enabled;
     _applyMutedToTrack();
     // Note: We no longer force audio routing here.
     // Audio output (speaker/earpiece) should be controlled separately via setSpeakerphone.
   }
 
-  Future<void> setSpeakerphone(bool enabled) async {
+  Future<void> setSpeakerphone(final bool enabled) async {
     try {
       await Helper.setSpeakerphoneOn(enabled);
     } catch (e) {
@@ -488,9 +433,9 @@ class RtcVoiceService {
 
   void _startMicLevelSampling() {
     _levelTimer?.cancel();
-    _levelTimer = Timer.periodic(const Duration(milliseconds: 400), (_) {
+    _levelTimer = Timer.periodic(const Duration(milliseconds: 400), (final _) {
       final hasConnectedPeer = _peerIceStates.values.any(
-        (state) =>
+        (final state) =>
             state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
             state == RTCIceConnectionState.RTCIceConnectionStateCompleted,
       );
@@ -504,7 +449,7 @@ class RtcVoiceService {
 
   void _emitConnectionState() {
     final connected = _peerIceStates.values.any(
-      (state) =>
+      (final state) =>
           state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
           state == RTCIceConnectionState.RTCIceConnectionStateCompleted,
     );
@@ -513,12 +458,11 @@ class RtcVoiceService {
     }
   }
 
-  void _emitTelemetry(String event) {
+  void _emitTelemetry(final String event) {
     if (_telemetryStream.isClosed) return;
     _telemetryStream.add({
       'event': event,
       'connectAttempts': _connectAttempts,
-      'turnRetries': _turnRetries,
       'candidateBuffered': _candidateBufferedCount,
       'meshLimitSkips': _meshLimitSkips,
       'peerCount': _peers.length,
@@ -526,14 +470,13 @@ class RtcVoiceService {
     });
   }
 
-  void _closePeer(String peerId) {
+  void _closePeer(final String peerId) {
     if (_renderers.containsKey(peerId)) {
       final renderer = _renderers.remove(peerId);
       renderer?.srcObject = null;
       renderer?.dispose();
     }
     _peers.remove(peerId)?.close();
-    _peerUsingTurn.remove(peerId);
     _peerIceStates.remove(peerId);
     _hasRemoteDescription.remove(peerId);
     _pendingCandidates.remove(peerId);
@@ -571,7 +514,7 @@ class RtcVoiceService {
     _emitTelemetry('disconnect');
   }
 
-  Future<void> disconnectIfCircle(String? circleId) async {
+  Future<void> disconnectIfCircle(final String? circleId) async {
     if (!_joined || _circleId == null || circleId == null) return;
     if (_circleId != circleId) return;
     await disconnect();

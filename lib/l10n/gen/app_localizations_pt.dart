@@ -1645,6 +1645,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get circlesStartGame => 'Iniciar jogo';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Aguardando jogadores';
 
   @override

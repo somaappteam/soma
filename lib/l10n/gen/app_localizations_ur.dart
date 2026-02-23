@@ -1640,6 +1640,9 @@ class AppLocalizationsUr extends AppLocalizations {
   String get circlesStartGame => 'کھیل شروع کریں';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'کھلاڑیوں کا انتظار';
 
   @override

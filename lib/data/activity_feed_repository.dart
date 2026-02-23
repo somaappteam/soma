@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/models/activity_event.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../models/activity_event.dart';
-import '../core/di/locator.dart';
 
 class ActivityFeedRepository {
   final _supabase = Supabase.instance.client;
@@ -18,7 +17,7 @@ class ActivityFeedRepository {
         .or('requester_id.eq.$uid,addressee_id.eq.$uid')
         .eq('status', 'accepted');
 
-    return rows.map<String>((r) {
+    return rows.map<String>((final r) {
       final requesterId = r['requester_id'] as String;
       return requesterId == uid
           ? r['addressee_id'] as String
@@ -30,7 +29,7 @@ class ActivityFeedRepository {
   ///
   /// Joins `user_stats` (last active, quiz count) with `profiles`
   /// to build a lightweight activity feed — no extra table required.
-  Future<List<ActivityEvent>> getFriendActivity({int limit = 30}) async {
+  Future<List<ActivityEvent>> getFriendActivity({final int limit = 30}) async {
     final friendIds = await _getFriendIds();
     if (friendIds.isEmpty) return [];
 
@@ -56,7 +55,7 @@ class ActivityFeedRepository {
           .order('updated_at', ascending: false)
           .limit(limit);
 
-      return rows.map<ActivityEvent>((r) {
+      return rows.map<ActivityEvent>((final r) {
         final profile = r['profiles'] as Map<String, dynamic>? ?? {};
         final username    = profile['username']?.toString()     ?? 'learner';
         final displayName = profile['display_name']?.toString() ?? username;

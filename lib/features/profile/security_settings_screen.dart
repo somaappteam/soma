@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/selection_controls.dart';
-import '../../core/theme/tokens.dart';
-import '../../data/settings_repository.dart';
-import '../../data/auth_repository.dart';
-import '../../data/session_repository.dart';
-import '../../core/widgets/responsive.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/core/widgets/selection_controls.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/session_repository.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SecuritySettingsScreen extends StatefulWidget {
@@ -45,7 +45,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
@@ -77,7 +77,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                   Expanded(
                     child: StreamBuilder<Map<String, dynamic>>(
                       stream: _settingsStream,
-                      builder: (context, snapshot) {
+                      builder: (final context, final snapshot) {
                         final data = snapshot.data ?? {};
                         final twoFactor = _twoFactorEnabled;
                         final biometric = data['biometric_enabled'] ?? false;
@@ -111,7 +111,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                               value: twoFactor,
                               onChanged: _mfaLoading
                                   ? null
-                                  : (v) async {
+                                  : (final v) async {
                                       if (v) {
                                         await _startMfaSetup(context);
                                       } else {
@@ -129,7 +129,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                               title: l10n.securityBiometricTitle,
                               subtitle: l10n.securityBiometricSubtitle,
                               value: biometric,
-                              onChanged: (v) => settingsRepository.updateSetting('biometric_enabled', v),
+                              onChanged: (final v) => settingsRepository.updateSetting('biometric_enabled', v),
                             ),
                             const SizedBox(height: 10),
                             _SwitchTile(
@@ -137,13 +137,13 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                               title: l10n.securityAppLockTitle,
                               subtitle: l10n.securityAppLockSubtitle,
                               value: appLock,
-                              onChanged: (v) => settingsRepository.updateSetting('app_lock_enabled', v),
+                              onChanged: (final v) => settingsRepository.updateSetting('app_lock_enabled', v),
                             ),
                             const SizedBox(height: 10),
                             _AutoLockRow(
                               enabled: appLock,
                               minutes: autoLockMinutes,
-                              onPick: (m) => settingsRepository.updateSetting('auto_lock_minutes', m),
+                              onPick: (final m) => settingsRepository.updateSetting('auto_lock_minutes', m),
                             ),
 
                             const SizedBox(height: 14),
@@ -155,7 +155,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                               padding: const EdgeInsets.all(16),
                               child: StreamBuilder<List<UserSession>>(
                                 stream: sessionRepository.streamSessions(),
-                                builder: (context, snapshot) {
+                                builder: (final context, final snapshot) {
                                   if (snapshot.connectionState == ConnectionState.waiting) {
                                     return const Center(child: CircularProgressIndicator());
                                   }
@@ -172,7 +172,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                   }
 
                                   return Column(
-                                    children: sessions.map((s) {
+                                    children: sessions.map((final s) {
                                       final label = s.isCurrent
                                           ? l10n.securityThisDevice
                                           : (s.deviceName ?? l10n.securityDevice);
@@ -212,7 +212,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                                   ),
                                                   const SizedBox(height: 4),
                                                   Text(
-                                                    "${platform.toUpperCase()} • ${_formatSeen(s.lastSeen)}",
+                                                    '${platform.toUpperCase()} • ${_formatSeen(s.lastSeen)}',
                                                     style: TextStyle(
                                                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
                                                       fontWeight: FontWeight.w700,
@@ -263,16 +263,16 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     );
   }
 
-  void _openChangePassword(BuildContext context) {
+  void _openChangePassword(final BuildContext context) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (_) => const _ChangePasswordSheet(),
+      builder: (final _) => const _ChangePasswordSheet(),
     );
   }
 
-  Future<void> _startMfaSetup(BuildContext context) async {
+  Future<void> _startMfaSetup(final BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     if (authRepository.currentUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -296,7 +296,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
         context: context,
         backgroundColor: Colors.transparent,
         isScrollControlled: true,
-        builder: (_) => _MfaSetupSheet(
+        builder: (final _) => _MfaSetupSheet(
           factorId: enroll.id,
           qrCode: totp.qrCode,
           secret: totp.secret,
@@ -315,7 +315,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     }
   }
 
-  Future<void> _disableMfa(BuildContext context) async {
+  Future<void> _disableMfa(final BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     try {
       final factors = await _supabase.auth.mfa.listFactors();
@@ -335,7 +335,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     }
   }
 
-  String _formatSeen(DateTime dt) {
+  String _formatSeen(final DateTime dt) {
     final l10n = AppLocalizations.of(context);
     final now = DateTime.now();
     final diff = now.difference(dt);
@@ -354,7 +354,7 @@ class _IconBtn extends StatelessWidget {
   const _IconBtn({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(14),
       padding: EdgeInsets.zero,
@@ -378,7 +378,7 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 10),
       child: Text(
@@ -408,7 +408,7 @@ class _Tile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(24),
       padding: EdgeInsets.zero,
@@ -458,7 +458,7 @@ class _SwitchTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(24),
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
@@ -492,7 +492,7 @@ class _AutoLockRow extends StatelessWidget {
   const _AutoLockRow({required this.enabled, required this.minutes, required this.onPick});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final options = const [1, 5, 15];
     return Glass(
@@ -511,7 +511,7 @@ class _AutoLockRow extends StatelessWidget {
           Opacity(
             opacity: enabled ? 1 : 0.45,
             child: Row(
-              children: options.map((m) {
+              children: options.map((final m) {
                 final selected = m == minutes;
                 return Padding(
                   padding: const EdgeInsets.only(left: 8),
@@ -538,7 +538,7 @@ class _IconBox extends StatelessWidget {
   const _IconBox({required this.icon});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       width: 44,
       height: 44,
@@ -582,7 +582,7 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final svgData = _parseSvg(widget.qrCode);
     return Padding(
@@ -669,7 +669,7 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
     );
   }
 
-  String _parseSvg(String dataUri) {
+  String _parseSvg(final String dataUri) {
     try {
       final uri = Uri.parse(dataUri);
       if (uri.scheme == 'data') {
@@ -704,7 +704,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     // In a real app we'd trigger a reload of the build to enable/disable button
     // For now we just check controllers
@@ -811,7 +811,7 @@ class _Input extends StatelessWidget {
   const _Input(this.c, {required this.hint, required this.obscure, required this.onChanged});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
@@ -824,7 +824,7 @@ class _Input extends StatelessWidget {
       child: TextField(
         controller: c,
         obscureText: obscure,
-        onChanged: (_) => onChanged(),
+        onChanged: (final _) => onChanged(),
         style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w800, fontSize: 14.5),
         cursorColor: Theme.of(context).colorScheme.primary,
         decoration: InputDecoration(

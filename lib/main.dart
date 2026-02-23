@@ -3,21 +3,20 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/i18n/ui_language.dart';
+import 'package:soma/core/services/app_bootstrap.dart';
+import 'package:soma/core/services/sync_retry_policy.dart';
+import 'package:soma/core/services/theme_mode_controller.dart';
+import 'package:soma/core/theme/app_theme.dart';
+import 'package:soma/core/widgets/app_lock_gate.dart';
+import 'package:soma/data/app_analytics_repository.dart';
+import 'package:soma/data/content_sync_service.dart';
+import 'package:soma/data/offline_queue_repository.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/features/auth/splash_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-
-import 'core/i18n/ui_language.dart';
-import 'core/services/app_bootstrap.dart';
-import 'core/services/sync_retry_policy.dart';
-import 'core/services/theme_mode_controller.dart';
-import 'core/theme/app_theme.dart';
-import 'core/widgets/app_lock_gate.dart';
-import 'data/app_analytics_repository.dart';
-import 'data/content_sync_service.dart';
-import 'data/offline_queue_repository.dart';
-import 'data/settings_repository.dart';
-import 'features/auth/splash_screen.dart';
-import 'models/app_settings.dart';
-import 'core/di/locator.dart';
+import 'package:soma/models/app_settings.dart';
 
 enum SyncStatus { idle, syncing, error }
 
@@ -27,11 +26,11 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   await SentryFlutter.init(
-    (options) {
+    (final options) {
       // Pass --dart-define=SENTRY_DSN=https://... to enable in release.
       const dsn = String.fromEnvironment('SENTRY_DSN');
-      const traceRate = double.fromEnvironment('SENTRY_TRACE_SAMPLE_RATE', defaultValue: 0.2);
-      const profileRate = double.fromEnvironment('SENTRY_PROFILE_SAMPLE_RATE', defaultValue: 0.1);
+      final traceRate = double.tryParse(const String.fromEnvironment('SENTRY_TRACE_SAMPLE_RATE')) ?? 0.2;
+      final profileRate = double.tryParse(const String.fromEnvironment('SENTRY_PROFILE_SAMPLE_RATE')) ?? 0.1;
       const enableInDebug = bool.fromEnvironment('SENTRY_ENABLE_IN_DEBUG', defaultValue: false);
 
       options.dsn = dsn.isEmpty ? '' : dsn;
@@ -63,7 +62,7 @@ Future<void> runContentSync() async {
   final retryPolicy = SyncRetryPolicy();
   final result = await retryPolicy.execute(
     runSync: contentSyncService.syncEverything,
-    onRetryScheduled: (attempt, failedSteps) async {
+    onRetryScheduled: (final attempt, final failedSteps) async {
       syncMessageNotifier.value =
           'Sync issue (${failedSteps.join(', ')}). Retrying ($attempt/${SyncRetryPolicy.maxAttempts})…';
       await appAnalyticsRepository.track('sync_retry_scheduled', metadata: {
@@ -78,7 +77,7 @@ Future<void> runContentSync() async {
     return;
   }
 
-  final durations = result.stepDurationsMs.entries.map((e) => '${e.key}:${e.value}ms').join(' · ');
+  final durations = result.stepDurationsMs.entries.map((final e) => '${e.key}:${e.value}ms').join(' · ');
   syncStatusNotifier.value = SyncStatus.error;
   syncMessageNotifier.value = result.failedSteps.isEmpty
       ? 'Sync failed unexpectedly. Tap retry to try again.'
@@ -94,7 +93,7 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   final List<Locale> _supportedLocales =
-      kSupportedUiLanguages.map((item) => Locale(item.code)).toList();
+      kSupportedUiLanguages.map((final item) => Locale(item.code)).toList();
 
   Locale? _currentLocale;
   StreamSubscription<AppSettings>? _settingsSubscription;
@@ -122,7 +121,7 @@ class _AppState extends State<App> {
   void _listenToSettingsChanges() {
     _settingsSubscription?.cancel();
     _settingsSubscription =
-        settingsRepository.getTypedSettingsStream().listen((settings) {
+        settingsRepository.getTypedSettingsStream().listen((final settings) {
       if (mounted) {
         final locale = uiLanguageToLocale(settings.languageUi);
         if (_currentLocale != locale) {
@@ -165,14 +164,14 @@ class _AppState extends State<App> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return AnimatedBuilder(
       animation: themeModeController,
-      builder: (context, _) {
+      builder: (final context, final _) {
         return MaterialApp(
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
-          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+          onGenerateTitle: (final context) => AppLocalizations.of(context).appTitle,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -186,7 +185,7 @@ class _AppState extends State<App> {
           themeMode: themeModeController.mode,
           themeAnimationDuration: const Duration(milliseconds: 180),
           themeAnimationCurve: Curves.easeOutCubic,
-          builder: (context, child) {
+          builder: (final context, final child) {
             if (child == null) return const SizedBox.shrink();
             final background =
                 Theme.of(context).extension<AppBackgroundTheme>()?.gradient;
@@ -201,7 +200,7 @@ class _AppState extends State<App> {
             final decoratedChild = MediaQuery(
               data: clampedMedia,
               child: LayoutBuilder(
-                builder: (context, constraints) {
+                builder: (final context, final constraints) {
                   final width = constraints.maxWidth;
                   final maxContentWidth =
                       width >= 1700 ? 1500.0 : (width >= 1400 ? 1320.0 : width);

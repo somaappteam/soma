@@ -1638,6 +1638,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get circlesStartGame => 'गेम शुरू करें';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'खिलाड़ियों की प्रतीक्षा कर रहे हैं';
 
   @override

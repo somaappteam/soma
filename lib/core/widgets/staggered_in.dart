@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../theme/motion.dart';
+import 'package:soma/core/theme/motion.dart';
 
 class StaggeredIn extends StatefulWidget {
   final Widget child;
@@ -52,7 +52,7 @@ class _StaggeredInState extends State<StaggeredIn> with SingleTickerProviderStat
     _configureAnimations(isLight);
   }
 
-  void _configureAnimations(bool isLight) {
+  void _configureAnimations(final bool isLight) {
     final effectiveCurve = widget.curve == MotionTokens.standardCurve
         ? (isLight ? MotionTokens.lightStaggerCurve : MotionTokens.darkStaggerCurve)
         : widget.curve;
@@ -77,7 +77,7 @@ class _StaggeredInState extends State<StaggeredIn> with SingleTickerProviderStat
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     _ensureInitialized();
     Widget child = FadeTransition(
       opacity: _fade,

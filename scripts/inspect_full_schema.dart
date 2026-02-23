@@ -1,6 +1,7 @@
 
-import 'package:postgres/postgres.dart';
 import 'dart:io';
+
+import 'package:postgres/postgres.dart';
 
 Future<void> main() async {
   final endpoint = Endpoint(
@@ -23,10 +24,10 @@ Future<void> main() async {
   ];
 
   final result = await conn.execute(
-    "SELECT table_name, column_name, data_type, is_nullable "
-    "FROM information_schema.columns "
+    'SELECT table_name, column_name, data_type, is_nullable '
+    'FROM information_schema.columns '
     "WHERE table_schema = 'public' "
-    "ORDER BY table_name, ordinal_position"
+    'ORDER BY table_name, ordinal_position'
   );
 
   final buffer = StringBuffer();

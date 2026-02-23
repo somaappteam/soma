@@ -18,7 +18,7 @@ class ThemeModeController extends ChangeNotifier {
     }
   }
 
-  Future<void> setMode(ThemeMode mode, {bool persist = true}) async {
+  Future<void> setMode(final ThemeMode mode, {final bool persist = true}) async {
     if (_mode == mode) return;
     _mode = mode;
     notifyListeners();
@@ -28,11 +28,11 @@ class ThemeModeController extends ChangeNotifier {
     }
   }
 
-  Future<void> setModeFromSetting(String value, {bool persist = true}) {
+  Future<void> setModeFromSetting(final String value, {final bool persist = true}) {
     return setMode(parse(value), persist: persist);
   }
 
-  static ThemeMode parse(String value) {
+  static ThemeMode parse(final String value) {
     switch (value) {
       case 'Dark':
         return ThemeMode.dark;
@@ -43,7 +43,7 @@ class ThemeModeController extends ChangeNotifier {
     }
   }
 
-  static String serialize(ThemeMode mode) {
+  static String serialize(final ThemeMode mode) {
     switch (mode) {
       case ThemeMode.dark:
         return 'Dark';

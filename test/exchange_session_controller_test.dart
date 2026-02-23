@@ -78,7 +78,7 @@ void main() {
 
     await controller.acceptRequest();
     for (var i = 0; i < ExchangeSessionController.maxMessagesPerMinute; i++) {
-      final ok = await controller.sendMessage('bonjour merci ${i}');
+      final ok = await controller.sendMessage('bonjour merci $i');
       expect(ok, isTrue);
       await controller.receivePartnerMessage('ok');
     }

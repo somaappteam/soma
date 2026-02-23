@@ -1,6 +1,7 @@
 
-import 'package:supabase/supabase.dart';
 import 'dart:io';
+
+import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
 const String serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYmp0ZWVkb2hmbGdrYXJmYXhrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTcwMDI2NCwiZXhwIjoyMDg1Mjc2MjY0fQ.jTZOgpQ7Fy1HlUT0YldRAtr6Bvwti_Al1hfaP5Bz0Nc';
@@ -9,7 +10,7 @@ Future<void> main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
   final buffer = StringBuffer();
   
-  void log(String msg) {
+  void log(final String msg) {
     print(msg);
     buffer.writeln(msg);
   }
@@ -46,10 +47,13 @@ Future<void> main() async {
       final res = await client.from(table).select().limit(1).maybeSingle();
       if (res != null) {
         log('✅ Table exists and has data.');
-        final keys = (res as Map<String, dynamic>).keys.toSet();
+        final keys = (res).keys.toSet();
         for (var col in columns) {
-          if (keys.contains(col)) log('  ✅ Column "$col" present');
-          else log('  ❌ Column "$col" MISSING');
+          if (keys.contains(col)) {
+            log('  ✅ Column "$col" present');
+          } else {
+            log('  ❌ Column "$col" MISSING');
+          }
         }
       } else {
         log('ℹ️ Table exists but is empty. Probing columns individually...');

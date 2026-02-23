@@ -1596,6 +1596,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get circlesStartGame => '开始游戏';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => '等待玩家';
 
   @override

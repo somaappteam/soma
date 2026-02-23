@@ -9,7 +9,7 @@ class TtsService {
   bool _isSpeaking = false;
   double get rate => _rate;
 
-  double _engineRate(double uiRate) {
+  double _engineRate(final double uiRate) {
     // Keep 1.0x as natural speed while preserving slower/faster presets.
     return (uiRate * 0.75).clamp(0.2, 1.0);
   }
@@ -79,7 +79,7 @@ class TtsService {
   /// preferred BCP-47 form expected by the platform TTS engine.
   /// Returns the original value unchanged if the code is not in the map
   /// (e.g., it was already a full locale like 'en-US').
-  static String toBcp47(String code) {
+  static String toBcp47(final String code) {
     final trimmed = code.trim().toLowerCase();
     return _langToBcp47[trimmed] ?? code;
   }
@@ -105,7 +105,7 @@ class TtsService {
         _isSpeaking = false;
       });
 
-      _tts.setErrorHandler((msg) {
+      _tts.setErrorHandler((final msg) {
         _isSpeaking = false;
         debugPrint('TTS Error handler: $msg');
       });
@@ -116,7 +116,7 @@ class TtsService {
   }
 
   /// Sets the playback speech rate.
-  Future<void> setRate(double rate) async {
+  Future<void> setRate(final double rate) async {
     _rate = rate;
     try {
       await _ensureInit();
@@ -130,7 +130,7 @@ class TtsService {
   /// Sets the TTS language, checking availability first.
   /// If the language is not available, it quietly resets to the default.
   /// Returns [true] if the language was set successfully, [false] otherwise.
-  Future<bool> setLanguage(String langCode) async {
+  Future<bool> setLanguage(final String langCode) async {
     try {
       await _ensureInit();
       final bcp47 = toBcp47(langCode);
@@ -167,7 +167,7 @@ class TtsService {
   /// The speech rate is always re-applied after setting the language because
   /// some TTS engines reset the rate to their default when the language
   /// changes.
-  Future<void> speak(String text, {String? language}) async {
+  Future<void> speak(final String text, {final String? language}) async {
     if (text.trim().isEmpty) return;
 
     // Require an explicit language. Without one we can't guarantee the correct

@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/premium_dialog.dart';
+import 'package:soma/core/widgets/responsive.dart';
+import 'package:soma/core/widgets/selection_controls.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/privacy_repository.dart';
+import 'package:soma/data/profile_repository.dart';
+import 'package:soma/data/settings_repository.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/premium_dialog.dart';
-import '../../core/widgets/selection_controls.dart';
-import '../../data/settings_repository.dart';
-import '../../core/widgets/responsive.dart';
-import '../../data/auth_repository.dart';
-import '../../data/profile_repository.dart';
-import '../../data/privacy_repository.dart';
 
 // Enum definitions (could be in a model file, but keeping here for simplicity as they were in privacy_store)
 enum ProfileVisibility { public, friends, private }
@@ -33,7 +33,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
@@ -65,7 +65,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                   Expanded(
                     child: StreamBuilder<Map<String, dynamic>>(
                       stream: _settingsStream,
-                      builder: (context, snapshot) {
+                      builder: (final context, final snapshot) {
                         // Default values if loading or empty
                         final data = snapshot.data ?? {};
                         
@@ -93,7 +93,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                                 _SegOpt(l10n.privacyVisibilityPrivate),
                               ],
                               selectedIndex: _visIndex(visibility),
-                              onPick: (i) {
+                              onPick: (final i) {
                                 final v = i == 0
                                     ? ProfileVisibility.public
                                     : i == 1
@@ -111,7 +111,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                               title: l10n.privacyShowOnlineTitle,
                               subtitle: l10n.privacyShowOnlineSubtitle,
                               value: showOnline,
-                              onChanged: (v) => settingsRepository.updateSetting('show_online_status', v),
+                              onChanged: (final v) => settingsRepository.updateSetting('show_online_status', v),
                             ),
                             const SizedBox(height: 10),
                             _SwitchTile(
@@ -119,7 +119,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                               title: l10n.privacyShowActivityTitle,
                               subtitle: l10n.privacyShowActivitySubtitle,
                               value: showActivity,
-                              onChanged: (v) => settingsRepository.updateSetting('show_learning_activity', v),
+                              onChanged: (final v) => settingsRepository.updateSetting('show_learning_activity', v),
                             ),
 
 
@@ -131,7 +131,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                               title: l10n.privacyAllowRequestsTitle,
                               subtitle: l10n.privacyAllowRequestsSubtitle,
                               value: allowRequests,
-                              onChanged: (v) => settingsRepository.updateSetting('allow_friend_requests', v),
+                              onChanged: (final v) => settingsRepository.updateSetting('allow_friend_requests', v),
                             ),
 
                             const SizedBox(height: 10),
@@ -145,7 +145,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                                 _SegOpt(l10n.privacyDmNoOne),
                               ],
                               selectedIndex: _dmIndex(dmPermission),
-                              onPick: (i) {
+                              onPick: (final i) {
                                 final p = i == 0
                                     ? DmPermission.everyone
                                     : i == 1
@@ -168,7 +168,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => _BlockedUsersScreen(
+                                    builder: (final _) => _BlockedUsersScreen(
                                       blockedIds: blockedIds,
                                     ),
                                   ),
@@ -209,15 +209,15 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
 
   // --- Parsers ---
 
-  ProfileVisibility _parseVisibility(String? v) {
-    return ProfileVisibility.values.firstWhere((e) => e.name == v, orElse: () => ProfileVisibility.friends);
+  ProfileVisibility _parseVisibility(final String? v) {
+    return ProfileVisibility.values.firstWhere((final e) => e.name == v, orElse: () => ProfileVisibility.friends);
   }
 
-  DmPermission _parseDmPermission(String? v) {
-    return DmPermission.values.firstWhere((e) => e.name == v, orElse: () => DmPermission.friendsOnly);
+  DmPermission _parseDmPermission(final String? v) {
+    return DmPermission.values.firstWhere((final e) => e.name == v, orElse: () => DmPermission.friendsOnly);
   }
 
-  int _visIndex(ProfileVisibility v) {
+  int _visIndex(final ProfileVisibility v) {
     switch (v) {
       case ProfileVisibility.public: return 0;
       case ProfileVisibility.friends: return 1;
@@ -225,7 +225,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     }
   }
 
-  String _visibilitySubtitle(ProfileVisibility v, AppLocalizations l10n) {
+  String _visibilitySubtitle(final ProfileVisibility v, final AppLocalizations l10n) {
     switch (v) {
       case ProfileVisibility.public: return l10n.privacyVisibilityPublicSubtitle;
       case ProfileVisibility.friends: return l10n.privacyVisibilityFriendsSubtitle;
@@ -233,7 +233,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     }
   }
 
-  int _dmIndex(DmPermission p) {
+  int _dmIndex(final DmPermission p) {
     switch (p) {
       case DmPermission.everyone: return 0;
       case DmPermission.friendsOnly: return 1;
@@ -241,7 +241,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     }
   }
 
-  String _dmSubtitle(DmPermission p, AppLocalizations l10n) {
+  String _dmSubtitle(final DmPermission p, final AppLocalizations l10n) {
     switch (p) {
       case DmPermission.everyone: return l10n.privacyDmEveryoneSubtitle;
       case DmPermission.friendsOnly: return l10n.privacyDmFriendsSubtitle;
@@ -249,15 +249,15 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     }
   }
 
-  void _showInfo(BuildContext context, String title, String body) {
+  void _showInfo(final BuildContext context, final String title, final String body) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (_) => _InfoSheet(title: title, body: body),
+      builder: (final _) => _InfoSheet(title: title, body: body),
     );
   }
 
-  void _confirmDelete(BuildContext context) {
+  void _confirmDelete(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     showPremiumDialog(
       context: context,
@@ -266,21 +266,21 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
       confirmText: l10n.delete,
       cancelText: l10n.cancel,
       destructive: true,
-    ).then((confirmed) {
+    ).then((final confirmed) {
       if (confirmed != true) return;
       if (!mounted) return;
       _deleteAccount(context);
     });
   }
 
-  List<String> _parseBlockedUsers(dynamic value) {
+  List<String> _parseBlockedUsers(final dynamic value) {
     if (value is List) {
-      return value.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
+      return value.map((final e) => e.toString()).where((final e) => e.isNotEmpty).toList();
     }
     return [];
   }
 
-  Future<void> _exportData(BuildContext context) async {
+  Future<void> _exportData(final BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     try {
       final payload = await privacyRepository.exportUserDataSnapshot();
@@ -294,7 +294,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     }
   }
 
-  Future<void> _deleteAccount(BuildContext context) async {
+  Future<void> _deleteAccount(final BuildContext context) async {
     final l10n = AppLocalizations.of(context);
     try {
       await privacyRepository.requestAccountDeletion();
@@ -305,7 +305,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
           content: Text('Account deletion request submitted.'),
         ),
       );
-      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.of(context).popUntil((final route) => route.isFirst);
     } catch (e) {
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -334,16 +334,16 @@ class _BlockedUsersScreenState extends State<_BlockedUsersScreen> {
     _profilesFuture = profileRepository.getProfilesByIds(_blockedIds);
   }
 
-  Future<void> _unblock(String userId) async {
+  Future<void> _unblock(final String userId) async {
     setState(() {
-      _blockedIds = _blockedIds.where((id) => id != userId).toList();
+      _blockedIds = _blockedIds.where((final id) => id != userId).toList();
       _profilesFuture = profileRepository.getProfilesByIds(_blockedIds);
     });
     await settingsRepository.updateSetting('blocked_user_ids', _blockedIds);
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     return Scaffold(
@@ -385,7 +385,7 @@ class _BlockedUsersScreenState extends State<_BlockedUsersScreen> {
                         )
                       : FutureBuilder<List<Map<String, dynamic>>>(
                           future: _profilesFuture,
-                          builder: (context, snapshot) {
+                          builder: (final context, final snapshot) {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return const Center(child: CircularProgressIndicator());
                             }
@@ -393,8 +393,8 @@ class _BlockedUsersScreenState extends State<_BlockedUsersScreen> {
                             return ListView.separated(
                               physics: const BouncingScrollPhysics(),
                               itemCount: profiles.length,
-                              separatorBuilder: (_, __) => const SizedBox(height: 10),
-                              itemBuilder: (context, index) {
+                              separatorBuilder: (final _, final __) => const SizedBox(height: 10),
+                              itemBuilder: (final context, final index) {
                                 final profile = profiles[index];
                                 final id = profile['id']?.toString() ?? '';
                                 return Glass(
@@ -457,7 +457,7 @@ class _IconBtn extends StatelessWidget {
   const _IconBtn({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(14),
       padding: EdgeInsets.zero,
@@ -479,7 +479,7 @@ class _SectionTitle extends StatelessWidget {
   const _SectionTitle(this.text);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 10),
       child: Text(
@@ -511,7 +511,7 @@ class _SwitchTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(24),
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
@@ -541,7 +541,7 @@ class _IconBox extends StatelessWidget {
   const _IconBox({required this.icon});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       width: 44,
       height: 44,
@@ -577,7 +577,7 @@ class _SegmentedChoice extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(24),
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
@@ -589,7 +589,7 @@ class _SegmentedChoice extends StatelessWidget {
           Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
           const SizedBox(height: 12),
           Row(
-            children: List.generate(options.length, (i) {
+            children: List.generate(options.length, (final i) {
               final selected = i == selectedIndex;
               return Expanded(
                 child: Container(
@@ -625,7 +625,7 @@ class _Tile extends StatelessWidget {
   });
  
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(24),
       padding: EdgeInsets.zero,
@@ -671,7 +671,7 @@ class _TileDanger extends StatelessWidget {
   });
  
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(24),
       padding: EdgeInsets.zero,
@@ -709,7 +709,7 @@ class _InfoSheet extends StatelessWidget {
   const _InfoSheet({required this.title, required this.body});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),

@@ -6,14 +6,14 @@ class SomaBreakpoints {
   static const double wide = 1200;
 }
 
-double somaMaxWidth(double width) {
+double somaMaxWidth(final double width) {
   if (width >= SomaBreakpoints.wide) return 1040;
   if (width >= SomaBreakpoints.medium) return 880;
   if (width >= SomaBreakpoints.compact) return 720;
   return width;
 }
 
-double somaGutter(double width) {
+double somaGutter(final double width) {
   if (width >= SomaBreakpoints.wide) return 36;
   if (width >= SomaBreakpoints.medium) return 28;
   if (width >= SomaBreakpoints.compact) return 22;
@@ -37,9 +37,9 @@ class ResponsiveFrame extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return LayoutBuilder(
-      builder: (context, constraints) {
+      builder: (final context, final constraints) {
         final width = constraints.maxWidth;
         final resolvedMax = maxWidth ?? somaMaxWidth(width);
         final resolvedPadding = padding ??
@@ -75,9 +75,9 @@ class ResponsiveScroll extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return LayoutBuilder(
-      builder: (context, constraints) {
+      builder: (final context, final constraints) {
         return SingleChildScrollView(
           physics: physics ?? const BouncingScrollPhysics(),
           padding: padding,

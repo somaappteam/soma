@@ -1637,6 +1637,9 @@ class AppLocalizationsTr extends AppLocalizations {
   String get circlesStartGame => 'Oyunu Başlat';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Oyuncular bekleniyor';
 
   @override

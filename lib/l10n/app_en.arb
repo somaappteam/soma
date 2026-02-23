@@ -741,6 +741,7 @@
   "circlesJoinRequests": "Join requests",
   "circlesAcceptSpectatorsHint": "Accept spectators before the match starts.",
   "circlesStartGame": "Start game",
+  "circlesStartingGame": "Starting game...",
   "circlesWaitingForPlayers": "Waiting for players",
   "circlesLeaveCircle": "Leave circle",
   "circlesRequestSent": "Request Sent",

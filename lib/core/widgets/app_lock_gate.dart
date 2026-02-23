@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 
-import '../../data/settings_repository.dart';
+import 'package:soma/data/settings_repository.dart';
 
 class AppLockGate extends StatefulWidget {
   final Widget child;
@@ -29,7 +29,7 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _settingsSub = settingsRepository.getSettingsStream().listen((settings) {
+    _settingsSub = settingsRepository.getSettingsStream().listen((final settings) {
       final nextLock = settings['app_lock_enabled'] ?? false;
       final nextBio = settings['biometric_enabled'] ?? false;
       final nextMinutes = (settings['auto_lock_minutes'] as num?)?.toInt() ?? 5;
@@ -52,7 +52,7 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(final AppLifecycleState state) {
     if (!_appLockEnabled) return;
     if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
       _lastInactive = DateTime.now();
@@ -101,7 +101,7 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Stack(
       children: [
         widget.child,
@@ -127,7 +127,7 @@ class _LockCard extends StatelessWidget {
   const _LockCard({required this.onUnlock});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),

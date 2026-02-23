@@ -1,15 +1,15 @@
+import 'package:soma/core/di/locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/di/locator.dart';
 
 class PresenceRepository {
-  PresenceRepository({SupabaseClient? client})
+  PresenceRepository({final SupabaseClient? client})
       : _supabase = client ?? Supabase.instance.client;
 
   final SupabaseClient _supabase;
 
   static const Duration onlineThreshold = Duration(minutes: 5);
 
-  Stream<bool> streamOnlineStatus(String userId) {
+  Stream<bool> streamOnlineStatus(final String userId) {
     return _supabase
         .from('user_sessions')
         .stream(primaryKey: ['id'])
@@ -17,13 +17,13 @@ class PresenceRepository {
         .map(_isOnlineFromRows);
   }
 
-  Stream<Map<String, bool>> streamMultipleOnlineStatuses(List<String> userIds) {
+  Stream<Map<String, bool>> streamMultipleOnlineStatuses(final List<String> userIds) {
     if (userIds.isEmpty) return Stream.value({});
     return _supabase
         .from('user_sessions')
         .stream(primaryKey: ['id'])
         .inFilter('user_id', userIds)
-        .map((rows) {
+        .map((final rows) {
       final grouped = <String, List<Map<String, dynamic>>>{};
       for (final row in rows) {
         final uid = row['user_id']?.toString();
@@ -36,7 +36,7 @@ class PresenceRepository {
     });
   }
 
-  Future<bool> fetchOnlineStatus(String userId) async {
+  Future<bool> fetchOnlineStatus(final String userId) async {
     final rows = await _supabase
         .from('user_sessions')
         .select('user_id, last_seen, is_current')
@@ -44,7 +44,7 @@ class PresenceRepository {
     return _isOnlineFromRows(List<Map<String, dynamic>>.from(rows));
   }
 
-  Future<Map<String, bool>> fetchOnlineStatuses(List<String> userIds) async {
+  Future<Map<String, bool>> fetchOnlineStatuses(final List<String> userIds) async {
     if (userIds.isEmpty) return {};
     final rows = await _supabase
         .from('user_sessions')
@@ -61,7 +61,7 @@ class PresenceRepository {
     };
   }
 
-  bool _isOnlineFromRows(List<Map<String, dynamic>> rows) {
+  bool _isOnlineFromRows(final List<Map<String, dynamic>> rows) {
     if (rows.isEmpty) return false;
     final now = DateTime.now();
     for (final row in rows) {

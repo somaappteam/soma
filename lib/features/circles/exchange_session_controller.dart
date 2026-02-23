@@ -20,7 +20,7 @@ class ExchangeMessage {
         'language_code': languageCode,
       };
 
-  factory ExchangeMessage.fromJson(Map<String, dynamic> json) {
+  factory ExchangeMessage.fromJson(final Map<String, dynamic> json) {
     return ExchangeMessage(
       from: json['from']?.toString() ?? 'Unknown',
       text: json['text']?.toString() ?? '',
@@ -122,7 +122,7 @@ class ExchangeSessionController extends ChangeNotifier {
       ..clear()
       ..addAll(((decoded['messages'] as List?) ?? const [])
           .whereType<Map>()
-          .map((e) => ExchangeMessage.fromJson(Map<String, dynamic>.from(e))));
+          .map((final e) => ExchangeMessage.fromJson(Map<String, dynamic>.from(e))));
 
     if (requestStatus == 'pending' && requestExpired) {
       requestStatus = 'expired';
@@ -144,7 +144,7 @@ class ExchangeSessionController extends ChangeNotifier {
         'requestCreatedAt': requestCreatedAt.toIso8601String(),
         'turnStartedAt': _turnStartedAt.toIso8601String(),
         'cooldownUntil': _cooldownUntil?.toIso8601String(),
-        'messages': _messages.map((m) => m.toJson()).toList(),
+        'messages': _messages.map((final m) => m.toJson()).toList(),
       }),
     );
   }
@@ -179,12 +179,12 @@ class ExchangeSessionController extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool messageLooksValidForRound(String text) {
+  bool messageLooksValidForRound(final String text) {
     final value = text.toLowerCase().trim();
     if (value.isEmpty) return false;
 
     final hints = _langHints[activeLanguageCode];
-    final tokens = value.split(RegExp(r"[^a-zA-ZÀ-ÿ']+")).where((t) => t.isNotEmpty).toList();
+    final tokens = value.split(RegExp(r"[^a-zA-ZÀ-ÿ']+")).where((final t) => t.isNotEmpty).toList();
 
     var charSignal = 0;
     if (activeLanguageCode == 'fr' && RegExp(r'[àâçéèêëîïôûùüÿœ]').hasMatch(value)) charSignal++;
@@ -200,16 +200,16 @@ class ExchangeSessionController extends ChangeNotifier {
 
   bool _withinRateLimit() {
     final now = DateTime.now();
-    _sentAt.removeWhere((t) => now.difference(t) > const Duration(minutes: 1));
+    _sentAt.removeWhere((final t) => now.difference(t) > const Duration(minutes: 1));
     return _sentAt.length < maxMessagesPerMinute;
   }
 
-  Future<bool> sendMessage(String text) async {
+  Future<bool> sendMessage(final String text) async {
     if (requestStatus == 'pending' && requestExpired) {
       requestStatus = 'expired';
     }
     if (!requestAccepted) return false;
-    final reportScore = (_messages.where((m) => m.from == partnerName).length > 40) ? 1 : 0;
+    final reportScore = (_messages.where((final m) => m.from == partnerName).length > 40) ? 1 : 0;
     if (reportScore > 0) return false;
     if (!isMyTurn) return false;
     if (isInCooldown) return false;
@@ -232,7 +232,7 @@ class ExchangeSessionController extends ChangeNotifier {
     return true;
   }
 
-  Future<void> receivePartnerMessage(String text) async {
+  Future<void> receivePartnerMessage(final String text) async {
     _messages.add(ExchangeMessage(from: partnerName, text: text, languageCode: activeLanguageCode));
     isMyTurn = true;
     _turnStartedAt = DateTime.now();

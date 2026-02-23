@@ -1,6 +1,7 @@
 import 'dart:async';
+
+import 'package:soma/data/auth_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'auth_repository.dart';
 
 class VoicePresence {
   final String userId;
@@ -45,9 +46,9 @@ class CircleVoiceService {
     return _presenceByUser[uid];
   }
 
-  VoicePresence? voiceFor(String userId) => _presenceByUser[userId];
+  VoicePresence? voiceFor(final String userId) => _presenceByUser[userId];
 
-  Future<void> connect({required String circleId, required String name}) async {
+  Future<void> connect({required final String circleId, required final String name}) async {
     final uid = authRepository.currentUser?.id;
     if (uid == null) return;
 
@@ -73,9 +74,9 @@ class CircleVoiceService {
     );
 
     _channel!
-        .onPresenceSync((payload) => _syncPresence())
-        .onPresenceJoin((payload) => _syncPresence())
-        .onPresenceLeave((payload) => _syncPresence());
+        .onPresenceSync((final payload) => _syncPresence())
+        .onPresenceJoin((final payload) => _syncPresence())
+        .onPresenceLeave((final payload) => _syncPresence());
 
     _channel!.subscribe();
     _track();
@@ -144,7 +145,7 @@ class CircleVoiceService {
     setMuted(!_muted);
   }
 
-  void setMuted(bool muted) {
+  void setMuted(final bool muted) {
     _muted = muted;
     if (_muted) {
       _speaking = false;
@@ -152,7 +153,7 @@ class CircleVoiceService {
     _track();
   }
 
-  void setSpeaking(bool speaking) {
+  void setSpeaking(final bool speaking) {
     if (_muted) {
       if (_speaking) {
         _speaking = false;
@@ -165,7 +166,7 @@ class CircleVoiceService {
     _track();
   }
 
-  Future<void> disconnectIfCircle(String? circleId) async {
+  Future<void> disconnectIfCircle(final String? circleId) async {
     if (_channel == null || circleId == null) return;
     if (_circleId != circleId) return;
 

@@ -1,9 +1,9 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'notifications_repository.dart';
-import 'profile_repository.dart';
-import 'achievements_repository.dart';
 import 'package:flutter/foundation.dart';
-import '../core/di/locator.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/data/achievements_repository.dart';
+import 'package:soma/data/notifications_repository.dart';
+import 'package:soma/data/profile_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SocialRepository {
   final _supabase = Supabase.instance.client;
@@ -11,7 +11,7 @@ class SocialRepository {
   String? get currentUserId => _supabase.auth.currentUser?.id;
 
   // Search users by username
-  Future<List<Map<String, dynamic>>> searchUsers(String query) async {
+  Future<List<Map<String, dynamic>>> searchUsers(final String query) async {
     if (query.isEmpty) return [];
     
     // Simple ILIKE search on username
@@ -25,13 +25,13 @@ class SocialRepository {
   }
 
   // Send Friend Request
-  Future<void> sendFriendRequest(String addresseeId) async {
+  Future<void> sendFriendRequest(final String addresseeId) async {
     final uid = currentUserId;
-    if (uid == null) throw Exception("Not logged in");
+    if (uid == null) throw Exception('Not logged in');
 
     final existingPendingId = await getOutgoingPendingRequestId(addresseeId);
     if (existingPendingId != null) {
-      throw Exception("Friend request already pending");
+      throw Exception('Friend request already pending');
     }
 
     final inserted = await _supabase.from('friendships').insert({
@@ -43,7 +43,7 @@ class SocialRepository {
 
     try {
       final fromProfile = await profileRepository.fetchProfile(userId: uid);
-      final fromName = fromProfile?.displayName ?? fromProfile?.username ?? "Someone";
+      final fromName = fromProfile?.displayName ?? fromProfile?.username ?? 'Someone';
 
       await notificationsRepository.sendFriendRequestNotification(
         toUserId: addresseeId,
@@ -52,12 +52,12 @@ class SocialRepository {
         friendshipId: friendshipId,
       );
     } catch (e) {
-      debugPrint("Non-critical: Failed to send friend request notification: $e");
+      debugPrint('Non-critical: Failed to send friend request notification: $e');
     }
   }
 
   // Accept Friend Request
-  Future<void> acceptFriendRequest(String friendshipId) async {
+  Future<void> acceptFriendRequest(final String friendshipId) async {
     await _supabase
         .from('friendships')
         .update({'status': 'accepted'})
@@ -66,7 +66,7 @@ class SocialRepository {
     await achievementsRepository.checkAfterFriend();
   }
 
-  Future<void> acceptFriendRequestFromUser(String requesterId) async {
+  Future<void> acceptFriendRequestFromUser(final String requesterId) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -124,7 +124,7 @@ class SocialRepository {
     return _supabase
         .from('friendships')
         .stream(primaryKey: ['id'])
-        .asyncMap((event) async => await getFriends());
+        .asyncMap((final event) async => await getFriends());
   }
 
   Stream<List<Map<String, dynamic>>> getIncomingRequestsStream() {
@@ -133,7 +133,7 @@ class SocialRepository {
     return _supabase
         .from('friendships')
         .stream(primaryKey: ['id'])
-        .asyncMap((event) async => await getIncomingRequests());
+        .asyncMap((final event) async => await getIncomingRequests());
   }
 
   Stream<List<Map<String, dynamic>>> getOutgoingRequestsStream() {
@@ -142,11 +142,11 @@ class SocialRepository {
     return _supabase
         .from('friendships')
         .stream(primaryKey: ['id'])
-        .asyncMap((event) async => await getOutgoingRequests());
+        .asyncMap((final event) async => await getOutgoingRequests());
   }
 
 
-  Future<String?> getOutgoingPendingRequestId(String addresseeId) async {
+  Future<String?> getOutgoingPendingRequestId(final String addresseeId) async {
     final uid = currentUserId;
     if (uid == null) return null;
 
@@ -161,7 +161,7 @@ class SocialRepository {
     return row?['id']?.toString();
   }
 
-  Future<void> cancelFriendRequestToUser(String addresseeId) async {
+  Future<void> cancelFriendRequestToUser(final String addresseeId) async {
     final friendshipId = await getOutgoingPendingRequestId(addresseeId);
     if (friendshipId == null) return;
     await cancelFriendRequest(friendshipId);
@@ -196,11 +196,11 @@ class SocialRepository {
   }
 
   // Decline Friend Request (incoming)
-  Future<void> declineFriendRequest(String friendshipId) async {
+  Future<void> declineFriendRequest(final String friendshipId) async {
     await _supabase.from('friendships').delete().eq('id', friendshipId);
   }
 
-  Future<void> declineFriendRequestFromUser(String requesterId) async {
+  Future<void> declineFriendRequestFromUser(final String requesterId) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -217,12 +217,12 @@ class SocialRepository {
   }
 
   // Cancel Friend Request (outgoing)
-  Future<void> cancelFriendRequest(String friendshipId) async {
+  Future<void> cancelFriendRequest(final String friendshipId) async {
     await _supabase.from('friendships').delete().eq('id', friendshipId);
   }
 
   // Remove Friend
-  Future<void> removeFriend(String friendUserId) async {
+  Future<void> removeFriend(final String friendUserId) async {
     final uid = currentUserId;
     if (uid == null) return;
 

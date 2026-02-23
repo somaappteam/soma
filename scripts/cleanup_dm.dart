@@ -40,7 +40,7 @@ void main() {
     final regex = RegExp(r'(Future<.*?>|String|bool|List<.*?>|void|_CorrectionResult)?\s*' + method + r'\s*\([^)]*\)\s*(async\s*)?\{');
     final match = regex.firstMatch(content);
     if (match != null) {
-      int start = match.start;
+      final int start = match.start;
       int braceCount = 0;
       int idx = start;
       bool inString = false;
@@ -69,7 +69,7 @@ void main() {
         }
       }
 
-      int end = idx;
+      final int end = idx;
       print('Removing $method (${end - start} chars)');
       content = content.replaceRange(start, end, '');
     } else {

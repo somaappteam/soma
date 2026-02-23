@@ -1,5 +1,6 @@
-import 'package:supabase/supabase.dart';
 import 'dart:io';
+
+import 'package:supabase/supabase.dart';
 
 void main() async {
   final client = SupabaseClient(

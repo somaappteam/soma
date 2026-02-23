@@ -1,14 +1,14 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/user_stats.dart';
-import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
-import 'offline_queue_repository.dart';
-import '../core/di/locator.dart';
+import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/data/offline_queue_repository.dart';
+import 'package:soma/models/user_stats.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class StatsRepository {
   final _supabase = Supabase.instance.client;
 
-  Future<UserStats> getStats({String? userId}) async {
+  Future<UserStats> getStats({final String? userId}) async {
     final uid = userId ?? _supabase.auth.currentUser?.id;
     if (uid == null) return UserStats.empty();
 
@@ -35,8 +35,8 @@ class StatsRepository {
   }
 
   Future<UserStats> recordQuizResult({
-    required int correctCount,
-    required int totalCount,
+    required final int correctCount,
+    required final int totalCount,
   }) async {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return UserStats.empty();
@@ -163,13 +163,13 @@ class StatsRepository {
 
   /// Upserts [payload] to Supabase in the background.
   /// On failure, enqueues the payload for offline retry.
-  void _pushToCloud(String table, Map<String, dynamic> payload) {
+  void _pushToCloud(final String table, final Map<String, dynamic> payload) {
     _supabase
         .from(table)
         .upsert(payload, onConflict: 'user_id')
-        .then((_) {
+        .then((final _) {
       debugPrint('StatsRepository: cloud sync OK for $table');
-    }).catchError((e) {
+    }).catchError((final e) {
       debugPrint('StatsRepository: cloud sync failed for $table – $e. Enqueuing.');
       offlineQueueRepository.enqueue(
         tableName: table,
@@ -179,7 +179,7 @@ class StatsRepository {
     });
   }
 
-  static DateTime? _parseDate(dynamic value) {
+  static DateTime? _parseDate(final dynamic value) {
     if (value == null) return null;
     if (value is DateTime) return value;
     if (value is String && value.isNotEmpty) {

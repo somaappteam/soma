@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/selection_controls.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/features/solo/solo_course_detail_screen.dart';
+import 'package:soma/features/solo/solo_sentences_quiz_screen.dart';
+import 'package:soma/features/solo/solo_vocab_quiz_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/selection_controls.dart';
-import '../../models/solo_course.dart';
-import '../../data/settings_repository.dart';
-import 'solo_course_detail_screen.dart';
-import 'solo_vocab_quiz_screen.dart';
-import 'solo_sentences_quiz_screen.dart';
+import 'package:soma/models/solo_course.dart';
 
 class SoloSetupScreen extends StatefulWidget {
   const SoloSetupScreen({super.key, required this.course, required this.mode});
@@ -20,7 +19,7 @@ class SoloSetupScreen extends StatefulWidget {
 }
 
 class _SoloSetupScreenState extends State<SoloSetupScreen> {
-  String level = "A"; // A/B/C
+  String level = 'A'; // A/B/C
   int questions = 10;
   int? timeLimit;
   SoloMode reviewQuizMode = SoloMode.vocabulary;
@@ -41,7 +40,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final effectiveMode = widget.mode == SoloMode.review ? reviewQuizMode : widget.mode;
@@ -54,7 +53,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (context, constraints) {
+          builder: (final context, final constraints) {
             final compactHeight = constraints.maxHeight < 760;
             final topSpacing = compactHeight ? 12.0 : 18.0;
             final sectionSpacing = compactHeight ? 12.0 : 16.0;
@@ -151,11 +150,11 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    _Chip(label: l10n.levelBeginner, selected: level == "A", onTap: () => setState(() => level = "A")),
+                                    _Chip(label: l10n.levelBeginner, selected: level == 'A', onTap: () => setState(() => level = 'A')),
                                     const SizedBox(width: 10),
-                                    _Chip(label: l10n.levelIntermediate, selected: level == "B", onTap: () => setState(() => level = "B")),
+                                    _Chip(label: l10n.levelIntermediate, selected: level == 'B', onTap: () => setState(() => level = 'B')),
                                     const SizedBox(width: 10),
-                                    _Chip(label: l10n.levelAdvanced, selected: level == "C", onTap: () => setState(() => level = "C")),
+                                    _Chip(label: l10n.levelAdvanced, selected: level == 'C', onTap: () => setState(() => level = 'C')),
                                   ],
                                 ),
 
@@ -165,11 +164,11 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    _Chip(label: "10", selected: questions == 10, onTap: () => setState(() => questions = 10)),
+                                    _Chip(label: '10', selected: questions == 10, onTap: () => setState(() => questions = 10)),
                                     const SizedBox(width: 10),
-                                    _Chip(label: "15", selected: questions == 15, onTap: () => setState(() => questions = 15)),
+                                    _Chip(label: '15', selected: questions == 15, onTap: () => setState(() => questions = 15)),
                                     const SizedBox(width: 10),
-                                    _Chip(label: "20", selected: questions == 20, onTap: () => setState(() => questions = 20)),
+                                    _Chip(label: '20', selected: questions == 20, onTap: () => setState(() => questions = 20)),
                                   ],
                                 ),
 
@@ -181,15 +180,15 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                                   children: [
                                     _Chip(label: l10n.noTimer, selected: timeLimit == null, onTap: () => setState(() => timeLimit = null)),
                                     const SizedBox(width: 10),
-                                    _Chip(label: "10s", selected: timeLimit == 10, onTap: () => setState(() => timeLimit = 10)),
+                                    _Chip(label: '10s', selected: timeLimit == 10, onTap: () => setState(() => timeLimit = 10)),
                                   ],
                                 ),
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    _Chip(label: "15s", selected: timeLimit == 15, onTap: () => setState(() => timeLimit = 15)),
+                                    _Chip(label: '15s', selected: timeLimit == 15, onTap: () => setState(() => timeLimit = 15)),
                                     const SizedBox(width: 10),
-                                    _Chip(label: "20s", selected: timeLimit == 20, onTap: () => setState(() => timeLimit = 20)),
+                                    _Chip(label: '20s', selected: timeLimit == 20, onTap: () => setState(() => timeLimit = 20)),
                                   ],
                                 ),
                               ],
@@ -207,7 +206,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => SoloSentencesQuizScreen(
+                                builder: (final _) => SoloSentencesQuizScreen(
                                   course: widget.course,
                                   level: level,
                                   totalQuestions: questions,
@@ -221,7 +220,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => SoloVocabQuizScreen(
+                                builder: (final _) => SoloVocabQuizScreen(
                                   course: widget.course,
                                   level: level,
                                   totalQuestions: questions,
@@ -254,7 +253,7 @@ class _Chip extends StatelessWidget {
   const _Chip({required this.label, required this.selected, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Expanded(
       child: AppSelectablePill(
         label: label,
@@ -271,7 +270,7 @@ class _IconGlass extends StatelessWidget {
   const _IconGlass({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(16),

@@ -21,7 +21,7 @@ class UserStats {
     required this.lastActiveDate,
   });
 
-  factory UserStats.fromRow(Map<String, dynamic> row) {
+  factory UserStats.fromRow(final Map<String, dynamic> row) {
     return UserStats(
       totalWins: row['total_wins'] ?? 0,
       streakDays: row['streak_days'] ?? 0,
@@ -35,7 +35,7 @@ class UserStats {
     );
   }
 
-  static DateTime? _parseDate(dynamic value) {
+  static DateTime? _parseDate(final dynamic value) {
     if (value == null) return null;
     if (value is DateTime) return value;
     if (value is String && value.isNotEmpty) {

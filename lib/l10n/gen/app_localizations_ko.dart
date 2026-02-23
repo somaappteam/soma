@@ -1602,6 +1602,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get circlesStartGame => '게임 시작';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => '플레이어 대기 중';
 
   @override

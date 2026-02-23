@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/data/social_repository.dart';
+import 'package:soma/features/social/dm_chat_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-
-import '../../core/widgets/glass.dart';
-import '../../models/friend.dart';
-import '../../data/social_repository.dart';
-import '../../data/presence_repository.dart';
-import 'dm_chat_screen.dart';
+import 'package:soma/models/friend.dart';
 
 class SelectFriendScreen extends StatefulWidget {
   const SelectFriendScreen({super.key});
@@ -15,7 +14,7 @@ class SelectFriendScreen extends StatefulWidget {
 }
 
 class _SelectFriendScreenState extends State<SelectFriendScreen> {
-  String query = "";
+  String query = '';
   List<Friend> _friends = [];
   bool _isLoading = true;
   bool _didLoad = false;
@@ -38,7 +37,7 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
     final data = await socialRepository.getFriends();
     if (!mounted) return;
     setState(() {
-      _friends = data.map((d) => Friend(
+      _friends = data.map((final d) => Friend(
         id: d['id'],
         username: d['username'] ?? l10n.userFallbackName,
         subtitle: d['location'], // or bio
@@ -49,9 +48,9 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final filtered = _friends.where((f) {
+    final filtered = _friends.where((final f) {
       if (query.trim().isEmpty) return true;
       return f.username.toLowerCase().contains(query.toLowerCase());
     }).toList();
@@ -92,7 +91,7 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
                       const SizedBox(width: 10),
                       Expanded(
                         child: TextField(
-                          onChanged: (v) => setState(() => query = v),
+                          onChanged: (final v) => setState(() => query = v),
                           style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w700),
                           cursorColor: Theme.of(context).colorScheme.primary,
                           decoration: InputDecoration(
@@ -105,7 +104,7 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
                       ),
                       if (query.isNotEmpty)
                         GestureDetector(
-                          onTap: () => setState(() => query = ""),
+                          onTap: () => setState(() => query = ''),
                           child: Icon(Icons.close_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                         ),
                     ],
@@ -134,13 +133,13 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
                           padding: const EdgeInsets.all(12),
                           child: StreamBuilder<Map<String, bool>>(
                             stream: presenceRepository.streamMultipleOnlineStatuses(
-                              filtered.map((f) => f.id).toList(),
+                              filtered.map((final f) => f.id).toList(),
                             ),
-                            builder: (context, presenceSnapshot) {
+                            builder: (final context, final presenceSnapshot) {
                               final onlineStatuses = presenceSnapshot.data ?? {};
                               return ListView(
                                 physics: const BouncingScrollPhysics(),
-                                children: filtered.map((f) {
+                                children: filtered.map((final f) {
                                   return _PickRow(
                                     friend: f,
                                     isOnline: onlineStatuses[f.id] ?? false,
@@ -149,8 +148,8 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (_) => DmChatScreen(
-                                            meId: socialRepository.currentUserId ?? "me",
+                                          builder: (final _) => DmChatScreen(
+                                            meId: socialRepository.currentUserId ?? 'me',
                                             otherId: f.id,
                                             otherName: f.username,
                                           ),
@@ -181,7 +180,7 @@ class _IconGlass extends StatelessWidget {
   const _IconGlass({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
@@ -206,7 +205,7 @@ class _PickRow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -264,7 +263,7 @@ class _AvatarDot extends StatelessWidget {
   const _AvatarDot({required this.online});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       width: 40,
@@ -278,7 +277,7 @@ class _AvatarDot extends StatelessWidget {
         children: [
           Center(
             child: Text(
-              "🙂",
+              '🙂',
               style: TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
             ),
           ),

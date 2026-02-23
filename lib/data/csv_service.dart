@@ -1,6 +1,6 @@
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:csv/csv.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class CsvService {
   static final CsvService instance = CsvService._init();
@@ -19,7 +19,7 @@ class CsvService {
         return;
       }
       
-      final headers = rows.first.map((e) => e.toString().trim()).toList();
+      final headers = rows.first.map((final e) => e.toString().trim()).toList();
       final result = <Map<String, dynamic>>[];
       
       for (var i = 1; i < rows.length; i++) {
@@ -48,7 +48,7 @@ class CsvService {
         return;
       }
       
-      final headers = rows.first.map((e) => e.toString().trim()).toList();
+      final headers = rows.first.map((final e) => e.toString().trim()).toList();
       final result = <Map<String, dynamic>>[];
       
       for (var i = 1; i < rows.length; i++) {
@@ -67,13 +67,13 @@ class CsvService {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getVocabularyByLang(String langCode) async {
+  Future<List<Map<String, dynamic>>> getVocabularyByLang(final String langCode) async {
     await _loadVocabulary();
-    return _vocabularyCache?.where((row) => row['lang_code'] == langCode).toList() ?? [];
+    return _vocabularyCache?.where((final row) => row['lang_code'] == langCode).toList() ?? [];
   }
 
-  Future<List<Map<String, dynamic>>> getSentencesByLang(String langCode) async {
+  Future<List<Map<String, dynamic>>> getSentencesByLang(final String langCode) async {
     await _loadSentences();
-    return _sentencesCache?.where((row) => row['lang_code'] == langCode).toList() ?? [];
+    return _sentencesCache?.where((final row) => row['lang_code'] == langCode).toList() ?? [];
   }
 }

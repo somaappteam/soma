@@ -1,12 +1,11 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:soma/core/theme/motion.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-
-import '../../models/fill_blank_question.dart';
-import '../../core/theme/motion.dart';
-
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/glass.dart';
+import 'package:soma/models/fill_blank_question.dart';
 
 class SentencesFillBlankScreen extends StatefulWidget {
   const SentencesFillBlankScreen({super.key, required this.questions});
@@ -47,7 +46,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
   void _startTimer() {
     _timer?.cancel();
     _secondsLeft = _secondsPerQuestion;
-    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (final t) {
       if (!mounted) return;
       if (_locked) return;
       setState(() {
@@ -59,7 +58,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
     });
   }
 
-  void _lockAndReveal(int? choice) {
+  void _lockAndReveal(final int? choice) {
     if (_locked) return;
     final q = widget.questions[_index];
 
@@ -95,23 +94,23 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
   }
 
   Color _choiceBorderColor({
-    required bool isCorrect,
-    required bool isSelected,
-    required ColorScheme scheme,
+    required final bool isCorrect,
+    required final bool isSelected,
+    required final ColorScheme scheme,
   }) {
     if (!_locked) {
       // In light mode, use white for glass borders
-      return scheme.onSurface.withOpacity(isSelected ? 0.4 : 0.2);
+      return scheme.onSurface.withValues(alpha: isSelected ? 0.4 : 0.2);
     }
     if (isCorrect) return const Color(0xFF58F7B6); // green glow vibe
     if (isSelected && !isCorrect) return const Color(0xFFFF5AA5); // pink/red
-    return scheme.onSurface.withOpacity(0.10);
+    return scheme.onSurface.withValues(alpha: 0.10);
   }
 
   Color _choiceFillColor({
-    required bool isCorrect,
-    required bool isSelected,
-    required ColorScheme scheme,
+    required final bool isCorrect,
+    required final bool isSelected,
+    required final ColorScheme scheme,
   }) {
     if (!_locked) {
       return scheme.onSurface.withValues(alpha: isSelected ? 0.08 : 0.04);
@@ -122,7 +121,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     if (widget.questions.isEmpty) {
@@ -147,7 +146,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
     return Scaffold(
       body: SafeArea(
         child: LayoutBuilder(
-          builder: (context, constraints) {
+          builder: (final context, final constraints) {
             final compactHeight = constraints.maxHeight < 760;
             final topSpacing = compactHeight ? 8.0 : 10.0;
             final sectionSpacing = compactHeight ? 10.0 : 14.0;
@@ -183,7 +182,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                           Icon(Icons.bolt_rounded, color: scheme.onSurface, size: 18),
                           const SizedBox(width: 8),
                           Text(
-                            "+$_score",
+                            '+$_score',
                             style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
                           ),
                         ],
@@ -213,7 +212,7 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                           ),
                           const Spacer(),
                           Text(
-                            "${_index + 1}/${widget.questions.length}",
+                            '${_index + 1}/${widget.questions.length}',
                             style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.65)),
                           ),
                         ],
@@ -320,8 +319,8 @@ class _SentencesFillBlankScreenState extends State<SentencesFillBlankScreen> {
                 Expanded(
                   child: ListView.separated(
                     itemCount: q.choices.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, i) {
+                    separatorBuilder: (final _, final __) => const SizedBox(height: 12),
+                    itemBuilder: (final context, final i) {
                       final isSelected = _selected == i;
                       final isCorrect = i == q.correctIndex;
                       return GestureDetector(
@@ -431,7 +430,7 @@ class _Pill extends StatelessWidget {
   const _Pill({required this.child});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Glass(
       radius: BorderRadius.circular(999),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

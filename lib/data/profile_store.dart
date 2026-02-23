@@ -1,14 +1,15 @@
-import 'package:flutter/foundation.dart';
 import 'dart:async';
-import '../models/user_profile.dart';
-import 'profile_repository.dart';
+
+import 'package:flutter/foundation.dart';
+import 'package:soma/data/profile_repository.dart';
+import 'package:soma/models/user_profile.dart';
 
 class ProfileStore extends ChangeNotifier {
   UserProfile _profile = UserProfile(
-    displayName: "Guest",
-    username: "",
-    bio: "",
-    location: "",
+    displayName: 'Guest',
+    username: '',
+    bio: '',
+    location: '',
     dailyGoalMinutes: 10,
   );
 
@@ -27,7 +28,7 @@ class ProfileStore extends ChangeNotifier {
 
     // 2. Subscribe to real-time updates
     _profileSub?.cancel();
-    _profileSub = profileRepository.getProfileStream().listen((p) {
+    _profileSub = profileRepository.getProfileStream().listen((final p) {
       if (p != null) {
         _profile = p;
         notifyListeners();
@@ -41,17 +42,17 @@ class ProfileStore extends ChangeNotifier {
     super.dispose();
   }
 
-  void update(UserProfile next) {
+  void update(final UserProfile next) {
     _profile = next;
     notifyListeners();
   }
 
   void reset() {
     _profile = UserProfile(
-      displayName: "Guest",
-      username: "",
-      bio: "",
-      location: "",
+      displayName: 'Guest',
+      username: '',
+      bio: '',
+      location: '',
       dailyGoalMinutes: 10,
       isGuest: true,
     );
@@ -60,12 +61,12 @@ class ProfileStore extends ChangeNotifier {
 
   void loginAsGuest() {
     _profile = UserProfile(
-      displayName: "Guest",
-      username: "",
-      bio: "",
-      location: "",
+      displayName: 'Guest',
+      username: '',
+      bio: '',
+      location: '',
       dailyGoalMinutes: 10,
-      avatarUrl: "",
+      avatarUrl: '',
       isGuest: true,
     );
     notifyListeners();

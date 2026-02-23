@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/core/di/locator.dart';
 import 'package:sqflite/sqflite.dart';
-import '../core/database/database_helper.dart';
-import '../core/di/locator.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class OfflineQueueItem {
   final int? id;
@@ -32,7 +33,7 @@ class OfflineQueueItem {
     };
   }
 
-  factory OfflineQueueItem.fromMap(Map<String, dynamic> map) {
+  factory OfflineQueueItem.fromMap(final Map<String, dynamic> map) {
     return OfflineQueueItem(
       id: map['id'] as int?,
       tableName: map['table_name'] as String,
@@ -53,9 +54,9 @@ class OfflineQueueRepository {
   // ─────────────────────────── Enqueue ────────────────────────────────────────
 
   Future<void> enqueue({
-    required String tableName,
-    required String operation,
-    required Map<String, dynamic> data,
+    required final String tableName,
+    required final String operation,
+    required final Map<String, dynamic> data,
   }) async {
     final db = await _dbHelper.database;
     await db.insert(
@@ -78,7 +79,7 @@ class OfflineQueueRepository {
     return maps.map(OfflineQueueItem.fromMap).toList();
   }
 
-  Future<void> delete(int id) async {
+  Future<void> delete(final int id) async {
     final db = await _dbHelper.database;
     await db.delete('offline_queue', where: 'id = ?', whereArgs: [id]);
   }
@@ -114,7 +115,7 @@ class OfflineQueueRepository {
     }
   }
 
-  Future<void> _replay(OfflineQueueItem item) async {
+  Future<void> _replay(final OfflineQueueItem item) async {
     switch (item.operation) {
       case 'UPSERT':
         await _supabase.from(item.tableName).upsert(item.data);
@@ -136,8 +137,8 @@ class OfflineQueueRepository {
     _connectivitySub?.cancel();
     _connectivitySub = Connectivity()
         .onConnectivityChanged
-        .listen((List<ConnectivityResult> results) {
-      final isOnline = results.any((r) =>
+        .listen((final results) {
+      final isOnline = results.any((final r) =>
           r == ConnectivityResult.wifi ||
           r == ConnectivityResult.mobile ||
           r == ConnectivityResult.ethernet);
@@ -148,8 +149,8 @@ class OfflineQueueRepository {
     });
 
     // Also drain immediately in case we're already online at startup.
-    Connectivity().checkConnectivity().then((results) {
-      final isOnline = results.any((r) =>
+    Connectivity().checkConnectivity().then((final results) {
+      final isOnline = results.any((final r) =>
           r == ConnectivityResult.wifi ||
           r == ConnectivityResult.mobile ||
           r == ConnectivityResult.ethernet);

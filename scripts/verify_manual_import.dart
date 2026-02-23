@@ -26,14 +26,14 @@ void main() async {
   exit(0);
 }
 
-Future<void> listAvailableLanguages(SupabaseClient client) async {
+Future<void> listAvailableLanguages(final SupabaseClient client) async {
   print('\n[Discovery] Checking available languages...');
   try {
     final vocabLangs = await client.from('vocabulary').select('lang_code').limit(50);
     final sentenceLangs = await client.from('sentences').select('lang_code').limit(50);
 
-    final vSet = vocabLangs.map((e) => e['lang_code']).toSet();
-    final sSet = sentenceLangs.map((e) => e['lang_code']).toSet();
+    final vSet = vocabLangs.map((final e) => e['lang_code']).toSet();
+    final sSet = sentenceLangs.map((final e) => e['lang_code']).toSet();
 
     print('  Vocabulary Languages found (sample): $vSet');
     print('  Sentence Languages found (sample): $sSet');
@@ -42,7 +42,7 @@ Future<void> listAvailableLanguages(SupabaseClient client) async {
   }
 }
 
-Future<void> testVocab(SupabaseClient client, String sourceLang, String targetLang) async {
+Future<void> testVocab(final SupabaseClient client, final String sourceLang, final String targetLang) async {
   print('\n[Vocabulary] Fetching for $sourceLang -> $targetLang');
 
   try {
@@ -80,7 +80,7 @@ Future<void> testVocab(SupabaseClient client, String sourceLang, String targetLa
   }
 }
 
-Future<void> testSentences(SupabaseClient client, String sourceLang, String targetLang) async {
+Future<void> testSentences(final SupabaseClient client, final String sourceLang, final String targetLang) async {
   print('\n[Sentences] Fetching for $sourceLang -> $targetLang');
   
   try {

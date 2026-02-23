@@ -39,21 +39,21 @@ void main() async {
         print("MISSING HOST: Circle '$name' ($circleId). Host $hostId is not in participants.");
         ghostsFound++;
         
-        print("  -> Closing circle...");
+        print('  -> Closing circle...');
         await client.from('circles').update({'status': 'ended'}).eq('id', circleId);
-        print("  -> Closed.");
+        print('  -> Closed.');
       } else {
         // print("  OK: Circle '$name' has host.");
       }
     }
 
     if (ghostsFound == 0) {
-      print("No ghost circles found!");
+      print('No ghost circles found!');
     } else {
-      print("Cleaned up $ghostsFound ghost circles.");
+      print('Cleaned up $ghostsFound ghost circles.');
     }
 
   } catch (e) {
-    print("Error: $e");
+    print('Error: $e');
   }
 }

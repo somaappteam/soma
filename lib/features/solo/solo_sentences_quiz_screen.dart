@@ -1,22 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../core/services/haptics_service.dart';
-import '../../core/services/sfx_service.dart';
+import 'package:soma/core/services/haptics_service.dart';
+import 'package:soma/core/services/sfx_service.dart';
+import 'package:soma/core/services/tts_service.dart';
+import 'package:soma/core/theme/motion.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/pressable_scale.dart';
 
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/pressable_scale.dart';
-import '../../core/widgets/staggered_in.dart';
-import '../../core/widgets/reward_sparkle.dart';
-import '../../models/solo_course.dart';
-import 'solo_result_screen.dart';
-import 'solo_course_detail_screen.dart';
-import '../../data/quiz_repository.dart';
-import '../../core/services/tts_service.dart';
-import '../../core/theme/motion.dart';
-import '../../data/settings_repository.dart';
+import 'package:soma/core/widgets/staggered_in.dart';
+import 'package:soma/data/quiz_repository.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/features/solo/solo_course_detail_screen.dart';
+import 'package:soma/features/solo/solo_result_screen.dart';
+import 'package:soma/models/solo_course.dart';
 
 class SoloSentencesQuizScreen extends StatefulWidget {
   const SoloSentencesQuizScreen({
@@ -28,6 +28,7 @@ class SoloSentencesQuizScreen extends StatefulWidget {
     this.reviewQuestions,
     this.reviewScope = 'all',
     this.timePerQuestion,
+    this.initialQuestions,
   });
 
   final SoloCourse course;
@@ -35,6 +36,7 @@ class SoloSentencesQuizScreen extends StatefulWidget {
   final int totalQuestions;
   final bool isReview;
   final List<Map<String, dynamic>>? reviewQuestions;
+  final List<Map<String, dynamic>>? initialQuestions;
   final String reviewScope;
   final int? timePerQuestion;
 
@@ -70,7 +72,12 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     super.initState();
     remaining = widget.timePerQuestion ?? 0;
     _loadSettings();
-    if (widget.reviewQuestions != null && widget.reviewQuestions!.isNotEmpty) {
+    if (widget.initialQuestions != null && widget.initialQuestions!.isNotEmpty) {
+      questions = widget.initialQuestions!;
+      _loading = false;
+      _prepareQuestion();
+      _startTimer();
+    } else if (widget.reviewQuestions != null && widget.reviewQuestions!.isNotEmpty) {
       questions = widget.reviewQuestions!;
       _loading = false;
       _prepareQuestion();
@@ -136,7 +143,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       if (resume == true) {
         final savedQuestions = (data['questions'] as List? ?? [])
             .whereType<Map>()
-            .map((e) => Map<String, dynamic>.from(e))
+            .map((final e) => Map<String, dynamic>.from(e))
             .toList();
         final savedIndex = (data['index'] as int? ?? 0).clamp(0, savedQuestions.length - 1);
         setState(() {
@@ -164,7 +171,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     return showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) {
+      builder: (final ctx) {
         final scheme = Theme.of(ctx).colorScheme;
         return Dialog(
           backgroundColor: Colors.transparent,
@@ -266,7 +273,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
         }
       }
     } catch (e, stack) {
-      debugPrint("Error loading quiz: $e");
+      debugPrint('Error loading quiz: $e');
       if (mounted) {
         setState(() {
           _loading = false;
@@ -285,7 +292,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       return;
     }
     remaining = timeLimit;
-    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+    timer = Timer.periodic(const Duration(seconds: 1), (final t) {
       if (!mounted) return;
       try {
         setState(() {
@@ -297,11 +304,11 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
           }
         });
       } catch (e, stack) {
-        debugPrint("Timer error: $e");
-         showDialog(context: context, builder: (_) => AlertDialog(
-          title: const Text("Timer Error"),
-          content: SingleChildScrollView(child: Text("$e\n$stack")),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text("OK"))],
+        debugPrint('Timer error: $e');
+         showDialog(context: context, builder: (final _) => AlertDialog(
+          title: const Text('Timer Error'),
+          content: SingleChildScrollView(child: Text('$e\n$stack')),
+          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
         ));
       }
     });
@@ -314,7 +321,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     super.dispose();
   }
 
-  void _submit({bool timedOut = false}) {
+  void _submit({final bool timedOut = false}) {
     if (revealed) return;
     if (!timedOut && selected == null) return;
     timer?.cancel();
@@ -359,7 +366,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     }
   }
 
-  Future<void> _speakSentence({bool withDelay = true}) {
+  Future<void> _speakSentence({final bool withDelay = true}) {
     if (!revealed) return Future.value();
     final q = questions[index % questions.length];
     final sentence = q['full_sentence']?.toString() ?? '';
@@ -412,7 +419,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       final q = questions[index % questions.length];
 
       // Sanitise DB null literals — Supabase may return the string 'null' for NULL columns.
-      String sanitize(dynamic v) {
+      String sanitize(final dynamic v) {
         final s = v?.toString().trim() ?? '';
         return s == 'null' ? '' : s;
       }
@@ -434,7 +441,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     } catch (e, stack) {
       showDialog(
         context: context,
-        builder: (_) => AlertDialog(
+        builder: (final _) => AlertDialog(
           title: const Text('Error Preparing Question'),
           content: SingleChildScrollView(child: Text('$e\n$stack')),
           actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
@@ -445,14 +452,14 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
 
 
   _ChoiceSet _buildChoiceSet(
-      Map<String, dynamic> question, String? correctOverride) {
+      final Map<String, dynamic> question, final String? correctOverride) {
     final pool = question['choice_pool'];
     final correctAnswer =
         (correctOverride ?? question['correct_answer']?.toString() ?? '').trim();
     if (pool is List && correctAnswer.isNotEmpty) {
       final items = pool
-          .map((e) => e.toString().trim())
-          .where((e) => e.isNotEmpty && e != 'null' && e != correctAnswer)
+          .map((final e) => e.toString().trim())
+          .where((final e) => e.isNotEmpty && e != 'null' && e != correctAnswer)
           .toSet()
           .toList();
       items.shuffle();
@@ -465,8 +472,8 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     final fallback = question['choices'];
     if (fallback is List) {
       final choices = fallback
-          .map((e) => e.toString().trim())
-          .where((e) => e.isNotEmpty && e != 'null')
+          .map((final e) => e.toString().trim())
+          .where((final e) => e.isNotEmpty && e != 'null')
           .toList();
       final correctIndex =
           question['correct'] is int ? question['correct'] as int : 0;
@@ -494,12 +501,12 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     '은','는','이','가','을','를','에','의','과','와','도','로',
   };
 
-  _BlankResult? _blankSentence(String sentence) {
+  _BlankResult? _blankSentence(final String sentence) {
     if (sentence.trim().isEmpty) return null;
     if (sentence.contains(RegExp(r'\s'))) {
       final parts = sentence.split(RegExp(r'\s+'));
 
-      List<int> _candidates(bool skipStopwords) {
+      List<int> candidates0(final bool skipStopwords) {
         final result = <int>[];
         for (var i = 0; i < parts.length; i++) {
           final cleaned = parts[i]
@@ -513,8 +520,8 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       }
 
       // Prefer content-word candidates; fall back to all words.
-      var candidates = _candidates(true);
-      if (candidates.isEmpty) candidates = _candidates(false);
+      var candidates = candidates0(true);
+      if (candidates.isEmpty) candidates = candidates0(false);
       if (candidates.isEmpty) return null;
       candidates.shuffle();
       final pickIndex = candidates.first;
@@ -528,16 +535,16 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     }
 
     // CJK / single-char fallback: pick a non-stopword character.
-    final chars = sentence.runes.map((rune) => String.fromCharCode(rune)).toList();
+    final chars = sentence.runes.map((final rune) => String.fromCharCode(rune)).toList();
     if (chars.isEmpty) return null;
     final contentChars = chars
         .asMap()
         .entries
-        .where((e) => e.value.trim().isNotEmpty && !_kStopwords.contains(e.value))
-        .map((e) => e.key)
+        .where((final e) => e.value.trim().isNotEmpty && !_kStopwords.contains(e.value))
+        .map((final e) => e.key)
         .toList();
     contentChars.shuffle();
-    final chars2 = sentence.runes.map((rune) => String.fromCharCode(rune)).toList();
+    final chars2 = sentence.runes.map((final rune) => String.fromCharCode(rune)).toList();
     final pickIdx = contentChars.isNotEmpty
         ? contentChars.first
         : (chars2..shuffle()).isEmpty ? 0 : 0;
@@ -554,7 +561,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => SoloResultScreen(
+        builder: (final _) => SoloResultScreen(
           course: widget.course,
           mode: SoloMode.sentences,
           level: widget.level,
@@ -563,7 +570,35 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
           points: correctCount * 25,
           mistakes: mistakes,
           onPlayAgain: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (final _) => SoloSentencesQuizScreen(
+                  course: widget.course,
+                  level: widget.level,
+                  totalQuestions: widget.totalQuestions,
+                  isReview: widget.isReview,
+                  reviewScope: widget.reviewScope,
+                  timePerQuestion: widget.timePerQuestion,
+                  initialQuestions: questions,
+                ),
+              ),
+            );
+          },
+          onContinue: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (final _) => SoloSentencesQuizScreen(
+                  course: widget.course,
+                  level: widget.level,
+                  totalQuestions: widget.totalQuestions,
+                  isReview: widget.isReview,
+                  reviewScope: widget.reviewScope,
+                  timePerQuestion: widget.timePerQuestion,
+                ),
+              ),
+            );
           },
           onReviewMistakes: () {
             Navigator.pop(context);
@@ -574,7 +609,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     if (_loading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator(color: Color(0xFF33D6FF))),
@@ -620,7 +655,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       return Scaffold(
         body: SafeArea(
           child: LayoutBuilder(
-            builder: (context, constraints) {
+            builder: (final context, final constraints) {
               final compactHeight = constraints.maxHeight < 760;
               final topSpacing = compactHeight ? 12.0 : 18.0;
               final sectionSpacing = compactHeight ? 10.0 : 14.0;
@@ -637,7 +672,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      "Sentences • ${widget.course.title}",
+                      'Sentences • ${widget.course.title}',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           color: scheme.onSurface,
@@ -654,7 +689,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                   const SizedBox(width: 10),
                   _Pill(
                       text:
-                          "${index + 1}/${questions.length < widget.totalQuestions ? questions.length : widget.totalQuestions}",
+                          '${index + 1}/${questions.length < widget.totalQuestions ? questions.length : widget.totalQuestions}',
                       icon: Icons.layers_rounded),
                 ],
               ),
@@ -745,7 +780,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                   child: _TtsControls(
                     rates: const [0.75, 1.0, 1.25],
                     selectedRate: _speechRate,
-                    onRateSelected: (rate) {
+                    onRateSelected: (final rate) {
                       setState(() => _speechRate = rate);
                       ttsService.setRate(rate);
                     },
@@ -761,8 +796,8 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                   padding: const EdgeInsets.fromLTRB(12, 20, 12, 20),
                   clipBehavior: Clip.none,
                   itemCount: choices.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
-                  itemBuilder: (_, i) {
+                  separatorBuilder: (final _, final __) => const SizedBox(height: 10),
+                  itemBuilder: (final _, final i) {
                     final isSel = selected == i;
                     final isCorrect = i == _correctIndex;
 
@@ -848,7 +883,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                                       child: ClipRect(
                                         child: AnimatedSwitcher(
                                           duration: MotionTokens.short,
-                                          transitionBuilder: (child, anim) {
+                                          transitionBuilder: (final child, final anim) {
                                             final slide = Tween<Offset>(
                                               begin: const Offset(0.16, 0),
                                               end: Offset.zero,
@@ -871,7 +906,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                                                 children: [
                                                   const Icon(Icons.check_rounded, color: Color(0xFF2AFADF), size: 18),
                                                   const SizedBox(width: 4),
-                                                  const RewardSparkle(show: true, size: 14, burst: false),
+                                                  const SizedBox.shrink(),
                                                 ],
                                               )
                                             : (revealed && isSel && !isCorrect)
@@ -905,7 +940,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                       ? Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: NeonButton(
-                            label: "Next",
+                            label: 'Next',
                             onTap: _next,
                           ),
                         )
@@ -923,7 +958,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
         body: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
-            child: Text("Build Error: $e\n$stack",
+            child: Text('Build Error: $e\n$stack',
                 style: const TextStyle(color: Colors.red)),
           ),
         ),
@@ -935,7 +970,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
 // ----------- RTL detection ---------------------------------------------------
 
 /// Returns [true] if the given 2-letter language code uses a right-to-left script.
-bool _isRtlLang(String code) {
+bool _isRtlLang(final String code) {
   const rtl = {
     'ar', 'he', 'fa', 'ur', 'ps', 'sd', 'ug', 'yi',
     'dv', 'ks', 'ku', 'ha', 'az', // Azerbaijani when written in Arabic script
@@ -963,7 +998,7 @@ class _SentencePromptWidget extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final isRtl = _isRtlLang(langCode);
     final textDir = isRtl ? TextDirection.rtl : TextDirection.ltr;
     final baseStyle = TextStyle(
@@ -1013,7 +1048,7 @@ class _IconGlass extends StatelessWidget {
   final VoidCallback onTap;
   const _IconGlass({required this.icon, required this.onTap});
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -1057,7 +1092,7 @@ class _TtsControls extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final opacity = disabled ? 0.5 : 1.0;
     return Opacity(
@@ -1067,12 +1102,12 @@ class _TtsControls extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         child: Row(
           children: [
-            ...rates.map((rate) {
+            ...rates.map((final rate) {
               final selected = rate == selectedRate;
               return Padding(
                 padding: const EdgeInsets.only(right: 6),
                 child: _SpeedChip(
-                  label: "${rate.toStringAsFixed(rate == 1.0 ? 0 : 2)}x",
+                  label: '${rate.toStringAsFixed(rate == 1.0 ? 0 : 2)}x',
                   selected: selected,
                   onTap: disabled ? null : () => onRateSelected(rate),
                 ),
@@ -1110,7 +1145,7 @@ class _SpeedChip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       borderRadius: BorderRadius.circular(999),
@@ -1145,7 +1180,7 @@ class _Pill extends StatelessWidget {
   const _Pill({required this.text, required this.icon});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

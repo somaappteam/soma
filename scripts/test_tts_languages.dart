@@ -6,7 +6,7 @@ void main() async {
   final tts = FlutterTts();
   
   final langs = await tts.getLanguages;
-  print("Available Languages: $langs");
+  print('Available Languages: $langs');
 
   final testCodes = ['en-US', 'en', 'es', 'es-ES', 'hu', 'el', 'fr', 'de'];
   for (final code in testCodes) {

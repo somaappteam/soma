@@ -1,8 +1,8 @@
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/user_profile.dart';
-import '../core/database/database_helper.dart';
 import 'package:flutter/foundation.dart';
-import '../core/di/locator.dart';
+import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/models/user_profile.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileRepository {
   final _supabase = Supabase.instance.client;
@@ -10,7 +10,7 @@ class ProfileRepository {
   // Get current user ID
   String? get currentUserId => _supabase.auth.currentUser?.id;
 
-  Future<UserProfile?> fetchProfile({String? userId}) async {
+  Future<UserProfile?> fetchProfile({final String? userId}) async {
     final uid = userId ?? currentUserId;
     if (uid == null) return null;
 
@@ -32,7 +32,7 @@ class ProfileRepository {
         );
       }
     } catch (e) {
-      debugPrint("Local profile fetch failed: $e");
+      debugPrint('Local profile fetch failed: $e');
     }
 
     try {
@@ -61,7 +61,7 @@ class ProfileRepository {
     final uid = currentUserId;
     if (uid == null) return const Stream.empty();
 
-    return _supabase.from('profiles').stream(primaryKey: ['id']).eq('id', uid).map((event) {
+    return _supabase.from('profiles').stream(primaryKey: ['id']).eq('id', uid).map((final event) {
       if (event.isEmpty) return null;
       final data = event.first;
       
@@ -82,7 +82,7 @@ class ProfileRepository {
     });
   }
 
-  Future<void> updateProfile(UserProfile profile) async {
+  Future<void> updateProfile(final UserProfile profile) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -108,7 +108,7 @@ class ProfileRepository {
   }
 
   // Fetch multiple profiles by IDs
-  Future<List<Map<String, dynamic>>> getProfilesByIds(List<String> userIds) async {
+  Future<List<Map<String, dynamic>>> getProfilesByIds(final List<String> userIds) async {
     if (userIds.isEmpty) return [];
     final data = await _supabase.from('profiles').select().inFilter('id', userIds);
     return List<Map<String, dynamic>>.from(data);
@@ -116,8 +116,8 @@ class ProfileRepository {
 
   // Fetch global exchange candidates (not limited to friends).
   Future<List<Map<String, dynamic>>> getExchangeCandidateProfiles({
-    int limit = 100,
-    int offset = 0,
+    final int limit = 100,
+    final int offset = 0,
   }) async {
     final uid = currentUserId;
     final baseQuery = _supabase.from('profiles').select(
@@ -129,22 +129,22 @@ class ProfileRepository {
     return List<Map<String, dynamic>>.from(data);
   }
 
-  Stream<List<Map<String, dynamic>>> streamExchangeCandidateProfiles({int limit = 120}) {
+  Stream<List<Map<String, dynamic>>> streamExchangeCandidateProfiles({final int limit = 120}) {
     final uid = currentUserId;
     final stream = _supabase
         .from('profiles')
         .stream(primaryKey: ['id'])
         .order('updated_at', ascending: false)
         .limit(limit)
-        .map((rows) => rows.map((e) => Map<String, dynamic>.from(e)).toList());
+        .map((final rows) => rows.map((final e) => Map<String, dynamic>.from(e)).toList());
 
     if (uid == null) return stream;
-    return stream.map((rows) => rows.where((row) => row['id']?.toString() != uid).toList());
+    return stream.map((final rows) => rows.where((final row) => row['id']?.toString() != uid).toList());
   }
 
   Future<List<Map<String, dynamic>>> getExchangeCandidateProfilesBefore({
-    required DateTime before,
-    int limit = 100,
+    required final DateTime before,
+    final int limit = 100,
   }) async {
     final uid = currentUserId;
     final baseQuery = _supabase.from('profiles').select(

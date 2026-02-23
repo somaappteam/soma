@@ -1,6 +1,5 @@
 
 import 'package:supabase/supabase.dart';
-import 'dart:io';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
 const String serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYmp0ZWVkb2hmbGdrYXJmYXhrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTcwMDI2NCwiZXhwIjoyMDg1Mjc2MjY0fQ.jTZOgpQ7Fy1HlUT0YldRAtr6Bvwti_Al1hfaP5Bz0Nc';
@@ -21,7 +20,7 @@ Future<void> main() async {
   try {
     // 2. Check current users
     final users = await client.from('profiles').select('id, username').limit(5);
-    print('Recent profile IDs: ${users.map((u) => u['id']).toList()}');
+    print('Recent profile IDs: ${users.map((final u) => u['id']).toList()}');
   } catch (e) {
     print('Error fetching profiles: $e');
   }

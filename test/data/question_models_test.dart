@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:soma/models/vocab_question.dart';
 import 'package:soma/models/sentence_question.dart';
+import 'package:soma/models/vocab_question.dart';
 
 void main() {
   group('VocabQuestion', () {

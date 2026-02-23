@@ -1,6 +1,7 @@
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:path/path.dart';
 import 'dart:io';
+
+import 'package:path/path.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
   sqfliteFfiInit();
@@ -9,8 +10,8 @@ void main() async {
   final dbPath = await getDatabasesPath();
   final path = join(dbPath, 'soma_local.db');
 
-  print("--- Manual SQLite Upgrade ---");
-  print("Database Path: $path");
+  print('--- Manual SQLite Upgrade ---');
+  print('Database Path: $path');
 
   final db = await openDatabase(path, version: 3);
 
@@ -70,7 +71,7 @@ void main() async {
     await db.execute(query);
   }
 
-  print("\nVerification...");
+  print('\nVerification...');
   final tables = ['courses', 'vocabulary', 'sentences', 'profiles', 'user_stats', 'user_courses', 'user_learned_items'];
   for (final table in tables) {
     final res = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='$table'");
@@ -82,6 +83,6 @@ void main() async {
   }
 
   await db.close();
-  print("\n--- Upgrade Complete ---");
+  print('\n--- Upgrade Complete ---');
   exit(0);
 }

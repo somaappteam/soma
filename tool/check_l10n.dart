@@ -14,9 +14,9 @@ void main() {
   final arbFiles = l10nDir
       .listSync()
       .whereType<File>()
-      .where((f) => f.path.endsWith('.arb') && !f.path.endsWith('app_en.arb'))
+      .where((final f) => f.path.endsWith('.arb') && !f.path.endsWith('app_en.arb'))
       .toList()
-    ..sort((a, b) => a.path.compareTo(b.path));
+    ..sort((final a, final b) => a.path.compareTo(b.path));
 
   final issues = <String>[];
   for (final file in arbFiles) {
@@ -39,7 +39,7 @@ void main() {
   stdout.writeln('Localization parity check passed for ${arbFiles.length + 1} locales.');
 }
 
-Set<String> _arbKeys(File file) {
+Set<String> _arbKeys(final File file) {
   final jsonMap = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
-  return jsonMap.keys.where((k) => !k.startsWith('@')).toSet();
+  return jsonMap.keys.where((final k) => !k.startsWith('@')).toSet();
 }

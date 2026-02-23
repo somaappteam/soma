@@ -1,16 +1,16 @@
 import 'package:flutter/foundation.dart';
+import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/session_tracker.dart';
+import 'package:soma/data/app_analytics_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../core/services/session_tracker.dart';
-import 'app_analytics_repository.dart';
-import '../core/di/locator.dart';
 
 class AuthRepository {
   final SupabaseClient _client = Supabase.instance.client;
 
   Future<AuthResponse> signUp({
-    required String email,
-    required String password,
-    String? username,
+    required final String email,
+    required final String password,
+    final String? username,
   }) async {
     try {
       final response = await _client.auth.signUp(
@@ -30,7 +30,7 @@ class AuthRepository {
     }
   }
 
-  Future<void> resendSignupConfirmation({required String email}) async {
+  Future<void> resendSignupConfirmation({required final String email}) async {
     await _client.auth.resend(
       type: OtpType.signup,
       email: email,
@@ -40,8 +40,8 @@ class AuthRepository {
 
 
   Future<AuthResponse> signIn({
-    required String email,
-    required String password,
+    required final String email,
+    required final String password,
   }) async {
     try {
       final response = await _client.auth.signInWithPassword(
@@ -60,7 +60,7 @@ class AuthRepository {
   }
 
 
-  Future<bool> signInWithOAuth(OAuthProvider provider) async {
+  Future<bool> signInWithOAuth(final OAuthProvider provider) async {
     try {
       final launched = await _client.auth.signInWithOAuth(
         provider,
@@ -95,11 +95,11 @@ class AuthRepository {
   }
 
 
-  Future<void> updatePassword(String newPassword) async {
+  Future<void> updatePassword(final String newPassword) async {
     await _client.auth.updateUser(UserAttributes(password: newPassword));
   }
 
-  Future<void> resetPassword({required String email}) async {
+  Future<void> resetPassword({required final String email}) async {
     try {
       await _client.auth.resetPasswordForEmail(email);
       await appAnalyticsRepository.track('auth_password_reset_sent');

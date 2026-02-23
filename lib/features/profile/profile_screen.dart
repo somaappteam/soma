@@ -1,36 +1,36 @@
-import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:soma/core/theme/layout_tokens.dart';
+import 'package:soma/core/theme/motion.dart';
+import 'package:soma/core/theme/spacing.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/core/widgets/neon_button.dart';
+import 'package:soma/core/widgets/premium_dialog.dart';
+import 'package:soma/core/widgets/premium_screen_scaffold.dart';
+
+import 'package:soma/data/achievements_repository.dart';
+import 'package:soma/data/activity_feed_repository.dart';
+import 'package:soma/data/auth_repository.dart';
+import 'package:soma/data/presence_repository.dart';
+import 'package:soma/data/profile_repository.dart';
+import 'package:soma/data/profile_store.dart';
+import 'package:soma/data/settings_repository.dart';
+import 'package:soma/data/social_repository.dart';
+import 'package:soma/data/stats_repository.dart';
+import 'package:soma/data/user_report_repository.dart';
+import 'package:soma/features/auth/sign_in_screen.dart';
+import 'package:soma/features/auth/sign_up_screen.dart';
+import 'package:soma/features/leaderboard/leaderboard_screen.dart';
+import 'package:soma/features/profile/settings_screen.dart';
+import 'package:soma/features/social/dm_chat_screen.dart';
+import 'package:soma/features/social/friends_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
-import '../../core/widgets/glass.dart';
-import '../../core/widgets/neon_button.dart';
-import '../../core/widgets/reward_sparkle.dart';
-import '../../core/widgets/premium_dialog.dart';
-import 'settings_screen.dart';
-import '../../core/theme/tokens.dart';
-import '../../core/theme/motion.dart';
-import '../../data/activity_feed_repository.dart';
-import '../../data/auth_repository.dart';
-import '../../data/profile_repository.dart';
-import '../../data/profile_store.dart';
-import '../../data/social_repository.dart';
-import '../../data/stats_repository.dart';
-import '../../data/user_report_repository.dart';
-import '../../data/achievements_repository.dart';
-import '../../data/presence_repository.dart';
-import '../../models/activity_event.dart';
-import '../../models/user_profile.dart';
-import '../../models/user_stats.dart';
-import '../../models/achievement.dart';
-import '../auth/sign_in_screen.dart';
-import '../auth/sign_up_screen.dart';
-import '../leaderboard/leaderboard_screen.dart';
-import '../social/friends_screen.dart';
-import '../social/dm_chat_screen.dart';
-import '../../core/theme/spacing.dart';
-import '../../core/theme/layout_tokens.dart';
-import '../../core/widgets/premium_screen_scaffold.dart';
-import '../../data/settings_repository.dart';
+import 'package:soma/models/achievement.dart';
+import 'package:soma/models/activity_event.dart';
+import 'package:soma/models/user_profile.dart';
+import 'package:soma/models/user_stats.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? userId;
@@ -94,7 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           
           isReported = await userReportRepository.hasReported(_viewedUserId!);
         } catch (e) {
-          debugPrint("Error loading visitor info: $e");
+          debugPrint('Error loading visitor info: $e');
         }
       }
 
@@ -108,10 +108,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       }
     } catch (e) {
-      debugPrint("Error loading profile: $e");
+      debugPrint('Error loading profile: $e');
       if (mounted) {
          // Optionally show a snackbar or error state
-         _showSnack("An error occurred");
+         _showSnack('An error occurred');
       }
     } finally {
       if (mounted) {
@@ -120,14 +120,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  List<String> _parseBlockedIds(dynamic rawValue) {
+  List<String> _parseBlockedIds(final dynamic rawValue) {
     if (rawValue is List) {
-      return rawValue.map((e) => e.toString()).where((e) => e.isNotEmpty).toList();
+      return rawValue.map((final e) => e.toString()).where((final e) => e.isNotEmpty).toList();
     }
     return const [];
   }
 
-  void _openMessage(UserProfile profile) {
+  void _openMessage(final UserProfile profile) {
     final l10n = AppLocalizations.of(context);
     final meId = _viewerId;
     final otherId = profile.id ?? _viewedUserId;
@@ -147,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => DmChatScreen(
+        builder: (final _) => DmChatScreen(
           meId: meId,
           otherId: otherId,
           otherName: profile.username,
@@ -156,7 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Future<void> _sendFriendRequest(UserProfile profile) async {
+  Future<void> _sendFriendRequest(final UserProfile profile) async {
     final l10n = AppLocalizations.of(context);
     if (_isRequestSending) return;
     final meId = _viewerId;
@@ -193,7 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _cancelFriendRequest(UserProfile profile) async {
+  Future<void> _cancelFriendRequest(final UserProfile profile) async {
     if (_isRequestSending) return;
     final otherId = profile.id ?? _viewedUserId;
     if (otherId == null) return;
@@ -219,7 +219,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> _toggleBlocked(UserProfile profile) async {
+  Future<void> _toggleBlocked(final UserProfile profile) async {
     final otherId = profile.id ?? _viewedUserId;
     if (otherId == null || otherId.isEmpty) {
       _showSnack('Unable to update block list right now.');
@@ -245,7 +245,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final blockedIds = _parseBlockedIds(settings['blocked_user_ids']);
     final nextIds = shouldBlock
         ? <String>{...blockedIds, otherId}.toList()
-        : blockedIds.where((id) => id != otherId).toList();
+        : blockedIds.where((final id) => id != otherId).toList();
 
     await settingsRepository.updateSetting('blocked_user_ids', nextIds);
     if (!mounted) return;
@@ -259,7 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _showSnack(shouldBlock ? 'User blocked.' : 'User unblocked.');
   }
 
-  Future<void> _toggleReported(UserProfile profile) async {
+  Future<void> _toggleReported(final UserProfile profile) async {
     final otherId = profile.id ?? _viewedUserId;
     if (otherId == null || otherId.isEmpty) {
       _showSnack('Unable to submit report right now.');
@@ -302,7 +302,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
 
-  String _resolveFallbackUsername(AppLocalizations l10n) {
+  String _resolveFallbackUsername(final AppLocalizations l10n) {
     final current = authRepository.currentUser;
     final metadataName = current?.userMetadata?['username']?.toString();
     if (metadataName != null && metadataName.isNotEmpty) return metadataName;
@@ -314,14 +314,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return l10n.genericUser;
   }
 
-  void _showSnack(String message) {
+  void _showSnack(final String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message)),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     if (_isGuest) {
       return _GuestProfileView(
@@ -329,28 +329,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
         onSettings: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            MaterialPageRoute(builder: (final _) => const SettingsScreen()),
           );
         },
         onSignIn: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const SignInScreen()),
+            MaterialPageRoute(builder: (final _) => const SignInScreen()),
           );
         },
         onSignUp: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const SignUpScreen()),
+            MaterialPageRoute(builder: (final _) => const SignUpScreen()),
           );
         },
       );
     }
     if (_isLoading) {
-      final scheme = Theme.of(context).colorScheme;
-      return SafeArea(
-        child: Center(
-          child: CircularProgressIndicator(color: scheme.primary),
+      return const PremiumScreenScaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
         ),
       );
     }
@@ -378,7 +377,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       : () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const LeaderboardScreen()),
+                            MaterialPageRoute(builder: (final _) => const LeaderboardScreen()),
                           );
                         },
                   onSettings: _isVisitorView
@@ -386,7 +385,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       : () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                            MaterialPageRoute(builder: (final _) => const SettingsScreen()),
                           );
                         },
                 ),
@@ -397,13 +396,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: ListView(
                     physics: const BouncingScrollPhysics(),
                     children: [
-                      _ProfileSectionLabel(label: 'Identity'),
+                      const _ProfileSectionLabel(label: 'Identity'),
                       const SizedBox(height: 6),
                       _PremiumSectionShell(
                         child: profile.showOnlineStatus && profile.id != null && profile.id!.isNotEmpty
                             ? StreamBuilder<bool>(
                                 stream: presenceRepository.streamOnlineStatus(profile.id!),
-                                builder: (context, snapshot) => _HeaderCard(
+                                builder: (final context, final snapshot) => _HeaderCard(
                                   profile: profile,
                                   showOnlineIndicator: snapshot.data == true,
                                 ),
@@ -414,7 +413,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       _PremiumSectionShell(child: _ProfileSpotlightCard(profile: profile)),
                       const SizedBox(height: S.sm),
                       if (_isVisitorView) ...[
-                        _ProfileSectionLabel(label: 'Overview'),
+                        const _ProfileSectionLabel(label: 'Overview'),
                         const SizedBox(height: 6),
                         _PremiumSectionShell(
                           child: _VisitorOverviewCard(
@@ -440,74 +439,89 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                       ] else ...[
-                        _ProfileSectionLabel(label: 'Progress'),
+                        const _ProfileSectionLabel(label: 'Progress'),
                         const SizedBox(height: 6),
                         FutureBuilder<UserStats>(
                           future: _statsFuture,
-                          builder: (context, snapshot) {
+                          builder: (final context, final snapshot) {
                             return AnimatedSwitcher(
                               duration: MotionTokens.short,
                               child: snapshot.connectionState == ConnectionState.waiting
-                                  ? const _PremiumSectionShell(child: _StatsSkeleton())
-                                  : _PremiumSectionShell(child: _StatsRow(
-                                      wins: (snapshot.data ?? UserStats.empty()).totalWins,
-                                      streak: (snapshot.data ?? UserStats.empty()).streakDays,
-                                    )),
+                                  ? const _PremiumSectionShell(
+                                      key: ValueKey('stats-loading'),
+                                      child: _StatsSkeleton(),
+                                    )
+                                  : _PremiumSectionShell(
+                                      key: ValueKey('stats-content'),
+                                      child: _StatsRow(
+                                        wins: (snapshot.data ?? UserStats.empty()).totalWins,
+                                        streak: (snapshot.data ?? UserStats.empty()).streakDays,
+                                      ),
+                                    ),
                             );
                           },
                         ),
                         const SizedBox(height: S.sm),
-                        _ProfileSectionLabel(label: 'Social'),
+                        const _ProfileSectionLabel(label: 'Social'),
                         const SizedBox(height: 6),
                         FutureBuilder<List<Map<String, dynamic>>>(
                           future: _friendsFuture,
-                          builder: (context, snapshot) {
+                          builder: (final context, final snapshot) {
                             return _PremiumSectionShell(
                               child: _FriendsCard(friends: snapshot.data ?? const <Map<String, dynamic>>[]),
                             );
                           },
                         ),
                         const SizedBox(height: S.sm),
-                        _ProfileSectionLabel(label: 'Achievements'),
+                        const _ProfileSectionLabel(label: 'Achievements'),
                         const SizedBox(height: 6),
                         FutureBuilder<List<Achievement>>(
                           future: _achievementsFuture,
-                          builder: (context, snapshot) {
+                          builder: (final context, final snapshot) {
                             return AnimatedSwitcher(
                               duration: MotionTokens.short,
                               child: snapshot.connectionState == ConnectionState.waiting
-                                  ? const _PremiumSectionShell(child: _AchievementsSkeleton())
-                                  : _PremiumSectionShell(child: _AchievementsCard(
-                                      achievements: snapshot.data ?? const <Achievement>[],
-                                    )),
+                                  ? const _PremiumSectionShell(
+                                      key: ValueKey('achievements-loading'),
+                                      child: _AchievementsSkeleton(),
+                                    )
+                                  : _PremiumSectionShell(
+                                      key: ValueKey('achievements-content'),
+                                      child: _AchievementsCard(
+                                        achievements: snapshot.data ?? const <Achievement>[],
+                                      ),
+                                    ),
                             );
                           },
                         ),
                         const SizedBox(height: S.sm),
-                        _ProfileSectionLabel(label: 'Friends Activity'),
+                        const _ProfileSectionLabel(label: 'Friends Activity'),
                         const SizedBox(height: 6),
                         FutureBuilder<List<ActivityEvent>>(
                           future: _activityFuture,
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return const _PremiumSectionShell(
-                                  child: _AchievementsSkeleton());
-                            }
-                            final events = snapshot.data ?? [];
-                            return _PremiumSectionShell(
-                              child: _ActivityFeedCard(events: events),
+                          builder: (final context, final snapshot) {
+                            return AnimatedSwitcher(
+                              duration: MotionTokens.short,
+                              child: snapshot.connectionState == ConnectionState.waiting
+                                  ? const _PremiumSectionShell(
+                                      key: ValueKey('activity-loading'),
+                                      child: _AchievementsSkeleton(),
+                                    )
+                                  : _PremiumSectionShell(
+                                      key: ValueKey('activity-content'),
+                                      child: _ActivityFeedCard(events: snapshot.data ?? []),
+                                    ),
                             );
                           },
                         ),
-                      const SizedBox(height: S.sm),
+                      ], 
                       const SizedBox(height: S.xl),
-                    ], // end of else ...[
-                    ], // end of ListView children
+                    ], 
                   ),
                 ),
               ],
             ),
+
       padding: PremiumLayout.screenPadding(PremiumLayout.densityForWidth(MediaQuery.of(context).size.width)),
     );
   }
@@ -522,11 +536,11 @@ class _TopBar extends StatelessWidget {
     this.onSettings,
     this.onBack,
     this.onLeaderboard,
-    this.title = "",
+    this.title = '',
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final resolvedTitle = title.isEmpty ? l10n.profileTitle : title;
     final scheme = Theme.of(context).colorScheme;
@@ -569,7 +583,7 @@ class _ProfileSectionLabel extends StatelessWidget {
   const _ProfileSectionLabel({required this.label});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Row(
       children: [
@@ -599,10 +613,10 @@ class _ProfileSectionLabel extends StatelessWidget {
 class _PremiumSectionShell extends StatelessWidget {
   final Widget child;
 
-  const _PremiumSectionShell({required this.child});
+  const _PremiumSectionShell({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
@@ -634,7 +648,7 @@ class _GuestProfileView extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final username = profile.username.isNotEmpty ? profile.username : l10n.guestUsername;
     final scheme = Theme.of(context).colorScheme;
@@ -664,7 +678,7 @@ class _GuestProfileView extends StatelessWidget {
                           children: [
                             _AvatarGlow(
                               size: 72,
-                              image: const AssetImage("assets/avatar/avatar_1.png"),
+                              image: const AssetImage('assets/avatar/avatar_1.png'),
                               showOnlineIndicator: false,
                             ),
                             const SizedBox(width: S.sm),
@@ -801,7 +815,7 @@ class _GuestMiniStatCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Glass(
@@ -858,7 +872,7 @@ class _GuestInfoRow extends StatelessWidget {
   const _GuestInfoRow({required this.icon, required this.text});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Row(
@@ -886,11 +900,11 @@ class _HeaderCard extends StatelessWidget {
   const _HeaderCard({required this.profile, required this.showOnlineIndicator});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final heroTag = profile.id != null && profile.id!.isNotEmpty
-        ? "profile-avatar-${profile.id}"
-        : "profile-avatar-${profile.username}";
+        ? 'profile-avatar-${profile.id}'
+        : 'profile-avatar-${profile.username}';
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Glass(
@@ -906,14 +920,14 @@ class _HeaderCard extends StatelessWidget {
                   size: 64,
                   image: (profile.avatarUrl?.isNotEmpty == true)
                       ? CachedNetworkImageProvider(profile.avatarUrl!) as ImageProvider
-                      : const AssetImage("assets/avatar/avatar_1.png"),
+                      : const AssetImage('assets/avatar/avatar_1.png'),
                   showOnlineIndicator: showOnlineIndicator,
                 ),
               ),
               const SizedBox(width: S.sm),
               Expanded(
                 child: Text(
-                  "@${profile.username}",
+                  '@${profile.username}',
                   style: textTheme.titleLarge?.copyWith(
                     color: scheme.onSurface,
                     fontWeight: FontWeight.w800,
@@ -954,7 +968,7 @@ class _HeaderCard extends StatelessWidget {
                         tween: Tween(begin: 0.98, end: 1.0),
                         duration: MotionTokens.short,
                         curve: MotionTokens.standardCurve,
-                        builder: (context, value, child) {
+                        builder: (final context, final value, final child) {
                           return Transform.scale(scale: value, child: child);
                         },
                         child: Text(
@@ -965,8 +979,7 @@ class _HeaderCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: S.xs),
-                      RewardSparkle(show: profile.totalXp > 0, size: 14),
+
                     ],
                   ),
                 ],
@@ -987,7 +1000,7 @@ class _ProfileSpotlightCard extends StatelessWidget {
   const _ProfileSpotlightCard({required this.profile});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -1046,7 +1059,7 @@ class _StatsSkeleton extends StatelessWidget {
   const _StatsSkeleton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final base = scheme.onSurface.withValues(alpha: 0.08);
     return Row(
@@ -1064,7 +1077,7 @@ class _SkeletonTile extends StatelessWidget {
   const _SkeletonTile({required this.base});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(S.sm),
       decoration: BoxDecoration(
@@ -1114,7 +1127,7 @@ class _AchievementsSkeleton extends StatelessWidget {
   const _AchievementsSkeleton();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final base = scheme.onSurface.withValues(alpha: 0.08);
     return Glass(
@@ -1141,7 +1154,7 @@ class _AchievementsSkeleton extends StatelessWidget {
             childAspectRatio: 1.05,
             children: List.generate(
               6,
-              (_) => Container(
+              (final _) => Container(
                 decoration: BoxDecoration(
                   color: base.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(18),
@@ -1162,13 +1175,13 @@ class _StatsRow extends StatelessWidget {
   const _StatsRow({required this.wins, required this.streak});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Row(
       children: [
-        Expanded(child: _StatTile(title: l10n.profileWins, value: "$wins", icon: Icons.emoji_events_rounded)),
+        Expanded(child: _StatTile(title: l10n.profileWins, value: '$wins', icon: Icons.emoji_events_rounded)),
         const SizedBox(width: S.sm),
-        Expanded(child: _StatTile(title: l10n.profileStreak, value: "$streak", icon: Icons.local_fire_department_rounded)),
+        Expanded(child: _StatTile(title: l10n.profileStreak, value: '$streak', icon: Icons.local_fire_department_rounded)),
       ],
     );
   }
@@ -1186,7 +1199,7 @@ class _StatTile extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Glass(
@@ -1237,7 +1250,7 @@ class _FriendsCard extends StatelessWidget {
   const _FriendsCard({required this.friends});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -1263,7 +1276,7 @@ class _FriendsCard extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const FriendsScreen()),
+                    MaterialPageRoute(builder: (final _) => const FriendsScreen()),
                   );
                 },
                 child: Text(
@@ -1290,9 +1303,9 @@ class _FriendsCard extends StatelessWidget {
           else
             StreamBuilder<Map<String, bool>>(
               stream: presenceRepository.streamMultipleOnlineStatuses(
-                visibleFriends.map((f) => f['id']?.toString() ?? '').toList(),
+                visibleFriends.map((final f) => f['id']?.toString() ?? '').toList(),
               ),
-              builder: (context, presenceSnapshot) {
+              builder: (final context, final presenceSnapshot) {
                 final onlineStatuses = presenceSnapshot.data ?? {};
                 return Wrap(
                   spacing: S.xs,
@@ -1302,7 +1315,7 @@ class _FriendsCard extends StatelessWidget {
                       _MiniAvatar(
                         image: (friend['avatar_url']?.toString().isNotEmpty == true)
                             ? CachedNetworkImageProvider(friend['avatar_url'].toString()) as ImageProvider
-                            : const AssetImage("assets/avatar/avatar_1.png"),
+                            : const AssetImage('assets/avatar/avatar_1.png'),
                         tooltip: '@${friend['username']?.toString() ?? 'friend'}',
                         isOnline: onlineStatuses[friend['id']?.toString()] == true,
                       ),
@@ -1323,7 +1336,7 @@ class _AchievementsCard extends StatelessWidget {
   const _AchievementsCard({required this.achievements});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -1345,7 +1358,7 @@ class _AchievementsCard extends StatelessWidget {
                   ),
                 ),
               ),
-              RewardSparkle(show: achievements.any((a) => a.unlocked), size: 16),
+
             ],
           ),
           const SizedBox(height: S.sm),
@@ -1362,7 +1375,7 @@ class _AchievementsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: S.xxs),
                 Text(
-                  "Complete lessons to earn your first badge.",
+                  'Complete lessons to earn your first badge.',
                   style: textTheme.bodySmall?.copyWith(
                     color: scheme.onSurface.withValues(alpha: 0.55),
                     fontWeight: FontWeight.w600,
@@ -1378,7 +1391,7 @@ class _AchievementsCard extends StatelessWidget {
               mainAxisSpacing: S.sm,
               crossAxisSpacing: S.sm,
               childAspectRatio: 1.05,
-              children: achievements.map((a) {
+              children: achievements.map((final a) {
                 return _BadgeTile(
                   icon: _iconForAchievement(a.id),
                   title: a.title,
@@ -1391,7 +1404,7 @@ class _AchievementsCard extends StatelessWidget {
     );
   }
 
-  IconData _iconForAchievement(String id) {
+  IconData _iconForAchievement(final String id) {
     switch (id) {
       case 'top3':
         return Icons.emoji_events_rounded;
@@ -1435,7 +1448,7 @@ class _VisitorActionsCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -1565,7 +1578,7 @@ class _ActionButton extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final enabled = onTap != null;
@@ -1631,7 +1644,7 @@ class _VisitorOverviewCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
@@ -1740,7 +1753,7 @@ class _VisitorOverviewCard extends StatelessWidget {
             runSpacing: 8,
             children: signals
                 .map(
-                  (signal) => _SignalChip(
+                  (final signal) => _SignalChip(
                     icon: signal.icon,
                     label: signal.label,
                     active: signal.active,
@@ -1766,7 +1779,7 @@ class _SignalChip extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Container(
@@ -1813,7 +1826,7 @@ class _VisitorMetricTile extends StatelessWidget {
   const _VisitorMetricTile({required this.icon, required this.title, required this.value});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Container(
@@ -1856,7 +1869,7 @@ class _IconGlassButton extends StatelessWidget {
   const _IconGlassButton({required this.icon, required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return GestureDetector(
       onTap: onTap,
@@ -1874,7 +1887,7 @@ class _LeaderboardButton extends StatelessWidget {
   const _LeaderboardButton({required this.onTap});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final l10n = AppLocalizations.of(context);
     return GestureDetector(
@@ -1912,7 +1925,7 @@ class _AvatarGlow extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       width: size,
@@ -1959,7 +1972,7 @@ class _MiniAvatar extends StatelessWidget {
   const _MiniAvatar({required this.image, this.tooltip, this.isOnline = false});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Tooltip(
       message: tooltip ?? '',
@@ -2001,7 +2014,7 @@ class _MiniAvatarPlus extends StatelessWidget {
   const _MiniAvatarPlus({required this.count});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Container(
@@ -2032,11 +2045,11 @@ class _BadgeTile extends StatelessWidget {
   const _BadgeTile({required this.icon, required this.title, required this.unlocked});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final opacity = unlocked ? 1.0 : 0.45;
-    Widget tile = Glass(
+    final Widget tile = Glass(
       radius: BorderRadius.circular(18),
       padding: const EdgeInsets.all(S.xs),
       child: Column(
@@ -2057,7 +2070,7 @@ class _BadgeTile extends StatelessWidget {
     );
 
     if (unlocked) {
-      return tile.animate(onPlay: (controller) => controller.repeat(reverse: true))
+      return tile.animate(onPlay: (final controller) => controller.repeat(reverse: true))
           .shimmer(duration: const Duration(seconds: 3), color: scheme.primary.withValues(alpha: 0.15));
     }
     return tile;
@@ -2076,7 +2089,7 @@ class _Pill extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     return Container(
@@ -2122,7 +2135,7 @@ class _NeonProgressBar extends StatelessWidget {
   const _NeonProgressBar({required this.value});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Container(
       height: 12,
@@ -2162,7 +2175,7 @@ class _ActivityFeedCard extends StatelessWidget {
   const _ActivityFeedCard({required this.events});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     if (events.isEmpty) {
       return Padding(
@@ -2181,8 +2194,8 @@ class _ActivityFeedCard extends StatelessWidget {
 
     return Column(
       children: events
-          .map((e) => _ActivityEventTile(event: e))
-          .expand((w) => [w, const Divider(height: 1, indent: 52)])
+          .map((final e) => _ActivityEventTile(event: e))
+          .expand((final w) => [w, const Divider(height: 1, indent: 52)])
           .take(events.length * 2 - 1)
           .toList(),
     );
@@ -2194,7 +2207,7 @@ class _ActivityEventTile extends StatelessWidget {
   const _ActivityEventTile({required this.event});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final avatarUrl = event.avatarUrl;
 
@@ -2218,7 +2231,7 @@ class _ActivityEventTile extends StatelessWidget {
                       width: 38,
                       height: 38,
                       fit: BoxFit.cover,
-                      errorWidget: (_, __, ___) =>
+                      errorWidget: (final _, final __, final ___) =>
                           Icon(Icons.person, color: scheme.onSurface, size: 20),
                     ),
                   )

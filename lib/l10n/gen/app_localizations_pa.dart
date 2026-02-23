@@ -1636,6 +1636,9 @@ class AppLocalizationsPa extends AppLocalizations {
   String get circlesStartGame => 'ਗੇਮ ਸ਼ੁਰੂ ਕਰੋ';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'ਖਿਡਾਰੀਆਂ ਦੀ ਉਡੀਕ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ';
 
   @override

@@ -1,6 +1,5 @@
 
 import 'package:postgres/postgres.dart';
-import 'dart:io';
 
 Future<void> main() async {
   final endpoint = Endpoint(

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../../data/soma_plus_repository.dart';
-import '../theme/app_theme.dart';
-import '../widgets/glass.dart';
+import 'package:soma/core/theme/app_theme.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/data/soma_plus_repository.dart';
 
 /// Wraps a premium feature. If the current user is below [minimum] tier,
 /// the child is rendered with a lock overlay and tapping it opens the paywall.
@@ -28,10 +27,10 @@ class SomaPlusGate extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     return ValueListenableBuilder<SomaPlusState>(
       valueListenable: somaPlusRepository.state,
-      builder: (context, state, _) {
+      builder: (final context, final state, final _) {
         final hasAccess = state.hasTierOrHigher(minimum);
         if (hasAccess) return child;
 
@@ -70,7 +69,7 @@ class _LockedWrapper extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final textTones = Theme.of(context).extension<AppTextToneTheme>();
 
@@ -112,11 +111,11 @@ class _LockedWrapper extends StatelessWidget {
     );
   }
 
-  void _openPaywall(BuildContext context) {
+  void _openPaywall(final BuildContext context) {
     // Lazily import here to avoid circular deps.
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => const _PaywallShell(),
+        builder: (final _) => const _PaywallShell(),
         fullscreenDialog: true,
       ),
     );
@@ -129,12 +128,12 @@ class _PaywallShell extends StatelessWidget {
   const _PaywallShell();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     // Import the real plans screen dynamically to avoid cyclic dep at top level.
     // We use a Builder so we can push inside the same navigator.
     return FutureBuilder<Widget>(
       future: _loadPlansScreen(),
-      builder: (context, snap) {
+      builder: (final context, final snap) {
         if (snap.hasData) return snap.data!;
         final scheme = Theme.of(context).colorScheme;
         return Scaffold(
@@ -159,7 +158,7 @@ class _PlansScreenProxy extends StatelessWidget {
   const _PlansScreenProxy();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     // The real screen is referenced here; Dart tree-shakes it if not used.
     return _SomaPlansScreenWidget();
   }
@@ -167,10 +166,10 @@ class _PlansScreenProxy extends StatelessWidget {
 
 // ignore: must_be_immutable
 class _SomaPlansScreenWidget extends StatelessWidget {
-  _SomaPlansScreenWidget();
+  const _SomaPlansScreenWidget();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     // Deferred to avoid circular dependencies at the widget file level.
     // In practice, navigate directly with:
     //   Navigator.push(ctx, MaterialPageRoute(builder: (_) => SomaPlansScreen()))

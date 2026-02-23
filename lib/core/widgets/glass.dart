@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
-import '../theme/motion.dart';
-import '../theme/tokens.dart';
+import 'package:soma/core/theme/app_theme.dart';
+import 'package:soma/core/theme/motion.dart';
+import 'package:soma/core/theme/tokens.dart';
 
 enum GlassDepth { l1, l2, l3 }
 
@@ -45,8 +45,8 @@ class _GlassState extends State<Glass> with SingleTickerProviderStateMixin {
   }
 
   ({double sigma, List<BoxShadow> shadows}) _depthStyle(
-    bool isLight,
-    Color shadow,
+    final bool isLight,
+    final Color shadow,
   ) {
     switch (widget.depth) {
       case GlassDepth.l1:
@@ -98,7 +98,7 @@ class _GlassState extends State<Glass> with SingleTickerProviderStateMixin {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final glass = Theme.of(context).extension<GlassTheme>();
     final isLight = Theme.of(context).brightness == Brightness.light;
     final fill = glass?.fill ?? T.glassFill;
@@ -132,7 +132,7 @@ class _GlassState extends State<Glass> with SingleTickerProviderStateMixin {
 
     return AnimatedBuilder(
       animation: _controller,
-      builder: (context, _) {
+      builder: (final context, final _) {
         final sweepX = lerpDouble(-1.2, 1.2, _controller.value) ?? 0;
         return ClipRRect(
           borderRadius: widget.radius,

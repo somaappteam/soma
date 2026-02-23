@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/data/csv_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../data/csv_service.dart';
-import '../core/database/database_helper.dart';
 
 // ─── Abstract interface ───────────────────────────────────────────────────────
 
@@ -16,9 +16,9 @@ abstract class VocabDataSource {
   /// Returns a record of `(sourceRows, targetRows)`.
   Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
       fetchVocab({
-    required String sourceLang,
-    required String targetLang,
-    int limit = 1000,
+    required final String sourceLang,
+    required final String targetLang,
+    final int limit = 1000,
   });
 }
 
@@ -31,19 +31,19 @@ class CsvVocabDataSource implements VocabDataSource {
   @override
   Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
       fetchVocab({
-    required String sourceLang,
-    required String targetLang,
-    int limit = 1000,
+    required final String sourceLang,
+    required final String targetLang,
+    final int limit = 1000,
   }) async {
     final csv = CsvService.instance;
     final sourceRows = await csv.getVocabularyByLang(sourceLang);
     final targetRows = await csv.getVocabularyByLang(targetLang);
 
-    List<Map<String, dynamic>> toMapList(dynamic rows) {
+    List<Map<String, dynamic>> toMapList(final dynamic rows) {
       if (rows is! List) return [];
       return rows
           .whereType<Map>()
-          .map((r) => Map<String, dynamic>.from(r))
+          .map((final r) => Map<String, dynamic>.from(r))
           .toList();
     }
 
@@ -61,9 +61,9 @@ class SupabaseVocabDataSource implements VocabDataSource {
   @override
   Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
       fetchVocab({
-    required String sourceLang,
-    required String targetLang,
-    int limit = 1000,
+    required final String sourceLang,
+    required final String targetLang,
+    final int limit = 1000,
   }) async {
     final client = Supabase.instance.client;
 
@@ -91,17 +91,17 @@ class SqliteVocabDataSource implements VocabDataSource {
   @override
   Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
       fetchVocab({
-    required String sourceLang,
-    required String targetLang,
-    int limit = 1000,
+    required final String sourceLang,
+    required final String targetLang,
+    final int limit = 1000,
   }) async {
     final dbHelper = DatabaseHelper.instance;
     final sourceRows = await dbHelper.getVocabularyByLang(sourceLang);
     final targetRows = await dbHelper.getVocabularyByLang(targetLang);
 
     // SQLite returns List<Map<String, Object?>>, we cast to dynamic
-    List<Map<String, dynamic>> toMapList(List<Map<String, dynamic>> rows) {
-      return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+    List<Map<String, dynamic>> toMapList(final List<Map<String, dynamic>> rows) {
+      return rows.map((final r) => Map<String, dynamic>.from(r)).toList();
     }
 
     return (source: toMapList(sourceRows), target: toMapList(targetRows));
@@ -113,9 +113,9 @@ class SqliteVocabDataSource implements VocabDataSource {
 abstract class SentenceDataSource {
   Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
       fetchSentences({
-    required String sourceLang,
-    required String targetLang,
-    int limit = 1000,
+    required final String sourceLang,
+    required final String targetLang,
+    final int limit = 1000,
   });
 }
 
@@ -125,19 +125,19 @@ class CsvSentenceDataSource implements SentenceDataSource {
   @override
   Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
       fetchSentences({
-    required String sourceLang,
-    required String targetLang,
-    int limit = 1000,
+    required final String sourceLang,
+    required final String targetLang,
+    final int limit = 1000,
   }) async {
     final csv = CsvService.instance;
     final sourceRows = await csv.getSentencesByLang(sourceLang);
     final targetRows = await csv.getSentencesByLang(targetLang);
 
-    List<Map<String, dynamic>> toMapList(dynamic rows) {
+    List<Map<String, dynamic>> toMapList(final dynamic rows) {
       if (rows is! List) return [];
       return rows
           .whereType<Map>()
-          .map((r) => Map<String, dynamic>.from(r))
+          .map((final r) => Map<String, dynamic>.from(r))
           .toList();
     }
 
@@ -151,17 +151,17 @@ class SqliteSentenceDataSource implements SentenceDataSource {
   @override
   Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
       fetchSentences({
-    required String sourceLang,
-    required String targetLang,
-    int limit = 1000,
+    required final String sourceLang,
+    required final String targetLang,
+    final int limit = 1000,
   }) async {
     final dbHelper = DatabaseHelper.instance;
     final sourceRows = await dbHelper.getSentencesByLang(sourceLang);
     final targetRows = await dbHelper.getSentencesByLang(targetLang);
 
     // SQLite returns List<Map<String, Object?>>, we cast to dynamic
-    List<Map<String, dynamic>> toMapList(List<Map<String, dynamic>> rows) {
-      return rows.map((r) => Map<String, dynamic>.from(r)).toList();
+    List<Map<String, dynamic>> toMapList(final List<Map<String, dynamic>> rows) {
+      return rows.map((final r) => Map<String, dynamic>.from(r)).toList();
     }
 
     return (source: toMapList(sourceRows), target: toMapList(targetRows));

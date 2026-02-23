@@ -1648,6 +1648,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get circlesStartGame => 'Mulai Permainan';
 
   @override
+  String get circlesStartingGame => 'Starting game...';
+
+  @override
   String get circlesWaitingForPlayers => 'Menunggu Pemain';
 
   @override

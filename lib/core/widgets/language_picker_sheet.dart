@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../../data/languages.dart';
-import '../theme/tokens.dart';
-import '../widgets/glass.dart';
+import 'package:soma/core/theme/tokens.dart';
+import 'package:soma/core/widgets/glass.dart';
+import 'package:soma/data/languages.dart';
 
 class LanguagePickerSheet extends StatefulWidget {
   final String title;
@@ -44,20 +43,20 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
       if (!nextShow) _query = '';
     });
     if (nextShow) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((final _) {
         if (mounted) _searchFocus.requestFocus();
       });
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final normalized = _query.trim().toLowerCase();
     final filtered = normalized.isEmpty
         ? widget.items
         : widget.items
-            .where((e) => e.name.toLowerCase().contains(normalized) || e.code.toLowerCase().contains(normalized))
+            .where((final e) => e.name.toLowerCase().contains(normalized) || e.code.toLowerCase().contains(normalized))
             .toList();
     final maxHeight = MediaQuery.of(context).size.height * 0.75;
 
@@ -120,7 +119,7 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                     child: TextField(
                       focusNode: _searchFocus,
                       autofocus: true,
-                      onChanged: (v) => setState(() => _query = v),
+                      onChanged: (final v) => setState(() => _query = v),
                       style: TextStyle(
                         color: widget.darkModeStyle ? Colors.white : scheme.onSurface,
                         fontWeight: FontWeight.w700,
@@ -154,7 +153,7 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                     ),
                   )
                 else
-                  ...filtered.map((e) {
+                  ...filtered.map((final e) {
                     final selected = e.code == widget.current.code;
                     final baseColor = widget.darkModeStyle ? Colors.white : scheme.onSurface;
                     return InkWell(
