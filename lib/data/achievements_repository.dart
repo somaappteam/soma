@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/models/achievement.dart';
 import 'package:soma/models/user_stats.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -61,7 +62,8 @@ class AchievementsRepository {
         description: row['description'],
         icon: row['icon'],
         unlocked: unlockedAtRaw != null,
-        unlockedAt: unlockedAtRaw != null ? DateTime.tryParse(unlockedAtRaw) : null,
+        unlockedAt:
+            unlockedAtRaw != null ? DateTime.tryParse(unlockedAtRaw) : null,
       );
     }).toList();
   }
@@ -88,7 +90,7 @@ class AchievementsRepository {
         }
         _cacheWarmed = true;
       } catch (e) {
-        debugPrint('AchievementsRepository: cache warm failed – $e');
+        appLogger.debug('AchievementsRepository: cache warm failed – $e');
       }
     }
 
@@ -107,7 +109,8 @@ class AchievementsRepository {
       // Fetch the achievement details and emit for in-app toast.
       _emitUnlockToast(achievementId);
     } catch (e) {
-      debugPrint('AchievementsRepository: unlock failed for $achievementId – $e');
+      appLogger.debug(
+          'AchievementsRepository: unlock failed for $achievementId – $e');
     }
   }
 
@@ -130,7 +133,7 @@ class AchievementsRepository {
         unlockedAt: DateTime.now(),
       );
     } catch (e) {
-      debugPrint('AchievementsRepository: toast emit failed – $e');
+      appLogger.debug('AchievementsRepository: toast emit failed – $e');
     }
   }
 
@@ -155,8 +158,8 @@ class AchievementsRepository {
     }
 
     // Streak milestones.
-    if (stats.streakDays >= 3)  await unlock('streak_3');
-    if (stats.streakDays >= 7)  await unlock('streak_7');
+    if (stats.streakDays >= 3) await unlock('streak_3');
+    if (stats.streakDays >= 7) await unlock('streak_7');
     if (stats.streakDays >= 30) await unlock('streak_30');
 
     // XP milestones — fetched once, checked against multiple thresholds.
@@ -168,12 +171,12 @@ class AchievementsRepository {
           .single();
       final totalXp = (profile['total_xp'] ?? 0) as int;
 
-      if (totalXp >= 500)   await unlock('xp_500');
-      if (totalXp >= 1000)  await unlock('xp_1000');
-      if (totalXp >= 5000)  await unlock('xp_5000');
+      if (totalXp >= 500) await unlock('xp_500');
+      if (totalXp >= 1000) await unlock('xp_1000');
+      if (totalXp >= 5000) await unlock('xp_5000');
       if (totalXp >= 10000) await unlock('xp_10000');
     } catch (e) {
-      debugPrint('AchievementsRepository: XP check failed – $e');
+      appLogger.debug('AchievementsRepository: XP check failed – $e');
     }
 
     await _checkTop3(uid);
@@ -215,25 +218,25 @@ class AchievementsRepository {
       ]);
 
       final profileRow = results[0];
-      final statsRow   = results[1];
+      final statsRow = results[1];
 
-      final totalXp      = (profileRow?['total_xp'] ?? 0) as int;
+      final totalXp = (profileRow?['total_xp'] ?? 0) as int;
       final totalQuizzes = (statsRow?['total_quizzes'] ?? 0) as int;
-      final streakDays   = (statsRow?['streak_days']   ?? 0) as int;
-      final circlesJoined= (statsRow?['circles_joined'] ?? 0) as int;
+      final streakDays = (statsRow?['streak_days'] ?? 0) as int;
+      final circlesJoined = (statsRow?['circles_joined'] ?? 0) as int;
 
       // XP milestones.
-      if (totalXp >= 500)   await unlock('xp_500');
-      if (totalXp >= 1000)  await unlock('xp_1000');
-      if (totalXp >= 5000)  await unlock('xp_5000');
+      if (totalXp >= 500) await unlock('xp_500');
+      if (totalXp >= 1000) await unlock('xp_1000');
+      if (totalXp >= 5000) await unlock('xp_5000');
       if (totalXp >= 10000) await unlock('xp_10000');
 
       // Quiz milestones.
       if (totalQuizzes >= 20) await unlock('study');
 
       // Streak milestones.
-      if (streakDays >= 3)  await unlock('streak_3');
-      if (streakDays >= 7)  await unlock('streak_7');
+      if (streakDays >= 3) await unlock('streak_3');
+      if (streakDays >= 7) await unlock('streak_7');
       if (streakDays >= 30) await unlock('streak_30');
 
       // Circle participation.
@@ -245,7 +248,7 @@ class AchievementsRepository {
       // Friends.
       await checkAfterFriend();
     } catch (e) {
-      debugPrint('AchievementsRepository: checkOnLogin failed – $e');
+      appLogger.debug('AchievementsRepository: checkOnLogin failed – $e');
     }
   }
 
@@ -259,9 +262,10 @@ class AchievementsRepository {
       final inTop = top.any((final row) => row['id']?.toString() == uid);
       if (inTop) await unlock('top3');
     } catch (e) {
-      debugPrint('AchievementsRepository: top3 check failed – $e');
+      appLogger.debug('AchievementsRepository: top3 check failed – $e');
     }
   }
 }
 
-AchievementsRepository get achievementsRepository => locator<AchievementsRepository>();
+AchievementsRepository get achievementsRepository =>
+    locator<AchievementsRepository>();

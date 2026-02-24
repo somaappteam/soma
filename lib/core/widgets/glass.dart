@@ -113,16 +113,21 @@ class _GlassState extends State<Glass> with SingleTickerProviderStateMixin {
     final coolEdgeTint = isLight
         ? Colors.white
         : const Color(0xFF66DFFF); // cool cyan edge tint in dark mode
-    final highlight = Color.lerp(effectiveFill, warmHighlightBase, isLight ? 0.18 : 0.12) ??
-        warmHighlightBase.withValues(alpha: 0.12);
-    final highlightOpacity = (effectiveFill.a + (isLight ? 0.12 : 0.06)).clamp(0.0, 1.0);
+    final highlight =
+        Color.lerp(effectiveFill, warmHighlightBase, isLight ? 0.18 : 0.12) ??
+            warmHighlightBase.withValues(alpha: 0.12);
+    final highlightOpacity =
+        (effectiveFill.a + (isLight ? 0.12 : 0.06)).clamp(0.0, 1.0);
     final rimColor = Color.lerp(stroke, coolEdgeTint, isLight ? 0.2 : 0.34) ??
         stroke.withValues(alpha: isLight ? 0.64 : 0.26);
     final depthStyle = _depthStyle(isLight, shadow);
     final selectedGlow = widget.selected
         ? [
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: isLight ? 0.18 : 0.28),
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withValues(alpha: isLight ? 0.18 : 0.28),
               blurRadius: isLight ? 16 : 20,
               spreadRadius: 0,
               offset: const Offset(0, 0),
@@ -167,7 +172,9 @@ class _GlassState extends State<Glass> with SingleTickerProviderStateMixin {
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                         borderRadius: widget.radius,
-                        border: Border.all(color: rimColor, width: widget.selected ? 1.15 : 0.7),
+                        border: Border.all(
+                            color: rimColor,
+                            width: widget.selected ? 1.15 : 0.7),
                       ),
                     ),
                   ),

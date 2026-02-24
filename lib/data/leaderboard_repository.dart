@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LeaderboardRepository {
@@ -7,7 +7,8 @@ class LeaderboardRepository {
 
   // ─────────────────────────── Global ─────────────────────────────────────────
 
-  Future<List<Map<String, dynamic>>> getGlobalLeaderboard({final int limit = 50}) async {
+  Future<List<Map<String, dynamic>>> getGlobalLeaderboard(
+      {final int limit = 50}) async {
     final response = await _supabase
         .from('leaderboard')
         .select()
@@ -34,7 +35,7 @@ class LeaderboardRepository {
           .limit(limit);
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      debugPrint('LeaderboardRepository.getLanguageLeaderboard: $e');
+      appLogger.debug('LeaderboardRepository.getLanguageLeaderboard: $e');
       return [];
     }
   }
@@ -42,9 +43,11 @@ class LeaderboardRepository {
   // ─────────────────────────── Weekly ─────────────────────────────────────────
 
   /// Returns top players active in the last 7 days, ordered by XP.
-  Future<List<Map<String, dynamic>>> getWeeklyLeaderboard({final int limit = 50}) async {
+  Future<List<Map<String, dynamic>>> getWeeklyLeaderboard(
+      {final int limit = 50}) async {
     try {
-      final cutoff = DateTime.now().subtract(const Duration(days: 7)).toIso8601String();
+      final cutoff =
+          DateTime.now().subtract(const Duration(days: 7)).toIso8601String();
       final response = await _supabase
           .from('leaderboard')
           .select()
@@ -53,7 +56,7 @@ class LeaderboardRepository {
           .limit(limit);
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      debugPrint('LeaderboardRepository.getWeeklyLeaderboard: $e');
+      appLogger.debug('LeaderboardRepository.getWeeklyLeaderboard: $e');
       return [];
     }
   }
@@ -75,7 +78,7 @@ class LeaderboardRepository {
           .limit(limit);
       return List<Map<String, dynamic>>.from(response);
     } catch (e) {
-      debugPrint('LeaderboardRepository.getFriendsLeaderboard: $e');
+      appLogger.debug('LeaderboardRepository.getFriendsLeaderboard: $e');
       return [];
     }
   }
@@ -105,7 +108,7 @@ class LeaderboardRepository {
           .maybeSingle();
       return response;
     } catch (e) {
-      debugPrint('LeaderboardRepository.fetchByUsername: $e');
+      appLogger.debug('LeaderboardRepository.fetchByUsername: $e');
       return null;
     }
   }
@@ -134,15 +137,14 @@ class LeaderboardRepository {
 
       return rows.map<String>((final r) {
         final requesterId = r['requester_id'] as String;
-        return requesterId == uid
-            ? r['addressee_id'] as String
-            : requesterId;
+        return requesterId == uid ? r['addressee_id'] as String : requesterId;
       }).toList();
     } catch (e) {
-      debugPrint('LeaderboardRepository.getFriendIds: $e');
+      appLogger.debug('LeaderboardRepository.getFriendIds: $e');
       return [];
     }
   }
 }
 
-LeaderboardRepository get leaderboardRepository => locator<LeaderboardRepository>();
+LeaderboardRepository get leaderboardRepository =>
+    locator<LeaderboardRepository>();

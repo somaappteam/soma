@@ -1,4 +1,6 @@
 // Mock Supabase init partial
+import 'package:soma/core/services/app_logger.dart';
+
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
 const String serviceRoleKey =
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuYmp0ZWVkb2hmbGdrYXJmYXhrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTcwMDI2NCwiZXhwIjoyMDg1Mjc2MjY0fQ.jTZOgpQ7Fy1HlUT0YldRAtr6Bvwti_Al1hfaP5Bz0Nc';
@@ -16,12 +18,12 @@ void main() async {
 }
 
 void _testParse(final String id) {
-  print('Testing ID: "$id"');
+  appLogger.info('Testing ID: "$id"');
   final res = _parseCourseLangs(id);
   if (res != null) {
-    print('  ✅ Parsed: ${res.source} -> ${res.target}');
+    appLogger.info('  ✅ Parsed: ${res.source} -> ${res.target}');
   } else {
-    print('  ❌ Failed to parse');
+    appLogger.info('  ❌ Failed to parse');
   }
 }
 

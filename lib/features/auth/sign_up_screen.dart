@@ -12,7 +12,6 @@ import 'package:soma/features/info/about_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 class SignUpScreen extends StatefulWidget {
   final VoidCallback? onSignedUp;
   const SignUpScreen({super.key, this.onSignedUp});
@@ -93,7 +92,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-
   void _showEmailConfirmationSnackBar(final String email) {
     final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
@@ -132,14 +130,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
   }
 
-
   Future<void> _handleOAuthSignUp(final OAuthProvider provider) async {
     final l10n = AppLocalizations.of(context);
     try {
       await authRepository.signInWithOAuth(provider);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${provider.name.toUpperCase()} ${l10n.signUp}...')),
+        SnackBar(
+            content: Text('${provider.name.toUpperCase()} ${l10n.signUp}...')),
       );
     } catch (e) {
       if (!mounted) return;
@@ -183,119 +181,134 @@ class _SignUpScreenState extends State<SignUpScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                    // top row
-                    Row(
+                  // top row
+                  Row(
+                    children: [
+                      _IconGlassButton(
+                        icon: Icons.arrow_back_rounded,
+                        onTap: () => Navigator.pop(context),
+                      ),
+                      const Spacer(),
+                      _IconGlassButton(
+                        icon: Icons.star_rounded,
+                        onTap: _handleStarTap,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 60),
+
+                  // Title
+                  Center(
+                    child: Text(
+                      l10n.signUp,
+                      style:
+                          Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Glass Card
+                  Glass(
+                    radius: BorderRadius.circular(26),
+                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                    child: Column(
                       children: [
-                        _IconGlassButton(
-                          icon: Icons.arrow_back_rounded,
-                          onTap: () => Navigator.pop(context),
+                        _GlassTextField(
+                          controller: _username,
+                          hint: l10n.authUsername,
+                          icon: Icons.person_outline_rounded,
+                          keyboardType: TextInputType.name,
+                          obscure: false,
+                          onToggleObscure: null,
                         ),
-                        const Spacer(),
-                        _IconGlassButton(
-                          icon: Icons.star_rounded,
-                          onTap: _handleStarTap,
+                        const SizedBox(height: 12),
+                        _GlassTextField(
+                          controller: _email,
+                          hint: l10n.authEmail,
+                          icon: Icons.mail_outline_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                          obscure: false,
+                          onToggleObscure: null,
+                        ),
+                        const SizedBox(height: 12),
+                        _GlassTextField(
+                          controller: _password,
+                          hint: l10n.authPassword,
+                          icon: Icons.lock_outline_rounded,
+                          keyboardType: TextInputType.visiblePassword,
+                          obscure: _obscure,
+                          onToggleObscure: () =>
+                              setState(() => _obscure = !_obscure),
+                        ),
+                        const SizedBox(height: 18),
+                        SizedBox(
+                          width: double.infinity,
+                          child: NeonButton(
+                            label: _isLoading
+                                ? l10n.authCreating
+                                : l10n.authCreateAccount,
+                            onTap: _isLoading ? () {} : _handleSignUp,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: _isLoading
+                                ? null
+                                : () =>
+                                    _handleOAuthSignUp(OAuthProvider.facebook),
+                            icon: const Icon(Icons.facebook_rounded),
+                            label: const Text('Continue with Facebook'),
+                          ),
                         ),
                       ],
                     ),
+                  ),
 
-                    const SizedBox(height: 60),
+                  const SizedBox(height: 14),
 
-                    // Title
-                    Center(
-                      child: Text(
-                        l10n.signUp,
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
+                  // bottom link
+                  Center(
+                    child: InkWell(
+                      onTap: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (final _) => const SignInScreen()),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Glass Card
-                    Glass(
-                      radius: BorderRadius.circular(26),
-                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
-                      child: Column(
-                        children: [
-                          _GlassTextField(
-                            controller: _username,
-                            hint: l10n.authUsername,
-                            icon: Icons.person_outline_rounded,
-                            keyboardType: TextInputType.name,
-                            obscure: false,
-                            onToggleObscure: null,
-                          ),
-                          const SizedBox(height: 12),
-                          _GlassTextField(
-                            controller: _email,
-                            hint: l10n.authEmail,
-                            icon: Icons.mail_outline_rounded,
-                            keyboardType: TextInputType.emailAddress,
-                            obscure: false,
-                            onToggleObscure: null,
-                          ),
-                          const SizedBox(height: 12),
-                          _GlassTextField(
-                            controller: _password,
-                            hint: l10n.authPassword,
-                            icon: Icons.lock_outline_rounded,
-                            keyboardType: TextInputType.visiblePassword,
-                            obscure: _obscure,
-                            onToggleObscure: () => setState(() => _obscure = !_obscure),
-                          ),
-                          const SizedBox(height: 18),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: NeonButton(
-                              label: _isLoading ? l10n.authCreating : l10n.authCreateAccount,
-                              onTap: _isLoading ? () {} : _handleSignUp,
+                      child: Text.rich(
+                        TextSpan(
+                          text: l10n.authHaveAccount,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.72),
+                                  ),
+                          children: [
+                            TextSpan(
+                              text: l10n.signIn,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton.icon(
-                              onPressed: _isLoading ? null : () => _handleOAuthSignUp(OAuthProvider.facebook),
-                              icon: const Icon(Icons.facebook_rounded),
-                              label: const Text('Continue with Facebook'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    // bottom link
-                    Center(
-                      child: InkWell(
-                        onTap: () => Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (final _) => const SignInScreen()),
-                        ),
-                        child: Text.rich(
-                          TextSpan(
-                            text: l10n.authHaveAccount,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.72),
-                                ),
-                            children: [
-                              TextSpan(
-                                text: l10n.signIn,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 80),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
@@ -359,7 +372,7 @@ class _GlassTextField extends StatelessWidget {
   Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
-    
+
     return Container(
       height: 54,
       decoration: BoxDecoration(
@@ -399,7 +412,9 @@ class _GlassTextField extends StatelessWidget {
             IconButton(
               onPressed: onToggleObscure,
               icon: Icon(
-                obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                obscure
+                    ? Icons.visibility_off_rounded
+                    : Icons.visibility_rounded,
                 color: scheme.onSurface.withValues(alpha: 0.75),
                 size: 20,
               ),

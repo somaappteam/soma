@@ -25,7 +25,7 @@ Future<void> _fcmBackgroundHandler(final RemoteMessage message) async {
   if (message.data['push_type'] == 'call') {
     final callerName = message.data['caller_name'] ?? 'Someone';
     final callerId = message.data['caller_id'];
-    
+
     final callParams = CallKitParams(
       id: message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString(),
       nameCaller: callerName,
@@ -67,12 +67,17 @@ Future<void> _fcmBackgroundHandler(final RemoteMessage message) async {
 }
 
 // ─── Android notification channel ───────────────────────────────────────────
-const _kChannelId   = 'soma_default';
+const _kChannelId = 'soma_default';
 const _kChannelName = 'Soma Notifications';
 const _kChannelDesc = 'Friend requests, circles, and daily reminders';
-const _kReminderId  = 1;
+const _kReminderId = 1;
 
-enum NotificationInitState { idle, ready, permissionDenied, tokenRegistrationFailed }
+enum NotificationInitState {
+  idle,
+  ready,
+  permissionDenied,
+  tokenRegistrationFailed
+}
 
 class NotificationService {
   final _plugin = FlutterLocalNotificationsPlugin();
@@ -80,11 +85,14 @@ class NotificationService {
 
   RealtimeChannel? _realtimeChannel;
   bool _pushEnabled = true;
-  final ValueNotifier<NotificationInitState> initState = ValueNotifier(NotificationInitState.idle);
+  final ValueNotifier<NotificationInitState> initState =
+      ValueNotifier(NotificationInitState.idle);
 
   // ─────────────────────────── Initialization ─────────────────────────────────
 
-  Future<void> initialize({final bool pushEnabled = true, final String reminderTime = '20:00'}) async {
+  Future<void> initialize(
+      {final bool pushEnabled = true,
+      final String reminderTime = '20:00'}) async {
     if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) return;
 
     _pushEnabled = pushEnabled;
@@ -94,7 +102,8 @@ class NotificationService {
     try {
       await Firebase.initializeApp();
     } catch (e) {
-      appLogger.error('Firebase initialization failed during early bootstrap', error: e);
+      appLogger.error('Firebase initialization failed during early bootstrap',
+          error: e);
     }
 
     _initFirebaseMessaging();
@@ -106,13 +115,15 @@ class NotificationService {
   }
 
   Future<void> _initLocalNotifications() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
-    const settings = InitializationSettings(android: androidSettings, iOS: iosSettings);
+    const settings =
+        InitializationSettings(android: androidSettings, iOS: iosSettings);
     await _plugin.initialize(settings);
 
     // Create Android notification channel.
@@ -124,7 +135,8 @@ class NotificationService {
         importance: Importance.high,
       );
       await _plugin
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
     }
   }
@@ -153,8 +165,10 @@ class NotificationService {
           return;
         }
 
-        final title = message.notification?.title ?? message.data['title']?.toString();
-        final body  = message.notification?.body  ?? message.data['body']?.toString();
+        final title =
+            message.notification?.title ?? message.data['title']?.toString();
+        final body =
+            message.notification?.body ?? message.data['body']?.toString();
         if (title != null) showNotification(title: title, body: body ?? '');
       });
 
@@ -174,19 +188,24 @@ class NotificationService {
       // Register FCM token with Supabase (best-effort).
       _registerFcmToken();
     } catch (e, st) {
-      appLogger.error('NotificationService Firebase init failed', error: e, stackTrace: st);
-      unawaited(errorReporter.capture(e, st, hint: 'NotificationService._initFirebaseMessaging'));
+      appLogger.error('NotificationService Firebase init failed',
+          error: e, stackTrace: st);
+      unawaited(errorReporter.capture(e, st,
+          hint: 'NotificationService._initFirebaseMessaging'));
     }
   }
 
   void _handleMessageTap(final RemoteMessage message) {
-    appLogger.debug('Handling notification tap', context: {'type': message.data['type']?.toString()});
-    
+    appLogger.debug('Handling notification tap',
+        context: {'type': message.data['type']?.toString()});
+
     // We expect payload to contain something like: { 'type': 'dm', 'otherId': '...', 'otherName': '...' }
     final type = message.data['type'] ?? message.data['push_type'];
     if (type == 'dm' || type == 'call') {
-      final otherId = message.data['otherId']?.toString() ?? message.data['caller_id']?.toString();
-      final otherName = message.data['otherName']?.toString() ?? message.data['caller_name']?.toString();
+      final otherId = message.data['otherId']?.toString() ??
+          message.data['caller_id']?.toString();
+      final otherName = message.data['otherName']?.toString() ??
+          message.data['caller_name']?.toString();
       final isCall = type == 'call' || message.data['push_type'] == 'call';
       final meId = _supabase.auth.currentUser?.id;
 
@@ -213,7 +232,8 @@ class NotificationService {
       final settings = await messaging.requestPermission();
       final status = settings.authorizationStatus;
 
-      if (status == AuthorizationStatus.denied || status == AuthorizationStatus.notDetermined) {
+      if (status == AuthorizationStatus.denied ||
+          status == AuthorizationStatus.notDetermined) {
         initState.value = NotificationInitState.permissionDenied;
         appLogger.warning('Notification permission denied');
         return;
@@ -225,8 +245,10 @@ class NotificationService {
       messaging.onTokenRefresh.listen(_upsertToken);
     } catch (e, st) {
       initState.value = NotificationInitState.tokenRegistrationFailed;
-      appLogger.error('FCM token registration failed', error: e, stackTrace: st);
-      await errorReporter.capture(e, st, hint: 'NotificationService._registerFcmToken');
+      appLogger.error('FCM token registration failed',
+          error: e, stackTrace: st);
+      await errorReporter.capture(e, st,
+          hint: 'NotificationService._registerFcmToken');
     }
   }
 
@@ -234,11 +256,14 @@ class NotificationService {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return;
     try {
-      await _supabase.from('profiles').update({'fcm_token': token}).eq('id', uid);
+      await _supabase
+          .from('profiles')
+          .update({'fcm_token': token}).eq('id', uid);
       appLogger.info('FCM token saved');
     } catch (e, st) {
       appLogger.error('FCM token upsert failed', error: e, stackTrace: st);
-      await errorReporter.capture(e, st, hint: 'NotificationService._upsertToken');
+      await errorReporter.capture(e, st,
+          hint: 'NotificationService._upsertToken');
     }
   }
 
@@ -247,17 +272,21 @@ class NotificationService {
     final uid = _supabase.auth.currentUser?.id;
     if (uid == null) return;
     try {
-      await _supabase.from('profiles').update({'fcm_token': null}).eq('id', uid);
+      await _supabase
+          .from('profiles')
+          .update({'fcm_token': null}).eq('id', uid);
       await FirebaseMessaging.instance.deleteToken();
     } catch (e, st) {
       appLogger.error('FCM token clear failed', error: e, stackTrace: st);
-      await errorReporter.capture(e, st, hint: 'NotificationService.clearToken');
+      await errorReporter.capture(e, st,
+          hint: 'NotificationService.clearToken');
     }
   }
 
   // ─────────────────────────── Show local notification ────────────────────────
 
-  Future<void> showNotification({required final String title, required final String body}) async {
+  Future<void> showNotification(
+      {required final String title, required final String body}) async {
     if (!_pushEnabled) return;
     const androidDetails = AndroidNotificationDetails(
       _kChannelId,
@@ -267,7 +296,8 @@ class NotificationService {
       priority: Priority.high,
     );
     const iosDetails = DarwinNotificationDetails();
-    const details = NotificationDetails(android: androidDetails, iOS: iosDetails);
+    const details =
+        NotificationDetails(android: androidDetails, iOS: iosDetails);
     await _plugin.show(
       DateTime.now().millisecondsSinceEpoch.remainder(100000),
       title,
@@ -279,17 +309,19 @@ class NotificationService {
   // ─────────────────────────── Daily reminder ──────────────────────────────────
 
   /// Schedules (or cancels) a daily reminder at [timeHHmm] (e.g. `'20:00'`).
-  Future<void> scheduleReminder(final String timeHHmm, {required final bool enabled}) async {
+  Future<void> scheduleReminder(final String timeHHmm,
+      {required final bool enabled}) async {
     await _plugin.cancel(_kReminderId);
     if (!enabled || timeHHmm.isEmpty || !_pushEnabled) return;
 
     final parts = timeHHmm.split(':');
     if (parts.length < 2) return;
-    final hour   = int.tryParse(parts[0]) ?? 20;
+    final hour = int.tryParse(parts[0]) ?? 20;
     final minute = int.tryParse(parts[1]) ?? 0;
 
     final now = tz.TZDateTime.now(tz.local);
-    var scheduled = tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    var scheduled =
+        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
     if (scheduled.isBefore(now)) {
       scheduled = scheduled.add(const Duration(days: 1));
     }
@@ -302,7 +334,8 @@ class NotificationService {
       priority: Priority.high,
     );
     const iosDetails = DarwinNotificationDetails();
-    const details = NotificationDetails(android: androidDetails, iOS: iosDetails);
+    const details =
+        NotificationDetails(android: androidDetails, iOS: iosDetails);
 
     try {
       await _plugin.zonedSchedule(
@@ -357,13 +390,14 @@ class NotificationService {
             if (!_pushEnabled) return;
             final row = payload.newRecord;
             final title = row['title']?.toString() ?? 'New notification';
-            final body  = row['body']?.toString()  ?? '';
+            final body = row['body']?.toString() ?? '';
             showNotification(title: title, body: body);
           },
         )
         .subscribe();
 
-    appLogger.info('Realtime notification listener started', context: {'user_id': uid});
+    appLogger.info('Realtime notification listener started',
+        context: {'user_id': uid});
   }
 
   void stopRealtimeListener() {

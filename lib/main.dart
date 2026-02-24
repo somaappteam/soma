@@ -6,6 +6,7 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:soma/core/di/locator.dart';
 import 'package:soma/core/i18n/ui_language.dart';
 import 'package:soma/core/services/app_bootstrap.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/core/services/sync_retry_policy.dart';
 import 'package:soma/core/services/theme_mode_controller.dart';
 import 'package:soma/core/theme/app_theme.dart';
@@ -29,15 +30,21 @@ Future<void> main() async {
     (final options) {
       // Pass --dart-define=SENTRY_DSN=https://... to enable in release.
       const dsn = String.fromEnvironment('SENTRY_DSN');
-      final traceRate = double.tryParse(const String.fromEnvironment('SENTRY_TRACE_SAMPLE_RATE')) ?? 0.2;
-      final profileRate = double.tryParse(const String.fromEnvironment('SENTRY_PROFILE_SAMPLE_RATE')) ?? 0.1;
-      const enableInDebug = bool.fromEnvironment('SENTRY_ENABLE_IN_DEBUG', defaultValue: false);
+      final traceRate = double.tryParse(
+              const String.fromEnvironment('SENTRY_TRACE_SAMPLE_RATE')) ??
+          0.2;
+      final profileRate = double.tryParse(
+              const String.fromEnvironment('SENTRY_PROFILE_SAMPLE_RATE')) ??
+          0.1;
+      const enableInDebug =
+          bool.fromEnvironment('SENTRY_ENABLE_IN_DEBUG', defaultValue: false);
 
       options.dsn = dsn.isEmpty ? '' : dsn;
       options.tracesSampleRate = traceRate.clamp(0, 1);
       options.profilesSampleRate = profileRate.clamp(0, 1);
       options.enableAppLifecycleBreadcrumbs = true;
-      options.environment = const String.fromEnvironment('APP_ENV', defaultValue: 'development');
+      options.environment =
+          const String.fromEnvironment('APP_ENV', defaultValue: 'development');
       options.debug = enableInDebug;
     },
     appRunner: () async {
@@ -77,7 +84,9 @@ Future<void> runContentSync() async {
     return;
   }
 
-  final durations = result.stepDurationsMs.entries.map((final e) => '${e.key}:${e.value}ms').join(' · ');
+  final durations = result.stepDurationsMs.entries
+      .map((final e) => '${e.key}:${e.value}ms')
+      .join(' · ');
   syncStatusNotifier.value = SyncStatus.error;
   syncMessageNotifier.value = result.failedSteps.isEmpty
       ? 'Sync failed unexpectedly. Tap retry to try again.'
@@ -114,7 +123,7 @@ class _AppState extends State<App> {
         setState(() => _currentLocale = locale);
       }
     } catch (e) {
-      debugPrint('Failed to load saved locale: $e');
+      appLogger.debug('Failed to load saved locale: $e');
     }
   }
 
@@ -128,7 +137,8 @@ class _AppState extends State<App> {
           setState(() => _currentLocale = locale);
         }
       }
-      themeModeController.setModeFromSetting(settings.themeMode, persist: false);
+      themeModeController.setModeFromSetting(settings.themeMode,
+          persist: false);
     });
   }
 
@@ -139,7 +149,8 @@ class _AppState extends State<App> {
     if (context == null) return;
 
     final messenger = ScaffoldMessenger.of(context);
-    final message = syncMessageNotifier.value ?? 'Background sync failed. We will retry automatically.';
+    final message = syncMessageNotifier.value ??
+        'Background sync failed. We will retry automatically.';
 
     messenger
       ..hideCurrentSnackBar()
@@ -171,7 +182,8 @@ class _AppState extends State<App> {
         return MaterialApp(
           navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
-          onGenerateTitle: (final context) => AppLocalizations.of(context).appTitle,
+          onGenerateTitle: (final context) =>
+              AppLocalizations.of(context).appTitle,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,

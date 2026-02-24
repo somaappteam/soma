@@ -1,3 +1,4 @@
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
@@ -7,7 +8,7 @@ const String serviceRoleKey =
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
 
-  print('--- Verifying Schema Connections ---');
+  appLogger.info('--- Verifying Schema Connections ---');
 
   // 1. Check Row Counts
   await _checkCounts(client);
@@ -16,32 +17,33 @@ void main() async {
   await _checkConceptIntegrity(client, 'vocabulary', 'word');
   await _checkConceptIntegrity(client, 'sentences', 'sentence');
 
-  print('--- Verification Complete ---');
+  appLogger.info('--- Verification Complete ---');
 }
 
 Future<void> _checkCounts(final SupabaseClient client) async {
-  print('\n[Row Counts]');
+  appLogger.info('\n[Row Counts]');
   try {
     final vocabCount = await client.from('vocabulary').count();
-    print('Vocabulary Rows: $vocabCount');
+    appLogger.info('Vocabulary Rows: $vocabCount');
 
     final sentCount = await client.from('sentences').count();
-    print('Sentences Rows: $sentCount');
+    appLogger.info('Sentences Rows: $sentCount');
   } catch (e) {
-    print('Error checking counts: $e');
+    appLogger.info('Error checking counts: $e');
   }
 }
 
-Future<void> _checkConceptIntegrity(
-    final SupabaseClient client, final String table, final String labelField) async {
-  print('\n[Integrity Check: $table]');
+Future<void> _checkConceptIntegrity(final SupabaseClient client,
+    final String table, final String labelField) async {
+  appLogger.info('\n[Integrity Check: $table]');
   try {
     // Fetch a sample of concept_ids
     final response = await client.from(table).select('concept_id').limit(100);
-    final concepts = (response as List).map((final e) => e['concept_id']).toSet();
+    final concepts =
+        (response as List).map((final e) => e['concept_id']).toSet();
 
     if (concepts.isEmpty) {
-      print('No data found to check integrity.');
+      appLogger.info('No data found to check integrity.');
       return;
     }
 
@@ -57,32 +59,32 @@ Future<void> _checkConceptIntegrity(
       if (table == 'sentences') {
         selectQuery = 'lang_code, $labelField';
       }
-      final rows = await client
-          .from(table)
-          .select(selectQuery)
-          .eq('concept_id', cid);
-      
-      final languages = (rows as List).map((final r) => r['lang'] ?? r['lang_code']).toList();
-      print('Concept ID $cid has ${languages.length} entries: $languages');
-      
+      final rows =
+          await client.from(table).select(selectQuery).eq('concept_id', cid);
+
+      final languages =
+          (rows as List).map((final r) => r['lang'] ?? r['lang_code']).toList();
+      appLogger
+          .info('Concept ID $cid has ${languages.length} entries: $languages');
+
       if (languages.length > 1) {
         validConcepts++;
       }
     }
 
-    print('Checked $totalChecked concepts. $validConcepts have multiple languages.');
-    
+    appLogger.info(
+        'Checked $totalChecked concepts. $validConcepts have multiple languages.');
+
     // Check if table has 'lang' or 'lang_code' column for query correctness above
     // (Handled implicitly by map above, but if error throws we catch it)
-    
   } catch (e) {
     // Retry with 'lang_code' if 'lang' failed, though my map logic tries to handle it.
     // The specific error might be "column does not exist".
     if (e.toString().contains('column') || e.toString().contains('exist')) {
-       print('Column mismatch error, trying alternative query... ($e)');
-       // Basic retry logic not implemented here for brevity, relying on correct guess
+      appLogger.info('Column mismatch error, trying alternative query... ($e)');
+      // Basic retry logic not implemented here for brevity, relying on correct guess
     } else {
-       print('Error checking integrity: $e');
+      appLogger.info('Error checking integrity: $e');
     }
   }
 }

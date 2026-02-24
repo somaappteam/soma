@@ -29,7 +29,8 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _settingsSub = settingsRepository.getSettingsStream().listen((final settings) {
+    _settingsSub =
+        settingsRepository.getSettingsStream().listen((final settings) {
       final nextLock = settings['app_lock_enabled'] ?? false;
       final nextBio = settings['biometric_enabled'] ?? false;
       final nextMinutes = (settings['auto_lock_minutes'] as num?)?.toInt() ?? 5;
@@ -54,7 +55,8 @@ class _AppLockGateState extends State<AppLockGate> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(final AppLifecycleState state) {
     if (!_appLockEnabled) return;
-    if (state == AppLifecycleState.inactive || state == AppLifecycleState.paused) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
       _lastInactive = DateTime.now();
     }
     if (state == AppLifecycleState.resumed) {

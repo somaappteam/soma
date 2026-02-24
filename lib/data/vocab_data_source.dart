@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/data/csv_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,8 +14,11 @@ abstract class VocabDataSource {
   /// Fetch vocabulary rows for [sourceLang] and [targetLang].
   ///
   /// Returns a record of `(sourceRows, targetRows)`.
-  Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
-      fetchVocab({
+  Future<
+      ({
+        List<Map<String, dynamic>> source,
+        List<Map<String, dynamic>> target
+      })> fetchVocab({
     required final String sourceLang,
     required final String targetLang,
     final int limit = 1000,
@@ -29,8 +32,11 @@ class CsvVocabDataSource implements VocabDataSource {
   const CsvVocabDataSource();
 
   @override
-  Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
-      fetchVocab({
+  Future<
+      ({
+        List<Map<String, dynamic>> source,
+        List<Map<String, dynamic>> target
+      })> fetchVocab({
     required final String sourceLang,
     required final String targetLang,
     final int limit = 1000,
@@ -59,8 +65,11 @@ class SupabaseVocabDataSource implements VocabDataSource {
   const SupabaseVocabDataSource();
 
   @override
-  Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
-      fetchVocab({
+  Future<
+      ({
+        List<Map<String, dynamic>> source,
+        List<Map<String, dynamic>> target
+      })> fetchVocab({
     required final String sourceLang,
     required final String targetLang,
     final int limit = 1000,
@@ -68,14 +77,22 @@ class SupabaseVocabDataSource implements VocabDataSource {
     final client = Supabase.instance.client;
 
     final results = await Future.wait([
-      client.from('vocabulary').select().eq('lang_code', sourceLang).limit(limit),
-      client.from('vocabulary').select().eq('lang_code', targetLang).limit(limit),
+      client
+          .from('vocabulary')
+          .select()
+          .eq('lang_code', sourceLang)
+          .limit(limit),
+      client
+          .from('vocabulary')
+          .select()
+          .eq('lang_code', targetLang)
+          .limit(limit),
     ]);
 
     final sourceRows = List<Map<String, dynamic>>.from(results[0] as List);
     final targetRows = List<Map<String, dynamic>>.from(results[1] as List);
 
-    debugPrint(
+    appLogger.debug(
         'SupabaseVocabDataSource: source(${sourceRows.length}) target(${targetRows.length})');
 
     return (source: sourceRows, target: targetRows);
@@ -89,8 +106,11 @@ class SqliteVocabDataSource implements VocabDataSource {
   const SqliteVocabDataSource();
 
   @override
-  Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
-      fetchVocab({
+  Future<
+      ({
+        List<Map<String, dynamic>> source,
+        List<Map<String, dynamic>> target
+      })> fetchVocab({
     required final String sourceLang,
     required final String targetLang,
     final int limit = 1000,
@@ -100,7 +120,8 @@ class SqliteVocabDataSource implements VocabDataSource {
     final targetRows = await dbHelper.getVocabularyByLang(targetLang);
 
     // SQLite returns List<Map<String, Object?>>, we cast to dynamic
-    List<Map<String, dynamic>> toMapList(final List<Map<String, dynamic>> rows) {
+    List<Map<String, dynamic>> toMapList(
+        final List<Map<String, dynamic>> rows) {
       return rows.map((final r) => Map<String, dynamic>.from(r)).toList();
     }
 
@@ -111,8 +132,11 @@ class SqliteVocabDataSource implements VocabDataSource {
 // ─── Sentence data sources ────────────────────────────────────────────────────
 
 abstract class SentenceDataSource {
-  Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
-      fetchSentences({
+  Future<
+      ({
+        List<Map<String, dynamic>> source,
+        List<Map<String, dynamic>> target
+      })> fetchSentences({
     required final String sourceLang,
     required final String targetLang,
     final int limit = 1000,
@@ -123,8 +147,11 @@ class CsvSentenceDataSource implements SentenceDataSource {
   const CsvSentenceDataSource();
 
   @override
-  Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
-      fetchSentences({
+  Future<
+      ({
+        List<Map<String, dynamic>> source,
+        List<Map<String, dynamic>> target
+      })> fetchSentences({
     required final String sourceLang,
     required final String targetLang,
     final int limit = 1000,
@@ -149,8 +176,11 @@ class SqliteSentenceDataSource implements SentenceDataSource {
   const SqliteSentenceDataSource();
 
   @override
-  Future<({List<Map<String, dynamic>> source, List<Map<String, dynamic>> target})>
-      fetchSentences({
+  Future<
+      ({
+        List<Map<String, dynamic>> source,
+        List<Map<String, dynamic>> target
+      })> fetchSentences({
     required final String sourceLang,
     required final String targetLang,
     final int limit = 1000,
@@ -160,7 +190,8 @@ class SqliteSentenceDataSource implements SentenceDataSource {
     final targetRows = await dbHelper.getSentencesByLang(targetLang);
 
     // SQLite returns List<Map<String, Object?>>, we cast to dynamic
-    List<Map<String, dynamic>> toMapList(final List<Map<String, dynamic>> rows) {
+    List<Map<String, dynamic>> toMapList(
+        final List<Map<String, dynamic>> rows) {
       return rows.map((final r) => Map<String, dynamic>.from(r)).toList();
     }
 

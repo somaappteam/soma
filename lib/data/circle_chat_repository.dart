@@ -46,14 +46,16 @@ class CircleChatRepository {
         'read_by': [uid],
       });
     } catch (_) {
-      _pendingSends.add({'circle_id': circleId, 'sender_id': uid, 'content': content});
+      _pendingSends
+          .add({'circle_id': circleId, 'sender_id': uid, 'content': content});
       _ensureRetryLoop();
       rethrow;
     }
   }
 
   void _ensureRetryLoop() {
-    _retryTimer ??= Timer.periodic(const Duration(seconds: 12), (final _) async {
+    _retryTimer ??=
+        Timer.periodic(const Duration(seconds: 12), (final _) async {
       if (_pendingSends.isEmpty) {
         _retryTimer?.cancel();
         _retryTimer = null;
@@ -78,7 +80,8 @@ class CircleChatRepository {
 
   Future<void> markRead(final String messageId) async {
     try {
-      await _supabase.rpc('mark_chat_message_read', params: {'message_id': messageId});
+      await _supabase
+          .rpc('mark_chat_message_read', params: {'message_id': messageId});
     } catch (_) {}
   }
 
@@ -119,8 +122,7 @@ class CircleChatRepository {
 
     await _supabase
         .from('chat_messages')
-        .update({'reactions': next})
-        .eq('id', messageId);
+        .update({'reactions': next}).eq('id', messageId);
   }
 
   Future<void> deleteMessage(final String messageId) async {
@@ -190,4 +192,5 @@ class CircleChatRepository {
   }
 }
 
-CircleChatRepository get circleChatRepository => locator<CircleChatRepository>();
+CircleChatRepository get circleChatRepository =>
+    locator<CircleChatRepository>();

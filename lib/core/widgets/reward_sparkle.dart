@@ -41,7 +41,8 @@ class RewardSparkle extends StatelessWidget {
                 alignment: Alignment.center,
                 children: List.generate(3, (final index) {
                   final angle = (index * 2 * math.pi) / 3;
-                  final offset = Offset(math.cos(angle), math.sin(angle)) * (size * 0.32);
+                  final offset =
+                      Offset(math.cos(angle), math.sin(angle)) * (size * 0.32);
                   return Transform.translate(
                     offset: offset,
                     child: Icon(

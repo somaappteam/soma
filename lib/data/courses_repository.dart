@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:soma/core/database/database_helper.dart';
 import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/data/languages.dart';
 import 'package:soma/data/settings_repository.dart';
 import 'package:soma/models/solo_course.dart';
@@ -24,7 +24,8 @@ class CoursesRepository {
   final List<SoloCourse> _customCourses = [];
   final Set<String> _removedCourseIds = {};
   static final Map<String, String> _languageNamesByCode = {
-    for (final language in kLanguages) language.code.toLowerCase(): language.name,
+    for (final language in kLanguages)
+      language.code.toLowerCase(): language.name,
   };
 
   Future<void> addCustomCourse(final SoloCourse course) async {
@@ -61,7 +62,7 @@ class CoursesRepository {
         _customCourses.add(course);
       }
       _removedCourseIds.remove(course.id);
-      debugPrint('Error saving custom course: $e');
+      appLogger.debug('Error saving custom course: $e');
     }
 
     _revision++;
@@ -98,7 +99,7 @@ class CoursesRepository {
     } catch (e) {
       _removedCourseIds.add(courseId);
       _customCourses.removeWhere((final c) => c.id == courseId);
-      debugPrint('Error removing course: $e');
+      appLogger.debug('Error removing course: $e');
     }
 
     _revision++;
@@ -118,8 +119,11 @@ class CoursesRepository {
     });
 
     // Listen to user_courses (progress) AND profiles (settings/custom courses)
-    final s1 = _supabase.from('user_courses').stream(primaryKey: ['id']).eq('user_id', uid);
-    final s2 = _supabase.from('profiles').stream(primaryKey: ['id']).eq('id', uid);
+    final s1 = _supabase
+        .from('user_courses')
+        .stream(primaryKey: ['id']).eq('user_id', uid);
+    final s2 =
+        _supabase.from('profiles').stream(primaryKey: ['id']).eq('id', uid);
 
     final sub1 = s1.listen((final _) async {
       if (!controller.isClosed) controller.add(await getUserCourses());
@@ -143,16 +147,18 @@ class CoursesRepository {
     try {
       final rows = await _dbHelper.getAllCourses();
       if (rows.isNotEmpty) {
-        localCourses = rows.map((final r) => SoloCourse(
-          id: r['id'] as String,
-          title: r['title'] as String,
-          subtitle:
-              "${_languageLabel(r['source_lang'])} → ${_languageLabel(r['target_lang'])}",
-          iconUrl: r['icon'] as String? ?? '',
-        )).toList();
+        localCourses = rows
+            .map((final r) => SoloCourse(
+                  id: r['id'] as String,
+                  title: r['title'] as String,
+                  subtitle:
+                      "${_languageLabel(r['source_lang'])} → ${_languageLabel(r['target_lang'])}",
+                  iconUrl: r['icon'] as String? ?? '',
+                ))
+            .toList();
       }
     } catch (e) {
-      debugPrint('Error fetching local courses: $e');
+      appLogger.debug('Error fetching local courses: $e');
     }
 
     // Removed fallback: We want empty list if user has no courses.
@@ -174,11 +180,9 @@ class CoursesRepository {
       final removedIds = _parseRemovedIds(settings[_removedCoursesKey]);
       final customProgress = _parseCustomProgress(settings[_customProgressKey]);
 
-      final response = await _supabase
-          .from('user_courses')
-          .select()
-          .eq('user_id', uid);
-      
+      final response =
+          await _supabase.from('user_courses').select().eq('user_id', uid);
+
       final Map<String, int> xpMap = {};
       final Map<String, DateTime?> lastAccessedMap = {};
       for (final row in response) {
@@ -186,7 +190,8 @@ class CoursesRepository {
         final xp = row['progress_xp'] as int;
         xpMap[cid] = xp;
         final lastAccessedRaw = row['last_accessed']?.toString();
-        lastAccessedMap[cid] = lastAccessedRaw != null ? DateTime.tryParse(lastAccessedRaw) : null;
+        lastAccessedMap[cid] =
+            lastAccessedRaw != null ? DateTime.tryParse(lastAccessedRaw) : null;
         // Cache progress in SQLite
         await _dbHelper.upsertUserCourse({
           'user_id': uid,
@@ -203,12 +208,14 @@ class CoursesRepository {
         if (!xpMap.containsKey(cid)) {
           xpMap[cid] = row['progress_xp'] as int;
           final lastAccessedRaw = row['last_accessed']?.toString();
-          lastAccessedMap[cid] = lastAccessedRaw != null ? DateTime.tryParse(lastAccessedRaw) : null;
+          lastAccessedMap[cid] = lastAccessedRaw != null
+              ? DateTime.tryParse(lastAccessedRaw)
+              : null;
         }
       }
 
       final customIds = customCourses.map((final c) => c.id).toSet();
-      
+
       // Filter localCourses to only those the user has actually started (has XP or in xpMap)
       final startedLocalCourses = localCourses.where((final c) {
         if (!xpMap.containsKey(c.id)) return false;
@@ -225,13 +232,12 @@ class CoursesRepository {
       return mergedCourses
           .where((final c) => !removedIds.contains(c.id))
           .map((final c) {
-            final isCustom = customIds.contains(c.id);
-            final xp = isCustom ? (customProgress[c.id] ?? c.xp) : (xpMap[c.id] ?? c.xp);
-            final lastAccessed = isCustom ? null : lastAccessedMap[c.id];
-            return c.copyWith(xp: xp, lastAccessed: lastAccessed);
-          })
-          .toList();
-
+        final isCustom = customIds.contains(c.id);
+        final xp =
+            isCustom ? (customProgress[c.id] ?? c.xp) : (xpMap[c.id] ?? c.xp);
+        final lastAccessed = isCustom ? null : lastAccessedMap[c.id];
+        return c.copyWith(xp: xp, lastAccessed: lastAccessed);
+      }).toList();
     } catch (e) {
       // Fallback
       return _mergeUniqueCourses([...localCourses, ..._customCourses])
@@ -258,12 +264,14 @@ class CoursesRepository {
   }
 
   String? _coursePairKey(final SoloCourse course) {
-    final idMatch = RegExp(r'^solo_([a-z]{2,})_([a-z]{2,})(?:_\d+)?$').firstMatch(course.id.toLowerCase());
+    final idMatch = RegExp(r'^solo_([a-z]{2,})_([a-z]{2,})(?:_\d+)?$')
+        .firstMatch(course.id.toLowerCase());
     if (idMatch != null) {
       return '${idMatch.group(1)}->${idMatch.group(2)}';
     }
 
-    final subtitleMatch = RegExp(r'^\s*(.*?)\s*→\s*(.*?)\s*$').firstMatch(course.subtitle);
+    final subtitleMatch =
+        RegExp(r'^\s*(.*?)\s*→\s*(.*?)\s*$').firstMatch(course.subtitle);
     if (subtitleMatch != null) {
       final src = subtitleMatch.group(1)?.trim().toLowerCase();
       final dst = subtitleMatch.group(2)?.trim().toLowerCase();
@@ -316,7 +324,10 @@ class CoursesRepository {
 
   Set<String> _parseRemovedIds(final dynamic raw) {
     if (raw is! List) return {};
-    return raw.map((final e) => e.toString()).where((final e) => e.isNotEmpty).toSet();
+    return raw
+        .map((final e) => e.toString())
+        .where((final e) => e.isNotEmpty)
+        .toSet();
   }
 
   Map<String, dynamic> _courseToJson(final SoloCourse course) {

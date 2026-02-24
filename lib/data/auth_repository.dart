@@ -38,7 +38,6 @@ class AuthRepository {
     );
   }
 
-
   Future<AuthResponse> signIn({
     required final String email,
     required final String password,
@@ -58,7 +57,6 @@ class AuthRepository {
       rethrow;
     }
   }
-
 
   Future<bool> signInWithOAuth(final OAuthProvider provider) async {
     try {
@@ -93,7 +91,6 @@ class AuthRepository {
       rethrow;
     }
   }
-
 
   Future<void> updatePassword(final String newPassword) async {
     await _client.auth.updateUser(UserAttributes(password: newPassword));

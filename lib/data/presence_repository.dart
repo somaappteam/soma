@@ -17,23 +17,25 @@ class PresenceRepository {
         .map(_isOnlineFromRows);
   }
 
-  Stream<Map<String, bool>> streamMultipleOnlineStatuses(final List<String> userIds) {
+  Stream<Map<String, bool>> streamMultipleOnlineStatuses(
+      final List<String> userIds) {
     if (userIds.isEmpty) return Stream.value({});
     return _supabase
         .from('user_sessions')
         .stream(primaryKey: ['id'])
         .inFilter('user_id', userIds)
         .map((final rows) {
-      final grouped = <String, List<Map<String, dynamic>>>{};
-      for (final row in rows) {
-        final uid = row['user_id']?.toString();
-        if (uid == null) continue;
-        grouped.putIfAbsent(uid, () => []).add(row);
-      }
-      return {
-        for (final uid in userIds) uid: _isOnlineFromRows(grouped[uid] ?? []),
-      };
-    });
+          final grouped = <String, List<Map<String, dynamic>>>{};
+          for (final row in rows) {
+            final uid = row['user_id']?.toString();
+            if (uid == null) continue;
+            grouped.putIfAbsent(uid, () => []).add(row);
+          }
+          return {
+            for (final uid in userIds)
+              uid: _isOnlineFromRows(grouped[uid] ?? []),
+          };
+        });
   }
 
   Future<bool> fetchOnlineStatus(final String userId) async {
@@ -44,7 +46,8 @@ class PresenceRepository {
     return _isOnlineFromRows(List<Map<String, dynamic>>.from(rows));
   }
 
-  Future<Map<String, bool>> fetchOnlineStatuses(final List<String> userIds) async {
+  Future<Map<String, bool>> fetchOnlineStatuses(
+      final List<String> userIds) async {
     if (userIds.isEmpty) return {};
     final rows = await _supabase
         .from('user_sessions')
@@ -57,7 +60,8 @@ class PresenceRepository {
       grouped.putIfAbsent(userId, () => []).add(Map<String, dynamic>.from(row));
     }
     return {
-      for (final entry in grouped.entries) entry.key: _isOnlineFromRows(entry.value),
+      for (final entry in grouped.entries)
+        entry.key: _isOnlineFromRows(entry.value),
     };
   }
 
@@ -68,9 +72,8 @@ class PresenceRepository {
       if (row['is_current'] != true) continue;
       final rawSeen = row['last_seen'];
       if (rawSeen == null) continue;
-      final lastSeen = rawSeen is DateTime
-          ? rawSeen
-          : DateTime.tryParse(rawSeen.toString());
+      final lastSeen =
+          rawSeen is DateTime ? rawSeen : DateTime.tryParse(rawSeen.toString());
       if (lastSeen == null) continue;
       if (now.difference(lastSeen.toLocal()).abs() <= onlineThreshold) {
         return true;

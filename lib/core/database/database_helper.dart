@@ -25,7 +25,8 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> _onUpgrade(final Database db, final int oldVersion, final int newVersion) async {
+  Future<void> _onUpgrade(
+      final Database db, final int oldVersion, final int newVersion) async {
     if (oldVersion < 3) {
       await _createUserTables(db);
     }
@@ -173,7 +174,7 @@ class DatabaseHelper {
   }
 
   // --- Content Sync Methods ---
-  
+
   Future<void> upsertCourse(final Map<String, dynamic> course) async {
     final db = await instance.database;
     await db.insert(
@@ -199,7 +200,8 @@ class DatabaseHelper {
         'lang_code': vocab['lang_code'], // Was 'lang'
         'word': vocab['word'],
         'article': vocab['article'],
-        'pronunciation': vocab['pronunciation'], // Replaced romanization/pinyin/transliteration
+        'pronunciation': vocab[
+            'pronunciation'], // Replaced romanization/pinyin/transliteration
         'level': vocab['level'],
         'created_at': vocab['created_at'],
       },
@@ -216,7 +218,8 @@ class DatabaseHelper {
         'concept_id': sentence['concept_id'],
         'lang_code': sentence['lang_code'],
         'sentence': sentence['sentence'],
-        'pronunciation': sentence['pronunciation'], // Replaced romanization/pinyin/transliteration
+        'pronunciation': sentence[
+            'pronunciation'], // Replaced romanization/pinyin/transliteration
         'level': sentence['level'],
         'created_at': sentence['created_at'],
       },
@@ -229,14 +232,18 @@ class DatabaseHelper {
     return await db.query('courses');
   }
 
-  Future<List<Map<String, dynamic>>> getVocabularyByLang(final String langCode) async {
+  Future<List<Map<String, dynamic>>> getVocabularyByLang(
+      final String langCode) async {
     final db = await instance.database;
-    return await db.query('vocabulary', where: 'lang_code = ?', whereArgs: [langCode]);
+    return await db
+        .query('vocabulary', where: 'lang_code = ?', whereArgs: [langCode]);
   }
 
-  Future<List<Map<String, dynamic>>> getSentencesByLang(final String langCode) async {
+  Future<List<Map<String, dynamic>>> getSentencesByLang(
+      final String langCode) async {
     final db = await instance.database;
-    return await db.query('sentences', where: 'lang_code = ?', whereArgs: [langCode]);
+    return await db
+        .query('sentences', where: 'lang_code = ?', whereArgs: [langCode]);
   }
 
   Future<void> upsertUserLearnedItem(final Map<String, dynamic> item) async {
@@ -269,7 +276,8 @@ class DatabaseHelper {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getUserLearnedItems(final String userId, final String courseId) async {
+  Future<List<Map<String, dynamic>>> getUserLearnedItems(
+      final String userId, final String courseId) async {
     final db = await instance.database;
     return await db.query(
       'user_learned_items',

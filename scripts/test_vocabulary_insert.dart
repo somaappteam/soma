@@ -1,3 +1,4 @@
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
@@ -7,7 +8,7 @@ const String serviceRoleKey =
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
 
-  print('--- Testing vocabulary insert with voca_id ---');
+  appLogger.info('--- Testing vocabulary insert with voca_id ---');
 
   try {
     // Match the exact CSV structure
@@ -24,19 +25,19 @@ void main() async {
       'level': 'A',
     };
 
-    print('Inserting test row: $testRow');
+    appLogger.info('Inserting test row: $testRow');
     await client.from('vocabulary').insert(testRow);
-    print('Insert succeeded!');
+    appLogger.info('Insert succeeded!');
 
     // Verify
-    final result = await client.from('vocabulary').select().eq('voca_id', 99999);
-    print('Result: ${result.length} rows');
+    final result =
+        await client.from('vocabulary').select().eq('voca_id', 99999);
+    appLogger.info('Result: ${result.length} rows');
 
     // Clean up
     await client.from('vocabulary').delete().eq('voca_id', 99999);
-    print('Cleaned up');
-
+    appLogger.info('Cleaned up');
   } catch (e) {
-    print('Error: $e');
+    appLogger.info('Error: $e');
   }
 }

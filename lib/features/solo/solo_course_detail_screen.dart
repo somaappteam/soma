@@ -35,19 +35,23 @@ class SoloCourseDetailScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          _IconGlass(icon: Icons.arrow_back_ios_new_rounded, onTap: () => Navigator.pop(context)),
+                          _IconGlass(
+                              icon: Icons.arrow_back_ios_new_rounded,
+                              onTap: () => Navigator.pop(context)),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               course.subtitle,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: scheme.onSurface, fontSize: 20, fontWeight: FontWeight.w900),
+                              style: TextStyle(
+                                  color: scheme.onSurface,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900),
                             ),
                           ),
                         ],
                       ),
                       SizedBox(height: topSpacing),
-
                       Expanded(
                         child: ListView(
                           physics: const BouncingScrollPhysics(),
@@ -73,11 +77,18 @@ class SoloCourseDetailScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(l10n.soloModeReview,
-                                      style: TextStyle(color: scheme.onSurface, fontSize: 16, fontWeight: FontWeight.w900)),
+                                      style: TextStyle(
+                                          color: scheme.onSurface,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w900)),
                                   const SizedBox(height: 8),
                                   Text(
                                     l10n.soloModeReviewDescription,
-                                    style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.65), fontSize: 12.5, fontWeight: FontWeight.w700),
+                                    style: TextStyle(
+                                        color: scheme.onSurface
+                                            .withValues(alpha: 0.65),
+                                        fontSize: 12.5,
+                                        fontWeight: FontWeight.w700),
                                   ),
                                   SizedBox(height: compactHeight ? 10 : 12),
                                   NeonButton(
@@ -104,7 +115,8 @@ class SoloCourseDetailScreen extends StatelessWidget {
   void _go(final BuildContext context, final SoloMode mode) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (final _) => SoloSetupScreen(course: course, mode: mode)),
+      MaterialPageRoute(
+          builder: (final _) => SoloSetupScreen(course: course, mode: mode)),
     );
   }
 }
@@ -115,7 +127,11 @@ class _ModeCard extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
 
-  const _ModeCard({required this.icon, required this.title, required this.subtitle, required this.onTap});
+  const _ModeCard(
+      {required this.icon,
+      required this.title,
+      required this.subtitle,
+      required this.onTap});
 
   @override
   Widget build(final BuildContext context) {
@@ -133,7 +149,8 @@ class _ModeCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 color: scheme.onSurface.withValues(alpha: 0.1),
-                border: Border.all(color: scheme.onSurface.withValues(alpha: 0.15)),
+                border:
+                    Border.all(color: scheme.onSurface.withValues(alpha: 0.15)),
               ),
               child: Icon(icon, color: scheme.onSurface),
             ),
@@ -142,14 +159,22 @@ class _ModeCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: TextStyle(color: scheme.onSurface, fontSize: 16, fontWeight: FontWeight.w900)),
+                  Text(title,
+                      style: TextStyle(
+                          color: scheme.onSurface,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900)),
                   const SizedBox(height: 4),
                   Text(subtitle,
-                      style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.65), fontSize: 12.5, fontWeight: FontWeight.w700)),
+                      style: TextStyle(
+                          color: scheme.onSurface.withValues(alpha: 0.65),
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700)),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.55)),
+            Icon(Icons.chevron_right_rounded,
+                color: scheme.onSurface.withValues(alpha: 0.55)),
           ],
         ),
       ),

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/core/services/haptics_service.dart';
 import 'package:soma/core/services/sfx_service.dart';
 import 'package:soma/core/services/tts_service.dart';
@@ -10,7 +11,6 @@ import 'package:soma/core/theme/motion.dart';
 import 'package:soma/core/widgets/glass.dart';
 import 'package:soma/core/widgets/neon_button.dart';
 import 'package:soma/core/widgets/pressable_scale.dart';
-
 import 'package:soma/core/widgets/staggered_in.dart';
 import 'package:soma/data/quiz_repository.dart';
 import 'package:soma/data/settings_repository.dart';
@@ -70,12 +70,14 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
     super.initState();
     remaining = widget.timePerQuestion ?? 0;
     _loadSettings();
-    if (widget.initialQuestions != null && widget.initialQuestions!.isNotEmpty) {
+    if (widget.initialQuestions != null &&
+        widget.initialQuestions!.isNotEmpty) {
       questions = widget.initialQuestions!;
       _loading = false;
       _prepareQuestion();
       _startTimer();
-    } else if (widget.reviewQuestions != null && widget.reviewQuestions!.isNotEmpty) {
+    } else if (widget.reviewQuestions != null &&
+        widget.reviewQuestions!.isNotEmpty) {
       questions = widget.reviewQuestions!;
       _loading = false;
       _prepareQuestion();
@@ -102,7 +104,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
       });
       await prefs.setString(_sessionKey, payload);
     } catch (e) {
-      debugPrint('Session save error: $e');
+      appLogger.debug('Session save error: $e');
     }
   }
 
@@ -145,13 +147,15 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
             .whereType<Map>()
             .map((final e) => Map<String, dynamic>.from(e))
             .toList();
-        final savedIndex = (data['index'] as int? ?? 0).clamp(0, savedQuestions.length - 1);
+        final savedIndex =
+            (data['index'] as int? ?? 0).clamp(0, savedQuestions.length - 1);
         setState(() {
           questions = savedQuestions;
           index = savedIndex;
           correctCount = data['correct'] as int? ?? 0;
           _loading = false;
-          _loadError = savedQuestions.isEmpty ? 'No questions in saved session.' : null;
+          _loadError =
+              savedQuestions.isEmpty ? 'No questions in saved session.' : null;
         });
         if (questions.isNotEmpty) {
           _prepareQuestion();
@@ -162,7 +166,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
         _loadQuestions();
       }
     } catch (e) {
-      debugPrint('Session load error: $e');
+      appLogger.debug('Session load error: $e');
       _loadQuestions();
     }
   }
@@ -180,7 +184,8 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
             decoration: BoxDecoration(
               color: scheme.surface.withValues(alpha: 0.95),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+              border:
+                  Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -212,9 +217,11 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                         onPressed: () => Navigator.pop(ctx, false),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: scheme.onSurface,
-                          side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.25)),
+                          side: BorderSide(
+                              color: scheme.onSurface.withValues(alpha: 0.25)),
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
                         ),
                         child: const Text('Start fresh'),
                       ),
@@ -225,7 +232,8 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
                         onPressed: () => Navigator.pop(ctx, true),
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
                         ),
                         child: const Text('Resume'),
                       ),
@@ -278,13 +286,13 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
         }
       }
     } catch (e, stack) {
-      debugPrint('Error loading quiz: $e');
+      appLogger.debug('Error loading quiz: $e');
       if (mounted) {
         setState(() {
           _loading = false;
           _loadError = 'Failed to load vocabulary questions. Please try again.';
         });
-        debugPrint('$stack');
+        appLogger.debug('$stack');
       }
     }
   }
@@ -309,12 +317,18 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
           }
         });
       } catch (e, stack) {
-        debugPrint('Timer error: $e');
-         showDialog(context: context, builder: (final _) => AlertDialog(
-          title: const Text('Timer Error'),
-          content: SingleChildScrollView(child: Text('$e\n$stack')),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
-        ));
+        appLogger.debug('Timer error: $e');
+        showDialog(
+            context: context,
+            builder: (final _) => AlertDialog(
+                  title: const Text('Timer Error'),
+                  content: SingleChildScrollView(child: Text('$e\n$stack')),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'))
+                  ],
+                ));
       }
     });
   }
@@ -398,9 +412,13 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
       final targetWord = sanitize(q['target_word']?.toString());
 
       // Also sanitise per-question fields that may be 'null'.
-      if ((q['article']?.toString().trim() ?? '') == 'null') q['article'] = null;
+      if ((q['article']?.toString().trim() ?? '') == 'null') {
+        q['article'] = null;
+      }
       if ((q['word']?.toString().trim() ?? '') == 'null') q['word'] = null;
-      if ((q['reading']?.toString().trim() ?? '') == 'null') q['reading'] = null;
+      if ((q['reading']?.toString().trim() ?? '') == 'null') {
+        q['reading'] = null;
+      }
 
       // Build the full word pool from whichever language is the answer language.
       // native_choices / target_choices are the pre-built pools stored in the question.
@@ -412,14 +430,24 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
         // Prompt: native word → answer: target word.
         promptText = nativeWord;
         correctAnswer = targetWord;
-        answerPool = (q['target_choices'] as List?)?.map((final e) => e.toString()).where(
-          (final e) => e.trim().isNotEmpty && e.trim() != 'null').toList() ?? [];
+        answerPool = (q['target_choices'] as List?)
+                ?.map((final e) => e.toString())
+                .where((final e) => e.trim().isNotEmpty && e.trim() != 'null')
+                .toList() ??
+            [];
       } else {
         // Prompt: target word → answer: native word.
-        promptText = targetWord.isNotEmpty ? targetWord : sanitize(q['prompt']?.toString());
-        correctAnswer = nativeWord.isNotEmpty ? nativeWord : sanitize(q['correct_answer']?.toString());
-        answerPool = (q['native_choices'] as List?)?.map((final e) => e.toString()).where(
-          (final e) => e.trim().isNotEmpty && e.trim() != 'null').toList() ?? [];
+        promptText = targetWord.isNotEmpty
+            ? targetWord
+            : sanitize(q['prompt']?.toString());
+        correctAnswer = nativeWord.isNotEmpty
+            ? nativeWord
+            : sanitize(q['correct_answer']?.toString());
+        answerPool = (q['native_choices'] as List?)
+                ?.map((final e) => e.toString())
+                .where((final e) => e.trim().isNotEmpty && e.trim() != 'null')
+                .toList() ??
+            [];
       }
 
       // Update the question map so the prompt widget shows the right text.
@@ -437,7 +465,11 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
         builder: (final _) => AlertDialog(
           title: const Text('Error Preparing Question'),
           content: SingleChildScrollView(child: Text('$e\n$stack')),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'))
+          ],
         ),
       );
     }
@@ -458,7 +490,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
         await ttsService.setRate(_speechRate);
         await ttsService.speak(prompt, language: lang.isNotEmpty ? lang : null);
       } catch (e) {
-        debugPrint('TTS Error in _scheduleQuestionAudio: $e');
+        appLogger.debug('TTS Error in _scheduleQuestionAudio: $e');
       }
     });
   }
@@ -474,7 +506,7 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
       await ttsService.setRate(_speechRate);
       await ttsService.speak(prompt, language: lang.isNotEmpty ? lang : null);
     } catch (e) {
-      debugPrint('TTS Error (Manual): $e');
+      appLogger.debug('TTS Error (Manual): $e');
     }
   }
 
@@ -488,8 +520,11 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
   /// Builds a [_ChoiceSet] with exactly 4 options: the [correctAnswer] plus up to
   /// 3 unique random distractors drawn from [pool]. The list is always shuffled
   /// so the correct answer appears in a random position each time.
-  _ChoiceSet _buildChoiceSet(final String correctAnswer, final List<String> pool) {
-    if (correctAnswer.trim().isEmpty) return const _ChoiceSet(choices: [], correctIndex: 0);
+  _ChoiceSet _buildChoiceSet(
+      final String correctAnswer, final List<String> pool) {
+    if (correctAnswer.trim().isEmpty) {
+      return const _ChoiceSet(choices: [], correctIndex: 0);
+    }
 
     final distractors = pool
         .map((final e) => e.toString().trim())
@@ -500,7 +535,8 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
 
     final choices = <String>[correctAnswer, ...distractors.take(3)];
     choices.shuffle();
-    return _ChoiceSet(choices: choices, correctIndex: choices.indexOf(correctAnswer));
+    return _ChoiceSet(
+        choices: choices, correctIndex: choices.indexOf(correctAnswer));
   }
 
   void _goToResults() {
@@ -562,7 +598,8 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
   Widget build(final BuildContext context) {
     if (_loading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: Color(0xFF33D6FF))),
+        body:
+            Center(child: CircularProgressIndicator(color: Color(0xFF33D6FF))),
       );
     }
 
@@ -615,282 +652,313 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
               child: Column(
                 children: [
-              Row(
-                children: [
-                  _IconGlass(
-                      icon: Icons.arrow_back_ios_new_rounded,
-                      onTap: () => Navigator.pop(context)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Solo • ${widget.course.title}',
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: scheme.onSurface,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900),
-                    ),
-                  ),
-                  _IconGlass(
-                    icon: Icons.swap_horiz_rounded,
-                    onTap: () {
-                      setState(() {
-                        _reverseLanguage = !_reverseLanguage;
-                        _prepareQuestion(); // Re-prepare current question instantly
-                      });
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  _IconGlass(
-                    icon: showReading
-                        ? Icons.sort_by_alpha_rounded
-                        : Icons.sort_by_alpha_outlined,
-                    onTap: () => setState(() => showReading = !showReading),
-                  ),
-                  const SizedBox(width: 10),
-                  _Pill(
-                      text:
-                          '${index + 1}/${questions.length < widget.totalQuestions ? questions.length : widget.totalQuestions}',
-                      icon: Icons.layers_rounded),
-                ],
-              ),
-              SizedBox(height: topSpacing),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: SizedBox(
-                  height: 10,
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: scheme.onSurface.withValues(alpha: 0.10),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Color.lerp(const Color(0xFF33D6FF),
-                          const Color(0xFFFF4BD8), 1.0 - progress)!,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: topSpacing),
-              Glass(
-                radius: BorderRadius.circular(22),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 92),
-                  child: AnimatedSize(
-                    duration: MotionTokens.short,
-                    curve: MotionTokens.standardCurve,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                    _VocabPromptRow(
-                      question: q,
-                      langCode: _reverseLanguage
-                          ? (q['source_lang']?.toString() ?? '')
-                          : (q['target_lang']?.toString() ?? ''),
-                    ),
-                    if (showReading &&
-                        (q['reading']?.toString().trim() ?? '').isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Directionality(
-                        textDirection: _isRtlLang(
-                                _reverseLanguage
-                                    ? (q['source_lang']?.toString() ?? '')
-                                    : (q['target_lang']?.toString() ?? ''),
-                              )
-                            ? TextDirection.rtl
-                            : TextDirection.ltr,
+                  Row(
+                    children: [
+                      _IconGlass(
+                          icon: Icons.arrow_back_ios_new_rounded,
+                          onTap: () => Navigator.pop(context)),
+                      const SizedBox(width: 12),
+                      Expanded(
                         child: Text(
-                          q['reading']?.toString() ?? '',
-                          textAlign: TextAlign.center,
+                          'Solo • ${widget.course.title}',
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(
-                              color: scheme.onSurface.withValues(alpha: 0.55),
-                              fontSize: 13.5,
-                              fontWeight: FontWeight.w600),
+                              color: scheme.onSurface,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900),
                         ),
                       ),
-                      ],
+                      _IconGlass(
+                        icon: Icons.swap_horiz_rounded,
+                        onTap: () {
+                          setState(() {
+                            _reverseLanguage = !_reverseLanguage;
+                            _prepareQuestion(); // Re-prepare current question instantly
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 8),
+                      _IconGlass(
+                        icon: showReading
+                            ? Icons.sort_by_alpha_rounded
+                            : Icons.sort_by_alpha_outlined,
+                        onTap: () => setState(() => showReading = !showReading),
+                      ),
+                      const SizedBox(width: 10),
+                      _Pill(
+                          text:
+                              '${index + 1}/${questions.length < widget.totalQuestions ? questions.length : widget.totalQuestions}',
+                          icon: Icons.layers_rounded),
                     ],
+                  ),
+                  SizedBox(height: topSpacing),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: SizedBox(
+                      height: 10,
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        backgroundColor:
+                            scheme.onSurface.withValues(alpha: 0.10),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color.lerp(const Color(0xFF33D6FF),
+                              const Color(0xFFFF4BD8), 1.0 - progress)!,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              SizedBox(height: sectionSpacing),
-              Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 330),
-                  child: _TtsControls(
-                    rates: const [0.75, 1.0, 1.25],
-                    selectedRate: _speechRate,
-                    onRateSelected: (final rate) {
-                      setState(() => _speechRate = rate);
-                      ttsService.setRate(rate);
-                    },
-                    onSpeak: _speakPrompt,
-                  ),
-                ),
-              ),
-              SizedBox(height: choicesTopSpacing),
-              Expanded(
-                child: ListView.separated(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(12, 20, 12, 20),
-                  clipBehavior: Clip.none,
-                  itemCount: choices.length,
-                  separatorBuilder: (final _, final __) => const SizedBox(height: 10),
-                  itemBuilder: (final _, final i) {
-                    final isSel = selected == i;
-                    final isCorrect = i == _correctIndex;
-
-                    Color bg = scheme.onSurface.withValues(alpha: 0.10);
-                    Color border = scheme.onSurface.withValues(alpha: 0.20);
-
-                    if (revealed) {
-                      if (isCorrect) {
-                        bg = const Color(0xFF2AFADF).withValues(alpha: 0.14);
-                        border = const Color(0xFF2AFADF).withValues(alpha: 0.85);
-                      } else if (isSel) {
-                        // User selected this wrong answer
-                        bg = const Color(0xFFFF4FD8).withValues(alpha: 0.12);
-                        border = const Color(0xFFFF4FD8).withValues(alpha: 0.85);
-                      }
-                    } else {
-                      if (isSel) {
-                        bg = scheme.onSurface.withValues(alpha: 0.12);
-                        border = scheme.onSurface.withValues(alpha: 0.28);
-                      }
-                    }
-
-                    return StaggeredIn(
-                      index: i,
-                      child: PressableScale(
-                        onTap: revealed
-                            ? null
-                            : () {
-                                  setState(() => selected = i);
-                                  _submit();
-                                },
-                        child: AnimatedScale(
-                          scale: revealed && isCorrect && isSel ? 1.015 : 1,
-                          duration: MotionTokens.short,
-                          curve: MotionTokens.emphasisCurve,
-                          child: AnimatedContainer(
-                            duration: MotionTokens.short,
-                            curve: MotionTokens.standardCurve,
-                            constraints: const BoxConstraints(minHeight: 72),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-                            clipBehavior: Clip.antiAlias,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              color: bg,
-                              border: Border.all(color: border),
-                              boxShadow: revealed && isCorrect
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF2AFADF).withValues(alpha: 0.35),
-                                        blurRadius: 16,
-                                        spreadRadius: 1,
-                                      ),
-                                    ]
-                                  : [],
+                  SizedBox(height: topSpacing),
+                  Glass(
+                    radius: BorderRadius.circular(22),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 92),
+                      child: AnimatedSize(
+                        duration: MotionTokens.short,
+                        curve: MotionTokens.standardCurve,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _VocabPromptRow(
+                              question: q,
+                              langCode: _reverseLanguage
+                                  ? (q['source_lang']?.toString() ?? '')
+                                  : (q['target_lang']?.toString() ?? ''),
                             ),
-                            child: AnimatedSize(
+                            if (showReading &&
+                                (q['reading']?.toString().trim() ?? '')
+                                    .isNotEmpty) ...[
+                              const SizedBox(height: 8),
+                              Directionality(
+                                textDirection: _isRtlLang(
+                                  _reverseLanguage
+                                      ? (q['source_lang']?.toString() ?? '')
+                                      : (q['target_lang']?.toString() ?? ''),
+                                )
+                                    ? TextDirection.rtl
+                                    : TextDirection.ltr,
+                                child: Text(
+                                  q['reading']?.toString() ?? '',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: scheme.onSurface
+                                          .withValues(alpha: 0.55),
+                                      fontSize: 13.5,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: sectionSpacing),
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 330),
+                      child: _TtsControls(
+                        rates: const [0.75, 1.0, 1.25],
+                        selectedRate: _speechRate,
+                        onRateSelected: (final rate) {
+                          setState(() => _speechRate = rate);
+                          ttsService.setRate(rate);
+                        },
+                        onSpeak: _speakPrompt,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: choicesTopSpacing),
+                  Expanded(
+                    child: ListView.separated(
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(12, 20, 12, 20),
+                      clipBehavior: Clip.none,
+                      itemCount: choices.length,
+                      separatorBuilder: (final _, final __) =>
+                          const SizedBox(height: 10),
+                      itemBuilder: (final _, final i) {
+                        final isSel = selected == i;
+                        final isCorrect = i == _correctIndex;
+
+                        Color bg = scheme.onSurface.withValues(alpha: 0.10);
+                        Color border = scheme.onSurface.withValues(alpha: 0.20);
+
+                        if (revealed) {
+                          if (isCorrect) {
+                            bg =
+                                const Color(0xFF2AFADF).withValues(alpha: 0.14);
+                            border =
+                                const Color(0xFF2AFADF).withValues(alpha: 0.85);
+                          } else if (isSel) {
+                            // User selected this wrong answer
+                            bg =
+                                const Color(0xFFFF4FD8).withValues(alpha: 0.12);
+                            border =
+                                const Color(0xFFFF4FD8).withValues(alpha: 0.85);
+                          }
+                        } else {
+                          if (isSel) {
+                            bg = scheme.onSurface.withValues(alpha: 0.12);
+                            border = scheme.onSurface.withValues(alpha: 0.28);
+                          }
+                        }
+
+                        return StaggeredIn(
+                          index: i,
+                          child: PressableScale(
+                            onTap: revealed
+                                ? null
+                                : () {
+                                    setState(() => selected = i);
+                                    _submit();
+                                  },
+                            child: AnimatedScale(
+                              scale: revealed && isCorrect && isSel ? 1.015 : 1,
                               duration: MotionTokens.short,
-                              curve: MotionTokens.standardCurve,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    child: Directionality(
-                                      textDirection: _isRtlLang(
+                              curve: MotionTokens.emphasisCurve,
+                              child: AnimatedContainer(
+                                duration: MotionTokens.short,
+                                curve: MotionTokens.standardCurve,
+                                constraints:
+                                    const BoxConstraints(minHeight: 72),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 16),
+                                clipBehavior: Clip.antiAlias,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  color: bg,
+                                  border: Border.all(color: border),
+                                  boxShadow: revealed && isCorrect
+                                      ? [
+                                          BoxShadow(
+                                            color: const Color(0xFF2AFADF)
+                                                .withValues(alpha: 0.35),
+                                            blurRadius: 16,
+                                            spreadRadius: 1,
+                                          ),
+                                        ]
+                                      : [],
+                                ),
+                                child: AnimatedSize(
+                                  duration: MotionTokens.short,
+                                  curve: MotionTokens.standardCurve,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        child: Directionality(
+                                          textDirection: _isRtlLang(
                                             _reverseLanguage
-                                                ? (q['target_lang']?.toString() ?? '')
-                                                : (q['source_lang']?.toString() ?? ''),
+                                                ? (q['target_lang']
+                                                        ?.toString() ??
+                                                    '')
+                                                : (q['source_lang']
+                                                        ?.toString() ??
+                                                    ''),
                                           )
-                                        ? TextDirection.rtl
-                                        : TextDirection.ltr,
-                                      child: Text(
-                                        choices[i],
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            color: scheme.onSurface.withValues(alpha: 0.92),
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w800),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  SizedBox(
-                                    width: 72,
-                                    height: 28,
-                                    child: Align(
-                                      alignment: Alignment.centerRight,
-                                      child: ClipRect(
-                                        child: AnimatedSwitcher(
-                                          duration: MotionTokens.short,
-                                          transitionBuilder: (final child, final anim) {
-                                            final slide = Tween<Offset>(
-                                              begin: const Offset(0.16, 0),
-                                              end: Offset.zero,
-                                            ).animate(CurvedAnimation(
-                                              parent: anim,
-                                              curve: Curves.easeOutCubic,
-                                            ));
-                                            return FadeTransition(
-                                              opacity: anim,
-                                              child: SlideTransition(
-                                                position: slide,
-                                                child: child,
-                                              ),
-                                            );
-                                          },
-                                        child: (revealed && isCorrect)
-                                            ? Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                key: const ValueKey('correct-reveal'),
-                                                children: [
-                                                  const Icon(Icons.check_rounded, color: Color(0xFF2AFADF), size: 18),
-                                                  const SizedBox(width: 4),
-                                                  const SizedBox.shrink(),
-                                                ],
-                                              )
-                                            : (revealed && isSel && !isCorrect)
-                                                ? const Icon(
-                                                    Icons.close_rounded,
-                                                    color: Color(0xFFFF4FD8),
-                                                    size: 18,
-                                                    key: ValueKey('wrong-reveal'),
-                                                  )
-                                                : const SizedBox.shrink(key: ValueKey('none')),
+                                              ? TextDirection.rtl
+                                              : TextDirection.ltr,
+                                          child: Text(
+                                            choices[i],
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                color: scheme.onSurface
+                                                    .withValues(alpha: 0.92),
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w800),
+                                          ),
                                         ),
                                       ),
-                                    ),
+                                      const SizedBox(width: 8),
+                                      SizedBox(
+                                        width: 72,
+                                        height: 28,
+                                        child: Align(
+                                          alignment: Alignment.centerRight,
+                                          child: ClipRect(
+                                            child: AnimatedSwitcher(
+                                              duration: MotionTokens.short,
+                                              transitionBuilder:
+                                                  (final child, final anim) {
+                                                final slide = Tween<Offset>(
+                                                  begin: const Offset(0.16, 0),
+                                                  end: Offset.zero,
+                                                ).animate(CurvedAnimation(
+                                                  parent: anim,
+                                                  curve: Curves.easeOutCubic,
+                                                ));
+                                                return FadeTransition(
+                                                  opacity: anim,
+                                                  child: SlideTransition(
+                                                    position: slide,
+                                                    child: child,
+                                                  ),
+                                                );
+                                              },
+                                              child: (revealed && isCorrect)
+                                                  ? Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      key: const ValueKey(
+                                                          'correct-reveal'),
+                                                      children: [
+                                                        const Icon(
+                                                            Icons.check_rounded,
+                                                            color: Color(
+                                                                0xFF2AFADF),
+                                                            size: 18),
+                                                        const SizedBox(
+                                                            width: 4),
+                                                        const SizedBox.shrink(),
+                                                      ],
+                                                    )
+                                                  : (revealed &&
+                                                          isSel &&
+                                                          !isCorrect)
+                                                      ? const Icon(
+                                                          Icons.close_rounded,
+                                                          color:
+                                                              Color(0xFFFF4FD8),
+                                                          size: 18,
+                                                          key: ValueKey(
+                                                              'wrong-reveal'),
+                                                        )
+                                                      : const SizedBox.shrink(
+                                                          key:
+                                                              ValueKey('none')),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                              ],
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: compactHeight ? 8 : 10),
-              if (widget.timePerQuestion == null)
-                AnimatedSize(
-                  duration: MotionTokens.short,
-                  curve: MotionTokens.standardCurve,
-                  child: revealed
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: NeonButton(
-                            label: 'Next',
-                            onTap: _next,
-                          ),
-                        )
-                      : const SizedBox(width: double.infinity, height: 0),
-                ),
-            ],
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: compactHeight ? 8 : 10),
+                  if (widget.timePerQuestion == null)
+                    AnimatedSize(
+                      duration: MotionTokens.short,
+                      curve: MotionTokens.standardCurve,
+                      child: revealed
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 8),
+                              child: NeonButton(
+                                label: 'Next',
+                                onTap: _next,
+                              ),
+                            )
+                          : const SizedBox(width: double.infinity, height: 0),
+                    ),
+                ],
               ),
             );
           },
@@ -905,8 +973,18 @@ class _SoloVocabQuizScreenState extends State<SoloVocabQuizScreen> {
 /// Returns [true] if the given 2-letter language code uses a right-to-left script.
 bool _isRtlLang(final String code) {
   const rtl = {
-    'ar', 'he', 'fa', 'ur', 'ps', 'sd', 'ug', 'yi',
-    'dv', 'ks', 'ku', 'ha',
+    'ar',
+    'he',
+    'fa',
+    'ur',
+    'ps',
+    'sd',
+    'ug',
+    'yi',
+    'dv',
+    'ks',
+    'ku',
+    'ha',
   };
   return rtl.contains(code.trim().toLowerCase().split('-').first);
 }
@@ -1018,7 +1096,9 @@ class _SpeedChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-              color: scheme.onSurface, fontWeight: FontWeight.w800, fontSize: 11),
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w800,
+              fontSize: 11),
         ),
       ),
     );
@@ -1066,9 +1146,13 @@ class _VocabPromptRow extends StatelessWidget {
     final article = question['article']?.toString().trim() ?? '';
     final word = question['word']?.toString().trim() ?? '';
     final gender = question['gender']?.toString().trim() ?? '';
-    final isReversed = prompt == question['native_word']; // Native word acts as prompt
-    final hasArticle = article.isNotEmpty && word.isNotEmpty && !isReversed
-        && article != 'null' && word != 'null';
+    final isReversed =
+        prompt == question['native_word']; // Native word acts as prompt
+    final hasArticle = article.isNotEmpty &&
+        word.isNotEmpty &&
+        !isReversed &&
+        article != 'null' &&
+        word != 'null';
 
     final isRtl = _isRtlLang(langCode);
     final textDir = isRtl ? TextDirection.rtl : TextDirection.ltr;

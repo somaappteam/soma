@@ -45,173 +45,192 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             _TabItem(NotificationsTab.circles, l10n.notificationsTabCircles),
             _TabItem(NotificationsTab.system, l10n.notificationsTabSystem),
           ];
-    final activeTab = tabs.any((final t) => t.value == tab) ? tab : tabs.first.value;
+    final activeTab =
+        tabs.any((final t) => t.value == tab) ? tab : tabs.first.value;
 
     return Scaffold(
       body: SafeArea(
-          child: ResponsiveFrame(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.sm),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
+        child: ResponsiveFrame(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.sm),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Glass(
+                      radius: BorderRadius.circular(14),
+                      padding: EdgeInsets.zero,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () => Navigator.pop(context),
+                        child: SizedBox(
+                          width: 44,
+                          height: 44,
+                          child: Center(
+                            child: Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.9),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.notificationsTitle,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                    const Spacer(),
+                    if (!isGuest)
                       Glass(
                         radius: BorderRadius.circular(14),
                         padding: EdgeInsets.zero,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(14),
-                          onTap: () => Navigator.pop(context),
+                          onTap: () => notificationsRepository.markAllAsRead(),
                           child: SizedBox(
                             width: 44,
                             height: 44,
                             child: Center(
                               child: Icon(
-                                Icons.arrow_back_ios_new_rounded,
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
-                                size: 20,
+                                Icons.done_all_rounded,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.9),
+                                size: 22,
                               ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.notificationsTitle,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.w900,
-                            ),
-                      ),
-                      const Spacer(),
-                      if (!isGuest)
-                        Glass(
-                          radius: BorderRadius.circular(14),
-                          padding: EdgeInsets.zero,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(14),
-                            onTap: () => notificationsRepository.markAllAsRead(),
-                            child: SizedBox(
-                              width: 44,
-                              height: 44,
-                              child: Center(
-                                child: Icon(
-                                  Icons.done_all_rounded,
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
-                                  size: 22,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: S.md),
-                  _Tabs(
-                    value: activeTab,
-                    tabs: tabs,
-                    onChanged: (final v) => setState(() => tab = v),
-                  ),
-                  const SizedBox(height: S.sm),
-                  Expanded(
-                    child: isGuest
-                        ? _buildGuestNotifications(context, activeTab)
-                        : StreamBuilder<List<Map<String, dynamic>>>(
-                            stream: notificationsRepository.getNotificationsStream(),
-                            builder: (final context, final snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const _NotificationsSkeleton();
-                              }
-                              if (snapshot.hasError) {
-                                return _NotificationsEmptyState(
-                                  title: l10n.notificationsEmpty,
-                                  subtitle: _tabDescription(context, activeTab),
-                                );
-                              }
-
-                              final items = (snapshot.data ?? []).map(_mapNotification).toList();
-                              final filtered = items.where((final n) {
-                                switch (activeTab) {
-                                  case NotificationsTab.courses:
-                                    return n.type == NotifType.course;
-                                  case NotificationsTab.social:
-                                    return n.type == NotifType.social;
-                                  case NotificationsTab.circles:
-                                    return n.type == NotifType.circle;
-                                  case NotificationsTab.system:
-                                    return n.type == NotifType.system;
-                                  default:
-                                    return true;
-                                }
-                              }).toList();
-
-                              if (filtered.isEmpty) {
-                                return _NotificationsEmptyState(
-                                  title: l10n.notificationsEmpty,
-                                  subtitle: _tabDescription(context, activeTab),
-                                );
-                              }
-
-                              return ListView.separated(
-                                physics: const BouncingScrollPhysics(),
-                                itemCount: filtered.length,
-                                separatorBuilder: (final _, final __) => const SizedBox(height: S.sm),
-                                itemBuilder: (final _, final i) {
-                                  final n = filtered[i];
-
-                                  return Dismissible(
-                                    key: ValueKey(n.id),
-                                    direction: DismissDirection.endToStart,
-                                      background: Container(
-                                        alignment: Alignment.centerRight,
-                                        padding: const EdgeInsets.only(right: S.md),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(24),
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .error
-                                              .withValues(alpha: 0.18),
-                                          border: Border.all(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onSurface
-                                                .withValues(alpha: 0.10),
-                                          ),
-                                        ),
-                                        child: Icon(
-                                          Icons.delete_rounded,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
-                                              .withValues(alpha: 0.92),
-                                        ),
-                                      ),
-                                    onDismissed: (final _) {
-                                      notificationsRepository.deleteNotification(n.id);
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(l10n.notificationsDeleted)),
-                                      );
-                                    },
-                                    child: _NotifCard(
-                                      n: n,
-                                      onTap: () => notificationsRepository.markAsRead(n.id),
-                                      onPrimaryAction: () => _handlePrimary(context, n),
-                                      onSecondaryAction: () => _handleSecondary(context, n),
-                                    ),
-                                  );
-                                },
+                  ],
+                ),
+                const SizedBox(height: S.md),
+                _Tabs(
+                  value: activeTab,
+                  tabs: tabs,
+                  onChanged: (final v) => setState(() => tab = v),
+                ),
+                const SizedBox(height: S.sm),
+                Expanded(
+                  child: isGuest
+                      ? _buildGuestNotifications(context, activeTab)
+                      : StreamBuilder<List<Map<String, dynamic>>>(
+                          stream:
+                              notificationsRepository.getNotificationsStream(),
+                          builder: (final context, final snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const _NotificationsSkeleton();
+                            }
+                            if (snapshot.hasError) {
+                              return _NotificationsEmptyState(
+                                title: l10n.notificationsEmpty,
+                                subtitle: _tabDescription(context, activeTab),
                               );
-                            },
-                          ),
-                  ),
-                ],
-              ),
+                            }
+
+                            final items = (snapshot.data ?? [])
+                                .map(_mapNotification)
+                                .toList();
+                            final filtered = items.where((final n) {
+                              switch (activeTab) {
+                                case NotificationsTab.courses:
+                                  return n.type == NotifType.course;
+                                case NotificationsTab.social:
+                                  return n.type == NotifType.social;
+                                case NotificationsTab.circles:
+                                  return n.type == NotifType.circle;
+                                case NotificationsTab.system:
+                                  return n.type == NotifType.system;
+                                default:
+                                  return true;
+                              }
+                            }).toList();
+
+                            if (filtered.isEmpty) {
+                              return _NotificationsEmptyState(
+                                title: l10n.notificationsEmpty,
+                                subtitle: _tabDescription(context, activeTab),
+                              );
+                            }
+
+                            return ListView.separated(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: filtered.length,
+                              separatorBuilder: (final _, final __) =>
+                                  const SizedBox(height: S.sm),
+                              itemBuilder: (final _, final i) {
+                                final n = filtered[i];
+
+                                return Dismissible(
+                                  key: ValueKey(n.id),
+                                  direction: DismissDirection.endToStart,
+                                  background: Container(
+                                    alignment: Alignment.centerRight,
+                                    padding: const EdgeInsets.only(right: S.md),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(24),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .error
+                                          .withValues(alpha: 0.18),
+                                      border: Border.all(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.10),
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.delete_rounded,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.92),
+                                    ),
+                                  ),
+                                  onDismissed: (final _) {
+                                    notificationsRepository
+                                        .deleteNotification(n.id);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content:
+                                              Text(l10n.notificationsDeleted)),
+                                    );
+                                  },
+                                  child: _NotifCard(
+                                    n: n,
+                                    onTap: () => notificationsRepository
+                                        .markAsRead(n.id),
+                                    onPrimaryAction: () =>
+                                        _handlePrimary(context, n),
+                                    onSecondaryAction: () =>
+                                        _handleSecondary(context, n),
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                ),
+              ],
             ),
           ),
         ),
+      ),
     );
   }
 
-  String _tabDescription(final BuildContext context, final NotificationsTab tab) {
+  String _tabDescription(
+      final BuildContext context, final NotificationsTab tab) {
     final l10n = AppLocalizations.of(context);
     switch (tab) {
       case NotificationsTab.courses:
@@ -227,13 +246,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Widget _buildGuestNotifications(final BuildContext context, final NotificationsTab activeTab) {
+  Widget _buildGuestNotifications(
+      final BuildContext context, final NotificationsTab activeTab) {
     final l10n = AppLocalizations.of(context);
     return AnimatedBuilder(
       animation: notificationsStore,
       builder: (final context, final _) {
         final items = notificationsStore.items
-            .where((final n) => n.type == NotifType.course || n.type == NotifType.system)
+            .where((final n) =>
+                n.type == NotifType.course || n.type == NotifType.system)
             .toList();
         final filtered = items.where((final n) {
           switch (activeTab) {
@@ -268,14 +289,23 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 padding: const EdgeInsets.only(right: S.md),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(24),
-                  color: Theme.of(context).colorScheme.error.withValues(alpha: 0.18),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .error
+                      .withValues(alpha: 0.18),
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.10),
                   ),
                 ),
                 child: Icon(
                   Icons.delete_rounded,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.92),
                 ),
               ),
               onDismissed: (final _) {
@@ -307,16 +337,24 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final time = _parseTime(row['created_at']);
     final isRead = row['is_read'] == true || row['is_read'] == 1;
 
-    final socialActionRaw = metadata['social_action'] ?? metadata['action'] ?? row['social_action'] ?? row['action'];
+    final socialActionRaw = metadata['social_action'] ??
+        metadata['action'] ??
+        row['social_action'] ??
+        row['action'];
     final socialAction = socialActionRaw?.toString() == 'friend_request'
         ? SocialAction.friendRequest
         : null;
 
-    final circleActionRaw = metadata['circle_action'] ?? metadata['action'] ?? row['circle_action'];
-    final circleAction = circleActionRaw?.toString() == 'invite' ? CircleAction.invite : null;
+    final circleActionRaw =
+        metadata['circle_action'] ?? metadata['action'] ?? row['circle_action'];
+    final circleAction =
+        circleActionRaw?.toString() == 'invite' ? CircleAction.invite : null;
 
-    final courseActionRaw = metadata['course_action'] ?? row['course_action'] ?? metadata['action'];
-    final courseAction = courseActionRaw?.toString() == 'daily_goal' ? CourseAction.dailyGoal : null;
+    final courseActionRaw =
+        metadata['course_action'] ?? row['course_action'] ?? metadata['action'];
+    final courseAction = courseActionRaw?.toString() == 'daily_goal'
+        ? CourseAction.dailyGoal
+        : null;
 
     final friendshipIdRaw = metadata['friendship_id'] ?? row['friendship_id'];
 
@@ -331,12 +369,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return AppNotification(
       id: row['id'].toString(),
       type: inferredType,
-      title: row['title'] ?? (socialAction == SocialAction.friendRequest
-          ? 'New friend request'
-          : l10n.notificationTitleFallback),
-      body: row['body'] ?? (socialAction == SocialAction.friendRequest
-          ? '${metadata['from_user_name']?.toString() ?? l10n.userFallbackName} sent you a friend request.'
-          : ''),
+      title: row['title'] ??
+          (socialAction == SocialAction.friendRequest
+              ? 'New friend request'
+              : l10n.notificationTitleFallback),
+      body: row['body'] ??
+          (socialAction == SocialAction.friendRequest
+              ? '${metadata['from_user_name']?.toString() ?? l10n.userFallbackName} sent you a friend request.'
+              : ''),
       time: time,
       isRead: isRead,
       socialAction: socialAction,
@@ -345,7 +385,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       friendshipId: friendshipIdRaw?.toString(),
       circleAction: circleAction,
       circleId: (metadata['circle_id'] ?? row['circle_id'])?.toString(),
-      circleTitle: (metadata['circle_title'] ?? row['circle_title'])?.toString(),
+      circleTitle:
+          (metadata['circle_title'] ?? row['circle_title'])?.toString(),
       courseAction: courseAction,
       courseId: (metadata['course_id'] ?? row['course_id'])?.toString(),
     );
@@ -373,13 +414,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return DateTime.now();
   }
 
-  Future<void> _handlePrimary(final BuildContext context, final AppNotification n) async {
+  Future<void> _handlePrimary(
+      final BuildContext context, final AppNotification n) async {
     final l10n = AppLocalizations.of(context);
     await notificationsRepository.markAsRead(n.id);
-    if (n.type == NotifType.social && n.socialAction == SocialAction.friendRequest) {
+    if (n.type == NotifType.social &&
+        n.socialAction == SocialAction.friendRequest) {
       try {
         if (n.friendshipId == null && n.fromUserId == null) {
-          throw StateError('Missing request identity for friend request action.');
+          throw StateError(
+              'Missing request identity for friend request action.');
         }
         if (n.friendshipId != null) {
           await socialRepository.acceptFriendRequest(n.friendshipId!);
@@ -395,15 +439,20 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.notificationsFriendAcceptFailed(e.toString()))),
+            SnackBar(
+                content:
+                    Text(l10n.notificationsFriendAcceptFailed(e.toString()))),
           );
         }
       }
       return;
     }
-    if (n.type == NotifType.circle && n.circleAction == CircleAction.invite && n.circleId != null) {
+    if (n.type == NotifType.circle &&
+        n.circleAction == CircleAction.invite &&
+        n.circleId != null) {
       try {
-        final outcome = await circlesRepository.joinCircleFromInvite(n.circleId!);
+        final outcome =
+            await circlesRepository.joinCircleFromInvite(n.circleId!);
         if (!context.mounted) return;
         Navigator.push(
           context,
@@ -414,11 +463,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         final label = outcome.role == 'player'
             ? l10n.circleJoinedAsPlayer
             : l10n.circleJoinedAsSpectator;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(label)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(label)));
       } catch (e) {
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.notificationsJoinCircleFailed(e.toString()))),
+          SnackBar(
+              content: Text(l10n.notificationsJoinCircleFailed(e.toString()))),
         );
       }
       return;
@@ -433,7 +484,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Future<void> _handlePrimaryGuest(final BuildContext context, final AppNotification n) async {
+  Future<void> _handlePrimaryGuest(
+      final BuildContext context, final AppNotification n) async {
     final l10n = AppLocalizations.of(context);
     notificationsStore.markRead(n.id);
     final label = n.type == NotifType.system
@@ -446,12 +498,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  Future<void> _handleSecondary(final BuildContext context, final AppNotification n) async {
+  Future<void> _handleSecondary(
+      final BuildContext context, final AppNotification n) async {
     final l10n = AppLocalizations.of(context);
-    if (n.type == NotifType.social && n.socialAction == SocialAction.friendRequest) {
+    if (n.type == NotifType.social &&
+        n.socialAction == SocialAction.friendRequest) {
       try {
         if (n.friendshipId == null && n.fromUserId == null) {
-          throw StateError('Missing request identity for friend request action.');
+          throw StateError(
+              'Missing request identity for friend request action.');
         }
         if (n.friendshipId != null) {
           await socialRepository.declineFriendRequest(n.friendshipId!);
@@ -467,7 +522,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.notificationsFriendDeclineFailed(e.toString()))),
+            SnackBar(
+                content:
+                    Text(l10n.notificationsFriendDeclineFailed(e.toString()))),
           );
         }
       }
@@ -490,7 +547,8 @@ class _Tabs extends StatelessWidget {
   final NotificationsTab value;
   final ValueChanged<NotificationsTab> onChanged;
   final List<_TabItem> tabs;
-  const _Tabs({required this.value, required this.onChanged, required this.tabs});
+  const _Tabs(
+      {required this.value, required this.onChanged, required this.tabs});
 
   @override
   Widget build(final BuildContext context) {
@@ -509,7 +567,9 @@ class _Tabs extends StatelessWidget {
                 height: 38,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  color: selected ? scheme.primary.withValues(alpha: 0.16) : Colors.transparent,
+                  color: selected
+                      ? scheme.primary.withValues(alpha: 0.16)
+                      : Colors.transparent,
                   border: Border.all(
                     color: selected
                         ? scheme.primary.withValues(alpha: 0.35)
@@ -596,7 +656,8 @@ class _NotifCard extends StatelessWidget {
                     Text(
                       n.title,
                       style: textTheme.titleMedium?.copyWith(
-                        color: scheme.onSurface.withValues(alpha: n.isRead ? 0.85 : 1),
+                        color: scheme.onSurface
+                            .withValues(alpha: n.isRead ? 0.85 : 1),
                         fontWeight: FontWeight.w900,
                       ),
                     ),
@@ -686,12 +747,14 @@ class _ActionRow extends StatelessWidget {
   final VoidCallback onPrimary;
   final VoidCallback? onSecondary;
 
-  const _ActionRow({required this.n, required this.onPrimary, this.onSecondary});
+  const _ActionRow(
+      {required this.n, required this.onPrimary, this.onSecondary});
 
   @override
   Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    if (n.type == NotifType.social && n.socialAction == SocialAction.friendRequest) {
+    if (n.type == NotifType.social &&
+        n.socialAction == SocialAction.friendRequest) {
       return Row(
         children: [
           _ChipButton(label: l10n.accept, onTap: onPrimary),
@@ -711,7 +774,8 @@ class _ActionRow extends StatelessWidget {
       );
     }
 
-    if (n.type == NotifType.course && n.courseAction == CourseAction.dailyGoal) {
+    if (n.type == NotifType.course &&
+        n.courseAction == CourseAction.dailyGoal) {
       return Row(
         children: [
           _ChipButton(label: l10n.open, onTap: onPrimary),
@@ -770,10 +834,12 @@ class _IconBubble extends StatelessWidget {
       height: 44,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        color: scheme.surfaceContainerHighest.withValues(alpha: isRead ? 0.5 : 0.75),
+        color: scheme.surfaceContainerHighest
+            .withValues(alpha: isRead ? 0.5 : 0.75),
         border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
       ),
-      child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92), size: 22),
+      child:
+          Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92), size: 22),
     );
   }
 }
@@ -792,29 +858,30 @@ class _NotificationsEmptyState extends StatelessWidget {
       padding: const EdgeInsets.all(S.lg),
       child: SizedBox(
         width: double.infinity,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(Icons.notifications_none_rounded, color: scheme.primary, size: 28),
-          const SizedBox(height: S.sm),
-          Text(
-            title,
-            style: textTheme.titleMedium?.copyWith(
-              color: scheme.onSurface.withValues(alpha: 0.9),
-              fontWeight: FontWeight.w800,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.notifications_none_rounded,
+                color: scheme.primary, size: 28),
+            const SizedBox(height: S.sm),
+            Text(
+              title,
+              style: textTheme.titleMedium?.copyWith(
+                color: scheme.onSurface.withValues(alpha: 0.9),
+                fontWeight: FontWeight.w800,
+              ),
             ),
-          ),
-          const SizedBox(height: S.xs),
-          Text(
-            subtitle,
-            style: textTheme.bodySmall?.copyWith(
-              color: scheme.onSurface.withValues(alpha: 0.6),
-              fontWeight: FontWeight.w600,
+            const SizedBox(height: S.xs),
+            Text(
+              subtitle,
+              style: textTheme.bodySmall?.copyWith(
+                color: scheme.onSurface.withValues(alpha: 0.6),
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
       ),
     );
   }
@@ -829,7 +896,8 @@ class _NotificationsSkeleton extends StatelessWidget {
       physics: const BouncingScrollPhysics(),
       itemCount: 4,
       separatorBuilder: (final _, final __) => const SizedBox(height: S.sm),
-      itemBuilder: (final context, final index) => const _NotificationsSkeletonCard(),
+      itemBuilder: (final context, final index) =>
+          const _NotificationsSkeletonCard(),
     );
   }
 }
@@ -867,11 +935,14 @@ class _NotificationsSkeletonCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _SkeletonLine(width: 120, color: base.withValues(alpha: 0.9)),
+                    _SkeletonLine(
+                        width: 120, color: base.withValues(alpha: 0.9)),
                     const SizedBox(height: S.xs),
-                    _SkeletonLine(width: 200, color: base.withValues(alpha: 0.8)),
+                    _SkeletonLine(
+                        width: 200, color: base.withValues(alpha: 0.8)),
                     const SizedBox(height: S.xs),
-                    _SkeletonLine(width: 160, color: base.withValues(alpha: 0.7)),
+                    _SkeletonLine(
+                        width: 160, color: base.withValues(alpha: 0.7)),
                   ],
                 ),
               ),

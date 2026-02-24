@@ -1,15 +1,20 @@
 import 'dart:io';
+import 'package:soma/core/services/app_logger.dart';
 
 void main() async {
   final dataDir = Directory('lib/data');
   if (!await dataDir.exists()) {
-    print('lib/data not found');
+    appLogger.info('lib/data not found');
     return;
   }
 
-  final files = dataDir.listSync(recursive: true).whereType<File>().where((final f) => f.path.endsWith('.dart'));
-  
-  final regex = RegExp(r'final\s+([a-zA-Z]+Repository)\s*=\s*([a-zA-Z]+Repository)\([^)]*\);');
+  final files = dataDir
+      .listSync(recursive: true)
+      .whereType<File>()
+      .where((final f) => f.path.endsWith('.dart'));
+
+  final regex = RegExp(
+      r'final\s+([a-zA-Z]+Repository)\s*=\s*([a-zA-Z]+Repository)\([^)]*\);');
 
   int modifiedCount = 0;
 
@@ -19,10 +24,12 @@ void main() async {
       // Add import if missing
       if (!content.contains("import '../core/di/locator.dart';")) {
         // Find the last import
-        final lastImportIndex = content.lastIndexOf(RegExp(r'^import .*;', multiLine: true));
+        final lastImportIndex =
+            content.lastIndexOf(RegExp(r'^import .*;', multiLine: true));
         if (lastImportIndex != -1) {
           final endOfImport = content.indexOf('\n', lastImportIndex);
-          content = "${content.substring(0, endOfImport + 1)}import '../core/di/locator.dart';\n${content.substring(endOfImport + 1)}";
+          content =
+              "${content.substring(0, endOfImport + 1)}import '../core/di/locator.dart';\n${content.substring(endOfImport + 1)}";
         } else {
           content = "import '../core/di/locator.dart';\n\n$content";
         }
@@ -36,10 +43,10 @@ void main() async {
       });
 
       await file.writeAsString(content);
-      print('Updated ${file.path}');
+      appLogger.info('Updated ${file.path}');
       modifiedCount++;
     }
   }
 
-  print('Migration complete. Modified $modifiedCount files.');
+  appLogger.info('Migration complete. Modified $modifiedCount files.');
 }

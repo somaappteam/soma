@@ -1,3 +1,4 @@
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
@@ -7,15 +8,18 @@ const String serviceRoleKey =
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
 
-  print('=== COURSE ID CHECK ===');
-  
+  appLogger.info('=== COURSE ID CHECK ===');
+
   try {
-    final courses = await client.from('courses').select('id, title, source_lang, target_lang');
-    print('Found ${courses.length} courses:');
+    final courses = await client
+        .from('courses')
+        .select('id, title, source_lang, target_lang');
+    appLogger.info('Found ${courses.length} courses:');
     for (final c in courses) {
-      print('  ID: ${c['id']} | Title: ${c['title']} | Lang: ${c['source_lang']} -> ${c['target_lang']}');
+      appLogger.info(
+          '  ID: ${c['id']} | Title: ${c['title']} | Lang: ${c['source_lang']} -> ${c['target_lang']}');
     }
   } catch (e) {
-    print('Error: $e');
+    appLogger.info('Error: $e');
   }
 }

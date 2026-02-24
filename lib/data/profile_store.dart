@@ -13,8 +13,6 @@ class ProfileStore extends ChangeNotifier {
     dailyGoalMinutes: 10,
   );
 
-
-
   UserProfile get profile => _profile;
   StreamSubscription<UserProfile?>? _profileSub;
 

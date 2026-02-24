@@ -2,7 +2,8 @@ import 'dart:io';
 
 void main(final List<String> args) {
   if (args.length != 2) {
-    stderr.writeln('Usage: dart run tool/check_coverage.dart <lcov_path> <minimum_percent>');
+    stderr.writeln(
+        'Usage: dart run tool/check_coverage.dart <lcov_path> <minimum_percent>');
     exitCode = 64;
     return;
   }
@@ -10,7 +11,8 @@ void main(final List<String> args) {
   final file = File(args[0]);
   final minPercent = double.tryParse(args[1]);
   if (!file.existsSync() || minPercent == null) {
-    stderr.writeln('Invalid input. fileExists=${file.existsSync()}, min=${args[1]}');
+    stderr.writeln(
+        'Invalid input. fileExists=${file.existsSync()}, min=${args[1]}');
     exitCode = 64;
     return;
   }
@@ -31,7 +33,8 @@ void main(final List<String> args) {
   }
 
   final coverage = totalFound == 0 ? 0.0 : (totalHit / totalFound) * 100;
-  stdout.writeln('Coverage: ${coverage.toStringAsFixed(2)}% (min ${minPercent.toStringAsFixed(2)}%)');
+  stdout.writeln(
+      'Coverage: ${coverage.toStringAsFixed(2)}% (min ${minPercent.toStringAsFixed(2)}%)');
 
   if (coverage < minPercent) {
     stderr.writeln('Coverage gate failed.');

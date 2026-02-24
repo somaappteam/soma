@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/core/theme/layout_tokens.dart';
 import 'package:soma/core/theme/motion.dart';
 import 'package:soma/core/theme/spacing.dart';
@@ -9,7 +10,6 @@ import 'package:soma/core/widgets/glass.dart';
 import 'package:soma/core/widgets/neon_button.dart';
 import 'package:soma/core/widgets/premium_dialog.dart';
 import 'package:soma/core/widgets/premium_screen_scaffold.dart';
-
 import 'package:soma/data/achievements_repository.dart';
 import 'package:soma/data/activity_feed_repository.dart';
 import 'package:soma/data/auth_repository.dart';
@@ -58,7 +58,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool get _isGuest => authRepository.currentUser == null;
   String? get _viewerId => authRepository.currentUser?.id;
   String? get _viewedUserId => widget.userId ?? _viewerId;
-  bool get _isVisitorView => widget.userId != null && widget.userId != _viewerId;
+  bool get _isVisitorView =>
+      widget.userId != null && widget.userId != _viewerId;
 
   @override
   void initState() {
@@ -82,19 +83,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
       String? pendingId;
       var isBlocked = false;
       var isReported = false;
-      
+
       if (_isVisitorView && _viewerId != null && _viewedUserId != null) {
         try {
           // Wrap auxiliary calls in their own try-catch to not block profile loading
-          pendingId = await socialRepository.getOutgoingPendingRequestId(_viewedUserId!);
-          
+          pendingId = await socialRepository
+              .getOutgoingPendingRequestId(_viewedUserId!);
+
           final settings = await settingsRepository.getSettings();
           final blockedIds = _parseBlockedIds(settings['blocked_user_ids']);
           isBlocked = blockedIds.contains(_viewedUserId);
-          
+
           isReported = await userReportRepository.hasReported(_viewedUserId!);
         } catch (e) {
-          debugPrint('Error loading visitor info: $e');
+          appLogger.debug('Error loading visitor info: $e');
         }
       }
 
@@ -108,10 +110,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       }
     } catch (e) {
-      debugPrint('Error loading profile: $e');
+      appLogger.debug('Error loading profile: $e');
       if (mounted) {
-         // Optionally show a snackbar or error state
-         _showSnack('An error occurred');
+        // Optionally show a snackbar or error state
+        _showSnack('An error occurred');
       }
     } finally {
       if (mounted) {
@@ -122,7 +124,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   List<String> _parseBlockedIds(final dynamic rawValue) {
     if (rawValue is List) {
-      return rawValue.map((final e) => e.toString()).where((final e) => e.isNotEmpty).toList();
+      return rawValue
+          .map((final e) => e.toString())
+          .where((final e) => e.isNotEmpty)
+          .toList();
     }
     return const [];
   }
@@ -178,7 +183,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       await socialRepository.sendFriendRequest(otherId);
       if (!mounted) return;
-      final pendingId = await socialRepository.getOutgoingPendingRequestId(otherId);
+      final pendingId =
+          await socialRepository.getOutgoingPendingRequestId(otherId);
       if (!mounted) return;
       setState(() {
         _isRequestSending = false;
@@ -301,7 +307,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-
   String _resolveFallbackUsername(final AppLocalizations l10n) {
     final current = authRepository.currentUser;
     final metadataName = current?.userMetadata?['username']?.toString();
@@ -353,176 +358,192 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
     }
-    
+
     // Default or fetched profile
-    final profile = _profile ?? UserProfile(
-      id: _viewedUserId,
-      displayName: l10n.profileDefaultDisplayName,
-      username: _resolveFallbackUsername(l10n),
-      bio: l10n.profileDefaultBio,
-      location: l10n.profileDefaultLocation,
-      dailyGoalMinutes: 15,
-    );
+    final profile = _profile ??
+        UserProfile(
+          id: _viewedUserId,
+          displayName: l10n.profileDefaultDisplayName,
+          username: _resolveFallbackUsername(l10n),
+          bio: l10n.profileDefaultBio,
+          location: l10n.profileDefaultLocation,
+          dailyGoalMinutes: 15,
+        );
 
     return PremiumScreenScaffold(
       body: Column(
         children: [
-                _TopBar(
-                  title: l10n.profileTitle,
-                  onBack: _isVisitorView && Navigator.canPop(context)
-                      ? () => Navigator.pop(context)
-                      : null,
-                  onLeaderboard: _isVisitorView
-                      ? null
-                      : () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (final _) => const LeaderboardScreen()),
-                          );
-                        },
-                  onSettings: _isVisitorView
-                      ? null
-                      : () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (final _) => const SettingsScreen()),
-                          );
-                        },
-                ),
-
-                const SizedBox(height: S.sm),
-
-                Expanded(
-                  child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    children: [
-                      const _ProfileSectionLabel(label: 'Identity'),
-                      const SizedBox(height: 6),
-                      _PremiumSectionShell(
-                        child: profile.showOnlineStatus && profile.id != null && profile.id!.isNotEmpty
-                            ? StreamBuilder<bool>(
-                                stream: presenceRepository.streamOnlineStatus(profile.id!),
-                                builder: (final context, final snapshot) => _HeaderCard(
-                                  profile: profile,
-                                  showOnlineIndicator: snapshot.data == true,
-                                ),
-                              )
-                            : _HeaderCard(profile: profile, showOnlineIndicator: false),
-                      ),
-                      const SizedBox(height: S.sm),
-                      _PremiumSectionShell(child: _ProfileSpotlightCard(profile: profile)),
-                      const SizedBox(height: S.sm),
-                      if (_isVisitorView) ...[
-                        const _ProfileSectionLabel(label: 'Overview'),
-                        const SizedBox(height: 6),
-                        _PremiumSectionShell(
-                          child: _VisitorOverviewCard(
+          _TopBar(
+            title: l10n.profileTitle,
+            onBack: _isVisitorView && Navigator.canPop(context)
+                ? () => Navigator.pop(context)
+                : null,
+            onLeaderboard: _isVisitorView
+                ? null
+                : () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (final _) => const LeaderboardScreen()),
+                    );
+                  },
+            onSettings: _isVisitorView
+                ? null
+                : () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (final _) => const SettingsScreen()),
+                    );
+                  },
+          ),
+          const SizedBox(height: S.sm),
+          Expanded(
+            child: ListView(
+              physics: const BouncingScrollPhysics(),
+              children: [
+                const _ProfileSectionLabel(label: 'Identity'),
+                const SizedBox(height: 6),
+                _PremiumSectionShell(
+                  child: profile.showOnlineStatus &&
+                          profile.id != null &&
+                          profile.id!.isNotEmpty
+                      ? StreamBuilder<bool>(
+                          stream: presenceRepository
+                              .streamOnlineStatus(profile.id!),
+                          builder: (final context, final snapshot) =>
+                              _HeaderCard(
                             profile: profile,
-                            isBlocked: _isBlocked,
-                            isReported: _isReported,
+                            showOnlineIndicator: snapshot.data == true,
                           ),
-                        ),
-                        const SizedBox(height: S.sm),
-                        _PremiumSectionShell(
-                          child: _VisitorActionsCard(
-                            isSending: _isRequestSending,
-                            requestSent: _requestSent,
-                            isBlocked: _isBlocked,
-                            isReported: _isReported,
-                            isReportSubmitting: _isReportSubmitting,
-                            onMessage: () => _openMessage(profile),
-                            onAddFriend: () => _requestSent
-                                ? _cancelFriendRequest(profile)
-                                : _sendFriendRequest(profile),
-                            onToggleBlocked: () => _toggleBlocked(profile),
-                            onToggleReported: () => _toggleReported(profile),
-                          ),
-                        ),
-                      ] else ...[
-                        const _ProfileSectionLabel(label: 'Progress'),
-                        const SizedBox(height: 6),
-                        FutureBuilder<UserStats>(
-                          future: _statsFuture,
-                          builder: (final context, final snapshot) {
-                            return AnimatedSwitcher(
-                              duration: MotionTokens.short,
-                              child: snapshot.connectionState == ConnectionState.waiting
-                                  ? const _PremiumSectionShell(
-                                      key: ValueKey('stats-loading'),
-                                      child: _StatsSkeleton(),
-                                    )
-                                  : _PremiumSectionShell(
-                                      key: ValueKey('stats-content'),
-                                      child: _StatsRow(
-                                        wins: (snapshot.data ?? UserStats.empty()).totalWins,
-                                        streak: (snapshot.data ?? UserStats.empty()).streakDays,
-                                      ),
-                                    ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: S.sm),
-                        const _ProfileSectionLabel(label: 'Social'),
-                        const SizedBox(height: 6),
-                        FutureBuilder<List<Map<String, dynamic>>>(
-                          future: _friendsFuture,
-                          builder: (final context, final snapshot) {
-                            return _PremiumSectionShell(
-                              child: _FriendsCard(friends: snapshot.data ?? const <Map<String, dynamic>>[]),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: S.sm),
-                        const _ProfileSectionLabel(label: 'Achievements'),
-                        const SizedBox(height: 6),
-                        FutureBuilder<List<Achievement>>(
-                          future: _achievementsFuture,
-                          builder: (final context, final snapshot) {
-                            return AnimatedSwitcher(
-                              duration: MotionTokens.short,
-                              child: snapshot.connectionState == ConnectionState.waiting
-                                  ? const _PremiumSectionShell(
-                                      key: ValueKey('achievements-loading'),
-                                      child: _AchievementsSkeleton(),
-                                    )
-                                  : _PremiumSectionShell(
-                                      key: ValueKey('achievements-content'),
-                                      child: _AchievementsCard(
-                                        achievements: snapshot.data ?? const <Achievement>[],
-                                      ),
-                                    ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: S.sm),
-                        const _ProfileSectionLabel(label: 'Friends Activity'),
-                        const SizedBox(height: 6),
-                        FutureBuilder<List<ActivityEvent>>(
-                          future: _activityFuture,
-                          builder: (final context, final snapshot) {
-                            return AnimatedSwitcher(
-                              duration: MotionTokens.short,
-                              child: snapshot.connectionState == ConnectionState.waiting
-                                  ? const _PremiumSectionShell(
-                                      key: ValueKey('activity-loading'),
-                                      child: _AchievementsSkeleton(),
-                                    )
-                                  : _PremiumSectionShell(
-                                      key: ValueKey('activity-content'),
-                                      child: _ActivityFeedCard(events: snapshot.data ?? []),
-                                    ),
-                            );
-                          },
-                        ),
-                      ], 
-                      const SizedBox(height: S.xl),
-                    ], 
-                  ),
+                        )
+                      : _HeaderCard(
+                          profile: profile, showOnlineIndicator: false),
                 ),
+                const SizedBox(height: S.sm),
+                _PremiumSectionShell(
+                    child: _ProfileSpotlightCard(profile: profile)),
+                const SizedBox(height: S.sm),
+                if (_isVisitorView) ...[
+                  const _ProfileSectionLabel(label: 'Overview'),
+                  const SizedBox(height: 6),
+                  _PremiumSectionShell(
+                    child: _VisitorOverviewCard(
+                      profile: profile,
+                      isBlocked: _isBlocked,
+                      isReported: _isReported,
+                    ),
+                  ),
+                  const SizedBox(height: S.sm),
+                  _PremiumSectionShell(
+                    child: _VisitorActionsCard(
+                      isSending: _isRequestSending,
+                      requestSent: _requestSent,
+                      isBlocked: _isBlocked,
+                      isReported: _isReported,
+                      isReportSubmitting: _isReportSubmitting,
+                      onMessage: () => _openMessage(profile),
+                      onAddFriend: () => _requestSent
+                          ? _cancelFriendRequest(profile)
+                          : _sendFriendRequest(profile),
+                      onToggleBlocked: () => _toggleBlocked(profile),
+                      onToggleReported: () => _toggleReported(profile),
+                    ),
+                  ),
+                ] else ...[
+                  const _ProfileSectionLabel(label: 'Progress'),
+                  const SizedBox(height: 6),
+                  FutureBuilder<UserStats>(
+                    future: _statsFuture,
+                    builder: (final context, final snapshot) {
+                      return AnimatedSwitcher(
+                        duration: MotionTokens.short,
+                        child: snapshot.connectionState ==
+                                ConnectionState.waiting
+                            ? const _PremiumSectionShell(
+                                key: ValueKey('stats-loading'),
+                                child: _StatsSkeleton(),
+                              )
+                            : _PremiumSectionShell(
+                                key: ValueKey('stats-content'),
+                                child: _StatsRow(
+                                  wins: (snapshot.data ?? UserStats.empty())
+                                      .totalWins,
+                                  streak: (snapshot.data ?? UserStats.empty())
+                                      .streakDays,
+                                ),
+                              ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: S.sm),
+                  const _ProfileSectionLabel(label: 'Social'),
+                  const SizedBox(height: 6),
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _friendsFuture,
+                    builder: (final context, final snapshot) {
+                      return _PremiumSectionShell(
+                        child: _FriendsCard(
+                            friends: snapshot.data ??
+                                const <Map<String, dynamic>>[]),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: S.sm),
+                  const _ProfileSectionLabel(label: 'Achievements'),
+                  const SizedBox(height: 6),
+                  FutureBuilder<List<Achievement>>(
+                    future: _achievementsFuture,
+                    builder: (final context, final snapshot) {
+                      return AnimatedSwitcher(
+                        duration: MotionTokens.short,
+                        child: snapshot.connectionState ==
+                                ConnectionState.waiting
+                            ? const _PremiumSectionShell(
+                                key: ValueKey('achievements-loading'),
+                                child: _AchievementsSkeleton(),
+                              )
+                            : _PremiumSectionShell(
+                                key: ValueKey('achievements-content'),
+                                child: _AchievementsCard(
+                                  achievements:
+                                      snapshot.data ?? const <Achievement>[],
+                                ),
+                              ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: S.sm),
+                  const _ProfileSectionLabel(label: 'Friends Activity'),
+                  const SizedBox(height: 6),
+                  FutureBuilder<List<ActivityEvent>>(
+                    future: _activityFuture,
+                    builder: (final context, final snapshot) {
+                      return AnimatedSwitcher(
+                        duration: MotionTokens.short,
+                        child:
+                            snapshot.connectionState == ConnectionState.waiting
+                                ? const _PremiumSectionShell(
+                                    key: ValueKey('activity-loading'),
+                                    child: _AchievementsSkeleton(),
+                                  )
+                                : _PremiumSectionShell(
+                                    key: ValueKey('activity-content'),
+                                    child: _ActivityFeedCard(
+                                        events: snapshot.data ?? []),
+                                  ),
+                      );
+                    },
+                  ),
+                ],
+                const SizedBox(height: S.xl),
               ],
             ),
-
-      padding: PremiumLayout.screenPadding(PremiumLayout.densityForWidth(MediaQuery.of(context).size.width)),
+          ),
+        ],
+      ),
+      padding: PremiumLayout.screenPadding(
+          PremiumLayout.densityForWidth(MediaQuery.of(context).size.width)),
     );
   }
 }
@@ -650,7 +671,8 @@ class _GuestProfileView extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final username = profile.username.isNotEmpty ? profile.username : l10n.guestUsername;
+    final username =
+        profile.username.isNotEmpty ? profile.username : l10n.guestUsername;
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
@@ -659,150 +681,162 @@ class _GuestProfileView extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.lg),
         child: Column(
           children: [
-                _TopBar(
-                  onSettings: onSettings,
-                  title: l10n.profileTitle,
-                ),
-                const SizedBox(height: S.sm),
-                Expanded(
-                  child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    children: [
-                      const _ProfileSectionLabel(label: 'Welcome'),
-                      const SizedBox(height: 6),
-                      Glass(
-                        radius: BorderRadius.circular(22),
-                        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _AvatarGlow(
-                              size: 72,
-                              image: const AssetImage('assets/avatar/avatar_1.png'),
-                              showOnlineIndicator: false,
-                            ),
-                            const SizedBox(width: S.sm),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    l10n.guestSessionLabel,
-                                    style: textTheme.bodySmall?.copyWith(
-                                      color: scheme.onSurface.withValues(alpha: 0.62),
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '@$username',
-                                    style: textTheme.titleLarge?.copyWith(
-                                      color: scheme.onSurface,
-                                      fontWeight: FontWeight.w900,
-                                    ),
-                                  ),
-                                  const SizedBox(height: S.xs),
-                                  Text(
-                                    profile.bio.isNotEmpty ? profile.bio : l10n.profileDefaultBio,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      color: scheme.onSurface.withValues(alpha: 0.68),
-                                      fontWeight: FontWeight.w600,
-                                      height: 1.2,
-                                    ),
-                                  ),
-                                ],
+            _TopBar(
+              onSettings: onSettings,
+              title: l10n.profileTitle,
+            ),
+            const SizedBox(height: S.sm),
+            Expanded(
+              child: ListView(
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  const _ProfileSectionLabel(label: 'Welcome'),
+                  const SizedBox(height: 6),
+                  Glass(
+                    radius: BorderRadius.circular(22),
+                    padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _AvatarGlow(
+                          size: 72,
+                          image: const AssetImage('assets/avatar/avatar_1.png'),
+                          showOnlineIndicator: false,
+                        ),
+                        const SizedBox(width: S.sm),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.guestSessionLabel,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color:
+                                      scheme.onSurface.withValues(alpha: 0.62),
+                                  fontWeight: FontWeight.w700,
+                                ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 2),
+                              Text(
+                                '@$username',
+                                style: textTheme.titleLarge?.copyWith(
+                                  color: scheme.onSurface,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              const SizedBox(height: S.xs),
+                              Text(
+                                profile.bio.isNotEmpty
+                                    ? profile.bio
+                                    : l10n.profileDefaultBio,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: textTheme.bodyMedium?.copyWith(
+                                  color:
+                                      scheme.onSurface.withValues(alpha: 0.68),
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: S.sm),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _GuestMiniStatCard(
+                          icon: Icons.local_fire_department_rounded,
+                          label: l10n.profileXpProgress,
+                          value: l10n.profileXpValue(profile.totalXp),
                         ),
                       ),
-                      const SizedBox(height: S.sm),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _GuestMiniStatCard(
-                              icon: Icons.local_fire_department_rounded,
-                              label: l10n.profileXpProgress,
-                              value: l10n.profileXpValue(profile.totalXp),
-                            ),
-                          ),
-                          const SizedBox(width: S.sm),
-                          Expanded(
-                            child: _GuestMiniStatCard(
-                              icon: Icons.timer_rounded,
-                              label: l10n.profileGoalLabel(profile.dailyGoalMinutes),
-                              value: l10n.minutesShort(profile.dailyGoalMinutes),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: S.sm),
-                      Glass(
-                        radius: BorderRadius.circular(22),
-                        padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.unlockFullProfile,
-                              style: textTheme.titleMedium?.copyWith(
-                                color: scheme.onSurface,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            const SizedBox(height: S.xs),
-                            _GuestInfoRow(icon: Icons.cloud_done_rounded, text: l10n.guestBenefitSync),
-                            const SizedBox(height: S.xs),
-                            _GuestInfoRow(icon: Icons.public_rounded, text: l10n.guestBenefitCircles),
-                            const SizedBox(height: S.xs),
-                            _GuestInfoRow(icon: Icons.notifications_active_rounded, text: l10n.guestBenefitNotifications),
-                          ],
+                      const SizedBox(width: S.sm),
+                      Expanded(
+                        child: _GuestMiniStatCard(
+                          icon: Icons.timer_rounded,
+                          label:
+                              l10n.profileGoalLabel(profile.dailyGoalMinutes),
+                          value: l10n.minutesShort(profile.dailyGoalMinutes),
                         ),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: S.md),
-                NeonButton(label: l10n.authCreateAccount, onTap: onSignUp),
-                const SizedBox(height: S.sm),
-                Glass(
-                  radius: BorderRadius.circular(999),
-                  padding: EdgeInsets.zero,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(999),
-                    onTap: onSignIn,
-                    child: SizedBox(
-                      height: 56,
-                      child: Center(
-                        child: Text(
-                          l10n.signIn,
+                  const SizedBox(height: S.sm),
+                  Glass(
+                    radius: BorderRadius.circular(22),
+                    padding: const EdgeInsets.fromLTRB(S.md, S.md, S.md, S.md),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.unlockFullProfile,
                           style: textTheme.titleMedium?.copyWith(
                             color: scheme.onSurface,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
+                        const SizedBox(height: S.xs),
+                        _GuestInfoRow(
+                            icon: Icons.cloud_done_rounded,
+                            text: l10n.guestBenefitSync),
+                        const SizedBox(height: S.xs),
+                        _GuestInfoRow(
+                            icon: Icons.public_rounded,
+                            text: l10n.guestBenefitCircles),
+                        const SizedBox(height: S.xs),
+                        _GuestInfoRow(
+                            icon: Icons.notifications_active_rounded,
+                            text: l10n.guestBenefitNotifications),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: S.md),
+            NeonButton(label: l10n.authCreateAccount, onTap: onSignUp),
+            const SizedBox(height: S.sm),
+            Glass(
+              radius: BorderRadius.circular(999),
+              padding: EdgeInsets.zero,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(999),
+                onTap: onSignIn,
+                child: SizedBox(
+                  height: 56,
+                  child: Center(
+                    child: Text(
+                      l10n.signIn,
+                      style: textTheme.titleMedium?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: S.xs),
-                Center(
-                  child: Text(
-                    l10n.progressStaysOnDevice,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: scheme.onSurface.withValues(alpha: 0.55),
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-      );
+            const SizedBox(height: S.xs),
+            Center(
+              child: Text(
+                l10n.progressStaysOnDevice,
+                style: textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurface.withValues(alpha: 0.55),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
+
 class _GuestMiniStatCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -919,7 +953,8 @@ class _HeaderCard extends StatelessWidget {
                 child: _AvatarGlow(
                   size: 64,
                   image: (profile.avatarUrl?.isNotEmpty == true)
-                      ? CachedNetworkImageProvider(profile.avatarUrl!) as ImageProvider
+                      ? CachedNetworkImageProvider(profile.avatarUrl!)
+                          as ImageProvider
                       : const AssetImage('assets/avatar/avatar_1.png'),
                   showOnlineIndicator: showOnlineIndicator,
                 ),
@@ -979,7 +1014,6 @@ class _HeaderCard extends StatelessWidget {
                           ),
                         ),
                       ),
-
                     ],
                   ),
                 ],
@@ -1022,7 +1056,8 @@ class _ProfileSpotlightCard extends StatelessWidget {
                 ],
               ),
             ),
-            child: Icon(Icons.info_outline_rounded, color: scheme.onPrimary, size: 22),
+            child: Icon(Icons.info_outline_rounded,
+                color: scheme.onPrimary, size: 22),
           ),
           const SizedBox(width: S.sm),
           Expanded(
@@ -1179,9 +1214,17 @@ class _StatsRow extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     return Row(
       children: [
-        Expanded(child: _StatTile(title: l10n.profileWins, value: '$wins', icon: Icons.emoji_events_rounded)),
+        Expanded(
+            child: _StatTile(
+                title: l10n.profileWins,
+                value: '$wins',
+                icon: Icons.emoji_events_rounded)),
         const SizedBox(width: S.sm),
-        Expanded(child: _StatTile(title: l10n.profileStreak, value: '$streak', icon: Icons.local_fire_department_rounded)),
+        Expanded(
+            child: _StatTile(
+                title: l10n.profileStreak,
+                value: '$streak',
+                icon: Icons.local_fire_department_rounded)),
       ],
     );
   }
@@ -1213,9 +1256,11 @@ class _StatTile extends StatelessWidget {
             decoration: BoxDecoration(
               color: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+              border:
+                  Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
             ),
-            child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.85), size: 20),
+            child: Icon(icon,
+                color: scheme.onSurface.withValues(alpha: 0.85), size: 20),
           ),
           const SizedBox(width: S.sm),
           Column(
@@ -1276,7 +1321,8 @@ class _FriendsCard extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (final _) => const FriendsScreen()),
+                    MaterialPageRoute(
+                        builder: (final _) => const FriendsScreen()),
                   );
                 },
                 child: Text(
@@ -1303,7 +1349,9 @@ class _FriendsCard extends StatelessWidget {
           else
             StreamBuilder<Map<String, bool>>(
               stream: presenceRepository.streamMultipleOnlineStatuses(
-                visibleFriends.map((final f) => f['id']?.toString() ?? '').toList(),
+                visibleFriends
+                    .map((final f) => f['id']?.toString() ?? '')
+                    .toList(),
               ),
               builder: (final context, final presenceSnapshot) {
                 final onlineStatuses = presenceSnapshot.data ?? {};
@@ -1313,13 +1361,19 @@ class _FriendsCard extends StatelessWidget {
                   children: [
                     for (final friend in visibleFriends)
                       _MiniAvatar(
-                        image: (friend['avatar_url']?.toString().isNotEmpty == true)
-                            ? CachedNetworkImageProvider(friend['avatar_url'].toString()) as ImageProvider
+                        image: (friend['avatar_url']?.toString().isNotEmpty ==
+                                true)
+                            ? CachedNetworkImageProvider(
+                                    friend['avatar_url'].toString())
+                                as ImageProvider
                             : const AssetImage('assets/avatar/avatar_1.png'),
-                        tooltip: '@${friend['username']?.toString() ?? 'friend'}',
-                        isOnline: onlineStatuses[friend['id']?.toString()] == true,
+                        tooltip:
+                            '@${friend['username']?.toString() ?? 'friend'}',
+                        isOnline:
+                            onlineStatuses[friend['id']?.toString()] == true,
                       ),
-                    if (remainingCount > 0) _MiniAvatarPlus(count: remainingCount),
+                    if (remainingCount > 0)
+                      _MiniAvatarPlus(count: remainingCount),
                   ],
                 );
               },
@@ -1358,7 +1412,6 @@ class _AchievementsCard extends StatelessWidget {
                   ),
                 ),
               ),
-
             ],
           ),
           const SizedBox(height: S.sm),
@@ -1478,7 +1531,8 @@ class _VisitorActionsCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                child: Icon(Icons.handshake_rounded, color: scheme.onPrimary, size: 19),
+                child: Icon(Icons.handshake_rounded,
+                    color: scheme.onPrimary, size: 19),
               ),
               const SizedBox(width: S.sm),
               Expanded(
@@ -1519,7 +1573,9 @@ class _VisitorActionsCard extends StatelessWidget {
               const SizedBox(width: S.xs),
               Expanded(
                 child: _ActionButton(
-                  icon: requestSent ? Icons.undo_rounded : Icons.person_add_alt_1_rounded,
+                  icon: requestSent
+                      ? Icons.undo_rounded
+                      : Icons.person_add_alt_1_rounded,
                   label: friendLabel,
                   onTap: isSending || isBlocked ? null : onAddFriend,
                 ),
@@ -1531,11 +1587,13 @@ class _VisitorActionsCard extends StatelessWidget {
             Container(
               width: double.infinity,
               margin: const EdgeInsets.only(bottom: S.xs),
-              padding: const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.xs),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: S.sm, vertical: S.xs),
               decoration: BoxDecoration(
                 color: scheme.surfaceContainerHighest.withValues(alpha: 0.65),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+                border:
+                    Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
               ),
               child: Text(
                 isBlocked
@@ -1587,7 +1645,9 @@ class _ActionButton extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         gradient: primary ? T.neonGradient : null,
-        color: primary ? null : scheme.surfaceContainerHighest.withValues(alpha: 0.7),
+        color: primary
+            ? null
+            : scheme.surfaceContainerHighest.withValues(alpha: 0.7),
         border: Border.all(
           color: scheme.onSurface.withValues(alpha: primary ? 0.18 : 0.14),
         ),
@@ -1606,14 +1666,16 @@ class _ActionButton extends StatelessWidget {
         children: [
           Icon(
             icon,
-            color: (primary ? scheme.onPrimary : scheme.onSurface).withValues(alpha: primary ? 0.98 : 0.9),
+            color: (primary ? scheme.onPrimary : scheme.onSurface)
+                .withValues(alpha: primary ? 0.98 : 0.9),
             size: 18,
           ),
           const SizedBox(width: S.xs),
           Text(
             label,
             style: textTheme.bodyMedium?.copyWith(
-              color: (primary ? scheme.onPrimary : scheme.onSurface).withValues(alpha: primary ? 0.98 : 0.9),
+              color: (primary ? scheme.onPrimary : scheme.onSurface)
+                  .withValues(alpha: primary ? 0.98 : 0.9),
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -1648,18 +1710,25 @@ class _VisitorOverviewCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final location = profile.location.isNotEmpty ? profile.location : l10n.profileLocationHidden;
+    final location = profile.location.isNotEmpty
+        ? profile.location
+        : l10n.profileLocationHidden;
     final bio = profile.bio.isNotEmpty ? profile.bio : l10n.profileBioHidden;
 
     final signals = <({IconData icon, String label, bool active})>[
       (
-        icon: profile.showOnlineStatus ? Icons.circle_rounded : Icons.circle_outlined,
-        label: profile.showOnlineStatus ? 'Online status visible' : 'Online status hidden',
+        icon: profile.showOnlineStatus
+            ? Icons.circle_rounded
+            : Icons.circle_outlined,
+        label: profile.showOnlineStatus
+            ? 'Online status visible'
+            : 'Online status hidden',
         active: profile.showOnlineStatus,
       ),
       (
         icon: isBlocked ? Icons.block_rounded : Icons.mark_email_read_rounded,
-        label: isBlocked ? 'Messaging disabled (blocked)' : 'Messaging available',
+        label:
+            isBlocked ? 'Messaging disabled (blocked)' : 'Messaging available',
         active: !isBlocked,
       ),
       (
@@ -1689,7 +1758,8 @@ class _VisitorOverviewCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                child: Icon(Icons.account_circle_rounded, color: scheme.onPrimary, size: 22),
+                child: Icon(Icons.account_circle_rounded,
+                    color: scheme.onPrimary, size: 22),
               ),
               const SizedBox(width: S.sm),
               Expanded(
@@ -1823,7 +1893,8 @@ class _VisitorMetricTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
-  const _VisitorMetricTile({required this.icon, required this.title, required this.value});
+  const _VisitorMetricTile(
+      {required this.icon, required this.title, required this.value});
 
   @override
   Widget build(final BuildContext context) {
@@ -1955,7 +2026,8 @@ class _AvatarGlow extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xFF58F7B6),
-                  border: Border.all(color: scheme.surface.withValues(alpha: 0.7), width: 2),
+                  border: Border.all(
+                      color: scheme.surface.withValues(alpha: 0.7), width: 2),
                 ),
               ),
             ),
@@ -2042,7 +2114,8 @@ class _BadgeTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final bool unlocked;
-  const _BadgeTile({required this.icon, required this.title, required this.unlocked});
+  const _BadgeTile(
+      {required this.icon, required this.title, required this.unlocked});
 
   @override
   Widget build(final BuildContext context) {
@@ -2055,7 +2128,9 @@ class _BadgeTile extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: scheme.onSurface.withValues(alpha: 0.90 * opacity), size: 26),
+          Icon(icon,
+              color: scheme.onSurface.withValues(alpha: 0.90 * opacity),
+              size: 26),
           const SizedBox(height: S.xs),
           Text(
             title,
@@ -2070,8 +2145,12 @@ class _BadgeTile extends StatelessWidget {
     );
 
     if (unlocked) {
-      return tile.animate(onPlay: (final controller) => controller.repeat(reverse: true))
-          .shimmer(duration: const Duration(seconds: 3), color: scheme.primary.withValues(alpha: 0.15));
+      return tile
+          .animate(
+              onPlay: (final controller) => controller.repeat(reverse: true))
+          .shimmer(
+              duration: const Duration(seconds: 3),
+              color: scheme.primary.withValues(alpha: 0.15));
     }
     return tile;
   }

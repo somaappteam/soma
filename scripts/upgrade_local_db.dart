@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:path/path.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
@@ -10,13 +11,13 @@ void main() async {
   final dbPath = await getDatabasesPath();
   final path = join(dbPath, 'soma_local.db');
 
-  print('--- Manual SQLite Upgrade ---');
-  print('Database Path: $path');
+  appLogger.info('--- Manual SQLite Upgrade ---');
+  appLogger.info('Database Path: $path');
 
   final db = await openDatabase(path, version: 3);
 
-  print("\nCreating missing tables if they don't exist...");
-  
+  appLogger.info("\nCreating missing tables if they don't exist...");
+
   final sql = [
     '''
     CREATE TABLE IF NOT EXISTS user_learned_items (
@@ -71,18 +72,27 @@ void main() async {
     await db.execute(query);
   }
 
-  print('\nVerification...');
-  final tables = ['courses', 'vocabulary', 'sentences', 'profiles', 'user_stats', 'user_courses', 'user_learned_items'];
+  appLogger.info('\nVerification...');
+  final tables = [
+    'courses',
+    'vocabulary',
+    'sentences',
+    'profiles',
+    'user_stats',
+    'user_courses',
+    'user_learned_items'
+  ];
   for (final table in tables) {
-    final res = await db.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='$table'");
+    final res = await db.rawQuery(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'");
     if (res.isNotEmpty) {
-      print("[OK] Table '$table' successfully provisioned.");
+      appLogger.info("[OK] Table '$table' successfully provisioned.");
     } else {
-      print("[FAIL] Table '$table' still missing!");
+      appLogger.info("[FAIL] Table '$table' still missing!");
     }
   }
 
   await db.close();
-  print('\n--- Upgrade Complete ---');
+  appLogger.info('\n--- Upgrade Complete ---');
   exit(0);
 }

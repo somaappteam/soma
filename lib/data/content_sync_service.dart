@@ -74,7 +74,8 @@ class ContentSyncService {
       );
       await _runStep(
         'user_stats',
-        () => _syncUserStats(userId, settings['sync_cursor_user_stats']?.toString()),
+        () => _syncUserStats(
+            userId, settings['sync_cursor_user_stats']?.toString()),
         failedSteps,
         stepDurationsMs,
       );
@@ -97,9 +98,13 @@ class ContentSyncService {
     );
 
     if (result.success) {
-      appLogger.info('Content sync completed', context: {'duration_ms': duration.inMilliseconds});
+      appLogger.info('Content sync completed',
+          context: {'duration_ms': duration.inMilliseconds});
     } else {
-      appLogger.warning('Content sync completed with failures', context: {'duration_ms': duration.inMilliseconds, 'failed_steps': failedSteps});
+      appLogger.warning('Content sync completed with failures', context: {
+        'duration_ms': duration.inMilliseconds,
+        'failed_steps': failedSteps
+      });
     }
 
     return result;
@@ -116,10 +121,13 @@ class ContentSyncService {
       await action();
     } catch (e, st) {
       failedSteps.add(name);
-      appLogger.error('Sync step failed', context: {'step': name}, error: e, stackTrace: st);
-      await errorReporter.capture(e, st, hint: 'ContentSyncService._runStep::$name');
+      appLogger.error('Sync step failed',
+          context: {'step': name}, error: e, stackTrace: st);
+      await errorReporter.capture(e, st,
+          hint: 'ContentSyncService._runStep::$name');
     } finally {
-      stepDurationsMs[name] = DateTime.now().difference(startedAt).inMilliseconds;
+      stepDurationsMs[name] =
+          DateTime.now().difference(startedAt).inMilliseconds;
     }
   }
 
@@ -136,7 +144,8 @@ class ContentSyncService {
 
     if (cursor != null && cursor.isNotEmpty) {
       try {
-        dynamic cursorQuery = _supabase.from(table).select().gte('updated_at', cursor);
+        dynamic cursorQuery =
+            _supabase.from(table).select().gte('updated_at', cursor);
         if (userFilterColumn != null && userFilterValue != null) {
           cursorQuery = cursorQuery.eq(userFilterColumn, userFilterValue);
         }
@@ -165,7 +174,8 @@ class ContentSyncService {
     return latest?.toIso8601String();
   }
 
-  Future<void> _persistCursor(final String key, final List<Map<String, dynamic>> rows) async {
+  Future<void> _persistCursor(
+      final String key, final List<Map<String, dynamic>> rows) async {
     final latest = _latestUpdatedAt(rows);
     if (latest != null) {
       await settingsRepository.updateSetting(key, latest);
@@ -182,7 +192,8 @@ class ContentSyncService {
   }
 
   Future<void> _syncVocabulary(final String? cursor) async {
-    final response = await _selectWithCursor(table: 'vocabulary', cursor: cursor);
+    final response =
+        await _selectWithCursor(table: 'vocabulary', cursor: cursor);
     for (final row in response) {
       await _dbHelper.upsertVocabulary(row);
     }
@@ -191,7 +202,8 @@ class ContentSyncService {
   }
 
   Future<void> _syncSentences(final String? cursor) async {
-    final response = await _selectWithCursor(table: 'sentences', cursor: cursor);
+    final response =
+        await _selectWithCursor(table: 'sentences', cursor: cursor);
     for (final row in response) {
       await _dbHelper.upsertSentence(row);
     }
@@ -214,7 +226,8 @@ class ContentSyncService {
     }
   }
 
-  Future<void> _syncUserProgress(final String userId, final Map<String, dynamic> settings) async {
+  Future<void> _syncUserProgress(
+      final String userId, final Map<String, dynamic> settings) async {
     final coursesResp = await _selectWithCursor(
       table: 'user_courses',
       cursor: settings['sync_cursor_user_courses']?.toString(),
@@ -261,8 +274,9 @@ class ContentSyncService {
   Future<void> _processOfflineQueue() async {
     final items = await offlineQueueRepository.getAll();
     if (items.isEmpty) return;
-    
-    appLogger.info('Processing offline queue', context: {'count': items.length});
+
+    appLogger
+        .info('Processing offline queue', context: {'count': items.length});
     final currentUserId = _supabase.auth.currentUser?.id;
 
     for (int i = 0; i < items.length; i++) {
@@ -281,7 +295,10 @@ class ContentSyncService {
         if (item.data['user_id'] != currentUserId) {
           appLogger.warning(
             'Offline queue user mismatch',
-            context: {'item_user_id': item.data['user_id']?.toString(), 'current_user_id': currentUserId},
+            context: {
+              'item_user_id': item.data['user_id']?.toString(),
+              'current_user_id': currentUserId
+            },
           );
         }
 
@@ -292,18 +309,28 @@ class ContentSyncService {
           } else if (item.tableName == 'user_courses') {
             onConflict = 'user_id,course_id';
           }
-          await _supabase.from(item.tableName).upsert(item.data, onConflict: onConflict);
+          await _supabase
+              .from(item.tableName)
+              .upsert(item.data, onConflict: onConflict);
         } else if (item.operation == 'RPC') {
-           final funcName = item.tableName.split(':').last;
-           await _supabase.rpc(funcName, params: item.data);
+          final funcName = item.tableName.split(':').last;
+          await _supabase.rpc(funcName, params: item.data);
         }
         await offlineQueueRepository.delete(item.id!);
       } catch (e, st) {
-        appLogger.error('Offline queue item failed', context: {'item_id': item.id, 'table': item.tableName}, error: e, stackTrace: st);
-        await errorReporter.capture(e, st, hint: 'ContentSyncService._processOfflineQueue');
+        appLogger.error('Offline queue item failed',
+            context: {'item_id': item.id, 'table': item.tableName},
+            error: e,
+            stackTrace: st);
+        await errorReporter.capture(e, st,
+            hint: 'ContentSyncService._processOfflineQueue');
         final es = e.toString();
-        if (e is PostgrestException || es.contains('PostgrestException') || es.contains('PGRST')) {
-          appLogger.warning('Dropping offline queue item after permanent database/schema error', context: {'item_id': item.id});
+        if (e is PostgrestException ||
+            es.contains('PostgrestException') ||
+            es.contains('PGRST')) {
+          appLogger.warning(
+              'Dropping offline queue item after permanent database/schema error',
+              context: {'item_id': item.id});
           await offlineQueueRepository.delete(item.id!);
         } else {
           rethrow;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soma/core/i18n/ui_language.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/core/services/haptics_service.dart';
 import 'package:soma/core/services/theme_mode_controller.dart';
 import 'package:soma/core/theme/spacing.dart';
@@ -27,7 +28,8 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  static const _appVersion = String.fromEnvironment('APP_VERSION', defaultValue: '1.0.0');
+  static const _appVersion =
+      String.fromEnvironment('APP_VERSION', defaultValue: '1.0.0');
   late Stream<Map<String, dynamic>> _settingsStream;
   bool _guestShowTranslation = true;
   bool _guestShowReading = true;
@@ -67,27 +69,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final settings = await settingsRepository.getSettings();
     if (!mounted) return;
     setState(() {
-      _guestShowTranslation = settings['show_translation'] ?? _guestShowTranslation;
+      _guestShowTranslation =
+          settings['show_translation'] ?? _guestShowTranslation;
       _guestShowReading = settings['show_reading'] ?? _guestShowReading;
       _guestMusic = settings['bg_music'] ?? _guestMusic;
       _guestSfx = settings['sfx_enabled'] ?? _guestSfx;
       _guestHaptics = settings['haptics_enabled'] ?? _guestHaptics;
-      _guestNotifications = settings['push_notifications'] ?? _guestNotifications;
+      _guestNotifications =
+          settings['push_notifications'] ?? _guestNotifications;
       _guestThemeMode = settings['theme_mode'] ?? _guestThemeMode;
-      _guestLanguageUi = normalizeUiLanguageCode(settings['language_ui']?.toString());
-      _guestTimerSeconds = (settings['default_timer_s'] as num?)?.toInt() ?? _guestTimerSeconds;
-      _guestDifficulty = settings['match_difficulty']?.toString() ?? _guestDifficulty;
-      _guestDailyReminder = settings['daily_reminder']?.toString() ?? _guestDailyReminder;
-      _guestTier = SomaPlusRepository.parseTier(settings['plus_plan']?.toString());
+      _guestLanguageUi =
+          normalizeUiLanguageCode(settings['language_ui']?.toString());
+      _guestTimerSeconds =
+          (settings['default_timer_s'] as num?)?.toInt() ?? _guestTimerSeconds;
+      _guestDifficulty =
+          settings['match_difficulty']?.toString() ?? _guestDifficulty;
+      _guestDailyReminder =
+          settings['daily_reminder']?.toString() ?? _guestDailyReminder;
+      _guestTier =
+          SomaPlusRepository.parseTier(settings['plus_plan']?.toString());
     });
   }
 
-  Future<void> _pickTimerSeconds({required final int current, required final ValueChanged<int> onSelected}) async {
+  Future<void> _pickTimerSeconds(
+      {required final int current,
+      required final ValueChanged<int> onSelected}) async {
     final options = [10, 15, 20, 25, 30];
     final result = await showModalBottomSheet<int>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (final ctx) => _BottomSheetList<int>(
         title: AppLocalizations.of(context).settingsDefaultTimerPerQuestion,
         options: options,
@@ -98,7 +110,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (result != null) onSelected(result);
   }
 
-  Future<void> _pickDifficulty({required final String current, required final ValueChanged<String> onSelected}) async {
+  Future<void> _pickDifficulty(
+      {required final String current,
+      required final ValueChanged<String> onSelected}) async {
     final options = <_BottomSheetOption<String>>[
       const _BottomSheetOption(value: 'Adaptive', label: 'Adaptive'),
       const _BottomSheetOption(value: 'Easy', label: 'Easy'),
@@ -108,23 +122,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final result = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (final ctx) => _BottomSheetList<String>(
         title: AppLocalizations.of(context).settingsMatchDifficulty,
         options: options.map((final o) => o.value).toList(),
         current: current,
-        labelBuilder: (final value) => options.firstWhere((final o) => o.value == value).label,
+        labelBuilder: (final value) =>
+            options.firstWhere((final o) => o.value == value).label,
       ),
     );
     if (result != null) onSelected(result);
   }
 
-  Future<void> _pickDailyReminder({required final String current, required final ValueChanged<String> onSelected}) async {
+  Future<void> _pickDailyReminder(
+      {required final String current,
+      required final ValueChanged<String> onSelected}) async {
     final options = ['08:00', '12:00', '17:00', '20:00', '22:00'];
     final result = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (final ctx) => _BottomSheetList<String>(
         title: AppLocalizations.of(context).settingsDailyReminder,
         options: options,
@@ -143,13 +162,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
         'subject': 'Soma App Support',
       },
     );
-     try {
+    try {
       if (await canLaunchUrl(emailLaunchUri)) {
         await launchUrl(emailLaunchUri);
       }
     } catch (e) {
       // Ignore errors if no email client is installed
-      debugPrint('Could not launch email: $e');
+      appLogger.debug('Could not launch email: $e');
     }
   }
 
@@ -159,7 +178,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: scheme.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (final ctx) => Padding(
         padding: const EdgeInsets.fromLTRB(S.lg, S.md, S.lg, S.xl),
         child: Column(
@@ -168,23 +188,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
           children: [
             Text(
               l10n.settingsSupport,
-              style: TextStyle(color: scheme.onSurface, fontSize: 18, fontWeight: FontWeight.w900),
+              style: TextStyle(
+                  color: scheme.onSurface,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: S.xs),
             Text(
               'Reach us any time for help, feedback, or account support.',
-              style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
+              style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.7),
+                  fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: S.md),
             InkWell(
               onTap: _launchEmail,
               borderRadius: BorderRadius.circular(8),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
                 child: Text(
                   'somaapp.team@gmail.com',
                   style: TextStyle(
-                    color: scheme.primary, 
+                    color: scheme.primary,
                     fontWeight: FontWeight.w800,
                     decoration: TextDecoration.underline,
                     decorationColor: scheme.primary,
@@ -199,7 +225,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onPressed: () => Navigator.pop(ctx),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: scheme.onSurface,
-                  side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.4)),
+                  side: BorderSide(
+                      color: scheme.onSurface.withValues(alpha: 0.4)),
                 ),
                 child: const Text('Close'),
               ),
@@ -209,8 +236,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-
-
 
   Widget _buildAccountCenter(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -225,7 +250,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () => showPremiumDialog(
               context: context,
               title: 'Manage subscription',
-              body: 'Subscription controls are managed by your app store billing account.',
+              body:
+                  'Subscription controls are managed by your app store billing account.',
               confirmText: 'Got it',
             ),
           ),
@@ -236,7 +262,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () => showPremiumDialog(
               context: context,
               title: 'Restore purchases',
-              body: 'Restores are supported for the same store account on this device.',
+              body:
+                  'Restores are supported for the same store account on this device.',
               confirmText: 'Continue',
             ),
           ),
@@ -247,7 +274,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () => showPremiumDialog(
               context: context,
               title: 'Invoice history',
-              body: 'Invoices and receipts are available in your store purchase history.',
+              body:
+                  'Invoices and receipts are available in your store purchase history.',
               confirmText: 'Open store',
             ),
           ),
@@ -276,11 +304,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('App version: $_appVersion', style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700)),
+          Text('App version: $_appVersion',
+              style: TextStyle(
+                  color: scheme.onSurface, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          Text('Last sync check: $hh:$mm', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75), fontWeight: FontWeight.w600, fontSize: 12)),
+          Text('Last sync check: $hh:$mm',
+              style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.75),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12)),
           const SizedBox(height: 4),
-          Text('Service status: Operational', style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.75), fontWeight: FontWeight.w600, fontSize: 12)),
+          Text('Service status: Operational',
+              style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.75),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12)),
         ],
       ),
     );
@@ -307,13 +345,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
       for (final language in kSupportedUiLanguages)
         _DropdownItem(language.code, language.labelBuilder(l10n)),
     ];
-    final guestThemeValue = themeItems.any((final item) => item.value == _guestThemeMode)
-        ? _guestThemeMode
-        : themeItems.first.value;
+    final guestThemeValue =
+        themeItems.any((final item) => item.value == _guestThemeMode)
+            ? _guestThemeMode
+            : themeItems.first.value;
     final normalizedGuestLanguage = normalizeUiLanguageCode(_guestLanguageUi);
-    final guestLanguageValue = languageItems.any((final item) => item.value == normalizedGuestLanguage)
-        ? normalizedGuestLanguage
-        : languageItems.first.value;
+    final guestLanguageValue =
+        languageItems.any((final item) => item.value == normalizedGuestLanguage)
+            ? normalizedGuestLanguage
+            : languageItems.first.value;
     return ListView(
       physics: const BouncingScrollPhysics(),
       children: [
@@ -329,7 +369,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             onTap: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (final _) => const SomaPlusPlansScreen()),
+                MaterialPageRoute(
+                    builder: (final _) => const SomaPlusPlansScreen()),
               );
               if (!mounted) return;
               await _loadGuestSettings();
@@ -518,13 +559,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.info_rounded,
                 label: l10n.settingsVersion,
                 trailingText: _appVersion,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const AboutScreen(view: AboutView.version))),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (final _) =>
+                            const AboutScreen(view: AboutView.version))),
               ),
               _DividerSoft(),
               _NavRow(
                 icon: Icons.description_rounded,
                 label: l10n.settingsTermsPrivacy,
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const AboutScreen(view: AboutView.termsAndPrivacy))),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (final _) => const AboutScreen(
+                            view: AboutView.termsAndPrivacy))),
               ),
               _DividerSoft(),
               _NavRow(
@@ -555,326 +604,372 @@ class _SettingsScreenState extends State<SettingsScreen> {
     ];
     return Scaffold(
       body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(S.md, S.sm, S.md, S.md),
-            child: Column(
-              children: [
-                _TopBar(
-                  title: l10n.settingsTitle,
-                  onBack: () => Navigator.pop(context),
-                ),
-                const SizedBox(height: S.sm),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(S.md, S.sm, S.md, S.md),
+          child: Column(
+            children: [
+              _TopBar(
+                title: l10n.settingsTitle,
+                onBack: () => Navigator.pop(context),
+              ),
+              const SizedBox(height: S.sm),
+              Expanded(
+                child: isGuest
+                    ? _buildGuestSettings(context)
+                    : StreamBuilder<Map<String, dynamic>>(
+                        stream: _settingsStream,
+                        builder: (final context, final snapshot) {
+                          final data = snapshot.data ?? {};
 
-                Expanded(
-                  child: isGuest ? _buildGuestSettings(context) : StreamBuilder<Map<String, dynamic>>(
-                    stream: _settingsStream,
-                    builder: (final context, final snapshot) {
-                      final data = snapshot.data ?? {};
-                       
-                      final showTranslation = data['show_translation'] ?? true;
-                      final showReading = data['show_reading'] ?? true;
-                       
-                      final music = data['bg_music'] ?? true;
-                      final sfx = data['sfx_enabled'] ?? true;
-                      final haptics = data['haptics_enabled'] ?? true;
-                       
-                      final notifications = data['push_notifications'] ?? true;
-                      final timerSeconds = (data['default_timer_s'] as num?)?.toInt() ?? 15;
-                      final difficulty = data['match_difficulty']?.toString() ?? 'Adaptive';
-                      final dailyReminder = data['daily_reminder']?.toString() ?? '20:00';
-                       
-                      final themeMode = data['theme_mode'] ?? 'System';
-                      final languageUi = normalizeUiLanguageCode(data['language_ui']?.toString());
-                      final subscriptionTier = SomaPlusRepository.parseTier(data['plus_plan']?.toString());
-                      final themeModeValue = themeItems.any((final item) => item.value == themeMode)
-                          ? themeMode
-                          : themeItems.first.value;
-                      final languageUiValue = languageItems.any((final item) => item.value == languageUi)
-                          ? languageUi
-                          : languageItems.first.value;
+                          final showTranslation =
+                              data['show_translation'] ?? true;
+                          final showReading = data['show_reading'] ?? true;
 
-                      if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
+                          final music = data['bg_music'] ?? true;
+                          final sfx = data['sfx_enabled'] ?? true;
+                          final haptics = data['haptics_enabled'] ?? true;
 
-                      return ListView(
-                        physics: const BouncingScrollPhysics(),
-                        children: [
-                          const _SectionTitle('Soma Plus'),
-                          const SizedBox(height: S.xs),
-                          Glass(
-                            radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(S.sm),
-                            child: _NavRow(
-                              icon: Icons.workspace_premium_rounded,
-                              label: 'Soma Plus plans',
-                              trailingText: subscriptionTier.name.toUpperCase(),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (final _) => const SomaPlusPlansScreen(),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: S.md),
-                          _SectionTitle(l10n.settingsSectionAccount),
-                          const SizedBox(height: S.xs),
-                          Glass(
-                            radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(S.sm),
-                            child: Column(
-                              children: [
-                                _NavRow(
-                                  icon: Icons.person_rounded,
-                                  label: l10n.settingsEditProfile,
+                          final notifications =
+                              data['push_notifications'] ?? true;
+                          final timerSeconds =
+                              (data['default_timer_s'] as num?)?.toInt() ?? 15;
+                          final difficulty =
+                              data['match_difficulty']?.toString() ??
+                                  'Adaptive';
+                          final dailyReminder =
+                              data['daily_reminder']?.toString() ?? '20:00';
+
+                          final themeMode = data['theme_mode'] ?? 'System';
+                          final languageUi = normalizeUiLanguageCode(
+                              data['language_ui']?.toString());
+                          final subscriptionTier = SomaPlusRepository.parseTier(
+                              data['plus_plan']?.toString());
+                          final themeModeValue = themeItems
+                                  .any((final item) => item.value == themeMode)
+                              ? themeMode
+                              : themeItems.first.value;
+                          final languageUiValue = languageItems
+                                  .any((final item) => item.value == languageUi)
+                              ? languageUi
+                              : languageItems.first.value;
+
+                          if (snapshot.connectionState ==
+                                  ConnectionState.waiting &&
+                              !snapshot.hasData) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          }
+
+                          return ListView(
+                            physics: const BouncingScrollPhysics(),
+                            children: [
+                              const _SectionTitle('Soma Plus'),
+                              const SizedBox(height: S.xs),
+                              Glass(
+                                radius: BorderRadius.circular(22),
+                                padding: const EdgeInsets.all(S.sm),
+                                child: _NavRow(
+                                  icon: Icons.workspace_premium_rounded,
+                                  label: 'Soma Plus plans',
+                                  trailingText:
+                                      subscriptionTier.name.toUpperCase(),
                                   onTap: () {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (final _) => const EditProfileScreen()),
+                                      MaterialPageRoute(
+                                        builder: (final _) =>
+                                            const SomaPlusPlansScreen(),
+                                      ),
                                     );
                                   },
                                 ),
-                                _DividerSoft(),
-                                _NavRow(
-                                  icon: Icons.lock_rounded,
-                                  label: l10n.settingsPrivacy,
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (final _) => const PrivacySettingsScreen()),
+                              ),
+                              const SizedBox(height: S.md),
+                              _SectionTitle(l10n.settingsSectionAccount),
+                              const SizedBox(height: S.xs),
+                              Glass(
+                                radius: BorderRadius.circular(22),
+                                padding: const EdgeInsets.all(S.sm),
+                                child: Column(
+                                  children: [
+                                    _NavRow(
+                                      icon: Icons.person_rounded,
+                                      label: l10n.settingsEditProfile,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (final _) =>
+                                                  const EditProfileScreen()),
+                                        );
+                                      },
+                                    ),
+                                    _DividerSoft(),
+                                    _NavRow(
+                                      icon: Icons.lock_rounded,
+                                      label: l10n.settingsPrivacy,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (final _) =>
+                                                  const PrivacySettingsScreen()),
+                                        );
+                                      },
+                                    ),
+                                    _DividerSoft(),
+                                    _NavRow(
+                                      icon: Icons.security_rounded,
+                                      label: l10n.settingsSecurity,
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (final _) =>
+                                                  const SecuritySettingsScreen()),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: S.md),
+                              _SectionTitle(l10n.settingsSectionGameplay),
+                              const SizedBox(height: S.xs),
+                              Glass(
+                                radius: BorderRadius.circular(22),
+                                padding: const EdgeInsets.all(S.sm),
+                                child: Column(
+                                  children: [
+                                    _ToggleRow(
+                                      icon: Icons.translate_rounded,
+                                      label: l10n.settingsShowTranslationLine,
+                                      value: showTranslation,
+                                      onChanged: (final v) => settingsRepository
+                                          .updateSetting('show_translation', v),
+                                    ),
+                                    _DividerSoft(),
+                                    _ToggleRow(
+                                      icon: Icons.text_fields_rounded,
+                                      label: l10n.settingsShowReadingLine,
+                                      value: showReading,
+                                      onChanged: (final v) => settingsRepository
+                                          .updateSetting('show_reading', v),
+                                    ),
+                                    _DividerSoft(),
+                                    _NavRow(
+                                      icon: Icons.timer_rounded,
+                                      label:
+                                          l10n.settingsDefaultTimerPerQuestion,
+                                      trailingText: '${timerSeconds}s',
+                                      onTap: () => _pickTimerSeconds(
+                                        current: timerSeconds,
+                                        onSelected: (final value) =>
+                                            settingsRepository.updateSetting(
+                                                'default_timer_s', value),
+                                      ),
+                                    ),
+                                    _DividerSoft(),
+                                    _NavRow(
+                                      icon: Icons.bar_chart_rounded,
+                                      label: l10n.settingsMatchDifficulty,
+                                      trailingText: difficulty == 'Adaptive'
+                                          ? l10n.settingsMatchDifficultyAdaptive
+                                          : difficulty,
+                                      onTap: () => _pickDifficulty(
+                                        current: difficulty,
+                                        onSelected: (final value) =>
+                                            settingsRepository.updateSetting(
+                                                'match_difficulty', value),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: S.md),
+                              _SectionTitle(l10n.settingsSectionSoundFeel),
+                              const SizedBox(height: S.xs),
+                              Glass(
+                                radius: BorderRadius.circular(22),
+                                padding: const EdgeInsets.all(S.sm),
+                                child: Column(
+                                  children: [
+                                    _ToggleRow(
+                                      icon: Icons.music_note_rounded,
+                                      label: l10n.settingsMusic,
+                                      value: music,
+                                      onChanged: (final v) => settingsRepository
+                                          .updateSetting('bg_music', v),
+                                    ),
+                                    _DividerSoft(),
+                                    _ToggleRow(
+                                      icon: Icons.volume_up_rounded,
+                                      label: l10n.settingsSoundEffects,
+                                      value: sfx,
+                                      onChanged: (final v) => settingsRepository
+                                          .updateSetting('sfx_enabled', v),
+                                    ),
+                                    _DividerSoft(),
+                                    _ToggleRow(
+                                      icon: Icons.vibration_rounded,
+                                      label: l10n.settingsHaptics,
+                                      value: haptics,
+                                      onChanged: (final v) => settingsRepository
+                                          .updateSetting('haptics_enabled', v),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: S.md),
+                              _SectionTitle(l10n.settingsSectionNotifications),
+                              const SizedBox(height: S.xs),
+                              Glass(
+                                radius: BorderRadius.circular(22),
+                                padding: const EdgeInsets.all(S.sm),
+                                child: Column(
+                                  children: [
+                                    _ToggleRow(
+                                      icon: Icons.notifications_rounded,
+                                      label: l10n.settingsPushNotifications,
+                                      value: notifications,
+                                      onChanged: (final v) =>
+                                          settingsRepository.updateSetting(
+                                              'push_notifications', v),
+                                    ),
+                                    _DividerSoft(),
+                                    _NavRow(
+                                      icon: Icons.schedule_rounded,
+                                      label: l10n.settingsDailyReminder,
+                                      trailingText: _formatTime(dailyReminder),
+                                      onTap: () => _pickDailyReminder(
+                                        current: dailyReminder,
+                                        onSelected: (final value) =>
+                                            settingsRepository.updateSetting(
+                                                'daily_reminder', value),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: S.md),
+                              _SectionTitle(l10n.settingsSectionAppearance),
+                              const SizedBox(height: S.xs),
+                              Glass(
+                                radius: BorderRadius.circular(22),
+                                padding: const EdgeInsets.all(S.sm),
+                                child: Column(
+                                  children: [
+                                    _DropdownRow(
+                                      icon: Icons.dark_mode_rounded,
+                                      label: l10n.settingsTheme,
+                                      value: themeModeValue,
+                                      items: themeItems,
+                                      onChanged: (final v) {
+                                        settingsRepository.updateSetting(
+                                            'theme_mode', v);
+                                        themeModeController
+                                            .setModeFromSetting(v);
+                                      },
+                                    ),
+                                    _DividerSoft(),
+                                    _DropdownRow(
+                                      icon: Icons.language_rounded,
+                                      label: l10n.settingsUiLanguage,
+                                      value: languageUiValue,
+                                      items: languageItems,
+                                      onChanged: (final v) => settingsRepository
+                                          .updateSetting('language_ui', v),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: S.md),
+                              const _SectionTitle('Account center'),
+                              const SizedBox(height: S.xs),
+                              _buildAccountCenter(context),
+                              const SizedBox(height: S.md),
+                              _buildTrustFooter(context),
+                              const SizedBox(height: S.md),
+                              _SectionTitle(l10n.settingsSectionAbout),
+                              const SizedBox(height: S.xs),
+                              Glass(
+                                radius: BorderRadius.circular(22),
+                                padding: const EdgeInsets.all(S.sm),
+                                child: Column(
+                                  children: [
+                                    _NavRow(
+                                      icon: Icons.info_rounded,
+                                      label: l10n.settingsVersion,
+                                      trailingText: _appVersion,
+                                      onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (final _) =>
+                                                  const AboutScreen(
+                                                      view:
+                                                          AboutView.version))),
+                                    ),
+                                    _DividerSoft(),
+                                    _NavRow(
+                                      icon: Icons.description_rounded,
+                                      label: l10n.settingsTermsPrivacy,
+                                      onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (final _) =>
+                                                  const AboutScreen(
+                                                      view: AboutView
+                                                          .termsAndPrivacy))),
+                                    ),
+                                    _DividerSoft(),
+                                    _NavRow(
+                                      icon: Icons.support_agent_rounded,
+                                      label: l10n.settingsSupport,
+                                      onTap: _showSupportSheet,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: S.md),
+                              Glass(
+                                radius: BorderRadius.circular(22),
+                                padding: const EdgeInsets.all(S.sm),
+                                child: _DangerRow(
+                                  icon: Icons.logout_rounded,
+                                  label: l10n.settingsLogout,
+                                  onTap: () async {
+                                    final confirmed = await showPremiumDialog(
+                                      context: context,
+                                      title: l10n.settingsLogout,
+                                      body:
+                                          'You can sign back in at any time to continue your progress.',
+                                      confirmText: l10n.settingsLogout,
+                                      cancelText: l10n.cancel,
+                                      destructive: true,
+                                    );
+                                    if (confirmed != true) return;
+                                    await authRepository.signOut();
+                                    profileStore.reset();
+                                    if (!context.mounted) return;
+                                    Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (final _) =>
+                                              const WelcomeScreen()),
+                                      (final route) => false,
                                     );
                                   },
                                 ),
-                                _DividerSoft(),
-                                _NavRow(
-                                  icon: Icons.security_rounded,
-                                  label: l10n.settingsSecurity,
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (final _) => const SecuritySettingsScreen()),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: S.md),
-                          _SectionTitle(l10n.settingsSectionGameplay),
-                          const SizedBox(height: S.xs),
-                          Glass(
-                            radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(S.sm),
-                            child: Column(
-                              children: [
-                                _ToggleRow(
-                                  icon: Icons.translate_rounded,
-                                  label: l10n.settingsShowTranslationLine,
-                                  value: showTranslation,
-                                  onChanged: (final v) => settingsRepository.updateSetting('show_translation', v),
-                                ),
-                                _DividerSoft(),
-                                _ToggleRow(
-                                  icon: Icons.text_fields_rounded,
-                                  label: l10n.settingsShowReadingLine,
-                                  value: showReading,
-                                  onChanged: (final v) => settingsRepository.updateSetting('show_reading', v),
-                                ),
-                                _DividerSoft(),
-                                _NavRow(
-                                  icon: Icons.timer_rounded,
-                                  label: l10n.settingsDefaultTimerPerQuestion,
-                                  trailingText: '${timerSeconds}s',
-                                  onTap: () => _pickTimerSeconds(
-                                    current: timerSeconds,
-                                    onSelected: (final value) => settingsRepository.updateSetting('default_timer_s', value),
-                                  ),
-                                ),
-                                _DividerSoft(),
-                                _NavRow(
-                                  icon: Icons.bar_chart_rounded,
-                                  label: l10n.settingsMatchDifficulty,
-                                  trailingText: difficulty == 'Adaptive'
-                                      ? l10n.settingsMatchDifficultyAdaptive
-                                      : difficulty,
-                                  onTap: () => _pickDifficulty(
-                                    current: difficulty,
-                                    onSelected: (final value) => settingsRepository.updateSetting('match_difficulty', value),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: S.md),
-                          _SectionTitle(l10n.settingsSectionSoundFeel),
-                          const SizedBox(height: S.xs),
-                          Glass(
-                            radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(S.sm),
-                            child: Column(
-                              children: [
-                                _ToggleRow(
-                                  icon: Icons.music_note_rounded,
-                                  label: l10n.settingsMusic,
-                                  value: music,
-                                  onChanged: (final v) => settingsRepository.updateSetting('bg_music', v),
-                                ),
-                                _DividerSoft(),
-                                _ToggleRow(
-                                  icon: Icons.volume_up_rounded,
-                                  label: l10n.settingsSoundEffects,
-                                  value: sfx,
-                                  onChanged: (final v) => settingsRepository.updateSetting('sfx_enabled', v),
-                                ),
-                                _DividerSoft(),
-                                _ToggleRow(
-                                  icon: Icons.vibration_rounded,
-                                  label: l10n.settingsHaptics,
-                                  value: haptics,
-                                  onChanged: (final v) => settingsRepository.updateSetting('haptics_enabled', v),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: S.md),
-                          _SectionTitle(l10n.settingsSectionNotifications),
-                          const SizedBox(height: S.xs),
-                          Glass(
-                            radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(S.sm),
-                            child: Column(
-                              children: [
-                                _ToggleRow(
-                                  icon: Icons.notifications_rounded,
-                                  label: l10n.settingsPushNotifications,
-                                  value: notifications,
-                                  onChanged: (final v) => settingsRepository.updateSetting('push_notifications', v),
-                                ),
-                                _DividerSoft(),
-                                _NavRow(
-                                  icon: Icons.schedule_rounded,
-                                  label: l10n.settingsDailyReminder,
-                                  trailingText: _formatTime(dailyReminder),
-                                  onTap: () => _pickDailyReminder(
-                                    current: dailyReminder,
-                                    onSelected: (final value) => settingsRepository.updateSetting('daily_reminder', value),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: S.md),
-                          _SectionTitle(l10n.settingsSectionAppearance),
-                          const SizedBox(height: S.xs),
-                          Glass(
-                            radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(S.sm),
-                            child: Column(
-                              children: [
-                                _DropdownRow(
-                                  icon: Icons.dark_mode_rounded,
-                                  label: l10n.settingsTheme,
-                                  value: themeModeValue,
-                                  items: themeItems,
-                                  onChanged: (final v) {
-                                    settingsRepository.updateSetting('theme_mode', v);
-                                    themeModeController.setModeFromSetting(v);
-                                  },
-                                ),
-                                _DividerSoft(),
-                                _DropdownRow(
-                                  icon: Icons.language_rounded,
-                                  label: l10n.settingsUiLanguage,
-                                  value: languageUiValue,
-                                  items: languageItems,
-                                  onChanged: (final v) => settingsRepository.updateSetting('language_ui', v),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: S.md),
-                          const _SectionTitle('Account center'),
-                          const SizedBox(height: S.xs),
-                          _buildAccountCenter(context),
-                          const SizedBox(height: S.md),
-                          _buildTrustFooter(context),
-                          const SizedBox(height: S.md),
-                          _SectionTitle(l10n.settingsSectionAbout),
-                          const SizedBox(height: S.xs),
-                          Glass(
-                            radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(S.sm),
-                            child: Column(
-                              children: [
-                                _NavRow(
-                                    icon: Icons.info_rounded,
-                                    label: l10n.settingsVersion,
-                                    trailingText: _appVersion,
-                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const AboutScreen(view: AboutView.version))),
-                                ),
-                                _DividerSoft(),
-                                _NavRow(
-                                    icon: Icons.description_rounded,
-                                    label: l10n.settingsTermsPrivacy,
-                                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const AboutScreen(view: AboutView.termsAndPrivacy))),
-                                ),
-                                _DividerSoft(),
-                                _NavRow(
-                                  icon: Icons.support_agent_rounded,
-                                  label: l10n.settingsSupport,
-                                  onTap: _showSupportSheet,
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: S.md),
-                          Glass(
-                            radius: BorderRadius.circular(22),
-                            padding: const EdgeInsets.all(S.sm),
-                            child: _DangerRow(
-                              icon: Icons.logout_rounded,
-                              label: l10n.settingsLogout,
-                              onTap: () async {
-                                final confirmed = await showPremiumDialog(
-                                  context: context,
-                                  title: l10n.settingsLogout,
-                                  body: 'You can sign back in at any time to continue your progress.',
-                                  confirmText: l10n.settingsLogout,
-                                  cancelText: l10n.cancel,
-                                  destructive: true,
-                                );
-                                if (confirmed != true) return;
-                                await authRepository.signOut();
-                                profileStore.reset();
-                                if (!context.mounted) return;
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(builder: (final _) => const WelcomeScreen()),
-                                  (final route) => false,
-                                );
-                              },
-                            ),
-                          ),
-
-                          const SizedBox(height: S.xxl),
-                        ],
-                      );
-                    }
-                  ),
-                ),
-              ],
-            ),
+                              ),
+                              const SizedBox(height: S.xxl),
+                            ],
+                          );
+                        }),
+              ),
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 }
 
@@ -895,7 +990,8 @@ class _TopBar extends StatelessWidget {
           child: Glass(
             radius: BorderRadius.circular(16),
             padding: const EdgeInsets.all(S.xs),
-            child: Icon(Icons.arrow_back_rounded, color: scheme.onSurface.withValues(alpha: 0.9)),
+            child: Icon(Icons.arrow_back_rounded,
+                color: scheme.onSurface.withValues(alpha: 0.9)),
           ),
         ),
         const SizedBox(width: S.sm),
@@ -934,7 +1030,10 @@ class _DividerSoft extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    return Divider(height: 1, thickness: 1, color: scheme.onSurface.withValues(alpha: 0.08));
+    return Divider(
+        height: 1,
+        thickness: 1,
+        color: scheme.onSurface.withValues(alpha: 0.08));
   }
 }
 
@@ -986,7 +1085,8 @@ class _NavRow extends StatelessWidget {
                 ),
               ),
             const SizedBox(width: S.xs),
-            Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.45)),
+            Icon(Icons.chevron_right_rounded,
+                color: scheme.onSurface.withValues(alpha: 0.45)),
           ],
         ),
       ),
@@ -1078,7 +1178,8 @@ class _DropdownRow extends StatelessWidget {
             dropdownColor: scheme.surface,
             underline: const SizedBox.shrink(),
             iconEnabledColor: scheme.onSurface.withValues(alpha: 0.8),
-            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
+            style:
+                TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
             items: items
                 .map((final e) => DropdownMenuItem<String>(
                       value: e.value,
@@ -1132,7 +1233,10 @@ class _BottomSheetList<T> extends StatelessWidget {
           children: [
             Text(
               title,
-              style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900, fontSize: 18),
+              style: TextStyle(
+                  color: scheme.onSurface,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18),
             ),
             const SizedBox(height: 12),
             ...options.map((final value) {
@@ -1192,7 +1296,8 @@ class _DangerRow extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.5)),
+            Icon(Icons.chevron_right_rounded,
+                color: scheme.onSurface.withValues(alpha: 0.5)),
           ],
         ),
       ),

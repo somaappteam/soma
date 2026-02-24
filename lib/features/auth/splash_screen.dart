@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:soma/core/theme/motion.dart';
-import 'package:soma/core/theme/tokens.dart';
 import 'package:soma/data/auth_repository.dart';
 import 'package:soma/features/auth/welcome_screen.dart';
 import 'package:soma/features/home/app_shell.dart';
-import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,7 +12,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scale;
   late final Animation<double> _fade;
@@ -33,7 +31,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
 
     _fade = Tween<double>(begin: 1.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: const Interval(0.0, 0.6, curve: MotionTokens.fadeCurve)),
+      CurvedAnimation(
+          parent: _controller,
+          curve: const Interval(0.0, 0.6, curve: MotionTokens.fadeCurve)),
     );
 
     _controller.forward();
@@ -44,7 +44,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     // Run animation for at least 600ms AND ensure auth session is fresh.
     await Future.wait([
       Future.delayed(const Duration(milliseconds: 600)),
-      Supabase.instance.client.auth.refreshSession().catchError((final _) => AuthResponse(session: null, user: null)),
+      Supabase.instance.client.auth
+          .refreshSession()
+          .catchError((final _) => AuthResponse(session: null, user: null)),
     ]);
     if (!mounted) return;
 
@@ -59,7 +61,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (final _, final __, final ___) => const WelcomeScreen(),
-        transitionsBuilder: (final _, final a, final __, final c) => FadeTransition(opacity: a, child: c),
+        transitionsBuilder: (final _, final a, final __, final c) =>
+            FadeTransition(opacity: a, child: c),
         transitionDuration: const Duration(milliseconds: 500),
       ),
     );
@@ -92,4 +95,3 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
   }
 }
-

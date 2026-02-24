@@ -65,21 +65,46 @@ class ExchangeSessionController extends ChangeNotifier {
   DateTime requestCreatedAt = DateTime.now();
   DateTime _turnStartedAt = DateTime.now();
   DateTime? _cooldownUntil;
-  static final Map<String, DateTime> _lastRequestByPartner = <String, DateTime>{};
+  static final Map<String, DateTime> _lastRequestByPartner =
+      <String, DateTime>{};
 
   static const Map<String, Set<String>> _langHints = {
-    'en': {'the', 'is', 'are', 'thanks', 'hello', 'what', 'where', 'weekend', 'today', 'good'},
-    'fr': {'bonjour', 'salut', 'merci', 'oui', 'non', 'comment', 'avec', 'pour', 'est', 'suis'},
+    'en': {
+      'the',
+      'is',
+      'are',
+      'thanks',
+      'hello',
+      'what',
+      'where',
+      'weekend',
+      'today',
+      'good'
+    },
+    'fr': {
+      'bonjour',
+      'salut',
+      'merci',
+      'oui',
+      'non',
+      'comment',
+      'avec',
+      'pour',
+      'est',
+      'suis'
+    },
     'es': {'hola', 'gracias', 'donde', 'como', 'estoy', 'usted', 'por', 'que'},
     'de': {'hallo', 'danke', 'ich', 'du', 'nicht', 'und', 'wo', 'wie'},
   };
 
-  String get inactiveLanguageCode =>
-      activeLanguageCode == firstLanguageCode ? secondLanguageCode : firstLanguageCode;
+  String get inactiveLanguageCode => activeLanguageCode == firstLanguageCode
+      ? secondLanguageCode
+      : firstLanguageCode;
 
   bool get requestAccepted => requestStatus == 'accepted';
 
-  bool get requestExpired => DateTime.now().difference(requestCreatedAt) > requestTtl;
+  bool get requestExpired =>
+      DateTime.now().difference(requestCreatedAt) > requestTtl;
 
   int get turnSecondsRemaining {
     final elapsed = DateTime.now().difference(_turnStartedAt);
@@ -87,7 +112,8 @@ class ExchangeSessionController extends ChangeNotifier {
     return left < 0 ? 0 : left;
   }
 
-  bool get isInCooldown => _cooldownUntil != null && DateTime.now().isBefore(_cooldownUntil!);
+  bool get isInCooldown =>
+      _cooldownUntil != null && DateTime.now().isBefore(_cooldownUntil!);
 
   int get cooldownSecondsRemaining {
     if (_cooldownUntil == null) return 0;
@@ -106,7 +132,8 @@ class ExchangeSessionController extends ChangeNotifier {
     }
     final decoded = jsonDecode(raw) as Map<String, dynamic>;
     round = (decoded['round'] as num?)?.toInt() ?? 1;
-    activeLanguageCode = decoded['activeLanguageCode']?.toString() ?? firstLanguageCode;
+    activeLanguageCode =
+        decoded['activeLanguageCode']?.toString() ?? firstLanguageCode;
     myCorrectionsUsed = (decoded['myCorrectionsUsed'] as num?)?.toInt() ?? 0;
     isMyTurn = decoded['isMyTurn'] == true;
     requestStatus = decoded['requestStatus']?.toString() ?? 'pending';
@@ -122,7 +149,8 @@ class ExchangeSessionController extends ChangeNotifier {
       ..clear()
       ..addAll(((decoded['messages'] as List?) ?? const [])
           .whereType<Map>()
-          .map((final e) => ExchangeMessage.fromJson(Map<String, dynamic>.from(e))));
+          .map((final e) =>
+              ExchangeMessage.fromJson(Map<String, dynamic>.from(e))));
 
     if (requestStatus == 'pending' && requestExpired) {
       requestStatus = 'expired';
@@ -150,7 +178,9 @@ class ExchangeSessionController extends ChangeNotifier {
   }
 
   Future<bool> sendRequestIfNeeded() async {
-    if (requestStatus == 'accepted' || requestStatus == 'declined') return false;
+    if (requestStatus == 'accepted' || requestStatus == 'declined') {
+      return false;
+    }
     if (requestStatus == 'pending' && !requestExpired) return false;
 
     final now = DateTime.now();
@@ -184,14 +214,27 @@ class ExchangeSessionController extends ChangeNotifier {
     if (value.isEmpty) return false;
 
     final hints = _langHints[activeLanguageCode];
-    final tokens = value.split(RegExp(r"[^a-zA-ZÀ-ÿ']+")).where((final t) => t.isNotEmpty).toList();
+    final tokens = value
+        .split(RegExp(r"[^a-zA-ZÃ€-Ã¿']+"))
+        .where((final t) => t.isNotEmpty)
+        .toList();
 
     var charSignal = 0;
-    if (activeLanguageCode == 'fr' && RegExp(r'[àâçéèêëîïôûùüÿœ]').hasMatch(value)) charSignal++;
-    if (activeLanguageCode == 'es' && RegExp(r'[áéíóúñ¿¡]').hasMatch(value)) charSignal++;
-    if (activeLanguageCode == 'de' && RegExp(r'[äöüß]').hasMatch(value)) charSignal++;
+    if (activeLanguageCode == 'fr' &&
+        RegExp(r'[Ã Ã¢Ã§Ã©Ã¨ÃªÃ«Ã®Ã¯Ã´Ã»Ã¹Ã¼Ã¿Å“]').hasMatch(value)) {
+      charSignal++;
+    }
+    if (activeLanguageCode == 'es' &&
+        RegExp(r'[Ã¡Ã©Ã­Ã³ÃºÃ±Â¿Â¡]').hasMatch(value)) {
+      charSignal++;
+    }
+    if (activeLanguageCode == 'de' && RegExp(r'[Ã¤Ã¶Ã¼ÃŸ]').hasMatch(value)) {
+      charSignal++;
+    }
 
-    if (hints == null || hints.isEmpty) return charSignal > 0 || tokens.length >= 2;
+    if (hints == null || hints.isEmpty) {
+      return charSignal > 0 || tokens.length >= 2;
+    }
 
     final hitCount = tokens.where(hints.contains).length;
     if (tokens.length <= 2) return true;
@@ -200,7 +243,8 @@ class ExchangeSessionController extends ChangeNotifier {
 
   bool _withinRateLimit() {
     final now = DateTime.now();
-    _sentAt.removeWhere((final t) => now.difference(t) > const Duration(minutes: 1));
+    _sentAt.removeWhere(
+        (final t) => now.difference(t) > const Duration(minutes: 1));
     return _sentAt.length < maxMessagesPerMinute;
   }
 
@@ -209,7 +253,10 @@ class ExchangeSessionController extends ChangeNotifier {
       requestStatus = 'expired';
     }
     if (!requestAccepted) return false;
-    final reportScore = (_messages.where((final m) => m.from == partnerName).length > 40) ? 1 : 0;
+    final reportScore =
+        (_messages.where((final m) => m.from == partnerName).length > 40)
+            ? 1
+            : 0;
     if (reportScore > 0) return false;
     if (!isMyTurn) return false;
     if (isInCooldown) return false;
@@ -223,7 +270,8 @@ class ExchangeSessionController extends ChangeNotifier {
     }
     if (!messageLooksValidForRound(text)) return false;
 
-    _messages.add(ExchangeMessage(from: 'You', text: text, languageCode: activeLanguageCode));
+    _messages.add(ExchangeMessage(
+        from: 'You', text: text, languageCode: activeLanguageCode));
     _sentAt.add(DateTime.now());
     isMyTurn = false;
     _turnStartedAt = DateTime.now();
@@ -233,7 +281,8 @@ class ExchangeSessionController extends ChangeNotifier {
   }
 
   Future<void> receivePartnerMessage(final String text) async {
-    _messages.add(ExchangeMessage(from: partnerName, text: text, languageCode: activeLanguageCode));
+    _messages.add(ExchangeMessage(
+        from: partnerName, text: text, languageCode: activeLanguageCode));
     isMyTurn = true;
     _turnStartedAt = DateTime.now();
     await _persist();
@@ -273,7 +322,9 @@ class ExchangeSessionController extends ChangeNotifier {
   Future<void> nextRound() async {
     if (round >= maxRounds) return;
     round += 1;
-    activeLanguageCode = activeLanguageCode == firstLanguageCode ? secondLanguageCode : firstLanguageCode;
+    activeLanguageCode = activeLanguageCode == firstLanguageCode
+        ? secondLanguageCode
+        : firstLanguageCode;
     myCorrectionsUsed = 0;
     isMyTurn = true;
     _turnStartedAt = DateTime.now();

@@ -24,8 +24,11 @@ class AppSelectablePill extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final selectedFill = isDark
         ? const Color(0xFF3A3568)
-        : Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), scheme.surface);
-    final selectedBorder = isDark ? const Color(0xFF6B5CFF) : scheme.primary.withValues(alpha: 0.35);
+        : Color.alphaBlend(
+            scheme.primary.withValues(alpha: 0.16), scheme.surface);
+    final selectedBorder = isDark
+        ? const Color(0xFF6B5CFF)
+        : scheme.primary.withValues(alpha: 0.35);
     final selectedText = isDark ? const Color(0xFF36F4E8) : scheme.primary;
 
     return InkWell(
@@ -37,15 +40,21 @@ class AppSelectablePill extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
-          color: selected ? selectedFill : scheme.onSurface.withValues(alpha: 0.08),
+          color: selected
+              ? selectedFill
+              : scheme.onSurface.withValues(alpha: 0.08),
           border: Border.all(
-            color: selected ? selectedBorder : scheme.onSurface.withValues(alpha: 0.14),
+            color: selected
+                ? selectedBorder
+                : scheme.onSurface.withValues(alpha: 0.14),
           ),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: selected ? selectedText : scheme.onSurface.withValues(alpha: 0.76),
+            color: selected
+                ? selectedText
+                : scheme.onSurface.withValues(alpha: 0.76),
             fontWeight: FontWeight.w900,
             fontSize: fontSize,
           ),
@@ -72,7 +81,8 @@ class AppNeonSwitch extends StatelessWidget {
     final selectedThumb = isDark ? const Color(0xFF36F4E8) : scheme.onPrimary;
     final selectedTrack = isDark
         ? const Color(0xFF4A3EA1)
-        : Color.alphaBlend(scheme.primary.withValues(alpha: 0.78), scheme.surface);
+        : Color.alphaBlend(
+            scheme.primary.withValues(alpha: 0.78), scheme.surface);
     final unselectedThumb = isDark
         ? Colors.white.withValues(alpha: 0.85)
         : scheme.outline.withValues(alpha: 0.85);

@@ -1,5 +1,5 @@
-
 import 'package:postgres/postgres.dart';
+import 'package:soma/core/services/app_logger.dart';
 
 Future<void> main() async {
   final endpoint = Endpoint(
@@ -10,14 +10,15 @@ Future<void> main() async {
     password: 'M_SOMA_APP_2026',
   );
 
-  print('Testing connection...');
+  appLogger.info('Testing connection...');
   try {
-    final connection = await Connection.open(endpoint, settings: ConnectionSettings(sslMode: SslMode.require));
-    print('Connected successfully!');
+    final connection = await Connection.open(endpoint,
+        settings: ConnectionSettings(sslMode: SslMode.require));
+    appLogger.info('Connected successfully!');
     final result = await connection.execute('SELECT version()');
-    print('PG Version: ${result.first}');
+    appLogger.info('PG Version: ${result.first}');
     await connection.close();
   } catch (e) {
-    print('Connection failed: $e');
+    appLogger.info('Connection failed: $e');
   }
 }

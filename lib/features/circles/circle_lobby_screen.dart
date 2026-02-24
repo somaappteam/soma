@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/core/theme/tokens.dart';
 import 'package:soma/core/widgets/glass.dart';
 import 'package:soma/core/widgets/neon_button.dart';
@@ -135,9 +136,10 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
   void _listenCircleStatus() {
     _circleSub?.cancel();
-    _circleSub = circlesRepository.getCircleStream(widget.circleId).listen((final data) {
+    _circleSub =
+        circlesRepository.getCircleStream(widget.circleId).listen((final data) {
       if (!mounted || _hasNavigated) return;
-      
+
       final newStatus = data['status']?.toString();
 
       setState(() => circleData = data);
@@ -148,17 +150,21 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
           _hasNavigated = true;
           _navigateToCountdown();
         } else {
-          debugPrint('CircleLobby: Status is active but questions are missing. Waiting for questions...');
+          appLogger.debug(
+              'CircleLobby: Status is active but questions are missing. Waiting for questions...');
         }
         return;
       }
 
-      if (newStatus == 'ended' || newStatus == 'terminated' || newStatus == 'closed') {
+      if (newStatus == 'ended' ||
+          newStatus == 'terminated' ||
+          newStatus == 'closed') {
         _hasNavigated = true;
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
           ..showSnackBar(
-            const SnackBar(content: Text('This circle has been terminated by the host.')),
+            const SnackBar(
+                content: Text('This circle has been terminated by the host.')),
           );
         Navigator.pop(context);
       }
@@ -178,7 +184,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
               context,
               MaterialPageRoute(
                 builder: (final _) => LiveQuizScreen(
-                  questions: List<Map<String, dynamic>>.from(circleData?['questions'] ?? []),
+                  questions: List<Map<String, dynamic>>.from(
+                      circleData?['questions'] ?? []),
                   timePerQ: circleData?['time_per_q'] ?? 10,
                   role: isHost ? LiveQuizRole.host : LiveQuizRole.participant,
                   circleId: widget.circleId,
@@ -205,8 +212,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       if (action == _HostExitAction.transfer) {
         final newHostId = await _pickNewHost(candidates);
         if (newHostId == null) {
-           setState(() => _isExiting = false);
-           return;
+          setState(() => _isExiting = false);
+          return;
         }
         try {
           await circlesRepository.transferHost(
@@ -419,10 +426,12 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
   }
 
   String _languageName(final String code) {
-    return kLanguages.firstWhere(
-      (final l) => l.code == code,
-      orElse: () => kLanguages.first,
-    ).name;
+    return kLanguages
+        .firstWhere(
+          (final l) => l.code == code,
+          orElse: () => kLanguages.first,
+        )
+        .name;
   }
 
   Future<LangOption?> _pickLanguage({
@@ -530,8 +539,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                     color: Colors.white.withValues(alpha: 0.5)),
                                 border: InputBorder.none,
                                 prefixIcon: Icon(Icons.search_rounded,
-                                    color:
-                                        Colors.white.withValues(alpha: 0.7)),
+                                    color: Colors.white.withValues(alpha: 0.7)),
                               ),
                             ),
                           ),
@@ -582,8 +590,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                     ),
                                     if (selected)
                                       Icon(Icons.check_rounded,
-                                          color:
-                                              Colors.white.withValues(alpha: 0.9)),
+                                          color: Colors.white
+                                              .withValues(alpha: 0.9)),
                                   ],
                                 ),
                               ),
@@ -619,7 +627,9 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
     await circleVoiceService.connect(circleId: widget.circleId, name: name);
     await rtcVoiceService.connect(
-        circleId: widget.circleId, asSpeaker: !isSpectator, prioritySpeaker: isHost);
+        circleId: widget.circleId,
+        asSpeaker: !isSpectator,
+        prioritySpeaker: isHost);
     _voiceSub?.cancel();
     _voiceSub = circleVoiceService.stream.listen((final _) {
       if (mounted) {
@@ -630,7 +640,9 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
 
   Future<void> _syncVoiceRole() async {
     await rtcVoiceService.connect(
-        circleId: widget.circleId, asSpeaker: !isSpectator, prioritySpeaker: isHost);
+        circleId: widget.circleId,
+        asSpeaker: !isSpectator,
+        prioritySpeaker: isHost);
   }
 
   Future<void> _inviteByUsername() async {
@@ -724,7 +736,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
         final size = MediaQuery.of(context).size;
         return Dialog(
           backgroundColor: Colors.transparent,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
+          insetPadding:
+              const EdgeInsets.symmetric(horizontal: 18, vertical: 28),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: SizedBox(
@@ -780,8 +793,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -847,7 +860,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     if (confirmed != true) return;
 
     setState(() => _isExiting = true);
-    
+
     try {
       await circlesRepository.leaveCircle(widget.circleId);
       await circleVoiceService.disconnectIfCircle(widget.circleId);
@@ -855,9 +868,9 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       if (!mounted) return;
       Navigator.pop(context);
     } catch (e) {
-       // If leave fails, we should probably still let them leave locally or show error?
-       // For now, just reset state if we stay
-       if (mounted) setState(() => _isExiting = false);
+      // If leave fails, we should probably still let them leave locally or show error?
+      // For now, just reset state if we stay
+      if (mounted) setState(() => _isExiting = false);
     }
   }
 
@@ -894,7 +907,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     }
   }
 
-  Future<void> _approveJoin(final String userId, {required final bool hasCapacity}) async {
+  Future<void> _approveJoin(final String userId,
+      {required final bool hasCapacity}) async {
     final l10n = AppLocalizations.of(context);
     if (!hasCapacity) {
       _toast(context, l10n.circlesFull);
@@ -943,7 +957,8 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
     }).toList();
   }
 
-  Future<_HostExitAction?> _promptHostExit({required final bool canTransfer}) async {
+  Future<_HostExitAction?> _promptHostExit(
+      {required final bool canTransfer}) async {
     final l10n = AppLocalizations.of(context);
     return showPremiumChoiceDialog<_HostExitAction>(
       context: context,
@@ -1001,7 +1016,10 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                         IconButton(
                           onPressed: () => Navigator.pop(ctx),
                           icon: Icon(Icons.close_rounded,
-                              color: Theme.of(ctx).colorScheme.onSurface.withValues(alpha: 0.85)),
+                              color: Theme.of(ctx)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.85)),
                         ),
                       ],
                     ),
@@ -1016,9 +1034,13 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 14),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
-                            color: Theme.of(context).brightness == Brightness.light
-                                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
-                                : Colors.black.withValues(alpha: 0.12),
+                            color:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.08)
+                                    : Colors.black.withValues(alpha: 0.12),
                             border: Border.all(
                                 color: Theme.of(context)
                                     .colorScheme
@@ -1080,7 +1102,7 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
             Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF))),
       );
     } else {
-       content = _buildLobbyContent(context);
+      content = _buildLobbyContent(context);
     }
 
     return Stack(
@@ -1157,11 +1179,13 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
       child: Scaffold(
         body: SafeArea(
           child: StreamBuilder<Map<String, bool>>(
-            stream: presenceRepository.streamMultipleOnlineStatuses(participantIds),
+            stream:
+                presenceRepository.streamMultipleOnlineStatuses(participantIds),
             builder: (final context, final presenceSnapshot) {
               final presence = presenceSnapshot.data ?? {};
-              final allReady = playerParticipants.every((final p) => (p['is_ready'] == true) || p['role'] == 'host');
-              
+              final allReady = playerParticipants.every(
+                  (final p) => (p['is_ready'] == true) || p['role'] == 'host');
+
               final displayPlayers = <PlayerSlot>[];
               for (int i = 0; i < maxPlayers; i++) {
                 if (i < playerParticipants.length) {
@@ -1171,13 +1195,18 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                   final isPReady = p['is_ready'] ?? false;
                   final role = p['role'];
                   final userId = uid?.toString();
-                  final isSelf = userId != null && userId == circlesRepository.currentUserId;
+                  final isSelf = userId != null &&
+                      userId == circlesRepository.currentUserId;
                   final isMuted = userId != null ? _isMutedFor(userId) : false;
-                  final isSpeaking = userId != null ? _isSpeakingFor(userId) : false;
-                  final isOnline = userId != null && (presence[userId] ?? false);
+                  final isSpeaking =
+                      userId != null ? _isSpeakingFor(userId) : false;
+                  final isOnline =
+                      userId != null && (presence[userId] ?? false);
 
                   displayPlayers.add(PlayerSlot(
-                    name: profile?['display_name'] ?? profile?['username'] ?? l10n.loading,
+                    name: profile?['display_name'] ??
+                        profile?['username'] ??
+                        l10n.loading,
                     isHost: role == 'host',
                     isReady: isPReady,
                     score: 0,
@@ -1199,152 +1228,282 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
               }
 
               return ResponsiveFrame(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-                child: Column(
-                  children: [
-                    _TopBar(
-                      title: circleData?['name'] ?? l10n.circlesLobbyTitle,
-                      subtitle: codeLine,
-                      onBack: () {
-                        if (!isHost) {
-                          Navigator.pop(context);
-                          return;
-                        }
-                        _handleHostExit();
-                      },
-                      onShare: () {
-                        _openLobbyActionsSheet();
-                      },
-                      onChat: _openChatSheet,
-                    ),
-                    const SizedBox(height: 14),
-                    Expanded(
-                      child: ListView(
-                        physics: const BouncingScrollPhysics(),
-                        children: [
-                          // Settings summary card
-                          Glass(
-                            radius: BorderRadius.circular(26),
-                            padding: const EdgeInsets.all(16),
-                            child: LayoutBuilder(
-                              builder: (final context, final constraints) {
-                                final isNarrow = constraints.maxWidth < 400;
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    _SectionTitle(l10n.circlesMatchSettings),
-                                    const SizedBox(height: 12),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+                  child: Column(
+                    children: [
+                      _TopBar(
+                        title: circleData?['name'] ?? l10n.circlesLobbyTitle,
+                        subtitle: codeLine,
+                        onBack: () {
+                          if (!isHost) {
+                            Navigator.pop(context);
+                            return;
+                          }
+                          _handleHostExit();
+                        },
+                        onShare: () {
+                          _openLobbyActionsSheet();
+                        },
+                        onChat: _openChatSheet,
+                      ),
+                      const SizedBox(height: 14),
+                      Expanded(
+                        child: ListView(
+                          physics: const BouncingScrollPhysics(),
+                          children: [
+                            // Settings summary card
+                            Glass(
+                              radius: BorderRadius.circular(26),
+                              padding: const EdgeInsets.all(16),
+                              child: LayoutBuilder(
+                                builder: (final context, final constraints) {
+                                  final isNarrow = constraints.maxWidth < 400;
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _SectionTitle(l10n.circlesMatchSettings),
+                                      const SizedBox(height: 12),
 
-                                    // --- Row 1 & 2 Logic ---
-                                    if (isNarrow) ...[
-                                      // Narrow Layout
-                                      if (_editingLobbySettings) ...[
-                                        // Edit Mode (Narrow)
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: _EditableSelectTile(
-                                                label: l10n.iSpeak,
-                                                value: _languageName(_editSpeakLang),
-                                                icon: Icons.record_voice_over_rounded,
-                                                onTap: () async {
-                                                  final next = await _pickLanguage(
-                                                    title: l10n.chooseYourLanguage,
-                                                    currentCode: _editSpeakLang,
-                                                  );
-                                                  if (next != null) {
-                                                    setState(() => _editSpeakLang = next.code);
-                                                  }
-                                                },
+                                      // --- Row 1 & 2 Logic ---
+                                      if (isNarrow) ...[
+                                        // Narrow Layout
+                                        if (_editingLobbySettings) ...[
+                                          // Edit Mode (Narrow)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _EditableSelectTile(
+                                                  label: l10n.iSpeak,
+                                                  value: _languageName(
+                                                      _editSpeakLang),
+                                                  icon: Icons
+                                                      .record_voice_over_rounded,
+                                                  onTap: () async {
+                                                    final next =
+                                                        await _pickLanguage(
+                                                      title: l10n
+                                                          .chooseYourLanguage,
+                                                      currentCode:
+                                                          _editSpeakLang,
+                                                    );
+                                                    if (next != null) {
+                                                      setState(() =>
+                                                          _editSpeakLang =
+                                                              next.code);
+                                                    }
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Expanded(
-                                              child: _EditableSelectTile(
-                                                label: l10n.iWantToLearn,
-                                                value: _languageName(_editLearnLang),
-                                                icon: Icons.translate_rounded,
-                                                onTap: () async {
-                                                  final next = await _pickLanguage(
-                                                    title: l10n.chooseLearningLanguage,
-                                                    currentCode: _editLearnLang,
-                                                  );
-                                                  if (next != null) {
-                                                    setState(() => _editLearnLang = next.code);
-                                                  }
-                                                },
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: _EditableSelectTile(
+                                                  label: l10n.iWantToLearn,
+                                                  value: _languageName(
+                                                      _editLearnLang),
+                                                  icon: Icons.translate_rounded,
+                                                  onTap: () async {
+                                                    final next =
+                                                        await _pickLanguage(
+                                                      title: l10n
+                                                          .chooseLearningLanguage,
+                                                      currentCode:
+                                                          _editLearnLang,
+                                                    );
+                                                    if (next != null) {
+                                                      setState(() =>
+                                                          _editLearnLang =
+                                                              next.code);
+                                                    }
+                                                  },
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 10),
-                                        _ModeToggle(
-                                          leftLabel: l10n.soloModeVocabulary,
-                                          leftValue: 'Vocabulary',
-                                          rightLabel: l10n.soloModeSentences,
-                                          rightValue: 'Sentences',
-                                          value: _editMode,
-                                          onChanged: (final value) => setState(() => _editMode = value),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        _LevelPicker(
-                                          level: _editLevel,
-                                          onChanged: (final value) => setState(() => _editLevel = value),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        _HostSettingRow(
-                                          title: l10n.circlesQuestions,
-                                          value: '$_editQuestions',
-                                          onMinus: _editQuestions > 5
-                                              ? () => setState(() => _editQuestions -= 5)
-                                              : null,
-                                          onPlus: _editQuestions < 50
-                                              ? () => setState(() => _editQuestions += 5)
-                                              : null,
-                                        ),
-                                        const SizedBox(height: 10),
-                                        _HostSettingRow(
-                                          title: l10n.circlesTimePerQuestion,
-                                          value: l10n.secondsShort(_editTimePerQ),
-                                          onMinus: _editTimePerQ > 5
-                                              ? () => setState(() => _editTimePerQ -= 1)
-                                              : null,
-                                          onPlus: _editTimePerQ < 60
-                                              ? () => setState(() => _editTimePerQ += 1)
-                                              : null,
-                                        ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          _ModeToggle(
+                                            leftLabel: l10n.soloModeVocabulary,
+                                            leftValue: 'Vocabulary',
+                                            rightLabel: l10n.soloModeSentences,
+                                            rightValue: 'Sentences',
+                                            value: _editMode,
+                                            onChanged: (final value) =>
+                                                setState(
+                                                    () => _editMode = value),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          _LevelPicker(
+                                            level: _editLevel,
+                                            onChanged: (final value) =>
+                                                setState(
+                                                    () => _editLevel = value),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          _HostSettingRow(
+                                            title: l10n.circlesQuestions,
+                                            value: '$_editQuestions',
+                                            onMinus: _editQuestions > 5
+                                                ? () => setState(
+                                                    () => _editQuestions -= 5)
+                                                : null,
+                                            onPlus: _editQuestions < 50
+                                                ? () => setState(
+                                                    () => _editQuestions += 5)
+                                                : null,
+                                          ),
+                                          const SizedBox(height: 10),
+                                          _HostSettingRow(
+                                            title: l10n.circlesTimePerQuestion,
+                                            value: l10n
+                                                .secondsShort(_editTimePerQ),
+                                            onMinus: _editTimePerQ > 5
+                                                ? () => setState(
+                                                    () => _editTimePerQ -= 1)
+                                                : null,
+                                            onPlus: _editTimePerQ < 60
+                                                ? () => setState(
+                                                    () => _editTimePerQ += 1)
+                                                : null,
+                                          ),
+                                        ] else ...[
+                                          // View Mode (Narrow)
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _PillInfo(
+                                                  icon: Icons.translate_rounded,
+                                                  title:
+                                                      "${circleData!['from_lang']} → ${circleData!['to_lang']}",
+                                                  subtitle:
+                                                      l10n.circlesLanguages,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _PillInfo(
+                                                  icon: Icons
+                                                      .local_fire_department_rounded,
+                                                  title: modeLabel,
+                                                  subtitle:
+                                                      l10n.circlesModeTitle,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: _PillInfo(
+                                                  icon: Icons
+                                                      .stacked_bar_chart_rounded,
+                                                  title: l10n
+                                                      .circlesLevelWithValue(
+                                                          levelLabel),
+                                                  subtitle:
+                                                      l10n.circlesDifficulty,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: _PillInfo(
+                                                  icon: Icons
+                                                      .help_outline_rounded,
+                                                  title: l10n.questionsShort(
+                                                      circleData![
+                                                              'questions_count'] ??
+                                                          0),
+                                                  subtitle:
+                                                      l10n.circlesQuestions,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Expanded(
+                                                child: _PillInfo(
+                                                  icon: Icons.timer_rounded,
+                                                  title: l10n.secondsShort(
+                                                      circleData![
+                                                              'time_per_q'] ??
+                                                          0),
+                                                  subtitle: l10n
+                                                      .circlesPerQuestionShort,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ] else ...[
-                                        // View Mode (Narrow)
+                                        // Wide Layout (Original Logic)
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: _PillInfo(
-                                                icon: Icons.translate_rounded,
-                                                title:
-                                                    "${circleData!['from_lang']} → ${circleData!['to_lang']}",
-                                                subtitle: l10n.circlesLanguages,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: _PillInfo(
-                                                icon: Icons.local_fire_department_rounded,
-                                                title: modeLabel,
-                                                subtitle: l10n.circlesModeTitle,
-                                              ),
+                                              child: _editingLobbySettings
+                                                  ? _EditableSelectTile(
+                                                      label: l10n.iSpeak,
+                                                      value: _languageName(
+                                                          _editSpeakLang),
+                                                      icon: Icons
+                                                          .record_voice_over_rounded,
+                                                      onTap: () async {
+                                                        final next =
+                                                            await _pickLanguage(
+                                                          title: l10n
+                                                              .chooseYourLanguage,
+                                                          currentCode:
+                                                              _editSpeakLang,
+                                                        );
+                                                        if (next != null) {
+                                                          setState(() =>
+                                                              _editSpeakLang =
+                                                                  next.code);
+                                                        }
+                                                      },
+                                                    )
+                                                  : _PillInfo(
+                                                      icon: Icons
+                                                          .translate_rounded,
+                                                      title:
+                                                          "${circleData!['from_lang']} → ${circleData!['to_lang']}",
+                                                      subtitle:
+                                                          l10n.circlesLanguages,
+                                                    ),
                                             ),
                                             const SizedBox(width: 10),
                                             Expanded(
-                                              child: _PillInfo(
-                                                icon: Icons.stacked_bar_chart_rounded,
-                                                title: l10n.circlesLevelWithValue(levelLabel),
-                                                subtitle: l10n.circlesDifficulty,
-                                              ),
+                                              child: _editingLobbySettings
+                                                  ? _EditableSelectTile(
+                                                      label: l10n.iWantToLearn,
+                                                      value: _languageName(
+                                                          _editLearnLang),
+                                                      icon: Icons
+                                                          .translate_rounded,
+                                                      onTap: () async {
+                                                        final next =
+                                                            await _pickLanguage(
+                                                          title: l10n
+                                                              .chooseLearningLanguage,
+                                                          currentCode:
+                                                              _editLearnLang,
+                                                        );
+                                                        if (next != null) {
+                                                          setState(() =>
+                                                              _editLearnLang =
+                                                                  next.code);
+                                                        }
+                                                      },
+                                                    )
+                                                  : _PillInfo(
+                                                      icon: Icons
+                                                          .local_fire_department_rounded,
+                                                      title: modeLabel,
+                                                      subtitle:
+                                                          l10n.circlesModeTitle,
+                                                    ),
                                             ),
                                           ],
                                         ),
@@ -1352,292 +1511,184 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: _PillInfo(
-                                                icon: Icons.help_outline_rounded,
-                                                title: l10n.questionsShort(
-                                                    circleData!['questions_count'] ?? 0),
-                                                subtitle: l10n.circlesQuestions,
-                                              ),
+                                              child: _editingLobbySettings
+                                                  ? _ModeToggle(
+                                                      leftLabel: l10n
+                                                          .soloModeVocabulary,
+                                                      leftValue: 'Vocabulary',
+                                                      rightLabel: l10n
+                                                          .soloModeSentences,
+                                                      rightValue: 'Sentences',
+                                                      value: _editMode,
+                                                      onChanged:
+                                                          (final value) =>
+                                                              setState(() =>
+                                                                  _editMode =
+                                                                      value),
+                                                    )
+                                                  : _PillInfo(
+                                                      icon: Icons
+                                                          .stacked_bar_chart_rounded,
+                                                      title: l10n
+                                                          .circlesLevelWithValue(
+                                                              levelLabel),
+                                                      subtitle: l10n
+                                                          .circlesDifficulty,
+                                                    ),
                                             ),
                                             const SizedBox(width: 10),
                                             Expanded(
-                                              child: _PillInfo(
-                                                icon: Icons.timer_rounded,
-                                                title: l10n.secondsShort(
-                                                    circleData!['time_per_q'] ?? 0),
-                                                subtitle: l10n.circlesPerQuestionShort,
+                                              child: _editingLobbySettings
+                                                  ? _LevelPicker(
+                                                      level: _editLevel,
+                                                      onChanged:
+                                                          (final value) =>
+                                                              setState(() =>
+                                                                  _editLevel =
+                                                                      value),
+                                                    )
+                                                  : _PillInfo(
+                                                      icon: Icons
+                                                          .help_outline_rounded,
+                                                      title: l10n.questionsShort(
+                                                          circleData![
+                                                                  'questions_count'] ??
+                                                              0),
+                                                      subtitle:
+                                                          l10n.circlesQuestions,
+                                                    ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: _editingLobbySettings
+                                                  ? _HostSettingRow(
+                                                      title:
+                                                          l10n.circlesQuestions,
+                                                      value: '$_editQuestions',
+                                                      onMinus: _editQuestions >
+                                                              5
+                                                          ? () => setState(() =>
+                                                              _editQuestions -=
+                                                                  5)
+                                                          : null,
+                                                      onPlus: _editQuestions <
+                                                              50
+                                                          ? () => setState(() =>
+                                                              _editQuestions +=
+                                                                  5)
+                                                          : null,
+                                                    )
+                                                  : _PillInfo(
+                                                      icon: Icons.timer_rounded,
+                                                      title: l10n.secondsShort(
+                                                          circleData![
+                                                                  'time_per_q'] ??
+                                                              0),
+                                                      subtitle: l10n
+                                                          .circlesPerQuestionShort,
+                                                    ),
+                                            ),
+                                          ],
+                                        ),
+                                        if (_editingLobbySettings) ...[
+                                          const SizedBox(height: 10),
+                                          _HostSettingRow(
+                                            title: l10n.circlesTimePerQuestion,
+                                            value: l10n
+                                                .secondsShort(_editTimePerQ),
+                                            onMinus: _editTimePerQ > 5
+                                                ? () => setState(
+                                                    () => _editTimePerQ -= 1)
+                                                : null,
+                                            onPlus: _editTimePerQ < 60
+                                                ? () => setState(
+                                                    () => _editTimePerQ += 1)
+                                                : null,
+                                          ),
+                                        ],
+                                      ],
+
+                                      const SizedBox(height: 14),
+
+                                      // Simplified quick actions
+                                      if (!isNarrow) // On wide, show side-by-side
+                                        Row(
+                                          children: [
+                                            if (!isSpectator) ...[
+                                              Expanded(
+                                                child: _QuickAction(
+                                                  icon: Icons
+                                                      .person_add_alt_1_rounded,
+                                                  label: l10n.circlesInvite,
+                                                  onTap: _inviteByUsername,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                            ],
+                                            Expanded(
+                                              child: _QuickAction(
+                                                icon: Icons.copy_rounded,
+                                                label: l10n.circlesCopyId,
+                                                onTap: () => _toast(context,
+                                                    l10n.circlesCopiedId),
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      else // On narrow, maybe stack or use smaller buttons?
+                                        // Actually, keep them side-by-side unless very small.
+                                        // 400px is enough for 2 buttons.
+                                        Row(
+                                          children: [
+                                            if (!isSpectator) ...[
+                                              Expanded(
+                                                child: _QuickAction(
+                                                  icon: Icons
+                                                      .person_add_alt_1_rounded,
+                                                  label: l10n.circlesInvite,
+                                                  onTap: _inviteByUsername,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 10),
+                                            ],
+                                            Expanded(
+                                              child: _QuickAction(
+                                                icon: Icons.copy_rounded,
+                                                label: l10n.circlesCopyId,
+                                                onTap: () => _toast(context,
+                                                    l10n.circlesCopiedId),
                                               ),
                                             ),
                                           ],
                                         ),
-                                      ],
-                                    ] else ...[
-                                      // Wide Layout (Original Logic)
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: _editingLobbySettings
-                                                ? _EditableSelectTile(
-                                                    label: l10n.iSpeak,
-                                                    value: _languageName(_editSpeakLang),
-                                                    icon: Icons.record_voice_over_rounded,
-                                                    onTap: () async {
-                                                      final next = await _pickLanguage(
-                                                        title: l10n.chooseYourLanguage,
-                                                        currentCode: _editSpeakLang,
-                                                      );
-                                                      if (next != null) {
-                                                        setState(
-                                                            () => _editSpeakLang = next.code);
-                                                      }
-                                                    },
-                                                  )
-                                                : _PillInfo(
-                                                    icon: Icons.translate_rounded,
-                                                    title:
-                                                        "${circleData!['from_lang']} → ${circleData!['to_lang']}",
-                                                    subtitle: l10n.circlesLanguages,
-                                                  ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: _editingLobbySettings
-                                                ? _EditableSelectTile(
-                                                    label: l10n.iWantToLearn,
-                                                    value: _languageName(_editLearnLang),
-                                                    icon: Icons.translate_rounded,
-                                                    onTap: () async {
-                                                      final next = await _pickLanguage(
-                                                        title: l10n.chooseLearningLanguage,
-                                                        currentCode: _editLearnLang,
-                                                      );
-                                                      if (next != null) {
-                                                        setState(
-                                                            () => _editLearnLang = next.code);
-                                                      }
-                                                    },
-                                                  )
-                                                : _PillInfo(
-                                                    icon: Icons.local_fire_department_rounded,
-                                                    title: modeLabel,
-                                                    subtitle: l10n.circlesModeTitle,
-                                                  ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: _editingLobbySettings
-                                                ? _ModeToggle(
-                                                    leftLabel: l10n.soloModeVocabulary,
-                                                    leftValue: 'Vocabulary',
-                                                    rightLabel: l10n.soloModeSentences,
-                                                    rightValue: 'Sentences',
-                                                    value: _editMode,
-                                                    onChanged: (final value) =>
-                                                        setState(() => _editMode = value),
-                                                  )
-                                                : _PillInfo(
-                                                    icon: Icons.stacked_bar_chart_rounded,
-                                                    title: l10n.circlesLevelWithValue(levelLabel),
-                                                    subtitle: l10n.circlesDifficulty,
-                                                  ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: _editingLobbySettings
-                                                ? _LevelPicker(
-                                                    level: _editLevel,
-                                                    onChanged: (final value) =>
-                                                        setState(() => _editLevel = value),
-                                                  )
-                                                : _PillInfo(
-                                                    icon: Icons.help_outline_rounded,
-                                                    title: l10n.questionsShort(
-                                                        circleData!['questions_count'] ?? 0),
-                                                    subtitle: l10n.circlesQuestions,
-                                                  ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: _editingLobbySettings
-                                                ? _HostSettingRow(
-                                                    title: l10n.circlesQuestions,
-                                                    value: '$_editQuestions',
-                                                    onMinus: _editQuestions > 5
-                                                        ? () => setState(
-                                                            () => _editQuestions -= 5)
-                                                        : null,
-                                                    onPlus: _editQuestions < 50
-                                                        ? () => setState(
-                                                            () => _editQuestions += 5)
-                                                        : null,
-                                                  )
-                                                : _PillInfo(
-                                                    icon: Icons.timer_rounded,
-                                                    title: l10n.secondsShort(
-                                                        circleData!['time_per_q'] ?? 0),
-                                                    subtitle: l10n.circlesPerQuestionShort,
-                                                  ),
-                                          ),
-                                        ],
-                                      ),
-                                      if (_editingLobbySettings) ...[
-                                        const SizedBox(height: 10),
-                                        _HostSettingRow(
-                                          title: l10n.circlesTimePerQuestion,
-                                          value: l10n.secondsShort(_editTimePerQ),
-                                          onMinus: _editTimePerQ > 5
-                                              ? () => setState(() => _editTimePerQ -= 1)
-                                              : null,
-                                          onPlus: _editTimePerQ < 60
-                                              ? () => setState(() => _editTimePerQ += 1)
-                                              : null,
-                                        ),
-                                      ],
+
+                                      const SizedBox(height: 12),
+
+                                      if (isHost)
+                                        _HostControlsRow(
+                                          roomLocked:
+                                              circleData?['is_locked'] ?? false,
+                                          isEditing: _editingLobbySettings,
+                                          isSaving: _savingLobbySettings,
+                                          onToggleLock: _toggleRoomLock,
+                                          onEdit: _toggleLobbySettingsEdit,
+                                          onCancel: _cancelLobbySettingsEdit,
+                                        )
+                                      else if (isSpectator)
+                                        _SpectatorTip()
+                                      else
+                                        _PlayerTip(),
                                     ],
-
-                                    const SizedBox(height: 14),
-
-                                    // Simplified quick actions
-                                    if (!isNarrow) // On wide, show side-by-side
-                                      Row(
-                                        children: [
-                                          if (!isSpectator) ...[
-                                            Expanded(
-                                              child: _QuickAction(
-                                                icon: Icons.person_add_alt_1_rounded,
-                                                label: l10n.circlesInvite,
-                                                onTap: _inviteByUsername,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                          ],
-                                          Expanded(
-                                            child: _QuickAction(
-                                              icon: Icons.copy_rounded,
-                                              label: l10n.circlesCopyId,
-                                              onTap: () =>
-                                                  _toast(context, l10n.circlesCopiedId),
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    else // On narrow, maybe stack or use smaller buttons?
-                                      // Actually, keep them side-by-side unless very small.
-                                      // 400px is enough for 2 buttons.
-                                      Row(
-                                        children: [
-                                          if (!isSpectator) ...[
-                                            Expanded(
-                                              child: _QuickAction(
-                                                icon: Icons.person_add_alt_1_rounded,
-                                                label: l10n.circlesInvite,
-                                                onTap: _inviteByUsername,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                          ],
-                                          Expanded(
-                                            child: _QuickAction(
-                                              icon: Icons.copy_rounded,
-                                              label: l10n.circlesCopyId,
-                                              onTap: () =>
-                                                  _toast(context, l10n.circlesCopiedId),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-
-                                    const SizedBox(height: 12),
-
-                                    if (isHost)
-                                      _HostControlsRow(
-                                        roomLocked: circleData?['is_locked'] ?? false,
-                                        isEditing: _editingLobbySettings,
-                                        isSaving: _savingLobbySettings,
-                                        onToggleLock: _toggleRoomLock,
-                                        onEdit: _toggleLobbySettingsEdit,
-                                        onCancel: _cancelLobbySettingsEdit,
-                                      )
-                                    else if (isSpectator)
-                                      _SpectatorTip()
-                                    else
-                                      _PlayerTip(),
-                                  ],
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
 
-                          const SizedBox(height: 12),
+                            const SizedBox(height: 12),
 
+                            const SizedBox(height: 14),
 
-                          const SizedBox(height: 14),
-
-                          // Players card
-                          Glass(
-                            radius: BorderRadius.circular(26),
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    _SectionTitle(l10n.circlesPlayers),
-                                    const Spacer(),
-                                      Text(
-                                        '${playerParticipants.length}/$maxPlayers',
-                                        style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
-                                          fontWeight: FontWeight.w800,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: 12),
-                                ...displayPlayers.map((final p) => Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 10),
-                                      child: _PlayerRow(
-                                        player: p,
-                                        onKick: null, // Host kick logic later
-                                        onToggleReady: isSpectator
-                                            ? null
-                                            : () async {
-                                                if (p.isEmpty) return;
-                                                // Find 'my' participant entry and toggle it
-                                                // This UI is a bit tricky because we're mapping
-                                                // displayPlayers (UI model) back to logic
-                                                // Better: just have a single "Ready" button at bottom
-                                              },
-                                        onToggleMute: p.isSelf &&
-                                                p.userId != null
-                                            ? () => _toggleMuteFor(p.userId!)
-                                            : null,
-                                        onAvatarTap: p.userId != null
-                                            ? () => _openProfileSheet(p.userId)
-                                            : null,
-                                      ),
-                                    )),
-                                const SizedBox(height: 6),
-                                  Text(
-                                    l10n.circlesHostStartWhenReady,
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 14),
-
-                          if (spectatorParticipants.isNotEmpty) ...[
+                            // Players card
                             Glass(
                               radius: BorderRadius.circular(26),
                               padding:
@@ -1647,266 +1698,384 @@ class _CircleLobbyScreenState extends State<CircleLobbyScreen> {
                                 children: [
                                   Row(
                                     children: [
-                                      _SectionTitle(l10n.circlesSpectators),
+                                      _SectionTitle(l10n.circlesPlayers),
                                       const Spacer(),
                                       Text(
-                                        '${spectatorParticipants.length}',
+                                        '${playerParticipants.length}/$maxPlayers',
                                         style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.70),
                                           fontWeight: FontWeight.w800,
                                         ),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 12),
-                                  Wrap(
-                                    spacing: 10,
-                                    runSpacing: 10,
-                                    children: spectatorParticipants.map((final p) {
-                                      final uid = p['user_id'];
+                                  ...displayPlayers.map((final p) => Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 10),
+                                        child: _PlayerRow(
+                                          player: p,
+                                          onKick: null, // Host kick logic later
+                                          onToggleReady: isSpectator
+                                              ? null
+                                              : () async {
+                                                  if (p.isEmpty) return;
+                                                  // Find 'my' participant entry and toggle it
+                                                  // This UI is a bit tricky because we're mapping
+                                                  // displayPlayers (UI model) back to logic
+                                                  // Better: just have a single "Ready" button at bottom
+                                                },
+                                          onToggleMute: p.isSelf &&
+                                                  p.userId != null
+                                              ? () => _toggleMuteFor(p.userId!)
+                                              : null,
+                                          onAvatarTap: p.userId != null
+                                              ? () =>
+                                                  _openProfileSheet(p.userId)
+                                              : null,
+                                        ),
+                                      )),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    l10n.circlesHostStartWhenReady,
+                                    style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.62),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(height: 14),
+
+                            if (spectatorParticipants.isNotEmpty) ...[
+                              Glass(
+                                radius: BorderRadius.circular(26),
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        _SectionTitle(l10n.circlesSpectators),
+                                        const Spacer(),
+                                        Text(
+                                          '${spectatorParticipants.length}',
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.70),
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Wrap(
+                                      spacing: 10,
+                                      runSpacing: 10,
+                                      children:
+                                          spectatorParticipants.map((final p) {
+                                        final uid = p['user_id'];
+                                        final profile = profilesCache[uid];
+                                        final name = profile?['display_name'] ??
+                                            profile?['username'] ??
+                                            l10n.circlesSpectator;
+                                        return _SpectatorChip(
+                                          name: name,
+                                          isOnline: uid != null &&
+                                              (presence[uid.toString()] ??
+                                                  false),
+                                          onTap: uid != null
+                                              ? () => _openProfileSheet(
+                                                  uid.toString())
+                                              : null,
+                                        );
+                                      }).toList(),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      l10n.circlesSpectatorCanWatch,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.62),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                            ],
+
+                            if (isHost && pendingParticipants.isNotEmpty) ...[
+                              Glass(
+                                radius: BorderRadius.circular(26),
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        _SectionTitle(l10n.circlesJoinRequests),
+                                        const Spacer(),
+                                        Text(
+                                          '${pendingParticipants.length}',
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.70),
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    ...pendingParticipants.map((final p) {
+                                      final uid = p['user_id']?.toString();
                                       final profile = profilesCache[uid];
                                       final name = profile?['display_name'] ??
                                           profile?['username'] ??
                                           l10n.circlesSpectator;
-                                      return _SpectatorChip(
+                                      final isActive =
+                                          circleData?['status'] == 'active';
+                                      final hasCapacity =
+                                          playerParticipants.length <
+                                              maxPlayers;
+                                      final canAccept =
+                                          !isActive && hasCapacity;
+                                      if (uid == null) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      return _JoinRequestRow(
                                         name: name,
-                                        isOnline: uid != null && (presence[uid.toString()] ?? false),
-                                        onTap: uid != null
-                                            ? () => _openProfileSheet(
-                                                uid.toString())
-                                            : null,
+                                        canAccept: canAccept,
+                                        isOnline: presence[uid] ?? false,
+                                        onAccept: () => _approveJoin(uid,
+                                            hasCapacity: hasCapacity),
+                                        onDecline: () => _declineJoin(uid),
                                       );
-                                    }).toList(),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    l10n.circlesSpectatorCanWatch,
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                          ],
-
-                          if (isHost && pendingParticipants.isNotEmpty) ...[
-                            Glass(
-                              radius: BorderRadius.circular(26),
-                              padding:
-                                  const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      _SectionTitle(l10n.circlesJoinRequests),
-                                      const Spacer(),
-                                      Text(
-                                        '${pendingParticipants.length}',
-                                        style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
-                                          fontWeight: FontWeight.w800,
-                                        ),
+                                    }),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      l10n.circlesAcceptSpectatorsHint,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.62),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12,
                                       ),
-                                    ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                            ],
+
+                            // Bottom CTA
+                            if (isHost) ...[
+                              NeonButton(
+                                label: _isStartingGame
+                                    ? l10n.circlesStartingGame
+                                    : (allReady
+                                        ? l10n.circlesStartGame
+                                        : l10n.circlesWaitingForPlayers),
+                                onTap: (allReady && !_isStartingGame)
+                                    ? () async {
+                                        if (circleData == null) return;
+                                        setState(() => _isStartingGame = true);
+
+                                        // 1. If questions are missing, fetch them now
+                                        final currentQs =
+                                            circleData?['questions'] as List?;
+                                        if (currentQs == null ||
+                                            currentQs.isEmpty) {
+                                          appLogger.debug(
+                                              'CircleLobby: Host starting but questions missing. Fetching...');
+                                          try {
+                                            final learnLang =
+                                                circleData?['to_lang']
+                                                        ?.toString() ??
+                                                    'es';
+                                            final speakLang =
+                                                circleData?['from_lang']
+                                                        ?.toString() ??
+                                                    'en';
+                                            final mode = circleData?['mode']
+                                                    ?.toString() ??
+                                                'Vocabulary';
+                                            final count = circleData?[
+                                                    'questions_count'] ??
+                                                10;
+                                            final courseId =
+                                                '$speakLang-$learnLang';
+
+                                            List<Map<String, dynamic>> newQs =
+                                                [];
+                                            if (mode == 'Vocabulary') {
+                                              newQs = await quizRepository
+                                                  .getVocabQuestionsFromSupabase(
+                                                      courseId, count);
+                                            } else {
+                                              newQs = await quizRepository
+                                                  .getSentenceQuestionsFromSupabase(
+                                                      courseId, count);
+                                            }
+
+                                            if (newQs.isNotEmpty) {
+                                              await circlesRepository
+                                                  .updateCircleQuestions(
+                                                      widget.circleId, newQs);
+                                              appLogger.debug(
+                                                  'CircleLobby: Uploaded ${newQs.length} questions.');
+                                            }
+                                          } catch (e) {
+                                            appLogger.debug(
+                                                'CircleLobby: Error pre-fetching questions: $e');
+                                            if (mounted) {
+                                              setState(() =>
+                                                  _isStartingGame = false);
+                                            }
+                                          }
+                                        }
+
+                                        // 2. Set status to active (this triggers navigation for everyone)
+                                        try {
+                                          await circlesRepository
+                                              .updateCircleStatus(
+                                                  widget.circleId, 'active');
+                                        } catch (e) {
+                                          appLogger.debug(
+                                              'CircleLobby: Error updating circle status: $e');
+                                          if (mounted) {
+                                            setState(
+                                                () => _isStartingGame = false);
+                                          }
+                                        }
+                                      }
+                                    : () {},
+                              ),
+                              const SizedBox(height: 10),
+                              _SecondaryButton(
+                                label: l10n.circlesLeaveCircle,
+                                onTap: () {
+                                  _handleHostExit();
+                                },
+                              ),
+                            ] else if (isSpectator) ...[
+                              NeonButton(
+                                label: isPendingJoin
+                                    ? l10n.circlesRequestSent
+                                    : l10n.circlesRequestToJoin,
+                                onTap: isPendingJoin ? null : _requestJoin,
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _SecondaryButton(
+                                      label: l10n.leave,
+                                      onTap: () =>
+                                          _confirmMemberExit(spectator: true),
+                                    ),
                                   ),
-                                  const SizedBox(height: 12),
-                                  ...pendingParticipants.map((final p) {
-                                    final uid = p['user_id']?.toString();
-                                    final profile = profilesCache[uid];
-                                    final name = profile?['display_name'] ??
-                                        profile?['username'] ??
-                                        l10n.circlesSpectator;
-                                    final isActive =
-                                        circleData?['status'] == 'active';
-                                    final hasCapacity =
-                                        playerParticipants.length < maxPlayers;
-                                    final canAccept = !isActive && hasCapacity;
-                                    if (uid == null) {
-                                      return const SizedBox.shrink();
-                                    }
-                                    return _JoinRequestRow(
-                                      name: name,
-                                      canAccept: canAccept,
-                                      isOnline: presence[uid] ?? false,
-                                      onAccept: () => _approveJoin(uid,
-                                          hasCapacity: hasCapacity),
-                                      onDecline: () => _declineJoin(uid),
-                                    );
-                                  }),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    l10n.circlesAcceptSpectatorsHint,
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62),
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 12,
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: NeonButton(
+                                      label: l10n.circlesWatchLive,
+                                      onTap: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (final _) =>
+                                                LiveQuizScreen(
+                                              questions: List<
+                                                      Map<String,
+                                                          dynamic>>.from(
+                                                  circleData?['questions'] ??
+                                                      []),
+                                              timePerQ:
+                                                  circleData?['time_per_q'] ??
+                                                      10,
+                                              role: LiveQuizRole.spectator,
+                                              circleId: widget.circleId,
+                                              joinRequested: isPendingJoin,
+                                            ),
+                                          ),
+                                        );
+                                        if (mounted) {
+                                          _loadCircle();
+                                        }
+                                      },
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(height: 14),
-                          ],
-
-                          // Bottom CTA
-                          if (isHost) ...[
-                            NeonButton(
-                              label: _isStartingGame
-                                  ? l10n.circlesStartingGame
-                                  : (allReady
-                                      ? l10n.circlesStartGame
-                                      : l10n.circlesWaitingForPlayers),
-                              onTap: (allReady && !_isStartingGame)
-                                  ? () async {
-                                      if (circleData == null) return;
-                                      setState(() => _isStartingGame = true);
-                                      
-                                      // 1. If questions are missing, fetch them now
-                                      final currentQs = circleData?['questions'] as List?;
-                                      if (currentQs == null || currentQs.isEmpty) {
-                                        debugPrint('CircleLobby: Host starting but questions missing. Fetching...');
-                                        try {
-                                          final learnLang = circleData?['to_lang']?.toString() ?? 'es';
-                                          final speakLang = circleData?['from_lang']?.toString() ?? 'en';
-                                          final mode = circleData?['mode']?.toString() ?? 'Vocabulary';
-                                          final count = circleData?['questions_count'] ?? 10;
-                                          final courseId = '$speakLang-$learnLang';
-
-                                          List<Map<String, dynamic>> newQs = [];
-                                          if (mode == 'Vocabulary') {
-                                            newQs = await quizRepository.getVocabQuestionsFromSupabase(courseId, count);
-                                          } else {
-                                            newQs = await quizRepository.getSentenceQuestionsFromSupabase(courseId, count);
-                                          }
-
-                                          if (newQs.isNotEmpty) {
-                                            await circlesRepository.updateCircleQuestions(widget.circleId, newQs);
-                                            debugPrint('CircleLobby: Uploaded ${newQs.length} questions.');
-                                          }
-                                        } catch (e) {
-                                          debugPrint('CircleLobby: Error pre-fetching questions: $e');
-                                          if (mounted) {
-                                            setState(() => _isStartingGame = false);
-                                          }
+                            ] else ...[
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _SecondaryButton(
+                                      label: l10n.leave,
+                                      onTap: () =>
+                                          _confirmMemberExit(spectator: false),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: NeonButton(
+                                      label: l10n.ready,
+                                      onTap: () async {
+                                        // Identify self
+                                        final me = participants.firstWhere(
+                                          (final p) =>
+                                              p['user_id'] ==
+                                              circlesRepository.currentUserId,
+                                          orElse: () => {},
+                                        );
+                                        if (me.isNotEmpty) {
+                                          final currentReady =
+                                              me['is_ready'] ?? false;
+                                          await circlesRepository.toggleReady(
+                                              widget.circleId, !currentReady);
                                         }
-                                      }
-
-                                      // 2. Set status to active (this triggers navigation for everyone)
-                                      try {
-                                        await circlesRepository.updateCircleStatus(widget.circleId, 'active');
-                                      } catch (e) {
-                                        debugPrint('CircleLobby: Error updating circle status: $e');
-                                        if (mounted) {
-                                          setState(() => _isStartingGame = false);
-                                        }
-                                      }
-                                    }
-                                  : () {},
-                            ),
-                            const SizedBox(height: 10),
-                            _SecondaryButton(
-                              label: l10n.circlesLeaveCircle,
-                              onTap: () {
-                                _handleHostExit();
-                              },
-                            ),
-                          ] else if (isSpectator) ...[
-                            NeonButton(
-                              label: isPendingJoin
-                                  ? l10n.circlesRequestSent
-                                  : l10n.circlesRequestToJoin,
-                              onTap: isPendingJoin ? null : _requestJoin,
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _SecondaryButton(
-                                    label: l10n.leave,
-                                    onTap: () => _confirmMemberExit(spectator: true),
+                                      },
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: NeonButton(
-                                    label: l10n.circlesWatchLive,
-                                    onTap: () async {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (final _) => LiveQuizScreen(
-                                            questions:
-                                                List<Map<String, dynamic>>.from(
-                                                    circleData?['questions'] ??
-                                                        []),
-                                            timePerQ:
-                                                circleData?['time_per_q'] ?? 10,
-                                            role: LiveQuizRole.spectator,
-                                            circleId: widget.circleId,
-                                            joinRequested: isPendingJoin,
-                                          ),
-                                        ),
-                                      );
-                                      if (mounted) {
-                                        _loadCircle();
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ] else ...[
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _SecondaryButton(
-                                    label: l10n.leave,
-                                    onTap: () => _confirmMemberExit(spectator: false),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: NeonButton(
-                                    label: l10n.ready,
-                                    onTap: () async {
-                                      // Identify self
-                                      final me = participants.firstWhere(
-                                        (final p) =>
-                                            p['user_id'] ==
-                                            circlesRepository.currentUserId,
-                                        orElse: () => {},
-                                      );
-                                      if (me.isNotEmpty) {
-                                        final currentReady =
-                                            me['is_ready'] ?? false;
-                                        await circlesRepository.toggleReady(
-                                            widget.circleId, !currentReady);
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                            ],
+                            const SizedBox(height: 20),
                           ],
-                          const SizedBox(height: 20),
-                        ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }
 
 enum _HostExitAction { transfer, end }
@@ -1993,7 +2162,10 @@ class _TopBar extends StatelessWidget {
               Text(
                 subtitle,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.70),
                   fontWeight: FontWeight.w700,
                   fontSize: 12.5,
                 ),
@@ -2028,7 +2200,12 @@ class _IconGlassButton extends StatelessWidget {
           width: 46,
           height: 46,
           child: Center(
-            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92), size: 22),
+            child: Icon(icon,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.92),
+                size: 22),
           ),
         ),
       ),
@@ -2075,11 +2252,20 @@ class _PillInfo extends StatelessWidget {
         color: Theme.of(context).brightness == Brightness.light
             ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
             : Colors.black.withValues(alpha: 0.14),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+        border: Border.all(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 22),
+          Icon(icon,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.9),
+              size: 22),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -2099,7 +2285,10 @@ class _PillInfo extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.65),
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
@@ -2140,13 +2329,18 @@ class _EditableSelectTile extends StatelessWidget {
               ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
               : Colors.black.withValues(alpha: 0.12),
           border: Border.all(
-              color:
-                  Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
             Icon(icon,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.9),
                 size: 20),
             const SizedBox(width: 10),
             Expanded(
@@ -2218,7 +2412,8 @@ class _ModeToggle extends StatelessWidget {
             ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
             : Colors.black.withValues(alpha: 0.14),
         border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
         ),
       ),
       child: Row(
@@ -2288,7 +2483,8 @@ class _LevelPicker extends StatelessWidget {
             ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
             : Colors.black.withValues(alpha: 0.14),
         border: Border.all(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14),
         ),
       ),
       child: Row(
@@ -2368,12 +2564,21 @@ class _QuickAction extends StatelessWidget {
           color: Theme.of(context).brightness == Brightness.light
               ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
               : Colors.black.withValues(alpha: 0.12),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.14)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 20),
+            Icon(icon,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.9),
+                size: 20),
             const SizedBox(width: 8),
             Text(
               label,
@@ -2412,12 +2617,22 @@ class _LobbyActionTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
-            Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 20),
+            Icon(icon,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.9),
+                size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: Column(
@@ -2435,7 +2650,10 @@ class _LobbyActionTile extends StatelessWidget {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.65),
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
                     ),
@@ -2444,7 +2662,10 @@ class _LobbyActionTile extends StatelessWidget {
               ),
             ),
             Icon(Icons.chevron_right_rounded,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.6)),
           ],
         ),
       ),
@@ -2490,7 +2711,10 @@ class _HostSettingRow extends StatelessWidget {
             icon: Icon(
               Icons.remove_circle_outline_rounded,
               color: onMinus == null
-                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
+                  ? Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.3)
                   : Theme.of(context).colorScheme.onSurface,
             ),
           ),
@@ -2507,7 +2731,10 @@ class _HostSettingRow extends StatelessWidget {
             icon: Icon(
               Icons.add_circle_outline_rounded,
               color: onPlus == null
-                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)
+                  ? Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.3)
                   : Theme.of(context).colorScheme.onSurface,
             ),
           ),
@@ -2582,7 +2809,11 @@ class _HostControlsRow extends StatelessWidget {
         color: Theme.of(context).brightness == Brightness.light
             ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
             : Colors.black.withValues(alpha: 0.14),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+        border: Border.all(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
@@ -2593,7 +2824,10 @@ class _HostControlsRow extends StatelessWidget {
             child: Text(
               l10n.circlesHostControls,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.9),
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -2617,7 +2851,11 @@ class _HostControlsRow extends StatelessWidget {
           Row(
             children: [
               Icon(Icons.lock_rounded,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75), size: 18),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.75),
+                  size: 18),
               AppNeonSwitch(value: roomLocked, onChanged: onToggleLock),
             ],
           ),
@@ -2640,13 +2878,20 @@ class _PlayerTip extends StatelessWidget {
       child: Row(
         children: [
           Icon(Icons.info_outline_rounded,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85), size: 20),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.85),
+              size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               'Tap Ready when you’re set. Host will start the match.',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.8),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -2670,13 +2915,20 @@ class _SpectatorTip extends StatelessWidget {
       child: Row(
         children: [
           Icon(Icons.visibility_rounded,
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85), size: 20),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.85),
+              size: 20),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               "You're spectating. Watch live once the host starts.",
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.8),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -2686,8 +2938,6 @@ class _SpectatorTip extends StatelessWidget {
     );
   }
 }
-
-
 
 class _PlayerRow extends StatelessWidget {
   final PlayerSlot player;
@@ -2716,9 +2966,16 @@ class _PlayerRow extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
         color: Theme.of(context).brightness == Brightness.light
-            ? Theme.of(context).colorScheme.onSurface.withValues(alpha: player.isEmpty ? 0.04 : 0.08)
+            ? Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: player.isEmpty ? 0.04 : 0.08)
             : Colors.black.withValues(alpha: player.isEmpty ? 0.08 : 0.14),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+        border: Border.all(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.14)),
       ),
       child: Row(
         children: [
@@ -2746,7 +3003,9 @@ class _PlayerRow extends StatelessWidget {
                         player.name,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
                               .withValues(alpha: player.isEmpty ? 0.55 : 1),
                           fontWeight: FontWeight.w900,
                           fontSize: 14,
@@ -2759,9 +3018,15 @@ class _PlayerRow extends StatelessWidget {
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(999),
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
-                          border:
-                              Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18)),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.10),
+                          border: Border.all(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.18)),
                         ),
                         child: Text(
                           'HOST',
@@ -2798,7 +3063,10 @@ class _PlayerRow extends StatelessWidget {
                           ? 'Waiting for player'
                           : (player.isReady ? 'Ready' : 'Not ready'),
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.70),
                         fontWeight: FontWeight.w700,
                         fontSize: 12,
                       ),
@@ -2828,7 +3096,8 @@ class _PlayerRow extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
                   color: Colors.black.withValues(alpha: 0.12),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.12)),
                 ),
                 child: Icon(
                   player.isReady
@@ -2850,12 +3119,22 @@ class _PlayerRow extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(14),
                   color: Theme.of(context).brightness == Brightness.light
-                      ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+                      ? Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.08)
                       : Colors.black.withValues(alpha: 0.12),
-                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                  border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.12)),
                 ),
                 child: Icon(Icons.close_rounded,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85)),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.85)),
               ),
             ),
           ],
@@ -2873,10 +3152,12 @@ class _MicBadge extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    final color =
-        muted ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92);
-    final bg =
-        muted ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12);
+    final color = muted
+        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55)
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92);
+    final bg = muted
+        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12);
 
     return Stack(
       alignment: Alignment.center,
@@ -2887,7 +3168,11 @@ class _MicBadge extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
             color: bg,
-            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+            border: Border.all(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.14)),
             boxShadow: speaking
                 ? [
                     BoxShadow(
@@ -2948,13 +3233,18 @@ class _JoinRequestRow extends StatelessWidget {
           color: Theme.of(context).brightness == Brightness.light
               ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
               : Colors.black.withValues(alpha: 0.12),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.14)),
         ),
         child: Row(
           children: [
             Stack(
               children: [
-                Icon(Icons.person_rounded, color: Theme.of(context).colorScheme.onSurface, size: 20),
+                Icon(Icons.person_rounded,
+                    color: Theme.of(context).colorScheme.onSurface, size: 20),
                 if (isOnline)
                   Positioned(
                     right: 0,
@@ -2965,7 +3255,9 @@ class _JoinRequestRow extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: const Color(0xFF58F7B6),
                         shape: BoxShape.circle,
-                        border: Border.all(color: Theme.of(context).colorScheme.surface, width: 1),
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.surface,
+                            width: 1),
                       ),
                     ),
                   ),
@@ -3017,10 +3309,20 @@ class _MiniAction extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+            border: Border.all(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.14)),
           ),
-          child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92), size: 20),
+          child: Icon(icon,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.92),
+              size: 20),
         ),
       ),
     );
@@ -3044,8 +3346,9 @@ class _AvatarDot extends StatelessWidget {
 
   @override
   Widget build(final BuildContext context) {
-    final color =
-        empty ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85);
+    final color = empty
+        ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18)
+        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85);
 
     return Stack(
       alignment: Alignment.center,
@@ -3087,16 +3390,24 @@ class _AvatarDot extends StatelessWidget {
               height: 16,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isOnline 
+                color: isOnline
                     ? const Color(0xFF58F7B6)
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: muted ? 0.55 : 0.9),
+                    : Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: muted ? 0.55 : 0.9),
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surface
+                      .withValues(alpha: 0.7),
                   width: 1.5,
                 ),
               ),
               child: Icon(
-                isOnline ? Icons.check_circle_rounded : (muted ? Icons.mic_off_rounded : Icons.mic_rounded),
+                isOnline
+                    ? Icons.check_circle_rounded
+                    : (muted ? Icons.mic_off_rounded : Icons.mic_rounded),
                 size: 10,
                 color: Theme.of(context).colorScheme.surface,
               ),
@@ -3112,7 +3423,8 @@ class _SpectatorChip extends StatelessWidget {
   final bool isOnline;
   final VoidCallback? onTap;
 
-  const _SpectatorChip({required this.name, required this.onTap, this.isOnline = false});
+  const _SpectatorChip(
+      {required this.name, required this.onTap, this.isOnline = false});
 
   @override
   Widget build(final BuildContext context) {
@@ -3126,7 +3438,11 @@ class _SpectatorChip extends StatelessWidget {
           color: Theme.of(context).brightness == Brightness.light
               ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
               : Colors.black.withValues(alpha: 0.12),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.14)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -3135,7 +3451,12 @@ class _SpectatorChip extends StatelessWidget {
               width: 10,
               height: 10,
               decoration: BoxDecoration(
-                color: isOnline ? const Color(0xFF58F7B6) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
+                color: isOnline
+                    ? const Color(0xFF58F7B6)
+                    : Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.55),
                 shape: BoxShape.circle,
                 boxShadow: [
                   if (isOnline)
@@ -3183,7 +3504,11 @@ class _SecondaryButton extends StatelessWidget {
           color: Theme.of(context).brightness == Brightness.light
               ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)
               : Colors.black.withValues(alpha: 0.16),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.16)),
         ),
         child: Center(
           child: Text(

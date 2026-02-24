@@ -39,7 +39,8 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
   void initState() {
     super.initState();
     _messagesStream = circleChatRepository.getMessagesStream(widget.circleId);
-    _chatConfigStream = circleChatRepository.streamCircleChatConfig(widget.circleId);
+    _chatConfigStream =
+        circleChatRepository.streamCircleChatConfig(widget.circleId);
   }
 
   @override
@@ -50,7 +51,9 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
     super.dispose();
   }
 
-  Future<void> _send({final int slowModeSeconds = 0, final Set<String> mutedIds = const <String>{}}) async {
+  Future<void> _send(
+      {final int slowModeSeconds = 0,
+      final Set<String> mutedIds = const <String>{}}) async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     if (widget.meId != null && mutedIds.contains(widget.meId)) {
@@ -64,7 +67,8 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
       if (elapsed < slowModeSeconds) {
         final wait = slowModeSeconds - elapsed;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Slow mode: wait ${wait}s before sending again.')),
+          SnackBar(
+              content: Text('Slow mode: wait ${wait}s before sending again.')),
         );
         return;
       }
@@ -108,7 +112,8 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
     });
   }
 
-  Future<void> _loadMissingProfiles(final List<Map<String, dynamic>> messages) async {
+  Future<void> _loadMissingProfiles(
+      final List<Map<String, dynamic>> messages) async {
     if (_loadingProfiles) return;
     final ids = messages
         .map((final m) => m['sender_id']?.toString())
@@ -154,7 +159,8 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
               title: const Text('React 👍'),
               onTap: () async {
                 Navigator.pop(context);
-                await circleChatRepository.toggleReaction(messageId: messageId, emoji: '👍');
+                await circleChatRepository.toggleReaction(
+                    messageId: messageId, emoji: '👍');
               },
             ),
             ListTile(
@@ -162,7 +168,8 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
               title: const Text('React 🔥'),
               onTap: () async {
                 Navigator.pop(context);
-                await circleChatRepository.toggleReaction(messageId: messageId, emoji: '🔥');
+                await circleChatRepository.toggleReaction(
+                    messageId: messageId, emoji: '🔥');
               },
             ),
             if (isHost)
@@ -171,7 +178,8 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                 title: const Text('Pin as highlight'),
                 onTap: () async {
                   Navigator.pop(context);
-                  await circleChatRepository.pinHighlight(circleId: widget.circleId, message: content);
+                  await circleChatRepository.pinHighlight(
+                      circleId: widget.circleId, message: content);
                 },
               ),
             if (isHost && !isMe)
@@ -242,7 +250,9 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                 <String>{};
             final slowModeSeconds = config['chat_slow_mode_seconds'] is int
                 ? config['chat_slow_mode_seconds'] as int
-                : int.tryParse(config['chat_slow_mode_seconds']?.toString() ?? '0') ?? 0;
+                : int.tryParse(
+                        config['chat_slow_mode_seconds']?.toString() ?? '0') ??
+                    0;
             final highlighted = config['chat_highlight_text']?.toString() ?? '';
 
             return Column(
@@ -271,9 +281,12 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                             );
                           },
                           itemBuilder: (final _) => const [
-                            PopupMenuItem(value: 0, child: Text('Slow mode off')),
-                            PopupMenuItem(value: 5, child: Text('Slow mode 5s')),
-                            PopupMenuItem(value: 10, child: Text('Slow mode 10s')),
+                            PopupMenuItem(
+                                value: 0, child: Text('Slow mode off')),
+                            PopupMenuItem(
+                                value: 5, child: Text('Slow mode 5s')),
+                            PopupMenuItem(
+                                value: 10, child: Text('Slow mode 10s')),
                           ],
                         ),
                       IconButton(
@@ -288,24 +301,31 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                     child: Glass(
                       radius: BorderRadius.circular(12),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
                       child: Row(
                         children: [
-                          Icon(Icons.push_pin_rounded, size: 16, color: mainTextColor),
+                          Icon(Icons.push_pin_rounded,
+                              size: 16, color: mainTextColor),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               highlighted,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: TextStyle(color: mainTextColor, fontWeight: FontWeight.w700),
+                              style: TextStyle(
+                                  color: mainTextColor,
+                                  fontWeight: FontWeight.w700),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                Divider(height: 1, color: scheme.onSurface.withValues(alpha: isDark ? 0.10 : 0.12)),
+                Divider(
+                    height: 1,
+                    color: scheme.onSurface
+                        .withValues(alpha: isDark ? 0.10 : 0.12)),
                 Expanded(
                   child: StreamBuilder<List<Map<String, dynamic>>>(
                     stream: _messagesStream,
@@ -350,24 +370,36 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                         itemBuilder: (final context, final index) {
                           final message = messages[index];
                           final id = message['id']?.toString() ?? '';
-                          final senderId = message['sender_id']?.toString() ?? '';
-                          final isMe = senderId.isNotEmpty && senderId == widget.meId;
+                          final senderId =
+                              message['sender_id']?.toString() ?? '';
+                          final isMe =
+                              senderId.isNotEmpty && senderId == widget.meId;
                           final senderName = _nameFor(senderId);
                           final content = message['content']?.toString() ?? '';
-                          final readBy = (message['read_by'] as List?)?.map((final e) => e.toString()).toSet() ?? {};
-                          final reactions = (message['reactions'] as Map<String, dynamic>?) ?? const {};
+                          final readBy = (message['read_by'] as List?)
+                                  ?.map((final e) => e.toString())
+                                  .toSet() ??
+                              {};
+                          final reactions =
+                              (message['reactions'] as Map<String, dynamic>?) ??
+                                  const {};
 
-                          if (!isMe && widget.meId != null && !readBy.contains(widget.meId)) {
+                          if (!isMe &&
+                              widget.meId != null &&
+                              !readBy.contains(widget.meId)) {
                             _queueRead(id);
                           }
 
                           return Align(
-                            alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                            alignment: isMe
+                                ? Alignment.centerRight
+                                : Alignment.centerLeft,
                             child: Padding(
                               padding: const EdgeInsets.only(bottom: 10),
                               child: Column(
-                                crossAxisAlignment:
-                                    isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                crossAxisAlignment: isMe
+                                    ? CrossAxisAlignment.end
+                                    : CrossAxisAlignment.start,
                                 children: [
                                   if (!isMe)
                                     Padding(
@@ -385,13 +417,16 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                                           ),
                                           const SizedBox(width: 4),
                                           StreamBuilder<bool>(
-                                            stream: presenceRepository.streamOnlineStatus(senderId),
-                                            builder: (final context, final snapshot) {
+                                            stream: presenceRepository
+                                                .streamOnlineStatus(senderId),
+                                            builder: (final context,
+                                                final snapshot) {
                                               if (snapshot.data == true) {
                                                 return Container(
                                                   width: 6,
                                                   height: 6,
-                                                  decoration: const BoxDecoration(
+                                                  decoration:
+                                                      const BoxDecoration(
                                                     color: Color(0xFF58F7B6),
                                                     shape: BoxShape.circle,
                                                   ),
@@ -422,24 +457,36 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                                       padding: const EdgeInsets.only(top: 4),
                                       child: Wrap(
                                         spacing: 6,
-                                        children: reactions.entries.map((final entry) {
-                                          final count = (entry.value as List?)?.length ?? 0;
+                                        children: reactions.entries
+                                            .map((final entry) {
+                                          final count =
+                                              (entry.value as List?)?.length ??
+                                                  0;
                                           return GestureDetector(
-                                            onTap: () => circleChatRepository.toggleReaction(
+                                            onTap: () => circleChatRepository
+                                                .toggleReaction(
                                               messageId: id,
                                               emoji: entry.key,
                                             ),
                                             child: Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4),
                                               decoration: BoxDecoration(
                                                 color: isDark
-                                                    ? Colors.white.withValues(alpha: 0.1)
-                                                    : scheme.onSurface.withValues(alpha: 0.07),
-                                                borderRadius: BorderRadius.circular(12),
+                                                    ? Colors.white
+                                                        .withValues(alpha: 0.1)
+                                                    : scheme.onSurface
+                                                        .withValues(
+                                                            alpha: 0.07),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
                                               child: Text(
                                                 '${entry.key} $count',
-                                                style: TextStyle(color: mainTextColor),
+                                                style: TextStyle(
+                                                    color: mainTextColor),
                                               ),
                                             ),
                                           );
@@ -460,7 +507,9 @@ class _CircleChatSheetState extends State<CircleChatSheet> {
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Text(
                       'Slow mode is on (${slowModeSeconds}s)',
-                      style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          color: secondaryTextColor,
+                          fontWeight: FontWeight.w600),
                     ),
                   ),
                 Padding(
@@ -554,7 +603,9 @@ class CircleChatBubble extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 280),
       decoration: BoxDecoration(
         color: isMe
-            ? (isDark ? const Color(0xFF5A67FF) : scheme.primary.withValues(alpha: 0.86))
+            ? (isDark
+                ? const Color(0xFF5A67FF)
+                : scheme.primary.withValues(alpha: 0.86))
             : (isDark
                 ? Colors.white.withValues(alpha: 0.12)
                 : scheme.surfaceContainerHighest.withValues(alpha: 0.72)),
@@ -574,7 +625,11 @@ class CircleChatBubble extends StatelessWidget {
           Text(
             text,
             style: TextStyle(
-              color: isMe ? Colors.white : (isDark ? Colors.white.withValues(alpha: 0.95) : scheme.onSurface),
+              color: isMe
+                  ? Colors.white
+                  : (isDark
+                      ? Colors.white.withValues(alpha: 0.95)
+                      : scheme.onSurface),
               fontWeight: FontWeight.w500,
               fontSize: 15,
               height: 1.3,
@@ -585,7 +640,11 @@ class CircleChatBubble extends StatelessWidget {
             Icon(
               isRead ? Icons.done_all_rounded : Icons.check_rounded,
               size: 16,
-              color: isRead ? const Color(0xFF4DE1F8) : (isDark ? Colors.white.withValues(alpha: 0.6) : scheme.onSurface.withValues(alpha: 0.45)),
+              color: isRead
+                  ? const Color(0xFF4DE1F8)
+                  : (isDark
+                      ? Colors.white.withValues(alpha: 0.6)
+                      : scheme.onSurface.withValues(alpha: 0.45)),
             ),
           ],
         ],

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/core/widgets/glass.dart';
 import 'package:soma/core/widgets/neon_button.dart';
 import 'package:soma/data/presence_repository.dart';
@@ -19,7 +20,7 @@ class AddFriendScreen extends StatefulWidget {
 class _AddFriendScreenState extends State<AddFriendScreen> {
   final controller = TextEditingController();
   bool loading = false;
-  
+
   // Search state
   Timer? _debounce;
   List<Map<String, dynamic>> _searchResults = [];
@@ -34,7 +35,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
 
   void _onSearchChanged(final String query) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    
+
     if (query.trim().isEmpty) {
       setState(() {
         _searchResults = [];
@@ -53,7 +54,7 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
           _searching = false;
         });
       } catch (e) {
-        debugPrint('Search error: $e');
+        appLogger.debug('Search error: $e');
         if (mounted) setState(() => _searching = false);
       }
     });
@@ -123,27 +124,27 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
     final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     return Scaffold(
       body: SafeArea(
-          child: LayoutBuilder(
-            builder: (final context, final constraints) {
-              final compactHeight = constraints.maxHeight < 760;
-              final keyboardVisible = keyboardInset > 0;
-              final topSpacing = compactHeight ? 12.0 : 16.0;
-              final sectionSpacing = compactHeight ? 10.0 : 12.0;
-              final resultListHeight = keyboardVisible
-                  ? (compactHeight ? 110.0 : 130.0)
-                  : (compactHeight ? 160.0 : 200.0);
+        child: LayoutBuilder(
+          builder: (final context, final constraints) {
+            final compactHeight = constraints.maxHeight < 760;
+            final keyboardVisible = keyboardInset > 0;
+            final topSpacing = compactHeight ? 12.0 : 16.0;
+            final sectionSpacing = compactHeight ? 10.0 : 12.0;
+            final resultListHeight = keyboardVisible
+                ? (compactHeight ? 110.0 : 130.0)
+                : (compactHeight ? 160.0 : 200.0);
 
-              return Align(
-                alignment: Alignment.topCenter,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 760),
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () => FocusScope.of(context).unfocus(),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-                      child: Column(
-                        children: [
+            return Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 760),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () => FocusScope.of(context).unfocus(),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                    child: Column(
+                      children: [
                         Row(
                           children: [
                             _IconGlass(
@@ -168,7 +169,8 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                         Expanded(
                           child: SingleChildScrollView(
                             physics: const BouncingScrollPhysics(),
-                            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                            keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior.onDrag,
                             child: Glass(
                               radius: BorderRadius.circular(22),
                               padding: const EdgeInsets.all(14),
@@ -178,25 +180,32 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                                   Text(
                                     l10n.addFriendFindByUsername,
                                     style: TextStyle(
-                                      color: scheme.onSurface.withValues(alpha: 0.75),
+                                      color: scheme.onSurface
+                                          .withValues(alpha: 0.75),
                                       fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                   const SizedBox(height: 10),
                                   Glass(
                                     radius: BorderRadius.circular(18),
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 10),
                                     child: Row(
                                       children: [
                                         Expanded(
                                           child: TextField(
                                             controller: controller,
                                             onChanged: _onSearchChanged,
-                                            style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w800),
+                                            style: TextStyle(
+                                                color: scheme.onSurface,
+                                                fontWeight: FontWeight.w800),
                                             cursorColor: scheme.primary,
                                             decoration: InputDecoration(
-                                              hintText: l10n.addFriendUsernameHint,
-                                              hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
+                                              hintText:
+                                                  l10n.addFriendUsernameHint,
+                                              hintStyle: TextStyle(
+                                                  color: scheme.onSurface
+                                                      .withValues(alpha: 0.45)),
                                               border: InputBorder.none,
                                               isDense: true,
                                             ),
@@ -204,7 +213,8 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                                         ),
                                         if (_searching)
                                           Padding(
-                                            padding: const EdgeInsets.only(left: 8),
+                                            padding:
+                                                const EdgeInsets.only(left: 8),
                                             child: SizedBox(
                                               width: 16,
                                               height: 16,
@@ -220,13 +230,16 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                                   SizedBox(height: sectionSpacing),
                                   if (_searchResults.isNotEmpty) ...[
                                     ConstrainedBox(
-                                      constraints: BoxConstraints(maxHeight: resultListHeight),
+                                      constraints: BoxConstraints(
+                                          maxHeight: resultListHeight),
                                       child: ListView.separated(
                                         shrinkWrap: true,
                                         physics: const BouncingScrollPhysics(),
                                         itemCount: _searchResults.length,
-                                        separatorBuilder: (final _, final __) => const SizedBox(height: 8),
-                                        itemBuilder: (final context, final index) {
+                                        separatorBuilder: (final _, final __) =>
+                                            const SizedBox(height: 8),
+                                        itemBuilder:
+                                            (final context, final index) {
                                           final user = _searchResults[index];
                                           return _SearchResultRow(
                                             user: user,
@@ -234,7 +247,9 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                                               Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (final _) => ProfileScreen(userId: user['id']),
+                                                  builder: (final _) =>
+                                                      ProfileScreen(
+                                                          userId: user['id']),
                                                 ),
                                               );
                                             },
@@ -246,7 +261,8 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                                     Text(
                                       l10n.addFriendTip,
                                       style: TextStyle(
-                                        color: scheme.onSurface.withValues(alpha: 0.55),
+                                        color: scheme.onSurface
+                                            .withValues(alpha: 0.55),
                                         fontWeight: FontWeight.w700,
                                         fontSize: 12,
                                       ),
@@ -265,18 +281,20 @@ class _AddFriendScreenState extends State<AddFriendScreen> {
                             bottom: math.min(keyboardInset, 24),
                           ),
                           child: NeonButton(
-                            label: loading ? l10n.addFriendSending : l10n.addFriendSendRequest,
+                            label: loading
+                                ? l10n.addFriendSending
+                                : l10n.addFriendSendRequest,
                             onTap: loading ? () {} : _send,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  ),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -295,7 +313,11 @@ class _IconGlass extends StatelessWidget {
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92)),
+        child: Icon(icon,
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.92)),
       ),
     );
   }
@@ -344,7 +366,8 @@ class _SearchResultRow extends StatelessWidget {
                   ),
                 ),
                 StreamBuilder<bool>(
-                  stream: presenceRepository.streamOnlineStatus(user['id'] ?? ''),
+                  stream:
+                      presenceRepository.streamOnlineStatus(user['id'] ?? ''),
                   builder: (final context, final snapshot) {
                     if (snapshot.data == true) {
                       return Positioned(

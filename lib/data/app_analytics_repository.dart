@@ -1,11 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AppAnalyticsRepository {
   final _supabase = Supabase.instance.client;
 
-  Future<void> track(final String event, {final Map<String, dynamic>? metadata}) async {
+  Future<void> track(final String event,
+      {final Map<String, dynamic>? metadata}) async {
     final uid = _supabase.auth.currentUser?.id;
     final payload = {
       'event_name': event,
@@ -17,9 +18,10 @@ class AppAnalyticsRepository {
     try {
       await _supabase.from('app_events').insert(payload);
     } catch (e) {
-      debugPrint('[app_analytics_fallback] $event $metadata ($e)');
+      appLogger.debug('[app_analytics_fallback] $event $metadata ($e)');
     }
   }
 }
 
-AppAnalyticsRepository get appAnalyticsRepository => locator<AppAnalyticsRepository>();
+AppAnalyticsRepository get appAnalyticsRepository =>
+    locator<AppAnalyticsRepository>();

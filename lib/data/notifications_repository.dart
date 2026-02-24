@@ -20,15 +20,11 @@ class NotificationsRepository {
   Future<void> markAsRead(final String notificationId) async {
     await _supabase
         .from('notifications')
-        .update({'is_read': true})
-        .eq('id', notificationId);
+        .update({'is_read': true}).eq('id', notificationId);
   }
 
   Future<void> deleteNotification(final String notificationId) async {
-    await _supabase
-        .from('notifications')
-        .delete()
-        .eq('id', notificationId);
+    await _supabase.from('notifications').delete().eq('id', notificationId);
   }
 
   Future<void> markAllAsRead() async {
@@ -37,8 +33,7 @@ class NotificationsRepository {
 
     await _supabase
         .from('notifications')
-        .update({'is_read': true})
-        .eq('user_id', uid);
+        .update({'is_read': true}).eq('user_id', uid);
   }
 
   Future<void> sendCircleInvite({
@@ -74,7 +69,8 @@ class NotificationsRepository {
       'notif_copy_friend_request',
       buckets: const ['A', 'B'],
     );
-    final title = variant == 'B' ? 'Someone wants to connect' : 'New friend request';
+    final title =
+        variant == 'B' ? 'Someone wants to connect' : 'New friend request';
     final body = variant == 'B'
         ? '$fromUserName sent you a connection invite.'
         : '$fromUserName wants to add you as a friend.';
@@ -97,4 +93,5 @@ class NotificationsRepository {
   }
 }
 
-NotificationsRepository get notificationsRepository => locator<NotificationsRepository>();
+NotificationsRepository get notificationsRepository =>
+    locator<NotificationsRepository>();

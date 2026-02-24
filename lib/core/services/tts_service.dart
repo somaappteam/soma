@@ -1,6 +1,8 @@
 import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:soma/core/services/app_logger.dart';
 
 class TtsService {
   final FlutterTts _tts = FlutterTts();
@@ -107,11 +109,11 @@ class TtsService {
 
       _tts.setErrorHandler((final msg) {
         _isSpeaking = false;
-        debugPrint('TTS Error handler: $msg');
+        appLogger.debug('TTS Error handler: $msg');
       });
     } catch (e) {
       _initialized = false;
-      debugPrint('Error initializing TTS: $e');
+      appLogger.debug('Error initializing TTS: $e');
     }
   }
 
@@ -123,7 +125,7 @@ class TtsService {
       // Map UI rate to engine rate (e.g., UI 1.0 -> Engine 0.75) for natural playback.
       await _tts.setSpeechRate(_engineRate(rate));
     } catch (e) {
-      debugPrint('Error setting TTS rate: $e');
+      appLogger.debug('Error setting TTS rate: $e');
     }
   }
 
@@ -148,11 +150,11 @@ class TtsService {
             return true;
           }
         }
-        debugPrint('TTS: language "$bcp47" not available on this device.');
+        appLogger.debug('TTS: language "$bcp47" not available on this device.');
         return false;
       }
     } catch (e) {
-      debugPrint('TTS setLanguage error for "$langCode": $e');
+      appLogger.debug('TTS setLanguage error for "$langCode": $e');
       return false;
     }
   }
@@ -191,7 +193,7 @@ class TtsService {
       }
       await _tts.speak(text);
     } catch (e) {
-      debugPrint('Error speaking TTS: $e');
+      appLogger.debug('Error speaking TTS: $e');
     }
   }
 
@@ -202,7 +204,7 @@ class TtsService {
         _isSpeaking = false;
       }
     } catch (e) {
-      debugPrint('Error stopping TTS: $e');
+      appLogger.debug('Error stopping TTS: $e');
     }
   }
 }

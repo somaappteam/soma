@@ -1,12 +1,14 @@
+import 'package:soma/core/services/app_logger.dart';
+
 void main() {
-  print('--- Quiz Logic Verification ---');
-  
+  appLogger.info('--- Quiz Logic Verification ---');
+
   final List<Map<String, dynamic>> targetList = [
     {'concept_id': 1, 'word': 'word1'},
     {'concept_id': 2, 'word': 'word2'},
     {'concept_id': 3, 'word': 'null'}, // Should be filtered
     {'concept_id': 4, 'word': 'word4'},
-    {'concept_id': 5, 'word': ''},      // Should be filtered
+    {'concept_id': 5, 'word': ''}, // Should be filtered
     {'concept_id': 6, 'word': 'word6'},
     {'concept_id': 7, 'word': 'word7'},
     {'concept_id': 8, 'word': 'word8'},
@@ -32,24 +34,24 @@ void main() {
   };
 
   // Simulated QuizRepository._formatVocabWord logic
-  String format(Map<String, dynamic> row) {
+  String format(final Map<String, dynamic> row) {
     final w = row['word']?.toString() ?? '';
     return (w.toLowerCase() == 'null' || w.isEmpty) ? '' : w;
   }
 
-  print('Simulating 12 candidates with 3 invalid entries...');
-  
+  appLogger.info('Simulating 12 candidates with 3 invalid entries...');
+
   // --- OLD LOGIC SIMULATION ---
   final limit = 10;
   final oldSelected = targetList.take(limit).toList();
-  final oldFiltered = oldSelected.where((row) {
+  final oldFiltered = oldSelected.where((final row) {
     final conceptId = row['concept_id'] as int;
     final sourceRow = sourceByConcept[conceptId];
     if (sourceRow == null) return false;
     return format(row).isNotEmpty && format(sourceRow).isNotEmpty;
   }).toList();
-  
-  print('OLD LOGIC (filter after take): ${oldFiltered.length} items');
+
+  appLogger.info('OLD LOGIC (filter after take): ${oldFiltered.length} items');
 
   // --- NEW LOGIC SIMULATION ---
   final candidates = <Map<String, dynamic>>[];
@@ -66,11 +68,12 @@ void main() {
   }
 
   final newSelected = candidates.take(limit).toList();
-  print('NEW LOGIC (filter before take): ${newSelected.length} items');
+  appLogger.info('NEW LOGIC (filter before take): ${newSelected.length} items');
 
   if (newSelected.length > oldFiltered.length) {
-    print('SUCCESS: New logic produced more valid items than old logic.');
+    appLogger
+        .info('SUCCESS: New logic produced more valid items than old logic.');
   } else {
-    print('FAILURE: New logic did not improve count.');
+    appLogger.info('FAILURE: New logic did not improve count.');
   }
 }

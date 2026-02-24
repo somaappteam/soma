@@ -1,4 +1,3 @@
-
 class LegalData {
   static const String privacyPolicy = '''
 # Privacy Policy

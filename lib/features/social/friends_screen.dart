@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/core/widgets/glass.dart';
 import 'package:soma/data/auth_repository.dart';
 import 'package:soma/data/presence_repository.dart';
@@ -22,9 +23,8 @@ class FriendsScreen extends StatefulWidget {
 }
 
 enum FriendViewFilter { all, online, requests }
+
 enum FriendSortOption { recent, onlineFirst, name }
-
-
 
 class _FriendsScreenState extends State<FriendsScreen> {
   String query = '';
@@ -51,7 +51,9 @@ class _FriendsScreenState extends State<FriendsScreen> {
     if (listEquals(ids, _currentFriendIds)) return;
     _currentFriendIds = ids;
     _onlineSub?.cancel();
-    _onlineSub = presenceRepository.streamMultipleOnlineStatuses(ids).listen((final statuses) {
+    _onlineSub = presenceRepository
+        .streamMultipleOnlineStatuses(ids)
+        .listen((final statuses) {
       if (!mounted) return;
       setState(() => _onlineStatuses = statuses);
     });
@@ -76,12 +78,15 @@ class _FriendsScreenState extends State<FriendsScreen> {
       next.add(friendId);
     }
     setState(() => _favoriteFriendIds = next);
-    await settingsRepository.updateSetting('favorite_friend_ids', next.toList());
-    _trackUiEvent('favorite_toggle', {'friendId': friendId, 'favorited': next.contains(friendId)});
+    await settingsRepository.updateSetting(
+        'favorite_friend_ids', next.toList());
+    _trackUiEvent('favorite_toggle',
+        {'friendId': friendId, 'favorited': next.contains(friendId)});
   }
 
   void _trackUiEvent(final String event, [final Map<String, dynamic>? extras]) {
-    debugPrint('[friends_ui] $event ${extras ?? const <String, dynamic>{}}');
+    appLogger
+        .debug('[friends_ui] $event ${extras ?? const <String, dynamic>{}}');
   }
 
   // Simplified handling for mapping friendship ID
@@ -101,8 +106,12 @@ class _FriendsScreenState extends State<FriendsScreen> {
         title: Text('Cancel request?'),
         content: Text('You can send a new friend request later.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.decline)),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l10n.cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(l10n.decline)),
         ],
       ),
     );
@@ -116,10 +125,15 @@ class _FriendsScreenState extends State<FriendsScreen> {
       context: context,
       builder: (final ctx) => AlertDialog(
         title: Text('Remove friend?'),
-        content: Text("You will no longer appear in each other's friends list."),
+        content:
+            Text("You will no longer appear in each other's friends list."),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
-          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(l10n.leave)),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text(l10n.cancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text(l10n.leave)),
         ],
       ),
     );
@@ -143,7 +157,8 @@ class _FriendsScreenState extends State<FriendsScreen> {
 
   Future<void> _copyInviteLink() async {
     final uid = authRepository.currentUser?.id ?? 'guest';
-    await Clipboard.setData(ClipboardData(text: 'https://soma.app/invite/$uid'));
+    await Clipboard.setData(
+        ClipboardData(text: 'https://soma.app/invite/$uid'));
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Invite link copied')),
@@ -158,448 +173,518 @@ class _FriendsScreenState extends State<FriendsScreen> {
 
     return Scaffold(
       body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    _IconGlass(
-                      icon: Icons.arrow_back_ios_new_rounded,
-                      onTap: () => Navigator.pop(context),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  _IconGlass(
+                    icon: Icons.arrow_back_ios_new_rounded,
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    l10n.friendsTitle,
+                    style: TextStyle(
+                      color: scheme.onSurface,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
                     ),
-                    const SizedBox(width: 12),
-                     Text(
-                      l10n.friendsTitle,
-                      style: TextStyle(
-                        color: scheme.onSurface,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
+                  ),
+                  const Spacer(),
+                  _IconGlass(
+                    icon: Icons.person_add_alt_1_rounded,
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (final _) => const AddFriendScreen()),
+                      );
+                      if (!mounted) return;
+                    },
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              // Search
+              Glass(
+                radius: BorderRadius.circular(20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: Row(
+                  children: [
+                    Icon(Icons.search_rounded,
+                        color: scheme.onSurface.withValues(alpha: 0.7)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        onChanged: (final v) => setState(() => query = v),
+                        style: TextStyle(
+                            color: scheme.onSurface,
+                            fontWeight: FontWeight.w700),
+                        cursorColor: scheme.onSurface,
+                        decoration: InputDecoration(
+                          hintText: l10n.searchFriendsHint,
+                          hintStyle: TextStyle(
+                              color: scheme.onSurface.withValues(alpha: 0.45)),
+                          border: InputBorder.none,
+                          isDense: true,
+                        ),
                       ),
                     ),
-                    const Spacer(),
-                    _IconGlass(
-                      icon: Icons.person_add_alt_1_rounded,
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (final _) => const AddFriendScreen()),
-                        );
-                        if (!mounted) return;
-                      },
-                    ),
+                    if (query.isNotEmpty)
+                      GestureDetector(
+                        onTap: () => setState(() => query = ''),
+                        child: Icon(Icons.close_rounded,
+                            color: scheme.onSurface.withValues(alpha: 0.7)),
+                      ),
                   ],
                 ),
+              ),
 
-                const SizedBox(height: 14),
+              const SizedBox(height: 14),
 
-                // Search
-                Glass(
-                  radius: BorderRadius.circular(20),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search_rounded,
-                          color: scheme.onSurface.withValues(alpha: 0.7)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          onChanged: (final v) => setState(() => query = v),
-                          style: TextStyle(
-                              color: scheme.onSurface, fontWeight: FontWeight.w700),
-                          cursorColor: scheme.onSurface,
-                          decoration: InputDecoration(
-                            hintText: l10n.searchFriendsHint,
-                            hintStyle: TextStyle(
-                                color: scheme.onSurface.withValues(alpha: 0.45)),
-                            border: InputBorder.none,
-                            isDense: true,
-                          ),
-                        ),
-                      ),
-                      if (query.isNotEmpty)
-                        GestureDetector(
-                          onTap: () => setState(() => query = ''),
-                          child: Icon(Icons.close_rounded,
-                              color: scheme.onSurface.withValues(alpha: 0.7)),
-                        ),
-                    ],
-                  ),
-                ),
+              Expanded(
+                child: StreamBuilder<List<Map<String, dynamic>>>(
+                  stream: socialRepository.getFriendsStream(),
+                  builder: (final context, final friendsSnapshot) {
+                    return StreamBuilder<List<Map<String, dynamic>>>(
+                      stream: socialRepository.getIncomingRequestsStream(),
+                      builder: (final context, final incomingSnapshot) {
+                        return StreamBuilder<List<Map<String, dynamic>>>(
+                          stream: socialRepository.getOutgoingRequestsStream(),
+                          builder: (final context, final outgoingSnapshot) {
+                            if (friendsSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator(
+                                      color: Color(0xFF2AFADF)));
+                            }
 
-                const SizedBox(height: 14),
+                            final friendsData = friendsSnapshot.data ?? [];
+                            final incomingData = incomingSnapshot.data ?? [];
+                            final outgoingData = outgoingSnapshot.data ?? [];
 
-                Expanded(
-                  child: StreamBuilder<List<Map<String, dynamic>>>(
-                    stream: socialRepository.getFriendsStream(),
-                    builder: (final context, final friendsSnapshot) {
-                      return StreamBuilder<List<Map<String, dynamic>>>(
-                        stream: socialRepository.getIncomingRequestsStream(),
-                        builder: (final context, final incomingSnapshot) {
-                          return StreamBuilder<List<Map<String, dynamic>>>(
-                            stream:
-                                socialRepository.getOutgoingRequestsStream(),
-                            builder: (final context, final outgoingSnapshot) {
-                              if (friendsSnapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Center(
-                                    child: CircularProgressIndicator(
-                                        color: Color(0xFF2AFADF)));
+                            final friends = friendsData
+                                .map((final data) => Friend(
+                                      id: data['id'],
+                                      username:
+                                          data['username'] ?? l10n.genericUser,
+                                      subtitle: data['location'] ??
+                                          l10n.somaLearnerSubtitle,
+                                      status: FriendStatus.friend,
+                                    ))
+                                .toList();
+
+                            _updateOnlineSubscription(
+                                friends.map((final f) => f.id).toList());
+
+                            final incoming = incomingData.map((final data) {
+                              final requester = data['requester'] ?? {};
+                              return Friend(
+                                id: data['id'].toString(),
+                                username:
+                                    requester['username'] ?? l10n.genericUser,
+                                subtitle: l10n.friendIncomingRequestLabel,
+                                status: FriendStatus.incomingRequest,
+                              );
+                            }).toList();
+
+                            final outgoing = outgoingData.map((final data) {
+                              final addressee = data['addressee'] ?? {};
+                              return Friend(
+                                id: data['id'].toString(),
+                                username:
+                                    addressee['username'] ?? l10n.genericUser,
+                                subtitle: l10n.friendRequestSentLabel,
+                                status: FriendStatus.outgoingRequest,
+                              );
+                            }).toList();
+
+                            final filtered = friends.where((final f) {
+                              final q = query.trim().toLowerCase();
+                              if (q.isEmpty) return true;
+                              return f.username.toLowerCase().contains(q) ||
+                                  (f.subtitle ?? '').toLowerCase().contains(q);
+                            }).toList();
+
+                            filtered.sort((final a, final b) {
+                              final q = query.trim().toLowerCase();
+                              final aFav =
+                                  _favoriteFriendIds.contains(a.id) ? 0 : 1;
+                              final bFav =
+                                  _favoriteFriendIds.contains(b.id) ? 0 : 1;
+                              if (aFav != bFav) return aFav.compareTo(bFav);
+
+                              if (_sort == FriendSortOption.onlineFirst) {
+                                final aOnline = _onlineStatuses[a.id] == true;
+                                final bOnline = _onlineStatuses[b.id] == true;
+                                final onlineCmp = (bOnline ? 1 : 0)
+                                    .compareTo(aOnline ? 1 : 0);
+                                if (onlineCmp != 0) return onlineCmp;
                               }
 
-                              final friendsData = friendsSnapshot.data ?? [];
-                              final incomingData = incomingSnapshot.data ?? [];
-                              final outgoingData = outgoingSnapshot.data ?? [];
+                              if (_sort == FriendSortOption.name) {
+                                return a.username
+                                    .toLowerCase()
+                                    .compareTo(b.username.toLowerCase());
+                              }
 
-                              final friends = friendsData
-                                  .map((final data) => Friend(
-                                        id: data['id'],
-                                        username: data['username'] ?? l10n.genericUser,
-                                        subtitle:
-                                            data['location'] ?? l10n.somaLearnerSubtitle,
-                                        status: FriendStatus.friend,
-                                      ))
-                                  .toList();
-                              
-                              _updateOnlineSubscription(friends.map((final f) => f.id).toList());
-
-                              final incoming = incomingData.map((final data) {
-                                final requester = data['requester'] ?? {};
-                                return Friend(
-                                  id: data['id'].toString(),
-                                  username: requester['username'] ?? l10n.genericUser,
-                                  subtitle: l10n.friendIncomingRequestLabel,
-                                  status: FriendStatus.incomingRequest,
-                                );
-                              }).toList();
-
-                              final outgoing = outgoingData.map((final data) {
-                                final addressee = data['addressee'] ?? {};
-                                return Friend(
-                                  id: data['id'].toString(),
-                                  username: addressee['username'] ?? l10n.genericUser,
-                                  subtitle: l10n.friendRequestSentLabel,
-                                  status: FriendStatus.outgoingRequest,
-                                );
-                              }).toList();
-
-                              final filtered = friends.where((final f) {
-                                final q = query.trim().toLowerCase();
-                                if (q.isEmpty) return true;
-                                return f.username.toLowerCase().contains(q) ||
-                                    (f.subtitle ?? '').toLowerCase().contains(q);
-                              }).toList();
-
-                              filtered.sort((final a, final b) {
-                                final q = query.trim().toLowerCase();
-                                final aFav = _favoriteFriendIds.contains(a.id) ? 0 : 1;
-                                final bFav = _favoriteFriendIds.contains(b.id) ? 0 : 1;
-                                if (aFav != bFav) return aFav.compareTo(bFav);
-
-                                if (_sort == FriendSortOption.onlineFirst) {
-                                  final aOnline = _onlineStatuses[a.id] == true;
-                                  final bOnline = _onlineStatuses[b.id] == true;
-                                  final onlineCmp = (bOnline ? 1 : 0).compareTo(aOnline ? 1 : 0);
-                                  if (onlineCmp != 0) return onlineCmp;
+                              if (q.isNotEmpty) {
+                                final aStarts =
+                                    a.username.toLowerCase().startsWith(q)
+                                        ? 0
+                                        : 1;
+                                final bStarts =
+                                    b.username.toLowerCase().startsWith(q)
+                                        ? 0
+                                        : 1;
+                                if (aStarts != bStarts) {
+                                  return aStarts.compareTo(bStarts);
                                 }
+                              }
 
-                                if (_sort == FriendSortOption.name) {
-                                  return a.username.toLowerCase().compareTo(b.username.toLowerCase());
-                                }
+                              return a.username
+                                  .toLowerCase()
+                                  .compareTo(b.username.toLowerCase());
+                            });
 
-                                if (q.isNotEmpty) {
-                                  final aStarts = a.username.toLowerCase().startsWith(q) ? 0 : 1;
-                                  final bStarts = b.username.toLowerCase().startsWith(q) ? 0 : 1;
-                                  if (aStarts != bStarts) return aStarts.compareTo(bStarts);
-                                }
+                            final visibleFriends = filtered.where((final f) {
+                              final isOnline = _onlineStatuses[f.id] == true;
+                              return switch (_filter) {
+                                FriendViewFilter.all => true,
+                                FriendViewFilter.online => isOnline,
+                                FriendViewFilter.requests => false,
+                              };
+                            }).toList();
 
-                                return a.username.toLowerCase().compareTo(b.username.toLowerCase());
-                              });
+                            final totalRequests =
+                                incoming.length + outgoing.length;
 
-                              final visibleFriends = filtered.where((final f) {
-                                final isOnline = _onlineStatuses[f.id] == true;
-                                return switch (_filter) {
-                                  FriendViewFilter.all => true,
-                                  FriendViewFilter.online => isOnline,
-                                  FriendViewFilter.requests => false,
-                                };
-                              }).toList();
-
-                              final totalRequests = incoming.length + outgoing.length;
-
-                              return ListView(
-                                physics: const BouncingScrollPhysics(),
-                                children: [
-                                  _FriendsOverviewCard(
-                                    friendsCount: friends.length,
-                                    onlineCount: friends.where((final f) => _onlineStatuses[f.id] == true).length,
-                                    requestsCount: totalRequests,
+                            return ListView(
+                              physics: const BouncingScrollPhysics(),
+                              children: [
+                                _FriendsOverviewCard(
+                                  friendsCount: friends.length,
+                                  onlineCount: friends
+                                      .where((final f) =>
+                                          _onlineStatuses[f.id] == true)
+                                      .length,
+                                  requestsCount: totalRequests,
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _FilterChip(
+                                        label: 'All',
+                                        selected:
+                                            _filter == FriendViewFilter.all,
+                                        onTap: () {
+                                          _trackUiEvent('filter_all');
+                                          setState(() =>
+                                              _filter = FriendViewFilter.all);
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _FilterChip(
+                                        label: 'Online',
+                                        selected:
+                                            _filter == FriendViewFilter.online,
+                                        onTap: () {
+                                          _trackUiEvent('filter_online');
+                                          setState(() => _filter =
+                                              FriendViewFilter.online);
+                                        },
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: _FilterChip(
+                                        label: 'Requests',
+                                        selected: _filter ==
+                                            FriendViewFilter.requests,
+                                        onTap: () {
+                                          _trackUiEvent('filter_requests');
+                                          setState(() => _filter =
+                                              FriendViewFilter.requests);
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: PopupMenuButton<FriendSortOption>(
+                                    initialValue: _sort,
+                                    onSelected: (final next) {
+                                      _trackUiEvent(
+                                          'sort_change', {'value': next.name});
+                                      setState(() => _sort = next);
+                                    },
+                                    itemBuilder: (final _) => const [
+                                      PopupMenuItem(
+                                        value: FriendSortOption.recent,
+                                        child: Text('Sort: Recent activity'),
+                                      ),
+                                      PopupMenuItem(
+                                        value: FriendSortOption.onlineFirst,
+                                        child: Text('Sort: Online first'),
+                                      ),
+                                      PopupMenuItem(
+                                        value: FriendSortOption.name,
+                                        child: Text('Sort: Name A-Z'),
+                                      ),
+                                    ],
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: scheme.onSurface
+                                            .withValues(alpha: 0.08),
+                                        border: Border.all(
+                                            color: scheme.onSurface
+                                                .withValues(alpha: 0.12)),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(Icons.swap_vert_rounded,
+                                              size: 16,
+                                              color: scheme.onSurface
+                                                  .withValues(alpha: 0.86)),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            _sort == FriendSortOption.recent
+                                                ? 'Recent'
+                                                : _sort ==
+                                                        FriendSortOption
+                                                            .onlineFirst
+                                                    ? 'Online first'
+                                                    : 'A-Z',
+                                            style: TextStyle(
+                                              color: scheme.onSurface
+                                                  .withValues(alpha: 0.86),
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                  const SizedBox(height: 12),
+                                ),
+                                const SizedBox(height: 14),
+                                if (_filter != FriendViewFilter.online &&
+                                    incoming.isNotEmpty) ...[
+                                  _SectionTitle(l10n.friendRequestsSection),
+                                  const SizedBox(height: 10),
                                   Row(
                                     children: [
                                       Expanded(
-                                        child: _FilterChip(
-                                          label: 'All',
-                                          selected: _filter == FriendViewFilter.all,
-                                          onTap: () {
-                                            _trackUiEvent('filter_all');
-                                            setState(() => _filter = FriendViewFilter.all);
-                                          },
+                                        child: TextButton.icon(
+                                          onPressed: () => _acceptAll(incoming),
+                                          icon: const Icon(
+                                              Icons.done_all_rounded),
+                                          label: const Text('Accept all'),
                                         ),
                                       ),
-                                      const SizedBox(width: 8),
                                       Expanded(
-                                        child: _FilterChip(
-                                          label: 'Online',
-                                          selected: _filter == FriendViewFilter.online,
-                                          onTap: () {
-                                            _trackUiEvent('filter_online');
-                                            setState(() => _filter = FriendViewFilter.online);
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: _FilterChip(
-                                          label: 'Requests',
-                                          selected: _filter == FriendViewFilter.requests,
-                                          onTap: () {
-                                            _trackUiEvent('filter_requests');
-                                            setState(() => _filter = FriendViewFilter.requests);
-                                          },
+                                        child: TextButton.icon(
+                                          onPressed: () =>
+                                              _declineAll(incoming),
+                                          icon: const Icon(Icons.close_rounded),
+                                          label: const Text('Decline all'),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 8),
-                                  Align(
-                                    alignment: Alignment.centerRight,
-                                    child: PopupMenuButton<FriendSortOption>(
-                                      initialValue: _sort,
-                                      onSelected: (final next) {
-                                        _trackUiEvent('sort_change', {'value': next.name});
-                                        setState(() => _sort = next);
-                                      },
-                                      itemBuilder: (final _) => const [
-                                        PopupMenuItem(
-                                          value: FriendSortOption.recent,
-                                          child: Text('Sort: Recent activity'),
-                                        ),
-                                        PopupMenuItem(
-                                          value: FriendSortOption.onlineFirst,
-                                          child: Text('Sort: Online first'),
-                                        ),
-                                        PopupMenuItem(
-                                          value: FriendSortOption.name,
-                                          child: Text('Sort: Name A-Z'),
-                                        ),
-                                      ],
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(12),
-                                          color: scheme.onSurface.withValues(alpha: 0.08),
-                                          border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(Icons.swap_vert_rounded, size: 16, color: scheme.onSurface.withValues(alpha: 0.86)),
-                                            const SizedBox(width: 6),
-                                            Text(
-                                              _sort == FriendSortOption.recent
-                                                  ? 'Recent'
-                                                  : _sort == FriendSortOption.onlineFirst
-                                                      ? 'Online first'
-                                                      : 'A-Z',
-                                              style: TextStyle(
-                                                color: scheme.onSurface.withValues(alpha: 0.86),
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                  Glass(
+                                    radius: BorderRadius.circular(22),
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      children: incoming.map((final f) {
+                                        return _RequestRow(
+                                          friend: f,
+                                          onAccept: () => _accept(f.id),
+                                          onDecline: () => _decline(f.id),
+                                        );
+                                      }).toList(),
                                     ),
                                   ),
-                                  const SizedBox(height: 14),
-                                  if (_filter != FriendViewFilter.online && incoming.isNotEmpty) ...[
-                                    _SectionTitle(l10n.friendRequestsSection),
-                                    const SizedBox(height: 10),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: TextButton.icon(
-                                            onPressed: () => _acceptAll(incoming),
-                                            icon: const Icon(Icons.done_all_rounded),
-                                            label: const Text('Accept all'),
-                                          ),
-                                        ),
-                                        Expanded(
-                                          child: TextButton.icon(
-                                            onPressed: () => _declineAll(incoming),
-                                            icon: const Icon(Icons.close_rounded),
-                                            label: const Text('Decline all'),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Glass(
-                                      radius: BorderRadius.circular(22),
-                                      padding: const EdgeInsets.all(12),
-                                      child: Column(
-                                        children: incoming.map((final f) {
-                                          return _RequestRow(
-                                            friend: f,
-                                            onAccept: () => _accept(f.id),
-                                            onDecline: () => _decline(f.id),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                  ],
-                                  if (_filter != FriendViewFilter.online && outgoing.isNotEmpty) ...[
-                                    _SectionTitle(l10n.friendPendingSection),
-                                    const SizedBox(height: 10),
-                                    Glass(
-                                      radius: BorderRadius.circular(22),
-                                      padding: const EdgeInsets.all(12),
-                                      child: Column(
-                                        children: outgoing.map((final f) {
-                                          return _PendingRow(
-                                            friend: f,
-                                            onCancel: () =>
-                                                _cancelOutgoing(f.id),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                  ],
-                                  if (_filter != FriendViewFilter.requests) ...[
-                                    _SectionTitle('Active now'),
-                                    const SizedBox(height: 10),
-                                  ],
-                                  if (_filter == FriendViewFilter.requests && incoming.isEmpty && outgoing.isEmpty)
-                                    Glass(
-                                      radius: BorderRadius.circular(22),
-                                      padding: const EdgeInsets.all(16),
-                                      child: Text(
-                                        'No pending requests right now.',
-                                        style: TextStyle(
-                                          color: scheme.onSurface.withValues(alpha: 0.75),
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    )
-                                  else if (_filter != FriendViewFilter.requests && visibleFriends.isEmpty)
-                                    Glass(
-                                      radius: BorderRadius.circular(22),
-                                      padding: const EdgeInsets.all(16),
-                                      child: Text(
-                                        query.isEmpty
-                                            ? l10n.friendsEmptyState
-                                            : l10n.noMatchForQuery(query),
-                                        style: TextStyle(
-                                          color: scheme.onSurface.withValues(alpha: 0.75),
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    )
-                                  else if (_filter != FriendViewFilter.requests)
-                                    Glass(
-                                      radius: BorderRadius.circular(22),
-                                      padding: const EdgeInsets.all(12),
-                                      child: Column(
-                                        children: visibleFriends.where((final f) => _onlineStatuses[f.id] == true).map((final f) {
-                                          return _FriendRow(
-                                            friend: f,
-                                            isFavorite: _favoriteFriendIds.contains(f.id),
-                                            onToggleFavorite: () => _toggleFavorite(f.id),
-                                            onOpenProfile: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (final _) => ProfileScreen(userId: f.id),
-                                                ),
-                                              );
-                                            },
-                                            onMessage: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (final _) => DmChatScreen(
-                                            meId: socialRepository.currentUserId ?? 
-                                                        authRepository.currentUser?.id ??
-                                                        'me',
-                                                    otherId: f.id,
-                                                    otherName: f.username,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            onRemove: () => _removeFriend(f.id),
-                                            isOnline: true,
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                   if (_filter != FriendViewFilter.requests && visibleFriends.any((final f) => _onlineStatuses[f.id] != true)) ...[
-                                     const SizedBox(height: 14),
-                                     _SectionTitle('Recently active'),
-                                     const SizedBox(height: 10),
-                                     Glass(
-                                       radius: BorderRadius.circular(22),
-                                       padding: const EdgeInsets.all(12),
-                                       child: Column(
-                                         children: visibleFriends.where((final f) => _onlineStatuses[f.id] != true).map((final f) {
-                                           return _FriendRow(
-                                             friend: f,
-                                             isFavorite: _favoriteFriendIds.contains(f.id),
-                                             onToggleFavorite: () => _toggleFavorite(f.id),
-                                             onOpenProfile: () {
-                                               Navigator.push(
-                                                 context,
-                                                 MaterialPageRoute(
-                                                   builder: (final _) => ProfileScreen(userId: f.id),
-                                                 ),
-                                               );
-                                             },
-                                             onMessage: () {
-                                               Navigator.push(
-                                                 context,
-                                                 MaterialPageRoute(
-                                                   builder: (final _) => DmChatScreen(
-                                                     meId: socialRepository.currentUserId ?? authRepository.currentUser?.id ?? 'me',
-                                                     otherId: f.id,
-                                                     otherName: f.username,
-                                                   ),
-                                                 ),
-                                               );
-                                             },
-                                             onRemove: () => _removeFriend(f.id),
-                                             isOnline: false,
-                                           );
-                                         }).toList(),
-                                       ),
-                                     ),
-                                   ],
+                                  const SizedBox(height: 16),
                                 ],
-                              );
-                            },
-                          );
-                        },
-                      );
-                    },
-                  ),
+                                if (_filter != FriendViewFilter.online &&
+                                    outgoing.isNotEmpty) ...[
+                                  _SectionTitle(l10n.friendPendingSection),
+                                  const SizedBox(height: 10),
+                                  Glass(
+                                    radius: BorderRadius.circular(22),
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      children: outgoing.map((final f) {
+                                        return _PendingRow(
+                                          friend: f,
+                                          onCancel: () => _cancelOutgoing(f.id),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                ],
+                                if (_filter != FriendViewFilter.requests) ...[
+                                  _SectionTitle('Active now'),
+                                  const SizedBox(height: 10),
+                                ],
+                                if (_filter == FriendViewFilter.requests &&
+                                    incoming.isEmpty &&
+                                    outgoing.isEmpty)
+                                  Glass(
+                                    radius: BorderRadius.circular(22),
+                                    padding: const EdgeInsets.all(16),
+                                    child: Text(
+                                      'No pending requests right now.',
+                                      style: TextStyle(
+                                        color: scheme.onSurface
+                                            .withValues(alpha: 0.75),
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  )
+                                else if (_filter != FriendViewFilter.requests &&
+                                    visibleFriends.isEmpty)
+                                  Glass(
+                                    radius: BorderRadius.circular(22),
+                                    padding: const EdgeInsets.all(16),
+                                    child: Text(
+                                      query.isEmpty
+                                          ? l10n.friendsEmptyState
+                                          : l10n.noMatchForQuery(query),
+                                      style: TextStyle(
+                                        color: scheme.onSurface
+                                            .withValues(alpha: 0.75),
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                  )
+                                else if (_filter != FriendViewFilter.requests)
+                                  Glass(
+                                    radius: BorderRadius.circular(22),
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      children: visibleFriends
+                                          .where((final f) =>
+                                              _onlineStatuses[f.id] == true)
+                                          .map((final f) {
+                                        return _FriendRow(
+                                          friend: f,
+                                          isFavorite:
+                                              _favoriteFriendIds.contains(f.id),
+                                          onToggleFavorite: () =>
+                                              _toggleFavorite(f.id),
+                                          onOpenProfile: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (final _) =>
+                                                    ProfileScreen(userId: f.id),
+                                              ),
+                                            );
+                                          },
+                                          onMessage: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (final _) =>
+                                                    DmChatScreen(
+                                                  meId: socialRepository
+                                                          .currentUserId ??
+                                                      authRepository
+                                                          .currentUser?.id ??
+                                                      'me',
+                                                  otherId: f.id,
+                                                  otherName: f.username,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          onRemove: () => _removeFriend(f.id),
+                                          isOnline: true,
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                if (_filter != FriendViewFilter.requests &&
+                                    visibleFriends.any((final f) =>
+                                        _onlineStatuses[f.id] != true)) ...[
+                                  const SizedBox(height: 14),
+                                  _SectionTitle('Recently active'),
+                                  const SizedBox(height: 10),
+                                  Glass(
+                                    radius: BorderRadius.circular(22),
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      children: visibleFriends
+                                          .where((final f) =>
+                                              _onlineStatuses[f.id] != true)
+                                          .map((final f) {
+                                        return _FriendRow(
+                                          friend: f,
+                                          isFavorite:
+                                              _favoriteFriendIds.contains(f.id),
+                                          onToggleFavorite: () =>
+                                              _toggleFavorite(f.id),
+                                          onOpenProfile: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (final _) =>
+                                                    ProfileScreen(userId: f.id),
+                                              ),
+                                            );
+                                          },
+                                          onMessage: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (final _) =>
+                                                    DmChatScreen(
+                                                  meId: socialRepository
+                                                          .currentUserId ??
+                                                      authRepository
+                                                          .currentUser?.id ??
+                                                      'me',
+                                                  otherId: f.id,
+                                                  otherName: f.username,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          onRemove: () => _removeFriend(f.id),
+                                          isOnline: false,
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ],
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
       ),
     );
   }
@@ -766,7 +851,6 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-
 class _IconGlass extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -807,9 +891,11 @@ class _AvatarDot extends StatelessWidget {
         children: [
           Center(
             child: Text(
-              username.trim().isEmpty ? '?' : username.trim().substring(0, 1).toUpperCase(),
-              style:
-                  TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
+              username.trim().isEmpty
+                  ? '?'
+                  : username.trim().substring(0, 1).toUpperCase(),
+              style: TextStyle(
+                  fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
             ),
           ),
           Positioned(
@@ -823,8 +909,9 @@ class _AvatarDot extends StatelessWidget {
                 color: online
                     ? const Color(0xFF58F7B6)
                     : scheme.onSurface.withValues(alpha: 0.25),
-                border:
-                    Border.all(color: scheme.surface.withValues(alpha: 0.35), width: 2), // border matches bg
+                border: Border.all(
+                    color: scheme.surface.withValues(alpha: 0.35),
+                    width: 2), // border matches bg
               ),
             ),
           ),
@@ -1047,7 +1134,8 @@ class _MiniAction extends StatelessWidget {
           color: scheme.onSurface.withValues(alpha: 0.08),
           border: Border.all(color: scheme.onSurface.withValues(alpha: 0.14)),
         ),
-        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92), size: 20),
+        child: Icon(icon,
+            color: scheme.onSurface.withValues(alpha: 0.92), size: 20),
       ),
     );
   }

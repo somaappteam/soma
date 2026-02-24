@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/data/offline_queue_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -26,7 +26,8 @@ class VocabSrsStore {
 
   Future<Map<int, SrsEntry>> load(final String courseId) async {
     final uid = _uid;
-    final localItems = await _dbHelper.getUserLearnedItems(uid ?? 'guest', courseId);
+    final localItems =
+        await _dbHelper.getUserLearnedItems(uid ?? 'guest', courseId);
 
     final entries = <int, SrsEntry>{};
     for (final item in localItems) {
@@ -52,7 +53,8 @@ class VocabSrsStore {
     return entries;
   }
 
-  Future<void> save(final String courseId, final Map<int, SrsEntry> entries) async {
+  Future<void> save(
+      final String courseId, final Map<int, SrsEntry> entries) async {
     final uid = _uid ?? 'guest';
 
     for (final entry in entries.values) {
@@ -62,7 +64,8 @@ class VocabSrsStore {
         'concept_id': entry.conceptId,
         'interval_days': entry.intervalDays,
         'ease_factor': entry.easeFactor,
-        'due_at': DateTime.fromMillisecondsSinceEpoch(entry.dueAtMs).toIso8601String(),
+        'due_at': DateTime.fromMillisecondsSinceEpoch(entry.dueAtMs)
+            .toIso8601String(),
       };
       await _dbHelper.upsertUserLearnedItem(item);
 
@@ -72,7 +75,7 @@ class VocabSrsStore {
               .from('user_learned_items')
               .upsert(item, onConflict: 'user_id, course_id, concept_id');
         } catch (e) {
-          debugPrint('Cloud SRS push failed: $e. Enqueuing.');
+          appLogger.debug('Cloud SRS push failed: $e. Enqueuing.');
           await offlineQueueRepository.enqueue(
             tableName: 'user_learned_items',
             operation: 'UPSERT',
@@ -126,7 +129,8 @@ class VocabSrsStore {
       );
     } else if (existing.intervalDays <= _firstInterval) {
       // Second correct answer → 6 days (SM-2 step 2).
-      final newEase = (existing.easeFactor + 0.1).clamp(_minEase, double.infinity);
+      final newEase =
+          (existing.easeFactor + 0.1).clamp(_minEase, double.infinity);
       entries[conceptId] = SrsEntry(
         conceptId: conceptId,
         intervalDays: _secondInterval,
@@ -135,8 +139,10 @@ class VocabSrsStore {
       );
     } else {
       // Subsequent correct → multiply by ease factor.
-      final newEase = (existing.easeFactor + 0.1).clamp(_minEase, double.infinity);
-      final newInterval = (existing.intervalDays * newEase).round().clamp(1, 365);
+      final newEase =
+          (existing.easeFactor + 0.1).clamp(_minEase, double.infinity);
+      final newInterval =
+          (existing.intervalDays * newEase).round().clamp(1, 365);
       entries[conceptId] = SrsEntry(
         conceptId: conceptId,
         intervalDays: newInterval,
@@ -149,7 +155,9 @@ class VocabSrsStore {
   }
 
   int _dueAtMs(final int intervalDays) {
-    return DateTime.now().add(Duration(days: intervalDays)).millisecondsSinceEpoch;
+    return DateTime.now()
+        .add(Duration(days: intervalDays))
+        .millisecondsSinceEpoch;
   }
 
   int? _parseInt(final dynamic value) {

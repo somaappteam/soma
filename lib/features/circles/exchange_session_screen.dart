@@ -38,7 +38,8 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     _controller = ExchangeSessionController(
       partnerName: widget.partnerName,
       partnerUserId: widget.partnerUserId,
-      sessionKey: '${widget.partnerUserId}_${widget.myLearningLanguage}_${widget.partnerLearningLanguage}',
+      sessionKey:
+          '${widget.partnerUserId}_${widget.myLearningLanguage}_${widget.partnerLearningLanguage}',
       firstLanguageCode: _normalizeCode(widget.myLearningLanguage),
       secondLanguageCode: _normalizeCode(widget.partnerLearningLanguage),
     )..hydrate();
@@ -59,8 +60,8 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     return langCodeFromValue(raw) ?? 'en';
   }
 
-
-  String _tr(final String en, {final String? fr, final String? es, final String? de}) {
+  String _tr(final String en,
+      {final String? fr, final String? es, final String? de}) {
     final code = Localizations.localeOf(context).languageCode;
     if (code == 'fr') return fr ?? en;
     if (code == 'es') return es ?? en;
@@ -90,17 +91,25 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     await _track('conversation_request_accepted');
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(_tr('Conversation request accepted. You can start chatting now.', fr: 'Demande de conversation acceptée. Vous pouvez commencer à discuter.', es: 'Solicitud de conversación aceptada. Ya puedes empezar a chatear.', de: 'Konversationsanfrage akzeptiert. Du kannst jetzt chatten.'))),
+      SnackBar(
+          content: Text(_tr(
+              'Conversation request accepted. You can start chatting now.',
+              fr: 'Demande de conversation acceptÃ©e. Vous pouvez commencer Ã  discuter.',
+              es: 'Solicitud de conversaciÃ³n aceptada. Ya puedes empezar a chatear.',
+              de: 'Konversationsanfrage akzeptiert. Du kannst jetzt chatten.'))),
     );
   }
-
 
   Future<void> _declineRequest() async {
     await _controller.declineRequest();
     await _track('conversation_request_declined');
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(_tr('Conversation request declined.', fr: 'Demande de conversation refusée.', es: 'Solicitud de conversación rechazada.', de: 'Konversationsanfrage abgelehnt.'))),
+      SnackBar(
+          content: Text(_tr('Conversation request declined.',
+              fr: 'Demande de conversation refusÃ©e.',
+              es: 'Solicitud de conversaciÃ³n rechazada.',
+              de: 'Konversationsanfrage abgelehnt.'))),
     );
   }
 
@@ -110,7 +119,11 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
 
     if (!_controller.requestAccepted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_tr('Accept conversation request before messaging.', fr: "Acceptez la demande de conversation avant d'envoyer un message.", es: 'Acepta la solicitud de conversación antes de enviar mensajes.', de: 'Akzeptiere die Konversationsanfrage, bevor du Nachrichten sendest.'))),
+        SnackBar(
+            content: Text(_tr('Accept conversation request before messaging.',
+                fr: "Acceptez la demande de conversation avant d'envoyer un message.",
+                es: 'Acepta la solicitud de conversaciÃ³n antes de enviar mensajes.',
+                de: 'Akzeptiere die Konversationsanfrage, bevor du Nachrichten sendest.'))),
       );
       await _track('request_required_blocked_send');
       return;
@@ -118,7 +131,11 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
 
     if (!_controller.isMyTurn) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_tr('Wait for your partner turn before sending.', fr: "Attendez le tour de votre partenaire avant d'envoyer.", es: 'Espera el turno de tu compañero antes de enviar.', de: 'Warte auf den Zug deines Partners, bevor du sendest.'))),
+        SnackBar(
+            content: Text(_tr('Wait for your partner turn before sending.',
+                fr: "Attendez le tour de votre partenaire avant d'envoyer.",
+                es: 'Espera el turno de tu compaÃ±ero antes de enviar.',
+                de: 'Warte auf den Zug deines Partners, bevor du sendest.'))),
       );
       await _track('turn_blocked_send');
       return;
@@ -129,7 +146,8 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     if (!ok) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Message blocked: use ${_controller.activeLanguageCode.toUpperCase()} and keep within limits/cooldown (${_controller.cooldownSecondsRemaining}s).'),
+          content: Text(
+              'Message blocked: use ${_controller.activeLanguageCode.toUpperCase()} and keep within limits/cooldown (${_controller.cooldownSecondsRemaining}s).'),
           backgroundColor: Colors.redAccent,
         ),
       );
@@ -142,7 +160,8 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
   }
 
   Future<void> _markPartnerReply() async {
-    await _controller.receivePartnerMessage('Thanks! Let us continue in ${_controller.activeLanguageCode.toUpperCase()}.');
+    await _controller.receivePartnerMessage(
+        'Thanks! Let us continue in ${_controller.activeLanguageCode.toUpperCase()}.');
     await _track('partner_reply_received');
   }
 
@@ -154,12 +173,28 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
   Future<void> _suggestReply() async {
     final lang = _controller.activeLanguageCode;
     final options = lang == 'fr'
-        ? ['Salut! Comment ça va ?', 'Je vais bien, merci.', 'Parlons de notre week-end.']
+        ? [
+            'Salut! Comment Ã§a va ?',
+            'Je vais bien, merci.',
+            'Parlons de notre week-end.'
+          ]
         : lang == 'es'
-            ? ['Hola, ¿cómo estás?', 'Estoy bien, gracias.', '¿Qué hiciste hoy?']
+            ? [
+                'Hola, Â¿cÃ³mo estÃ¡s?',
+                'Estoy bien, gracias.',
+                'Â¿QuÃ© hiciste hoy?'
+              ]
             : lang == 'de'
-                ? ['Hallo! Wie geht es dir?', 'Mir geht es gut, danke.', 'Was hast du heute gemacht?']
-                : ['Hi! How are you?', 'I am doing well, thanks.', 'What did you do today?'];
+                ? [
+                    'Hallo! Wie geht es dir?',
+                    'Mir geht es gut, danke.',
+                    'Was hast du heute gemacht?'
+                  ]
+                : [
+                    'Hi! How are you?',
+                    'I am doing well, thanks.',
+                    'What did you do today?'
+                  ];
     final selected = await showModalBottomSheet<String>(
       context: context,
       builder: (final ctx) => SafeArea(
@@ -188,7 +223,8 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
     if (!context.mounted) return;
     if (!allowed) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Correction limit reached for this round (1 max).')),
+        const SnackBar(
+            content: Text('Correction limit reached for this round (1 max).')),
       );
       return;
     }
@@ -211,7 +247,8 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
           'Why: normalized spacing/capitalization, improved readability, and simplified CEFR-friendly phrasing.',
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
         ],
       ),
     );
@@ -223,7 +260,12 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
 
     if (text.length > 600) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_tr('Draft is too long to translate (max 600 characters).', fr: 'Le brouillon est trop long à traduire (600 caractères max).', es: 'El borrador es demasiado largo para traducir (máximo 600 caracteres).', de: 'Der Entwurf ist zu lang zum Übersetzen (max. 600 Zeichen).'))),
+        SnackBar(
+            content: Text(_tr(
+                'Draft is too long to translate (max 600 characters).',
+                fr: 'Le brouillon est trop long Ã  traduire (600 caractÃ¨res max).',
+                es: 'El borrador es demasiado largo para traducir (mÃ¡ximo 600 caracteres).',
+                de: 'Der Entwurf ist zu lang zum Ãœbersetzen (max. 600 Zeichen).'))),
       );
       return;
     }
@@ -236,12 +278,21 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
       await _track('helper_translate_draft', data: {'target_language': target});
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_tr('Draft translated to $target.', fr: 'Brouillon traduit en $target.', es: 'Borrador traducido a $target.', de: 'Entwurf in $target übersetzt.'))),
+        SnackBar(
+            content: Text(_tr('Draft translated to $target.',
+                fr: 'Brouillon traduit en $target.',
+                es: 'Borrador traducido a $target.',
+                de: 'Entwurf in $target Ã¼bersetzt.'))),
       );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(_tr('Could not translate draft right now. Please try again.', fr: 'Le brouillon ne peut pas être traduit pour le moment. Réessayez.', es: 'No se pudo traducir el borrador ahora mismo. Inténtalo de nuevo.', de: 'Der Entwurf konnte gerade nicht übersetzt werden. Bitte erneut versuchen.'))),
+        SnackBar(
+            content: Text(_tr(
+                'Could not translate draft right now. Please try again.',
+                fr: 'Le brouillon ne peut pas Ãªtre traduit pour le moment. RÃ©essayez.',
+                es: 'No se pudo traducir el borrador ahora mismo. IntÃ©ntalo de nuevo.',
+                de: 'Der Entwurf konnte gerade nicht Ã¼bersetzt werden. Bitte erneut versuchen.'))),
       );
     }
   }
@@ -292,7 +343,9 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
               await _track('review_weak_items_tap');
               if (!context.mounted) return;
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tip: open Solo mode > Review to practice weak items.')));
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text(
+                      'Tip: open Solo mode > Review to practice weak items.')));
             },
             child: const Text('Review weak items'),
           ),
@@ -318,7 +371,8 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
             Text('Exchange with ${widget.partnerName}'),
             const SizedBox(width: 8),
             StreamBuilder<bool>(
-              stream: presenceRepository.streamOnlineStatus(widget.partnerUserId),
+              stream:
+                  presenceRepository.streamOnlineStatus(widget.partnerUserId),
               builder: (final context, final snapshot) {
                 final isOnline = snapshot.data ?? false;
                 return Container(
@@ -330,7 +384,8 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                     boxShadow: isOnline
                         ? [
                             BoxShadow(
-                              color: const Color(0xFF58F7B6).withValues(alpha: 0.4),
+                              color: const Color(0xFF58F7B6)
+                                  .withValues(alpha: 0.4),
                               blurRadius: 4,
                               spreadRadius: 1,
                             ),
@@ -349,7 +404,8 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
       body: AnimatedBuilder(
         animation: _controller,
         builder: (final context, final _) {
-          final roundLabel = '${_controller.activeLanguageCode.toUpperCase()} round';
+          final roundLabel =
+              '${_controller.activeLanguageCode.toUpperCase()} round';
           return Column(
             children: [
               Padding(
@@ -361,13 +417,13 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Round ${_controller.round}/${ExchangeSessionController.maxRounds} • $roundLabel',
+                        'Round ${_controller.round}/${ExchangeSessionController.maxRounds} â€¢ $roundLabel',
                         style: const TextStyle(fontWeight: FontWeight.w900),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Language lock • ${_controller.isMyTurn ? 'Your turn' : 'Partner turn'} • '
-                        'Corrections left: ${ExchangeSessionController.maxCorrectionPerRound - _controller.myCorrectionsUsed} • '
+                        'Language lock â€¢ ${_controller.isMyTurn ? 'Your turn' : 'Partner turn'} â€¢ '
+                        'Corrections left: ${ExchangeSessionController.maxCorrectionPerRound - _controller.myCorrectionsUsed} â€¢ '
                         'Turn timer: ${_controller.turnSecondsRemaining}s',
                       ),
                       const SizedBox(height: 4),
@@ -389,17 +445,21 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                   itemBuilder: (final _, final i) {
                     final m = _controller.messages[i];
                     return Align(
-                      alignment: m.from == 'You' ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: m.from == 'You'
+                          ? Alignment.centerRight
+                          : Alignment.centerLeft,
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 8),
                         decoration: BoxDecoration(
                           color: m.from == 'You'
                               ? const Color(0xFF2AFADF).withValues(alpha: 0.25)
                               : Colors.white.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Text('${m.from}: ${m.text} (${m.languageCode.toUpperCase()})'),
+                        child: Text(
+                            '${m.from}: ${m.text} (${m.languageCode.toUpperCase()})'),
                       ),
                     );
                   },
@@ -414,11 +474,17 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                         Expanded(
                           child: TextField(
                             controller: _input,
-                            decoration: InputDecoration(hintText: _tr('Type message...', fr: 'Saisissez un message...', es: 'Escribe un mensaje...', de: 'Nachricht eingeben...')),
+                            decoration: InputDecoration(
+                                hintText: _tr('Type message...',
+                                    fr: 'Saisissez un message...',
+                                    es: 'Escribe un mensaje...',
+                                    de: 'Nachricht eingeben...')),
                           ),
                         ),
                         const SizedBox(width: 8),
-                        IconButton(onPressed: _send, icon: const Icon(Icons.send_rounded)),
+                        IconButton(
+                            onPressed: _send,
+                            icon: const Icon(Icons.send_rounded)),
                       ],
                     ),
                     const SizedBox(height: 6),
@@ -427,26 +493,58 @@ class _ExchangeSessionScreenState extends State<ExchangeSessionScreen> {
                       runSpacing: 2,
                       children: [
                         if (_controller.requestStatus == 'pending') ...[
-                          TextButton(onPressed: _acceptRequest, child: Text(_tr('Accept request', fr: 'Accepter', es: 'Aceptar', de: 'Annehmen'))),
-                          TextButton(onPressed: _declineRequest, child: Text(_tr('Decline request', fr: 'Refuser', es: 'Rechazar', de: 'Ablehnen'))),
+                          TextButton(
+                              onPressed: _acceptRequest,
+                              child: Text(_tr('Accept request',
+                                  fr: 'Accepter',
+                                  es: 'Aceptar',
+                                  de: 'Annehmen'))),
+                          TextButton(
+                              onPressed: _declineRequest,
+                              child: Text(_tr('Decline request',
+                                  fr: 'Refuser',
+                                  es: 'Rechazar',
+                                  de: 'Ablehnen'))),
                         ] else if (_controller.requestStatus == 'accepted')
-                          TextButton(onPressed: null, child: Text(_tr('Request accepted', fr: 'Demande acceptée', es: 'Solicitud aceptada', de: 'Anfrage akzeptiert')) )
+                          TextButton(
+                              onPressed: null,
+                              child: Text(_tr('Request accepted',
+                                  fr: 'Demande acceptÃ©e',
+                                  es: 'Solicitud aceptada',
+                                  de: 'Anfrage akzeptiert')))
                         else
-                          TextButton(onPressed: null, child: Text(_tr('Request ${_controller.requestStatus}', fr: 'Demande ${_controller.requestStatus}', es: 'Solicitud ${_controller.requestStatus}', de: 'Anfrage ${_controller.requestStatus}'))),
-                        TextButton(onPressed: _translateDraft, child: const Text('Translate')),
-                        TextButton(onPressed: _suggestReply, child: const Text('Suggest reply')),
-                        TextButton(onPressed: _correctMySentence, child: const Text('Correct me')),
-                        TextButton(onPressed: _markPartnerReply, child: const Text('Partner replied')),
-                        TextButton(onPressed: _skipTurn, child: const Text('Skip turn')),
+                          TextButton(
+                              onPressed: null,
+                              child: Text(_tr(
+                                  'Request ${_controller.requestStatus}',
+                                  fr: 'Demande ${_controller.requestStatus}',
+                                  es: 'Solicitud ${_controller.requestStatus}',
+                                  de: 'Anfrage ${_controller.requestStatus}'))),
+                        TextButton(
+                            onPressed: _translateDraft,
+                            child: const Text('Translate')),
+                        TextButton(
+                            onPressed: _suggestReply,
+                            child: const Text('Suggest reply')),
+                        TextButton(
+                            onPressed: _correctMySentence,
+                            child: const Text('Correct me')),
+                        TextButton(
+                            onPressed: _markPartnerReply,
+                            child: const Text('Partner replied')),
+                        TextButton(
+                            onPressed: _skipTurn,
+                            child: const Text('Skip turn')),
                       ],
                     ),
                     const SizedBox(height: 2),
                     Text(
                       l10n.start,
-                      style: Theme.of(context)
-                          .textTheme
-                          .labelSmall
-                          ?.copyWith(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55)),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.55)),
                     ),
                   ],
                 ),

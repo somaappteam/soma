@@ -1,5 +1,5 @@
-
 import 'package:postgres/postgres.dart';
+import 'package:soma/core/services/app_logger.dart';
 
 Future<void> main() async {
   final variations = [
@@ -26,7 +26,7 @@ Future<void> main() async {
   ];
 
   for (var config in variations) {
-    print('Testing: $config');
+    appLogger.info('Testing: $config');
     try {
       final conn = await Connection.open(
         Endpoint(
@@ -38,11 +38,11 @@ Future<void> main() async {
         ),
         settings: ConnectionSettings(sslMode: SslMode.require),
       );
-      print('✅ SUCCESS for $config');
+      appLogger.info('✅ SUCCESS for $config');
       await conn.close();
       return;
     } catch (e) {
-      print('❌ FAILED for $config: $e');
+      appLogger.info('❌ FAILED for $config: $e');
     }
   }
 }

@@ -32,142 +32,145 @@ class _AddCourseScreenState extends State<AddCourseScreen> {
 
     return Scaffold(
       body: SafeArea(
-          child: ResponsiveFrame(
-            child: LayoutBuilder(
-              builder: (final context, final constraints) {
-                final compactHeight = constraints.maxHeight < 760;
-                final sectionSpacing = compactHeight ? 14.0 : 18.0;
-                final bottomSpacing = compactHeight ? 8.0 : 10.0;
+        child: ResponsiveFrame(
+          child: LayoutBuilder(
+            builder: (final context, final constraints) {
+              final compactHeight = constraints.maxHeight < 760;
+              final sectionSpacing = compactHeight ? 14.0 : 18.0;
+              final bottomSpacing = compactHeight ? 8.0 : 10.0;
 
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-                  child: Column(
-                    children: [
-                  Row(
-                    children: [
-                      Glass(
-                        radius: BorderRadius.circular(14),
-                        padding: EdgeInsets.zero,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(14),
-                          onTap: () => Navigator.pop(context),
-                          child: SizedBox(
-                            width: 44,
-                            height: 44,
-                            child: Center(
-                              child: Icon(Icons.arrow_back_ios_new_rounded,
-                                  color: scheme.onSurface.withValues(alpha: 0.9),
-                                  size: 20),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.addCourse,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: scheme.onSurface,
-                              fontWeight: FontWeight.w900,
-                            ),
-                      ),
-                    ],
-                  ),
-
-                  SizedBox(height: sectionSpacing),
-
-                  Glass(
-                    radius: BorderRadius.circular(24),
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+                child: Column(
+                  children: [
+                    Row(
                       children: [
-                        _SelectTile(
-                          label: l10n.iSpeak,
-                          value: speak.name,
-                          icon: Icons.record_voice_over_rounded,
-                          onTap: () async {
-                            final v = await _pickLanguage(
-                              context,
-                              title: l10n.chooseYourLanguage,
-                              items: kLanguages,
-                              current: speak,
-                            );
-                            if (v != null) setState(() => speak = v);
-                          },
-                        ),
-                        SizedBox(height: compactHeight ? 12 : 16),
-                        _SelectTile(
-                          label: l10n.iWantToLearn,
-                          value: learn.name,
-                          icon: Icons.translate_rounded,
-                          onTap: () async {
-                            final v = await _pickLanguage(
-                              context,
-                              title: l10n.chooseLearningLanguage,
-                              items: kLanguages,
-                              current: learn,
-                            );
-                            if (v != null) setState(() => learn = v);
-                          },
-                        ),
-                        if (!valid) ...[
-                          SizedBox(height: compactHeight ? 10 : 12),
-                          Text(
-                            l10n.chooseTwoDifferentLanguages,
-                            style: TextStyle(
-                                color: scheme.error,
-                                fontWeight: FontWeight.w800),
+                        Glass(
+                          radius: BorderRadius.circular(14),
+                          padding: EdgeInsets.zero,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () => Navigator.pop(context),
+                            child: SizedBox(
+                              width: 44,
+                              height: 44,
+                              child: Center(
+                                child: Icon(Icons.arrow_back_ios_new_rounded,
+                                    color:
+                                        scheme.onSurface.withValues(alpha: 0.9),
+                                    size: 20),
+                              ),
+                            ),
                           ),
-                        ],
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          l10n.addCourse,
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: scheme.onSurface,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                        ),
                       ],
                     ),
-                  ),
 
-                  const Spacer(),
+                    SizedBox(height: sectionSpacing),
 
-                  // Create button
-                  Glass(
-                    radius: BorderRadius.circular(26),
-                    padding: EdgeInsets.zero,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(26),
-                      onTap: valid
-                          ? () {
-                              final id = 'solo_${speak.code}_${learn.code}';
-                              final course = SoloCourse(
-                                id: id,
-                                title: l10n.soloCourseTitle,
-                                subtitle: '${speak.name} → ${learn.name}',
-                                iconUrl: '',
+                    Glass(
+                      radius: BorderRadius.circular(24),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _SelectTile(
+                            label: l10n.iSpeak,
+                            value: speak.name,
+                            icon: Icons.record_voice_over_rounded,
+                            onTap: () async {
+                              final v = await _pickLanguage(
+                                context,
+                                title: l10n.chooseYourLanguage,
+                                items: kLanguages,
+                                current: speak,
                               );
-                              Navigator.pop(context, course);
-                            }
-                          : null,
-                      child: SizedBox(
-                        height: 56,
-                        width: double.infinity,
-                        child: Center(
-                          child: Text(
-                            l10n.createCourse,
-                            style: TextStyle(
-                              color: scheme.primary.withValues(alpha: valid ? 1 : 0.45),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
+                              if (v != null) setState(() => speak = v);
+                            },
+                          ),
+                          SizedBox(height: compactHeight ? 12 : 16),
+                          _SelectTile(
+                            label: l10n.iWantToLearn,
+                            value: learn.name,
+                            icon: Icons.translate_rounded,
+                            onTap: () async {
+                              final v = await _pickLanguage(
+                                context,
+                                title: l10n.chooseLearningLanguage,
+                                items: kLanguages,
+                                current: learn,
+                              );
+                              if (v != null) setState(() => learn = v);
+                            },
+                          ),
+                          if (!valid) ...[
+                            SizedBox(height: compactHeight ? 10 : 12),
+                            Text(
+                              l10n.chooseTwoDifferentLanguages,
+                              style: TextStyle(
+                                  color: scheme.error,
+                                  fontWeight: FontWeight.w800),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+
+                    const Spacer(),
+
+                    // Create button
+                    Glass(
+                      radius: BorderRadius.circular(26),
+                      padding: EdgeInsets.zero,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(26),
+                        onTap: valid
+                            ? () {
+                                final id = 'solo_${speak.code}_${learn.code}';
+                                final course = SoloCourse(
+                                  id: id,
+                                  title: l10n.soloCourseTitle,
+                                  subtitle: '${speak.name} → ${learn.name}',
+                                  iconUrl: '',
+                                );
+                                Navigator.pop(context, course);
+                              }
+                            : null,
+                        child: SizedBox(
+                          height: 56,
+                          width: double.infinity,
+                          child: Center(
+                            child: Text(
+                              l10n.createCourse,
+                              style: TextStyle(
+                                color: scheme.primary
+                                    .withValues(alpha: valid ? 1 : 0.45),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
 
-                  SizedBox(height: bottomSpacing),
-                ],
-              ),
-                );
-              },
-            ),
+                    SizedBox(height: bottomSpacing),
+                  ],
+                ),
+              );
+            },
           ),
         ),
+      ),
     );
   }
 }

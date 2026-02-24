@@ -49,33 +49,33 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
-            child: ResponsiveFrame(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-                child: Column(
+        child: ResponsiveFrame(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+            child: Column(
+              children: [
+                // Header
+                Row(
                   children: [
-                  // Header
-                  Row(
-                    children: [
-                      _IconBtn(
-                        icon: Icons.arrow_back_ios_new_rounded,
-                        onTap: () => Navigator.pop(context),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.securityTitle,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.w900,
-                            ),
-                      ),
-                    ],
-                  ),
+                    _IconBtn(
+                      icon: Icons.arrow_back_ios_new_rounded,
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.securityTitle,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                  ],
+                ),
 
-                  const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                  Expanded(
-                    child: StreamBuilder<Map<String, dynamic>>(
+                Expanded(
+                  child: StreamBuilder<Map<String, dynamic>>(
                       stream: _settingsStream,
                       builder: (final context, final snapshot) {
                         final data = snapshot.data ?? {};
@@ -83,9 +83,11 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                         final biometric = data['biometric_enabled'] ?? false;
                         final appLock = data['app_lock_enabled'] ?? false;
                         final autoLockMinutes = data['auto_lock_minutes'] ?? 5;
-                        
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
 
                         return ListView(
@@ -129,7 +131,8 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                               title: l10n.securityBiometricTitle,
                               subtitle: l10n.securityBiometricSubtitle,
                               value: biometric,
-                              onChanged: (final v) => settingsRepository.updateSetting('biometric_enabled', v),
+                              onChanged: (final v) => settingsRepository
+                                  .updateSetting('biometric_enabled', v),
                             ),
                             const SizedBox(height: 10),
                             _SwitchTile(
@@ -137,13 +140,15 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                               title: l10n.securityAppLockTitle,
                               subtitle: l10n.securityAppLockSubtitle,
                               value: appLock,
-                              onChanged: (final v) => settingsRepository.updateSetting('app_lock_enabled', v),
+                              onChanged: (final v) => settingsRepository
+                                  .updateSetting('app_lock_enabled', v),
                             ),
                             const SizedBox(height: 10),
                             _AutoLockRow(
                               enabled: appLock,
                               minutes: autoLockMinutes,
-                              onPick: (final m) => settingsRepository.updateSetting('auto_lock_minutes', m),
+                              onPick: (final m) => settingsRepository
+                                  .updateSetting('auto_lock_minutes', m),
                             ),
 
                             const SizedBox(height: 14),
@@ -156,8 +161,10 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                               child: StreamBuilder<List<UserSession>>(
                                 stream: sessionRepository.streamSessions(),
                                 builder: (final context, final snapshot) {
-                                  if (snapshot.connectionState == ConnectionState.waiting) {
-                                    return const Center(child: CircularProgressIndicator());
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                        child: CircularProgressIndicator());
                                   }
 
                                   final sessions = snapshot.data ?? [];
@@ -165,7 +172,10 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                     return Text(
                                       l10n.securityNoSessions,
                                       style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.75),
                                         fontWeight: FontWeight.w700,
                                       ),
                                     );
@@ -175,15 +185,26 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                     children: sessions.map((final s) {
                                       final label = s.isCurrent
                                           ? l10n.securityThisDevice
-                                          : (s.deviceName ?? l10n.securityDevice);
-                                      final platform = s.platform ?? l10n.unknown;
+                                          : (s.deviceName ??
+                                              l10n.securityDevice);
+                                      final platform =
+                                          s.platform ?? l10n.unknown;
                                       return Container(
-                                        margin: const EdgeInsets.only(bottom: 10),
+                                        margin:
+                                            const EdgeInsets.only(bottom: 10),
                                         padding: const EdgeInsets.all(12),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(18),
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
-                                          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                                          borderRadius:
+                                              BorderRadius.circular(18),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.06),
+                                          border: Border.all(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                                  .withValues(alpha: 0.12)),
                                         ),
                                         child: Row(
                                           children: [
@@ -191,22 +212,39 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                               width: 40,
                                               height: 40,
                                               decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(14),
-                                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-                                                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                                                borderRadius:
+                                                    BorderRadius.circular(14),
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface
+                                                    .withValues(alpha: 0.08),
+                                                border: Border.all(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface
+                                                        .withValues(
+                                                            alpha: 0.12)),
                                               ),
-                                              child: Icon(Icons.devices_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9)),
+                                              child: Icon(Icons.devices_rounded,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface
+                                                      .withValues(alpha: 0.9)),
                                             ),
                                             const SizedBox(width: 12),
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     label,
                                                     style: TextStyle(
-                                                      color: Theme.of(context).colorScheme.onSurface,
-                                                      fontWeight: FontWeight.w900,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface,
+                                                      fontWeight:
+                                                          FontWeight.w900,
                                                       fontSize: 14,
                                                     ),
                                                   ),
@@ -214,8 +252,13 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                                   Text(
                                                     '${platform.toUpperCase()} • ${_formatSeen(s.lastSeen)}',
                                                     style: TextStyle(
-                                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
-                                                      fontWeight: FontWeight.w700,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface
+                                                          .withValues(
+                                                              alpha: 0.65),
+                                                      fontWeight:
+                                                          FontWeight.w700,
                                                       fontSize: 12,
                                                     ),
                                                   ),
@@ -224,16 +267,31 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                                             ),
                                             if (s.isCurrent)
                                               Container(
-                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 6),
                                                 decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.circular(999),
-                                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
-                                                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.22)),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          999),
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface
+                                                      .withValues(alpha: 0.12),
+                                                  border: Border.all(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface
+                                                          .withValues(
+                                                              alpha: 0.22)),
                                                 ),
                                                 child: Text(
                                                   l10n.securityActiveLabel,
                                                   style: TextStyle(
-                                                    color: Theme.of(context).colorScheme.onSurface,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface,
                                                     fontWeight: FontWeight.w800,
                                                     fontSize: 12,
                                                   ),
@@ -249,17 +307,15 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                             ),
 
                             const SizedBox(height: 14),
-                            
                           ],
                         );
-                      }
-                    ),
-                  ),
-                  ],
+                      }),
                 ),
-              ),
+              ],
             ),
           ),
+        ),
+      ),
     );
   }
 
@@ -365,7 +421,12 @@ class _IconBtn extends StatelessWidget {
           width: 44,
           height: 44,
           child: Center(
-            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 20),
+            child: Icon(icon,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.9),
+                size: 20),
           ),
         ),
       ),
@@ -384,7 +445,8 @@ class _SectionTitle extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
           fontWeight: FontWeight.w900,
           fontSize: 12.5,
           letterSpacing: 0.2,
@@ -426,14 +488,27 @@ class _Tile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 15)),
                     const SizedBox(height: 4),
                     Text(subtitle,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.62),
+                            fontWeight: FontWeight.w700,
+                            height: 1.2)),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75)),
+              Icon(Icons.chevron_right_rounded,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.75)),
             ],
           ),
         ),
@@ -470,10 +545,20 @@ class _SwitchTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
+                Text(title,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 15)),
                 const SizedBox(height: 4),
                 Text(subtitle,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+                    style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.62),
+                        fontWeight: FontWeight.w700,
+                        height: 1.2)),
               ],
             ),
           ),
@@ -489,7 +574,8 @@ class _AutoLockRow extends StatelessWidget {
   final int minutes;
   final ValueChanged<int> onPick;
 
-  const _AutoLockRow({required this.enabled, required this.minutes, required this.onPick});
+  const _AutoLockRow(
+      {required this.enabled, required this.minutes, required this.onPick});
 
   @override
   Widget build(final BuildContext context) {
@@ -505,7 +591,13 @@ class _AutoLockRow extends StatelessWidget {
           Expanded(
             child: Text(
               l10n.securityAutoLockAfter,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85), fontWeight: FontWeight.w900, fontSize: 14),
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.85),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14),
             ),
           ),
           Opacity(
@@ -546,13 +638,18 @@ class _IconBox extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
         border: Border.all(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.12)),
       ),
-      child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92), size: 22),
+      child: Icon(icon,
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92),
+          size: 22),
     );
   }
 }
-
 
 class _MfaSetupSheet extends StatefulWidget {
   final String factorId;
@@ -601,7 +698,10 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
           children: [
             Text(
               l10n.securitySetup2faTitle,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 16),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 16),
             ),
             const SizedBox(height: 10),
             Center(
@@ -614,15 +714,25 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
             const SizedBox(height: 10),
             Text(
               l10n.securitySecretKeyLabel,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75), fontWeight: FontWeight.w800),
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.75),
+                  fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 6),
             SelectableText(
               widget.secret,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w800),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 12),
-            _Input(_codeCtrl, hint: l10n.securityCodeHint, obscure: false, onChanged: () => setState(() {})),
+            _Input(_codeCtrl,
+                hint: l10n.securityCodeHint,
+                obscure: false,
+                onChanged: () => setState(() {})),
             const SizedBox(height: 12),
             InkWell(
               borderRadius: BorderRadius.circular(999),
@@ -634,7 +744,8 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
                       setState(() => _isVerifying = true);
                       try {
                         await Supabase.instance.client.auth.mfa
-                            .challengeAndVerify(factorId: widget.factorId, code: code);
+                            .challengeAndVerify(
+                                factorId: widget.factorId, code: code);
                         if (!context.mounted) return;
                         widget.onVerified();
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -644,7 +755,9 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
                         if (!context.mounted) return;
                         setState(() => _isVerifying = false);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.securityVerifyCodeFailed(e.toString()))),
+                          SnackBar(
+                              content: Text(
+                                  l10n.securityVerifyCodeFailed(e.toString()))),
                         );
                       }
                     },
@@ -653,13 +766,23 @@ class _MfaSetupSheetState extends State<_MfaSetupSheet> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
-                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.10),
+                  border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.14)),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   _isVerifying ? l10n.securityVerifying : l10n.securityVerify,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14),
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14),
                 ),
               ),
             ),
@@ -708,7 +831,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
     final l10n = AppLocalizations.of(context);
     // In a real app we'd trigger a reload of the build to enable/disable button
     // For now we just check controllers
-    
+
     return Padding(
       padding: EdgeInsets.only(
         left: 16,
@@ -722,16 +845,27 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n.securityChangePasswordTitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 16)),
+            Text(l10n.securityChangePasswordTitle,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16)),
             const SizedBox(height: 12),
-
-            _Input(oldCtrl, hint: l10n.securityCurrentPasswordHint, obscure: true, onChanged: () => setState(() {})),
+            _Input(oldCtrl,
+                hint: l10n.securityCurrentPasswordHint,
+                obscure: true,
+                onChanged: () => setState(() {})),
             const SizedBox(height: 10),
-            _Input(newCtrl, hint: l10n.securityNewPasswordHint, obscure: true, onChanged: () => setState(() {})),
+            _Input(newCtrl,
+                hint: l10n.securityNewPasswordHint,
+                obscure: true,
+                onChanged: () => setState(() {})),
             const SizedBox(height: 10),
-            _Input(confirmCtrl, hint: l10n.securityConfirmPasswordHint, obscure: true, onChanged: () => setState(() {})),
+            _Input(confirmCtrl,
+                hint: l10n.securityConfirmPasswordHint,
+                obscure: true,
+                onChanged: () => setState(() {})),
             const SizedBox(height: 12),
-
             InkWell(
               borderRadius: BorderRadius.circular(999),
               onTap: _isSaving
@@ -739,7 +873,9 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
                   : () async {
                       if (authRepository.currentUser == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.securitySignInToChangePassword)),
+                          SnackBar(
+                              content:
+                                  Text(l10n.securitySignInToChangePassword)),
                         );
                         return;
                       }
@@ -750,19 +886,22 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
 
                       if (current.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.securityEnterCurrentPassword)),
+                          SnackBar(
+                              content: Text(l10n.securityEnterCurrentPassword)),
                         );
                         return;
                       }
                       if (next.length < 8) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.securityPasswordMinLength)),
+                          SnackBar(
+                              content: Text(l10n.securityPasswordMinLength)),
                         );
                         return;
                       }
                       if (next != confirm) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.securityPasswordsDoNotMatch)),
+                          SnackBar(
+                              content: Text(l10n.securityPasswordsDoNotMatch)),
                         );
                         return;
                       }
@@ -779,7 +918,9 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
                         if (!context.mounted) return;
                         setState(() => _isSaving = false);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.securityPasswordUpdateFailed(e.toString()))),
+                          SnackBar(
+                              content: Text(l10n
+                                  .securityPasswordUpdateFailed(e.toString()))),
                         );
                       }
                     },
@@ -788,11 +929,22 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
-                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.10),
+                  border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.14)),
                 ),
                 alignment: Alignment.center,
-                child: Text(l10n.save, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14)),
+                child: Text(l10n.save,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14)),
               ),
             ),
           ],
@@ -808,7 +960,8 @@ class _Input extends StatelessWidget {
   final bool obscure;
   final VoidCallback onChanged;
 
-  const _Input(this.c, {required this.hint, required this.obscure, required this.onChanged});
+  const _Input(this.c,
+      {required this.hint, required this.obscure, required this.onChanged});
 
   @override
   Widget build(final BuildContext context) {
@@ -818,18 +971,30 @@ class _Input extends StatelessWidget {
         color: Theme.of(context).brightness == Brightness.light
             ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
             : T.fieldFill,
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+        border: Border.all(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.12)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: TextField(
         controller: c,
         obscureText: obscure,
         onChanged: (final _) => onChanged(),
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w800, fontSize: 14.5),
+        style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontWeight: FontWeight.w800,
+            fontSize: 14.5),
         cursorColor: Theme.of(context).colorScheme.primary,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45), fontWeight: FontWeight.w700),
+          hintStyle: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.45),
+              fontWeight: FontWeight.w700),
           border: InputBorder.none,
           isDense: true,
         ),

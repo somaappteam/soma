@@ -19,7 +19,6 @@ class CirclesRepository {
 
   // NOTE: getOpenCircleParticipantCounts removed as we now specific columns in the circles table.
 
-
   /// Create a new circle
   Future<String> createCircle({
     required final String name,
@@ -38,7 +37,8 @@ class CirclesRepository {
     if (uid == null) throw Exception('Not logged in');
 
     if (kDebugMode) {
-      appLogger.debug('Creating circle', context: {'questions_count': questions?.length ?? 0});
+      appLogger.debug('Creating circle',
+          context: {'questions_count': questions?.length ?? 0});
     }
 
     // 1. Create circle
@@ -98,8 +98,10 @@ class CirclesRepository {
       final stats = await statsRepository.incrementCirclesJoined();
       await achievementsRepository.checkAfterCircle(stats: stats);
     } catch (e, st) {
-      appLogger.warning('Optional stats update failed after joining circle', error: e, stackTrace: st);
-      await errorReporter.capture(e, st, hint: 'CirclesRepository.joinCircle.optionalStats');
+      appLogger.warning('Optional stats update failed after joining circle',
+          error: e, stackTrace: st);
+      await errorReporter.capture(e, st,
+          hint: 'CirclesRepository.joinCircle.optionalStats');
     }
   }
 
@@ -164,15 +166,18 @@ class CirclesRepository {
       final stats = await statsRepository.incrementCirclesJoined();
       await achievementsRepository.checkAfterCircle(stats: stats);
     } catch (e, st) {
-      appLogger.warning('Optional stats update failed after joining circle', error: e, stackTrace: st);
-      await errorReporter.capture(e, st, hint: 'CirclesRepository.joinCircle.optionalStats');
+      appLogger.warning('Optional stats update failed after joining circle',
+          error: e, stackTrace: st);
+      await errorReporter.capture(e, st,
+          hint: 'CirclesRepository.joinCircle.optionalStats');
     }
 
     return CircleJoinOutcome(role: role, status: status);
   }
 
   /// Listen to participants in a circle
-  Stream<List<Map<String, dynamic>>> getParticipantsStream(final String circleId) {
+  Stream<List<Map<String, dynamic>>> getParticipantsStream(
+      final String circleId) {
     return _supabase
         .from('circle_participants')
         .stream(primaryKey: ['id'])
@@ -207,10 +212,10 @@ class CirclesRepository {
       // If host leaves and circle is still open, end it
       if (isHost && isOpen) {
         await endCircle(circleId);
-        debugPrint('Host left circle $circleId - circle ended.');
+        appLogger.debug('Host left circle $circleId - circle ended.');
       }
     } catch (e) {
-      debugPrint('Error in leaveCircle: $e');
+      appLogger.debug('Error in leaveCircle: $e');
       // Still try to remove participant even if other checks fail
       try {
         await _supabase
@@ -223,7 +228,8 @@ class CirclesRepository {
   }
 
   /// Update circle status (lobby, active, ended)
-  Future<void> updateCircleStatus(final String circleId, final String status) async {
+  Future<void> updateCircleStatus(
+      final String circleId, final String status) async {
     await _supabase
         .from('circles')
         .update({'status': status}).eq('id', circleId);
@@ -237,7 +243,8 @@ class CirclesRepository {
     }).eq('id', circleId);
   }
 
-  Future<void> updateCircleLock(final String circleId, final bool isLocked) async {
+  Future<void> updateCircleLock(
+      final String circleId, final bool isLocked) async {
     await _supabase.from('circles').update({
       'is_locked': isLocked,
     }).eq('id', circleId);
@@ -304,11 +311,11 @@ class CirclesRepository {
   /// End circle so it disappears from open lists
   Future<void> endCircle(final String circleId) async {
     try {
-      debugPrint('Ending circle: $circleId');
+      appLogger.debug('Ending circle: $circleId');
       await updateCircleStatus(circleId, 'ended');
-      debugPrint("Circle $circleId status set to 'ended'");
+      appLogger.debug("Circle $circleId status set to 'ended'");
     } catch (e) {
-      debugPrint('Failed to end circle $circleId: $e');
+      appLogger.debug('Failed to end circle $circleId: $e');
       rethrow;
     }
   }
@@ -376,7 +383,8 @@ class CirclesRepository {
         .map((final rows) => rows.isNotEmpty ? rows.first : {});
   }
 
-  Future<void> updateParticipantScore(final String circleId, final int score) async {
+  Future<void> updateParticipantScore(
+      final String circleId, final int score) async {
     final uid = currentUserId;
     if (uid == null) return;
 
@@ -412,13 +420,13 @@ class CirclesRepository {
 
         // 3. If host missing, end the circle
         if (hostParticipant == null) {
-          debugPrint(
+          appLogger.debug(
               'Found ghost circle $circleId (Host $hostId missing). Ending it.');
           await endCircle(circleId); // This sets status to 'ended'
         }
       }
     } catch (e) {
-      debugPrint('Error cleaning up ghost circles: $e');
+      appLogger.debug('Error cleaning up ghost circles: $e');
     }
   }
 }
@@ -431,5 +439,3 @@ class CircleJoinOutcome {
 }
 
 CirclesRepository get circlesRepository => locator<CirclesRepository>();
-
-

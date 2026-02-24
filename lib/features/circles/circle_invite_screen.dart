@@ -46,7 +46,8 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
     });
 
     try {
-      final outcome = await circlesRepository.joinCircleFromInvite(widget.circleId);
+      final outcome =
+          await circlesRepository.joinCircleFromInvite(widget.circleId);
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -78,135 +79,140 @@ class _CircleInviteScreenState extends State<CircleInviteScreen> {
 
     return Scaffold(
       body: SafeArea(
-          child: ResponsiveFrame(
-            maxWidth: 420,
-            child: LayoutBuilder(
-              builder: (final context, final constraints) {
-                final compactHeight = constraints.maxHeight < 760;
-                final sectionSpacing = compactHeight ? 12.0 : 16.0;
+        child: ResponsiveFrame(
+          maxWidth: 420,
+          child: LayoutBuilder(
+            builder: (final context, final constraints) {
+              final compactHeight = constraints.maxHeight < 760;
+              final sectionSpacing = compactHeight ? 12.0 : 16.0;
 
-                return Padding(
-                  padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-                  child: Column(
-                    children: [
-                  Row(
-                    children: [
-                      Glass(
-                        radius: BorderRadius.circular(14),
-                        padding: EdgeInsets.zero,
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(14),
-                          onTap: () => Navigator.pop(context),
-                          child: const SizedBox(
-                            width: 44,
-                            height: 44,
-                            child: Center(
-                              child: Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Glass(
+                          radius: BorderRadius.circular(14),
+                          padding: EdgeInsets.zero,
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(14),
+                            onTap: () => Navigator.pop(context),
+                            child: const SizedBox(
+                              width: 44,
+                              height: 44,
+                              child: Center(
+                                child: Icon(Icons.arrow_back_ios_new_rounded,
+                                    color: Colors.white, size: 20),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Circle Invite',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        const SizedBox(width: 12),
+                        Text(
+                          'Circle Invite',
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                  ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: sectionSpacing),
+                    Glass(
+                      radius: BorderRadius.circular(24),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w900,
+                              fontSize: 16,
                             ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: sectionSpacing),
-                  Glass(
-                    radius: BorderRadius.circular(24),
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 16,
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          l10n.circleIdLabel(widget.circleId),
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.7),
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        if (_error != null) ...[
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 8),
                           Text(
-                            _error!,
-                            style: const TextStyle(
-                              color: Color(0xFFFF6B6B),
+                            l10n.circleIdLabel(widget.circleId),
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.7),
                               fontWeight: FontWeight.w700,
                             ),
                           ),
+                          if (_error != null) ...[
+                            const SizedBox(height: 10),
+                            Text(
+                              _error!,
+                              style: const TextStyle(
+                                color: Color(0xFFFF6B6B),
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
-                  ),
-                  const Spacer(),
-                  if (_isGuest) ...[
-                    NeonButton(
-                      label: l10n.signInToJoin,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (final _) => SignInScreen(onSignedIn: _attemptJoin),
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(height: compactHeight ? 10 : 12),
-                    Glass(
-                      radius: BorderRadius.circular(999),
-                      padding: EdgeInsets.zero,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(999),
+                    const Spacer(),
+                    if (_isGuest) ...[
+                      NeonButton(
+                        label: l10n.signInToJoin,
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (final _) => SignUpScreen(onSignedUp: _attemptJoin),
+                              builder: (final _) =>
+                                  SignInScreen(onSignedIn: _attemptJoin),
                             ),
                           );
                         },
-                        child: SizedBox(
-                          height: 56,
-                          child: Center(
-                            child: Text(
-                              l10n.authCreateAccount,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w800,
+                      ),
+                      SizedBox(height: compactHeight ? 10 : 12),
+                      Glass(
+                        radius: BorderRadius.circular(999),
+                        padding: EdgeInsets.zero,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(999),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (final _) =>
+                                    SignUpScreen(onSignedUp: _attemptJoin),
+                              ),
+                            );
+                          },
+                          child: SizedBox(
+                            height: 56,
+                            child: Center(
+                              child: Text(
+                                l10n.authCreateAccount,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ] else ...[
-                    NeonButton(
-                      label: _isLoading ? l10n.joiningCircle : l10n.joinCircle,
-                      onTap: _isLoading ? null : _attemptJoin,
-                    ),
+                    ] else ...[
+                      NeonButton(
+                        label:
+                            _isLoading ? l10n.joiningCircle : l10n.joinCircle,
+                        onTap: _isLoading ? null : _attemptJoin,
+                      ),
+                    ],
+                    SizedBox(height: compactHeight ? 14 : 18),
                   ],
-                  SizedBox(height: compactHeight ? 14 : 18),
-                ],
-              ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
+        ),
       ),
     );
   }

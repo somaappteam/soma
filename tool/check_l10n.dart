@@ -14,7 +14,8 @@ void main() {
   final arbFiles = l10nDir
       .listSync()
       .whereType<File>()
-      .where((final f) => f.path.endsWith('.arb') && !f.path.endsWith('app_en.arb'))
+      .where((final f) =>
+          f.path.endsWith('.arb') && !f.path.endsWith('app_en.arb'))
       .toList()
     ..sort((final a, final b) => a.path.compareTo(b.path));
 
@@ -23,7 +24,8 @@ void main() {
     final keys = _arbKeys(file);
     final missing = base.difference(keys);
     if (missing.isNotEmpty) {
-      issues.add('${file.path} missing ${missing.length} key(s): ${missing.take(8).join(', ')}');
+      issues.add(
+          '${file.path} missing ${missing.length} key(s): ${missing.take(8).join(', ')}');
     }
   }
 
@@ -36,7 +38,8 @@ void main() {
     return;
   }
 
-  stdout.writeln('Localization parity check passed for ${arbFiles.length + 1} locales.');
+  stdout.writeln(
+      'Localization parity check passed for ${arbFiles.length + 1} locales.');
 }
 
 Set<String> _arbKeys(final File file) {

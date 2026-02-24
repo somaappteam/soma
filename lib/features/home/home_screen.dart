@@ -24,15 +24,12 @@ import 'package:soma/features/solo/solo_course_detail_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:soma/models/solo_course.dart';
 
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
-
 
 class _HomeScreenState extends State<HomeScreen> {
   // We'll load courses via StreamBuilder
@@ -55,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _reloadCourses() {
     // No-op or force refresh if needed, but stream covers most cases
     setState(() {
-       _coursesStream = coursesRepository.getUserCoursesStream();
+      _coursesStream = coursesRepository.getUserCoursesStream();
     });
   }
 
@@ -107,7 +104,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                  child: Icon(Icons.delete_forever_rounded, color: scheme.onError, size: 26),
+                  child: Icon(Icons.delete_forever_rounded,
+                      color: scheme.onError, size: 26),
                 ),
                 const SizedBox(height: 14),
                 Text(
@@ -135,9 +133,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         onPressed: () => Navigator.pop(ctx, false),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: scheme.onSurface,
-                          side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.24)),
+                          side: BorderSide(
+                              color: scheme.onSurface.withValues(alpha: 0.24)),
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
                         ),
                         child: Text(l10n.cancel),
                       ),
@@ -150,7 +150,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           backgroundColor: scheme.error,
                           foregroundColor: scheme.onError,
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
                           elevation: 0,
                         ),
                         child: Text(
@@ -196,11 +197,14 @@ class _HomeScreenState extends State<HomeScreen> {
             setState(() => _isEditingCourses = !editing);
           },
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: S.xs, vertical: S.xs),
+            padding:
+                const EdgeInsets.symmetric(horizontal: S.xs, vertical: S.xs),
             child: Text(
               editing ? l10n.done : l10n.editCourses,
               style: TextStyle(
-                color: editing ? scheme.primary : scheme.onSurface.withValues(alpha: 0.8),
+                color: editing
+                    ? scheme.primary
+                    : scheme.onSurface.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w900,
                 fontSize: 12.5,
               ),
@@ -211,16 +215,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCourseList(final List<SoloCourse> courses, {required final bool editing, required final double listGap}) {
+  Widget _buildCourseList(final List<SoloCourse> courses,
+      {required final bool editing, required final double listGap}) {
     final l10n = AppLocalizations.of(context);
     // If courses is empty, the ListView.separated below will correctly handle it
     // by rendering just the AddCourseButton (count = 0 + 1).
 
     return ListView.separated(
-              physics: const BouncingScrollPhysics(),
-              itemCount: editing ? courses.length : courses.length + 1,
-              separatorBuilder: (final _, final __) => SizedBox(height: listGap),
-              itemBuilder: (final context, final i) {
+      physics: const BouncingScrollPhysics(),
+      itemCount: editing ? courses.length : courses.length + 1,
+      separatorBuilder: (final _, final __) => SizedBox(height: listGap),
+      itemBuilder: (final context, final i) {
         if (!editing && i == courses.length) {
           return StaggeredIn(
             index: i,
@@ -233,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
         }
 
         final c = courses[i];
-        final parts = c.subtitle.split('→');
+        final parts = c.subtitle.split('â†’');
         final fallback = l10n.unknown;
         final fromLang = parts.isNotEmpty ? parts.first.trim() : fallback;
         final toLang = parts.length > 1 ? parts[1].trim() : fallback;
@@ -254,7 +259,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 : () async {
                     await Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (final _) => SoloCourseDetailScreen(course: c)),
+                      MaterialPageRoute(
+                          builder: (final _) =>
+                              SoloCourseDetailScreen(course: c)),
                     );
                     _reloadCourses();
                   },
@@ -284,166 +291,201 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final isGuest = authRepository.currentUser == null;
-    
+
     return PremiumScreenScaffold(
       body: ResponsiveFrame(
         child: Column(
           children: [
             // Header row
             Row(
-                  children: [
-                    // Profile Pic + Username
-                    StreamBuilder<Map<String, bool>>(
-                      stream: presenceRepository.streamMultipleOnlineStatuses([authRepository.currentUser?.id].whereType<String>().toList()),
-                      builder: (final context, final presenceSnapshot) {
-                        final isOnline = presenceSnapshot.data?[authRepository.currentUser?.id] ?? false;
-                        
-                        return AnimatedBuilder(
-                          animation: profileStore,
-                          builder: (final context, final _) {
-                            final p = profileStore.profile;
-                            final hasAvatar = p.avatarUrl != null && p.avatarUrl!.isNotEmpty;
-                            final username = p.username.isNotEmpty ? p.username : l10n.guestUsername;
-                            
-                            return Row(
+              children: [
+                // Profile Pic + Username
+                StreamBuilder<Map<String, bool>>(
+                  stream: presenceRepository.streamMultipleOnlineStatuses([
+                    authRepository.currentUser?.id
+                  ].whereType<String>().toList()),
+                  builder: (final context, final presenceSnapshot) {
+                    final isOnline = presenceSnapshot
+                            .data?[authRepository.currentUser?.id] ??
+                        false;
+
+                    return AnimatedBuilder(
+                      animation: profileStore,
+                      builder: (final context, final _) {
+                        final p = profileStore.profile;
+                        final hasAvatar =
+                            p.avatarUrl != null && p.avatarUrl!.isNotEmpty;
+                        final username = p.username.isNotEmpty
+                            ? p.username
+                            : l10n.guestUsername;
+
+                        return Row(
+                          children: [
+                            Stack(
                               children: [
-                                Stack(
-                                  children: [
-                                    Container(
-                                      width: 42,
-                                      height: 42,
+                                Container(
+                                  width: 42,
+                                  height: 42,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surfaceContainerHighest,
+                                    image: hasAvatar
+                                        ? DecorationImage(
+                                            image: CachedNetworkImageProvider(
+                                                p.avatarUrl!),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
+                                    border: Border.all(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.16),
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: !hasAvatar
+                                      ? Center(
+                                          child: Text(
+                                            username.isNotEmpty
+                                                ? username[0].toUpperCase()
+                                                : '?',
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        )
+                                      : null,
+                                ),
+                                if (isOnline)
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      width: 12,
+                                      height: 12,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                        image: hasAvatar
-                                            ? DecorationImage(
-                                                image: CachedNetworkImageProvider(p.avatarUrl!),
-                                                fit: BoxFit.cover,
-                                              )
-                                            : null,
+                                        color: const Color(0xFF58F7B6),
                                         border: Border.all(
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16),
-                                          width: 1.5,
-                                        ),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surface,
+                                            width: 2.5),
                                       ),
-                                      child: !hasAvatar
-                                          ? Center(
-                                              child: Text(
-                                                username.isNotEmpty ? username[0].toUpperCase() : '?',
-                                                style: TextStyle(
-                                                  color: Theme.of(context).colorScheme.onSurface,
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            )
-                                          : null,
                                     ),
-                                    if (isOnline)
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: Container(
-                                          width: 12,
-                                          height: 12,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: const Color(0xFF58F7B6),
-                                            border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2.5),
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(width: 10),
-                                Text(
-                                  username,
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 17,
-                                      ),
-                                ),
+                                  ),
                               ],
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              username,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 17,
+                                  ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+                const Spacer(),
+                if (isGuest)
+                  AnimatedBuilder(
+                    animation: notificationsStore,
+                    builder: (final context, final _) {
+                      final count = notificationsStore.items
+                          .where((final n) =>
+                              !n.isRead &&
+                              (n.type == NotifType.course ||
+                                  n.type == NotifType.system))
+                          .length;
+                      return _BellWithBadge(
+                        count: count,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (final _) =>
+                                    const NotificationsScreen()),
+                          );
+                        },
+                      );
+                    },
+                  )
+                else
+                  StreamBuilder<List<Map<String, dynamic>>>(
+                      stream: notificationsRepository.getNotificationsStream(),
+                      builder: (final context, final snapshot) {
+                        final count = snapshot.data
+                                ?.where((final n) =>
+                                    !(n['is_read'] as bool? ?? false))
+                                .length ??
+                            0;
+                        return _BellWithBadge(
+                          count: count,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (final _) =>
+                                      const NotificationsScreen()),
                             );
                           },
                         );
-                      },
-                    ),
-                    const Spacer(),
-                    if (isGuest)
-                      AnimatedBuilder(
-                        animation: notificationsStore,
-                        builder: (final context, final _) {
-                          final count = notificationsStore.items
-                              .where((final n) => !n.isRead && (n.type == NotifType.course || n.type == NotifType.system))
-                              .length;
-                          return _BellWithBadge(
-                            count: count,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (final _) => const NotificationsScreen()),
-                              );
-                            },
-                          );
-                        },
-                      )
-                    else
-                      StreamBuilder<List<Map<String, dynamic>>>(
-                        stream: notificationsRepository.getNotificationsStream(),
-                        builder: (final context, final snapshot) {
-                          final count = snapshot.data?.where((final n) => !(n['is_read'] as bool? ?? false)).length ?? 0;
-                          return _BellWithBadge(
-                            count: count,
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (final _) => const NotificationsScreen()),
-                              );
-                            },
-                          );
-                        }
-                      ),
-                    const SizedBox(width: S.xs),
-                  ],
-                ),
+                      }),
+                const SizedBox(width: S.xs),
+              ],
+            ),
 
-                const SizedBox(height: SectionGap.xl),
+            const SizedBox(height: SectionGap.xl),
 
-                if (!isGuest) ...[
-                  _ActiveFriendsStrip(),
-                  const SizedBox(height: SectionGap.lg),
-                ],
+            if (!isGuest) ...[
+              _ActiveFriendsStrip(),
+              const SizedBox(height: SectionGap.lg),
+            ],
 
-                // Welcome
-                _buildWelcomeRow(editing: _isEditingCourses),
-                const SizedBox(height: S.sm),
+            // Welcome
+            _buildWelcomeRow(editing: _isEditingCourses),
+            const SizedBox(height: S.sm),
 
+            // Course list
+            Expanded(
+              child: StreamBuilder<List<SoloCourse>>(
+                stream: _coursesStream,
+                builder: (final context, final snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const _CoursesSkeleton();
+                  }
 
-                // Course list
-                Expanded(
-                  child: StreamBuilder<List<SoloCourse>>(
-                    stream: _coursesStream,
-                    builder: (final context, final snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const _CoursesSkeleton();
-                      }
-                       
-                      final courses = snapshot.data ?? [];
-                      final density = PremiumLayout.densityForWidth(MediaQuery.of(context).size.width);
-                      final listGap = PremiumLayout.listGap(density);
-                      return _buildCourseList(courses, editing: _isEditingCourses, listGap: listGap);
-                    },
-                  ),
-                ),
+                  final courses = snapshot.data ?? [];
+                  final density = PremiumLayout.densityForWidth(
+                      MediaQuery.of(context).size.width);
+                  final listGap = PremiumLayout.listGap(density);
+                  return _buildCourseList(courses,
+                      editing: _isEditingCourses, listGap: listGap);
+                },
+              ),
+            ),
           ],
         ),
       ),
-      padding: PremiumLayout.screenPadding(PremiumLayout.densityForWidth(MediaQuery.of(context).size.width)),
+      padding: PremiumLayout.screenPadding(
+          PremiumLayout.densityForWidth(MediaQuery.of(context).size.width)),
     );
   }
 }
-
 
 class _SmallIconButton extends StatelessWidget {
   final IconData icon;
@@ -463,7 +505,8 @@ class _SmallIconButton extends StatelessWidget {
           width: 44,
           height: 44,
           child: Center(
-            child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.9), size: 22),
+            child: Icon(icon,
+                color: scheme.onSurface.withValues(alpha: 0.9), size: 22),
           ),
         ),
       ),
@@ -471,14 +514,13 @@ class _SmallIconButton extends StatelessWidget {
   }
 }
 
-
-
 class _CoursesSkeleton extends StatelessWidget {
   const _CoursesSkeleton();
 
   @override
   Widget build(final BuildContext context) {
-    final density = PremiumLayout.densityForWidth(MediaQuery.of(context).size.width);
+    final density =
+        PremiumLayout.densityForWidth(MediaQuery.of(context).size.width);
     final listGap = PremiumLayout.listGap(density);
     return ListView.separated(
       physics: const BouncingScrollPhysics(),
@@ -586,7 +628,7 @@ class CourseCard extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      '$fromLang  →  $toLang',
+                      '$fromLang  â†’  $toLang',
                       style: textTheme.titleMedium?.copyWith(
                         color: scheme.onSurface,
                         fontWeight: FontWeight.w800,
@@ -605,7 +647,8 @@ class CourseCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             color: scheme.error.withValues(alpha: 0.14),
-                            border: Border.all(color: scheme.error.withValues(alpha: 0.45)),
+                            border: Border.all(
+                                color: scheme.error.withValues(alpha: 0.45)),
                           ),
                           child: Icon(
                             Icons.delete_forever_rounded,
@@ -616,7 +659,8 @@ class CourseCard extends StatelessWidget {
                       ),
                     )
                   else
-                    Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.65)),
+                    Icon(Icons.chevron_right_rounded,
+                        color: scheme.onSurface.withValues(alpha: 0.65)),
                 ],
               ),
               const SizedBox(height: 12),
@@ -627,7 +671,8 @@ class CourseCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
                   color: scheme.onSurface.withValues(alpha: 0.08),
-              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+                  border: Border.all(
+                      color: scheme.onSurface.withValues(alpha: 0.12)),
                 ),
                 child: Align(
                   alignment: Alignment.centerLeft,
@@ -649,7 +694,8 @@ class CourseCard extends StatelessWidget {
                           BoxShadow(
                             color: scheme.primary.withValues(alpha: 0.35),
                             blurRadius: 18,
-                            spreadRadius: 2, // Reverted to original as BorderRadius is not compatible here
+                            spreadRadius:
+                                2, // Reverted to original as BorderRadius is not compatible here
                           ),
                         ],
                       ),
@@ -701,9 +747,14 @@ class _Pill extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: icon == Icons.bolt_rounded
-              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.9)
-              : Theme.of(context).colorScheme.tertiary.withValues(alpha: 0.85)),
+          Icon(icon,
+              size: 16,
+              color: icon == Icons.bolt_rounded
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.9)
+                  : Theme.of(context)
+                      .colorScheme
+                      .tertiary
+                      .withValues(alpha: 0.85)),
           const SizedBox(width: 6),
           Text(
             label,
@@ -742,8 +793,6 @@ class _FlagDot extends StatelessWidget {
   }
 }
 
-
-
 class _AddCourseButton extends StatelessWidget {
   final void Function(SoloCourse newCourse) onAdded;
 
@@ -763,7 +812,8 @@ class _AddCourseButton extends StatelessWidget {
 
         if (created != null) {
           final existingCourses = await coursesRepository.getUserCourses();
-          final duplicate = existingCourses.any((final course) => _isSameCourse(course, created));
+          final duplicate = existingCourses
+              .any((final course) => _isSameCourse(course, created));
           if (duplicate) {
             if (!context.mounted) return;
             ScaffoldMessenger.of(context)
@@ -793,14 +843,16 @@ class _AddCourseButton extends StatelessWidget {
   }
 
   String? _coursePairKey(final SoloCourse course) {
-    final idMatch = RegExp(r'^solo_([a-z]{2,})_([a-z]{2,})(?:_\d+)?$').firstMatch(
+    final idMatch =
+        RegExp(r'^solo_([a-z]{2,})_([a-z]{2,})(?:_\d+)?$').firstMatch(
       course.id.toLowerCase(),
     );
     if (idMatch != null) {
       return '${idMatch.group(1)}->${idMatch.group(2)}';
     }
 
-    final subtitleMatch = RegExp(r'^\s*(.*?)\s*→\s*(.*?)\s*$').firstMatch(course.subtitle);
+    final subtitleMatch =
+        RegExp(r'^\s*(.*?)\s*â†’\s*(.*?)\s*$').firstMatch(course.subtitle);
     if (subtitleMatch != null) {
       final src = subtitleMatch.group(1)?.trim().toLowerCase();
       final dst = subtitleMatch.group(2)?.trim().toLowerCase();
@@ -842,7 +894,8 @@ class _BellWithBadge extends StatelessWidget {
                     spreadRadius: 1,
                   ),
                 ],
-                border: Border.all(color: scheme.onSurface.withValues(alpha: 0.2)),
+                border:
+                    Border.all(color: scheme.onSurface.withValues(alpha: 0.2)),
               ),
               child: Text(
                 count > 99 ? '99+' : '$count',
@@ -880,7 +933,9 @@ class _ActiveFriendsStrip extends StatelessWidget {
           stream: presenceRepository.streamMultipleOnlineStatuses(friendIds),
           builder: (final context, final presenceSnapshot) {
             final onlineStatuses = presenceSnapshot.data ?? {};
-            final onlineFriends = friends.where((final f) => onlineStatuses[f['id']?.toString()] == true).toList();
+            final onlineFriends = friends
+                .where((final f) => onlineStatuses[f['id']?.toString()] == true)
+                .toList();
 
             if (onlineFriends.isEmpty) return const SizedBox.shrink();
 
@@ -905,7 +960,8 @@ class _ActiveFriendsStrip extends StatelessWidget {
                     padding: EdgeInsets.zero,
                     scrollDirection: Axis.horizontal,
                     itemCount: onlineFriends.length,
-                    separatorBuilder: (final _, final __) => const SizedBox(width: 14),
+                    separatorBuilder: (final _, final __) =>
+                        const SizedBox(width: 14),
                     itemBuilder: (final context, final index) {
                       final f = onlineFriends[index];
                       final avatarUrl = f['avatar_url']?.toString();
@@ -917,7 +973,9 @@ class _ActiveFriendsStrip extends StatelessWidget {
                             ? null
                             : () => Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (final _) => ProfileScreen(userId: userId)),
+                                  MaterialPageRoute(
+                                      builder: (final _) =>
+                                          ProfileScreen(userId: userId)),
                                 ),
                         child: Column(
                           children: [
@@ -929,27 +987,33 @@ class _ActiveFriendsStrip extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: scheme.primary.withValues(alpha: 0.4),
+                                      color:
+                                          scheme.primary.withValues(alpha: 0.4),
                                       width: 1.5,
                                     ),
-                                    image: (avatarUrl != null && avatarUrl.isNotEmpty)
+                                    image: (avatarUrl != null &&
+                                            avatarUrl.isNotEmpty)
                                         ? DecorationImage(
-                                            image: CachedNetworkImageProvider(avatarUrl),
+                                            image: CachedNetworkImageProvider(
+                                                avatarUrl),
                                             fit: BoxFit.cover,
                                           )
                                         : null,
                                   ),
-                                  child: (avatarUrl == null || avatarUrl.isEmpty)
-                                      ? Center(
-                                          child: Text(
-                                            username.isNotEmpty ? username[0].toUpperCase() : '?',
-                                            style: TextStyle(
-                                              color: scheme.onSurface,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                          ),
-                                        )
-                                      : null,
+                                  child:
+                                      (avatarUrl == null || avatarUrl.isEmpty)
+                                          ? Center(
+                                              child: Text(
+                                                username.isNotEmpty
+                                                    ? username[0].toUpperCase()
+                                                    : '?',
+                                                style: TextStyle(
+                                                  color: scheme.onSurface,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
+                                            )
+                                          : null,
                                 ),
                                 Positioned(
                                   bottom: 0,
@@ -960,7 +1024,8 @@ class _ActiveFriendsStrip extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: const Color(0xFF58F7B6),
-                                      border: Border.all(color: scheme.surface, width: 2),
+                                      border: Border.all(
+                                          color: scheme.surface, width: 2),
                                     ),
                                   ),
                                 ),

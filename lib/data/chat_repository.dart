@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/data/presence_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -29,11 +29,12 @@ class ChatRepository {
         .order('last_message_at', ascending: false)
         .limit(50)
         .map((final _) {
-          debugPrint('ChatRepository: inbox refresh stream event');
+          appLogger.debug('ChatRepository: inbox refresh stream event');
         });
   }
 
-  Future<void> sendMessage(final String receiverId, final String content) async {
+  Future<void> sendMessage(
+      final String receiverId, final String content) async {
     final uid = currentUserId;
     if (uid == null) throw Exception('Not logged in');
 
@@ -43,10 +44,10 @@ class ChatRepository {
         .eq('id', uid)
         .maybeSingle();
     final settings = settingsRow?['settings'];
-    final blockedSource = settings is Map<String, dynamic>
-        ? settings['blocked_user_ids']
-        : null;
-    final blockedIds = (blockedSource as List?)?.map((final e) => e.toString()).toList() ?? [];
+    final blockedSource =
+        settings is Map<String, dynamic> ? settings['blocked_user_ids'] : null;
+    final blockedIds =
+        (blockedSource as List?)?.map((final e) => e.toString()).toList() ?? [];
     if (blockedIds.contains(receiverId)) {
       throw Exception('You have blocked this user.');
     }
@@ -64,23 +65,23 @@ class ChatRepository {
         'receiver_id': receiverId,
         'content': content,
       });
-      // Conversation synchronization is now handled by a database trigger 
+      // Conversation synchronization is now handled by a database trigger
       // (update_conversations_on_message) to avoid RLS issues.
-      
+
       await recordLatencyEvent(
         metric: 'send_to_insert_ms',
         valueMs: DateTime.now().difference(startedAt).inMilliseconds,
         peerUserId: receiverId,
       );
     } catch (_) {
-      _pendingDmSends.add(_PendingDmSend(receiverId: receiverId, content: content));
+      _pendingDmSends
+          .add(_PendingDmSend(receiverId: receiverId, content: content));
       _ensureRetryLoop();
       rethrow;
     }
 
     await setTypingState(otherUserId: receiverId, isTyping: false);
   }
-
 
   String _parseMessagePreview(final String? content) {
     if (content == null || content.isEmpty) return '';
@@ -106,7 +107,9 @@ class ChatRepository {
           case 'contact':
             return label.isNotEmpty ? label : 'Contact card';
           case 'invite':
-            return label.isNotEmpty ? label : (text.isNotEmpty ? text : 'Practice invite');
+            return label.isNotEmpty
+                ? label
+                : (text.isNotEmpty ? text : 'Practice invite');
           case 'poll':
             return label.isNotEmpty ? label : 'Poll';
           case 'checklist':
@@ -132,10 +135,10 @@ class ChatRepository {
       final friendship = await _supabase
           .from('friendships')
           .select('status,created_at')
-          .or(
-              'and(requester_id.eq.$uid,addressee_id.eq.$receiverId),and(requester_id.eq.$receiverId,addressee_id.eq.$uid)')
+          .or('and(requester_id.eq.$uid,addressee_id.eq.$receiverId),and(requester_id.eq.$receiverId,addressee_id.eq.$uid)')
           .maybeSingle();
-      final createdAt = DateTime.tryParse(friendship?['created_at']?.toString() ?? '');
+      final createdAt =
+          DateTime.tryParse(friendship?['created_at']?.toString() ?? '');
       final isAccepted = friendship?['status']?.toString() == 'accepted';
       final isNewConnection = !isAccepted ||
           createdAt == null ||
@@ -146,13 +149,15 @@ class ChatRepository {
     }
 
     if (_sendTimestamps.length >= allowed) {
-      throw Exception('Rate limit reached. Please wait before sending more messages.');
+      throw Exception(
+          'Rate limit reached. Please wait before sending more messages.');
     }
     _sendTimestamps.add(now);
   }
 
   void _ensureRetryLoop() {
-    _retryTimer ??= Timer.periodic(const Duration(seconds: 12), (final _) async {
+    _retryTimer ??=
+        Timer.periodic(const Duration(seconds: 12), (final _) async {
       if (_pendingDmSends.isEmpty) {
         _retryTimer?.cancel();
         _retryTimer = null;
@@ -217,14 +222,16 @@ class ChatRepository {
         .stream(primaryKey: ['user_id', 'other_user_id'])
         .eq('user_id', otherUserId)
         .map((final rows) {
-      final matches = rows.where((final r) => r['other_user_id'] == uid).toList();
-      if (matches.isEmpty) return false;
-      final row = matches.first;
-      final isTyping = row['is_typing'] == true;
-      final updatedAt = DateTime.tryParse(row['updated_at']?.toString() ?? '');
-      if (!isTyping || updatedAt == null) return false;
-      return DateTime.now().difference(updatedAt).inSeconds <= 8;
-    });
+          final matches =
+              rows.where((final r) => r['other_user_id'] == uid).toList();
+          if (matches.isEmpty) return false;
+          final row = matches.first;
+          final isTyping = row['is_typing'] == true;
+          final updatedAt =
+              DateTime.tryParse(row['updated_at']?.toString() ?? '');
+          if (!isTyping || updatedAt == null) return false;
+          return DateTime.now().difference(updatedAt).inSeconds <= 8;
+        });
   }
 
   Future<Map<String, dynamic>> getDmGateState(final String otherUserId) async {
@@ -265,10 +272,14 @@ class ChatRepository {
   }) async {
     final uid = currentUserId;
     if (uid == null) return;
-    await _supabase.from('message_requests').update({
-      'status': accept ? 'accepted' : 'declined',
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('requester_id', requesterId).eq('recipient_id', uid);
+    await _supabase
+        .from('message_requests')
+        .update({
+          'status': accept ? 'accepted' : 'declined',
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('requester_id', requesterId)
+        .eq('recipient_id', uid);
   }
 
   Future<void> submitChatReport({
@@ -313,10 +324,13 @@ class ChatRepository {
     } else {
       next[emoji] = users.toList();
     }
-    await _supabase.from('messages').update({'reactions': next}).eq('id', messageId);
+    await _supabase
+        .from('messages')
+        .update({'reactions': next}).eq('id', messageId);
   }
 
-  Stream<List<Map<String, dynamic>>> getMessagesStream(final String otherUserId) {
+  Stream<List<Map<String, dynamic>>> getMessagesStream(
+      final String otherUserId) {
     final uid = currentUserId;
     if (uid == null) return const Stream.empty();
 
@@ -331,7 +345,8 @@ class ChatRepository {
           final filtered = rows.where((final row) {
             final sId = row['sender_id'];
             final rId = row['receiver_id'];
-            return (sId == uid && rId == otherUserId) || (sId == otherUserId && rId == uid);
+            return (sId == uid && rId == otherUserId) ||
+                (sId == otherUserId && rId == uid);
           }).toList();
           // We fetched DESC (newest first) to get the latest updates/edits.
           // The UI expects ASC (oldest first) so we reverse the list.
@@ -400,26 +415,27 @@ class ChatRepository {
     final uid = currentUserId;
     if (uid == null) return;
 
-    debugPrint('ChatRepository: deleting message $messageId');
+    appLogger.debug('ChatRepository: deleting message $messageId');
     await _supabase
         .from('messages')
         .delete()
         .eq('id', messageId)
         .eq('sender_id', uid);
-    debugPrint('ChatRepository: deleted message $messageId');
+    appLogger.debug('ChatRepository: deleted message $messageId');
   }
 
-  Future<void> editMessageById(final String messageId, final String content) async {
+  Future<void> editMessageById(
+      final String messageId, final String content) async {
     final uid = currentUserId;
     if (uid == null) return;
 
-    debugPrint('ChatRepository: editing message $messageId');
+    appLogger.debug('ChatRepository: editing message $messageId');
     await _supabase
         .from('messages')
         .update({'content': content})
         .eq('id', messageId)
         .eq('sender_id', uid);
-    debugPrint('ChatRepository: edited message $messageId');
+    appLogger.debug('ChatRepository: edited message $messageId');
   }
 
   Future<void> setConversationPreference(
@@ -455,9 +471,10 @@ class ChatRepository {
         .stream(primaryKey: ['user_id', 'other_user_id'])
         .eq('user_id', uid)
         .map((final event) {
-      final matches = event.where((final e) => e['other_user_id'] == otherUserId);
-      return matches.isNotEmpty ? matches.first : null;
-    });
+          final matches =
+              event.where((final e) => e['other_user_id'] == otherUserId);
+          return matches.isNotEmpty ? matches.first : null;
+        });
   }
 
   Stream<List<Map<String, dynamic>>> getInboxThreadsStream() async* {
@@ -487,7 +504,7 @@ class ChatRepository {
         );
       }
     } catch (e) {
-      debugPrint('ChatRepository: Error fetching conversations: $e');
+      appLogger.debug('ChatRepository: Error fetching conversations: $e');
     }
 
     // 2. Fallback to Messages if no conversations found
@@ -526,14 +543,17 @@ class ChatRepository {
         }
         normalizedRows.addAll(derived.values);
         normalizedRows.sort((final a, final b) {
-          final aTime = DateTime.tryParse(a['last_message_at']?.toString() ?? '') ??
-              DateTime.fromMillisecondsSinceEpoch(0);
-          final bTime = DateTime.tryParse(b['last_message_at']?.toString() ?? '') ??
-              DateTime.fromMillisecondsSinceEpoch(0);
+          final aTime =
+              DateTime.tryParse(a['last_message_at']?.toString() ?? '') ??
+                  DateTime.fromMillisecondsSinceEpoch(0);
+          final bTime =
+              DateTime.tryParse(b['last_message_at']?.toString() ?? '') ??
+                  DateTime.fromMillisecondsSinceEpoch(0);
           return bTime.compareTo(aTime);
         });
       } catch (e) {
-        debugPrint('ChatRepository: Error deriving threads from messages: $e');
+        appLogger
+            .debug('ChatRepository: Error deriving threads from messages: $e');
       }
     }
 
@@ -571,7 +591,7 @@ class ChatRepository {
             if (addressee == uid && requester != null) friendIds.add(requester);
           }
         } catch (e) {
-          debugPrint('ChatRepository: Error fetching friendships: $e');
+          appLogger.debug('ChatRepository: Error fetching friendships: $e');
         }
       }(),
       // Fetch Message Requests
@@ -587,12 +607,17 @@ class ChatRepository {
             final recipient = row['recipient_id']?.toString();
             final status = row['status']?.toString();
             if (status == 'pending') {
-              if (requester == uid && recipient != null) outgoingPendingIds.add(recipient);
-              if (recipient == uid && requester != null) incomingPendingIds.add(requester);
+              if (requester == uid && recipient != null) {
+                outgoingPendingIds.add(recipient);
+              }
+              if (recipient == uid && requester != null) {
+                incomingPendingIds.add(requester);
+              }
             }
           }
         } catch (e) {
-          debugPrint('ChatRepository: Error fetching message requests: $e');
+          appLogger
+              .debug('ChatRepository: Error fetching message requests: $e');
         }
       }(),
       // Fetch Profiles
@@ -604,15 +629,16 @@ class ChatRepository {
               .inFilter('id', otherIds);
           profileMap = {for (var p in profiles) p['id'].toString(): p};
         } catch (e) {
-          debugPrint('ChatRepository: Error fetching profiles: $e');
+          appLogger.debug('ChatRepository: Error fetching profiles: $e');
         }
       }(),
       // Fetch Online Status
       () async {
         try {
-          onlineStatuses = await presenceRepository.fetchOnlineStatuses(otherIds);
+          onlineStatuses =
+              await presenceRepository.fetchOnlineStatuses(otherIds);
         } catch (e) {
-          debugPrint('ChatRepository: Error fetching online statuses: $e');
+          appLogger.debug('ChatRepository: Error fetching online statuses: $e');
         }
       }(),
     ]);
@@ -629,29 +655,42 @@ class ChatRepository {
       final isOnline = onlineStatuses[otherId] ?? false;
 
       // Fallback display name info
-      final displayName = profile?['display_name']?.toString().isNotEmpty == true
-          ? profile!['display_name'].toString()
-          : (profile?['username']?.toString().isNotEmpty == true
-              ? profile!['username'].toString()
-              : 'User ${otherId.substring(0, 4)}');
+      final displayName =
+          profile?['display_name']?.toString().isNotEmpty == true
+              ? profile!['display_name'].toString()
+              : (profile?['username']?.toString().isNotEmpty == true
+                  ? profile!['username'].toString()
+                  : 'User ${otherId.substring(0, 4)}');
 
-      final reliabilityScore = ((settings['reply_consistency_score'] as num?)?.toInt())?.clamp(0, 100);
-      final correctionHelpfulnessScore = ((settings['correction_helpfulness_score'] as num?)?.toInt())?.clamp(0, 100);
-      final voiceFeedbackScore = ((settings['voice_feedback_quality_score'] as num?)?.toInt())?.clamp(0, 100);
-      final verifiedSeriousLearner = settings['verified_serious_learner'] == true;
+      final reliabilityScore =
+          ((settings['reply_consistency_score'] as num?)?.toInt())
+              ?.clamp(0, 100);
+      final correctionHelpfulnessScore =
+          ((settings['correction_helpfulness_score'] as num?)?.toInt())
+              ?.clamp(0, 100);
+      final voiceFeedbackScore =
+          ((settings['voice_feedback_quality_score'] as num?)?.toInt())
+              ?.clamp(0, 100);
+      final verifiedSeriousLearner =
+          settings['verified_serious_learner'] == true;
 
       final lastMessageRaw = row['last_message']?.toString() ?? '';
       final lastMessageText = _parseMessagePreview(lastMessageRaw);
       final normalizedLastMessage = lastMessageText.toLowerCase();
-      final hasChallengePending =
-          normalizedLastMessage.contains('challenge') || normalizedLastMessage.contains('[challenge]');
+      final hasChallengePending = normalizedLastMessage.contains('challenge') ||
+          normalizedLastMessage.contains('[challenge]');
       final hasCorrectionUnread =
-          normalizedLastMessage.contains('correction') || normalizedLastMessage.contains('correct this');
-      final hasVoiceFeedback =
-          normalizedLastMessage.contains('voice') || normalizedLastMessage.contains('transcript');
-      final practiceStreakAtRisk = DateTime.now().difference(
-            DateTime.tryParse(row['last_message_at']?.toString() ?? '') ?? DateTime.now(),
-          ).inHours >= 24;
+          normalizedLastMessage.contains('correction') ||
+              normalizedLastMessage.contains('correct this');
+      final hasVoiceFeedback = normalizedLastMessage.contains('voice') ||
+          normalizedLastMessage.contains('transcript');
+      final practiceStreakAtRisk = DateTime.now()
+              .difference(
+                DateTime.tryParse(row['last_message_at']?.toString() ?? '') ??
+                    DateTime.now(),
+              )
+              .inHours >=
+          24;
 
       final unreadCount = row['unread_count'] is int
           ? row['unread_count'] as int
@@ -662,7 +701,8 @@ class ChatRepository {
         'otherName': displayName,
         'avatar_url': profile?['avatar_url'],
         'lastMsg': lastMessageText,
-        'time': DateTime.tryParse(row['last_message_at']?.toString() ?? '') ?? DateTime.now(),
+        'time': DateTime.tryParse(row['last_message_at']?.toString() ?? '') ??
+            DateTime.now(),
         'unreadCount': unreadCount,
         'isPinned': row['is_pinned'] == true,
         'isMuted': row['is_muted'] == true,

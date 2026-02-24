@@ -43,7 +43,8 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
   Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
-    final effectiveMode = widget.mode == SoloMode.review ? reviewQuizMode : widget.mode;
+    final effectiveMode =
+        widget.mode == SoloMode.review ? reviewQuizMode : widget.mode;
     final modeLabel = widget.mode == SoloMode.vocabulary
         ? l10n.soloModeVocabulary
         : widget.mode == SoloMode.sentences
@@ -68,18 +69,22 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                     children: [
                       Row(
                         children: [
-                          _IconGlass(icon: Icons.arrow_back_ios_new_rounded, onTap: () => Navigator.pop(context)),
+                          _IconGlass(
+                              icon: Icons.arrow_back_ios_new_rounded,
+                              onTap: () => Navigator.pop(context)),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               l10n.soloSetupTitle(modeLabel),
-                              style: TextStyle(color: scheme.onSurface, fontSize: 20, fontWeight: FontWeight.w900),
+                              style: TextStyle(
+                                  color: scheme.onSurface,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w900),
                             ),
                           ),
                         ],
                       ),
                       SizedBox(height: topSpacing),
-
                       Expanded(
                         child: SingleChildScrollView(
                           physics: const BouncingScrollPhysics(),
@@ -90,105 +95,171 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(widget.course.subtitle,
-                                    style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w800, fontSize: 12.5)),
+                                    style: TextStyle(
+                                        color: scheme.onSurface
+                                            .withValues(alpha: 0.7),
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 12.5)),
                                 const SizedBox(height: 10),
-
                                 if (widget.mode == SoloMode.review) ...[
                                   Text(l10n.soloReviewModeTitle,
-                                      style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
+                                      style: TextStyle(
+                                          color: scheme.onSurface,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w900)),
                                   const SizedBox(height: 10),
                                   Row(
                                     children: [
                                       _Chip(
                                         label: l10n.soloModeVocabulary,
-                                        selected: reviewQuizMode == SoloMode.vocabulary,
-                                        onTap: () => setState(() => reviewQuizMode = SoloMode.vocabulary),
+                                        selected: reviewQuizMode ==
+                                            SoloMode.vocabulary,
+                                        onTap: () => setState(() =>
+                                            reviewQuizMode =
+                                                SoloMode.vocabulary),
                                       ),
                                       const SizedBox(width: 10),
                                       _Chip(
                                         label: l10n.soloModeSentences,
-                                        selected: reviewQuizMode == SoloMode.sentences,
-                                        onTap: () => setState(() => reviewQuizMode = SoloMode.sentences),
+                                        selected: reviewQuizMode ==
+                                            SoloMode.sentences,
+                                        onTap: () => setState(() =>
+                                            reviewQuizMode =
+                                                SoloMode.sentences),
                                       ),
                                     ],
                                   ),
                                   SizedBox(height: sectionSpacing - 4),
                                   Text(l10n.soloReviewOptionsTitle,
-                                      style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
+                                      style: TextStyle(
+                                          color: scheme.onSurface,
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w900)),
                                   const SizedBox(height: 10),
                                   Row(
                                     children: [
                                       _Chip(
                                         label: l10n.soloReviewScopeAllLearned,
                                         selected: reviewScope == 'all',
-                                        onTap: () => setState(() => reviewScope = 'all'),
+                                        onTap: () =>
+                                            setState(() => reviewScope = 'all'),
                                       ),
                                       const SizedBox(width: 10),
                                       _Chip(
                                         label: l10n.soloReviewScopeStruggling,
                                         selected: reviewScope == 'struggling',
-                                        onTap: () => setState(() => reviewScope = 'struggling'),
+                                        onTap: () => setState(
+                                            () => reviewScope = 'struggling'),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 10),
                                   Text(
                                     reviewScope == 'struggling'
-                                        ? l10n.soloReviewScopeStrugglingDescription
-                                        : l10n.soloReviewScopeAllLearnedDescription,
+                                        ? l10n
+                                            .soloReviewScopeStrugglingDescription
+                                        : l10n
+                                            .soloReviewScopeAllLearnedDescription,
                                     style: TextStyle(
-                                      color: scheme.onSurface.withValues(alpha: 0.62),
+                                      color: scheme.onSurface
+                                          .withValues(alpha: 0.62),
                                       fontWeight: FontWeight.w700,
                                       fontSize: 12,
                                     ),
                                   ),
                                   SizedBox(height: sectionSpacing),
                                 ],
-
                                 Text(l10n.difficulty,
-                                    style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
+                                    style: TextStyle(
+                                        color: scheme.onSurface,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w900)),
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    _Chip(label: l10n.levelBeginner, selected: level == 'A', onTap: () => setState(() => level = 'A')),
+                                    _Chip(
+                                        label: l10n.levelBeginner,
+                                        selected: level == 'A',
+                                        onTap: () =>
+                                            setState(() => level = 'A')),
                                     const SizedBox(width: 10),
-                                    _Chip(label: l10n.levelIntermediate, selected: level == 'B', onTap: () => setState(() => level = 'B')),
+                                    _Chip(
+                                        label: l10n.levelIntermediate,
+                                        selected: level == 'B',
+                                        onTap: () =>
+                                            setState(() => level = 'B')),
                                     const SizedBox(width: 10),
-                                    _Chip(label: l10n.levelAdvanced, selected: level == 'C', onTap: () => setState(() => level = 'C')),
+                                    _Chip(
+                                        label: l10n.levelAdvanced,
+                                        selected: level == 'C',
+                                        onTap: () =>
+                                            setState(() => level = 'C')),
                                   ],
                                 ),
-
                                 SizedBox(height: sectionSpacing),
                                 Text(l10n.numberOfQuestions,
-                                    style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
+                                    style: TextStyle(
+                                        color: scheme.onSurface,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w900)),
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    _Chip(label: '10', selected: questions == 10, onTap: () => setState(() => questions = 10)),
+                                    _Chip(
+                                        label: '10',
+                                        selected: questions == 10,
+                                        onTap: () =>
+                                            setState(() => questions = 10)),
                                     const SizedBox(width: 10),
-                                    _Chip(label: '15', selected: questions == 15, onTap: () => setState(() => questions = 15)),
+                                    _Chip(
+                                        label: '15',
+                                        selected: questions == 15,
+                                        onTap: () =>
+                                            setState(() => questions = 15)),
                                     const SizedBox(width: 10),
-                                    _Chip(label: '20', selected: questions == 20, onTap: () => setState(() => questions = 20)),
+                                    _Chip(
+                                        label: '20',
+                                        selected: questions == 20,
+                                        onTap: () =>
+                                            setState(() => questions = 20)),
                                   ],
                                 ),
-
                                 SizedBox(height: sectionSpacing),
                                 Text(l10n.timerPerQuestion,
-                                    style: TextStyle(color: scheme.onSurface, fontSize: 15, fontWeight: FontWeight.w900)),
+                                    style: TextStyle(
+                                        color: scheme.onSurface,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w900)),
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    _Chip(label: l10n.noTimer, selected: timeLimit == null, onTap: () => setState(() => timeLimit = null)),
+                                    _Chip(
+                                        label: l10n.noTimer,
+                                        selected: timeLimit == null,
+                                        onTap: () =>
+                                            setState(() => timeLimit = null)),
                                     const SizedBox(width: 10),
-                                    _Chip(label: '10s', selected: timeLimit == 10, onTap: () => setState(() => timeLimit = 10)),
+                                    _Chip(
+                                        label: '10s',
+                                        selected: timeLimit == 10,
+                                        onTap: () =>
+                                            setState(() => timeLimit = 10)),
                                   ],
                                 ),
                                 const SizedBox(height: 10),
                                 Row(
                                   children: [
-                                    _Chip(label: '15s', selected: timeLimit == 15, onTap: () => setState(() => timeLimit = 15)),
+                                    _Chip(
+                                        label: '15s',
+                                        selected: timeLimit == 15,
+                                        onTap: () =>
+                                            setState(() => timeLimit = 15)),
                                     const SizedBox(width: 10),
-                                    _Chip(label: '20s', selected: timeLimit == 20, onTap: () => setState(() => timeLimit = 20)),
+                                    _Chip(
+                                        label: '20s',
+                                        selected: timeLimit == 20,
+                                        onTap: () =>
+                                            setState(() => timeLimit = 20)),
                                   ],
                                 ),
                               ],
@@ -196,9 +267,7 @@ class _SoloSetupScreenState extends State<SoloSetupScreen> {
                           ),
                         ),
                       ),
-
                       SizedBox(height: topSpacing),
-
                       NeonButton(
                         label: l10n.start,
                         onTap: () {
@@ -250,7 +319,8 @@ class _Chip extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _Chip({required this.label, required this.selected, required this.onTap});
+  const _Chip(
+      {required this.label, required this.selected, required this.onTap});
 
   @override
   Widget build(final BuildContext context) {

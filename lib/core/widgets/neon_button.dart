@@ -24,14 +24,16 @@ class NeonButton extends StatefulWidget {
   State<NeonButton> createState() => _NeonButtonState();
 }
 
-class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateMixin {
+class _NeonButtonState extends State<NeonButton>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late Animation<double> _pulse;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: MotionTokens.lightPulse);
+    _controller =
+        AnimationController(vsync: this, duration: MotionTokens.lightPulse);
     _pulse = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
   }
 
@@ -51,12 +53,16 @@ class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateM
 
   void _configurePulse() {
     final isLight = Theme.of(context).brightness == Brightness.light;
-    _controller.duration = isLight ? MotionTokens.lightPulse : MotionTokens.darkPulse;
+    _controller.duration =
+        isLight ? MotionTokens.lightPulse : MotionTokens.darkPulse;
     _pulse = CurvedAnimation(
       parent: _controller,
-      curve: isLight ? MotionTokens.lightStaggerCurve : MotionTokens.darkStaggerCurve,
+      curve: isLight
+          ? MotionTokens.lightStaggerCurve
+          : MotionTokens.darkStaggerCurve,
     );
-    final shouldAnimate = widget.style == NeonButtonStyle.vibrant && widget.onTap != null;
+    final shouldAnimate =
+        widget.style == NeonButtonStyle.vibrant && widget.onTap != null;
     if (shouldAnimate) {
       _controller.repeat(reverse: true);
     } else {
@@ -79,7 +85,8 @@ class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateM
     final isSubtle = widget.style == NeonButtonStyle.subtle;
 
     final gradientStart = isLight ? scheme.primary : T.neonA;
-    final gradientEnd = isSubtle ? scheme.secondary : (isLight ? scheme.tertiary : T.neonC);
+    final gradientEnd =
+        isSubtle ? scheme.secondary : (isLight ? scheme.tertiary : T.neonC);
     final ambientGlow = isLight ? scheme.primary : T.neonA;
     final accentGlow = isLight ? scheme.secondary : T.neonB;
 
@@ -94,16 +101,14 @@ class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateM
       child: AnimatedBuilder(
         animation: _pulse,
         builder: (final context, final child) {
-          final glowStrength = isSubtle
-              ? 0.02
-              : (lerpDouble(0.08, 0.16, _pulse.value) ?? 0.12);
-          final shimmerShift = isSubtle ? 0.0 : (lerpDouble(-0.2, 0.2, _pulse.value) ?? 0.0);
-          final baseA = enabled
-              ? gradientStart
-              : gradientStart.withValues(alpha: 0.45);
-          final baseC = enabled
-              ? gradientEnd
-              : gradientEnd.withValues(alpha: 0.45);
+          final glowStrength =
+              isSubtle ? 0.02 : (lerpDouble(0.08, 0.16, _pulse.value) ?? 0.12);
+          final shimmerShift =
+              isSubtle ? 0.0 : (lerpDouble(-0.2, 0.2, _pulse.value) ?? 0.0);
+          final baseA =
+              enabled ? gradientStart : gradientStart.withValues(alpha: 0.45);
+          final baseC =
+              enabled ? gradientEnd : gradientEnd.withValues(alpha: 0.45);
           return Stack(
             alignment: Alignment.center,
             clipBehavior: Clip.none,
@@ -140,7 +145,9 @@ class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateM
                     colors: [baseA, baseC],
                   ),
                   border: isSubtle
-                      ? Border.all(color: scheme.onPrimary.withValues(alpha: 0.22), width: 0.8)
+                      ? Border.all(
+                          color: scheme.onPrimary.withValues(alpha: 0.22),
+                          width: 0.8)
                       : null,
                 ),
                 child: Center(
@@ -163,7 +170,8 @@ class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateM
                   height: 1,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(1),
-                    color: Colors.white.withValues(alpha: isSubtle ? 0.16 : 0.25),
+                    color:
+                        Colors.white.withValues(alpha: isSubtle ? 0.16 : 0.25),
                   ),
                 ),
               ),
@@ -179,7 +187,8 @@ class _NeonButtonState extends State<NeonButton> with SingleTickerProviderStateM
                           end: Alignment(1.2 + shimmerShift, 0.6),
                           colors: [
                             Colors.white.withValues(alpha: 0),
-                            Colors.white.withValues(alpha: isSubtle ? 0.2 : 0.35),
+                            Colors.white
+                                .withValues(alpha: isSubtle ? 0.2 : 0.35),
                             Colors.white.withValues(alpha: 0),
                           ],
                           stops: const [0.25, 0.5, 0.75],

@@ -12,7 +12,6 @@ import 'package:soma/features/info/about_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 class SignInScreen extends StatefulWidget {
   final VoidCallback? onSignedIn;
   const SignInScreen({super.key, this.onSignedIn});
@@ -50,7 +49,7 @@ class _SignInScreenState extends State<SignInScreen> {
         email: email,
         password: password,
       );
-      
+
       // Refresh profile state for the app
       await profileStore.load();
 
@@ -83,14 +82,14 @@ class _SignInScreenState extends State<SignInScreen> {
     }
   }
 
-
   Future<void> _handleOAuthSignIn(final OAuthProvider provider) async {
     final l10n = AppLocalizations.of(context);
     try {
       await authRepository.signInWithOAuth(provider);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${provider.name.toUpperCase()} ${l10n.signIn}...')),
+        SnackBar(
+            content: Text('${provider.name.toUpperCase()} ${l10n.signIn}...')),
       );
     } catch (e) {
       if (!mounted) return;
@@ -154,11 +153,13 @@ class _SignInScreenState extends State<SignInScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
                   color: T.fieldFill,
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.12)),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.mail_outline_rounded, color: Colors.white.withValues(alpha: 0.85), size: 20),
+                    Icon(Icons.mail_outline_rounded,
+                        color: Colors.white.withValues(alpha: 0.85), size: 20),
                     const SizedBox(width: 10),
                     Expanded(
                       child: TextField(
@@ -190,9 +191,11 @@ class _SignInScreenState extends State<SignInScreen> {
                       onPressed: () => Navigator.pop(context, false),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        side: BorderSide(color: Colors.white.withValues(alpha: 0.25)),
+                        side: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.25)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                       ),
                       child: Text(l10n.cancel),
                     ),
@@ -203,9 +206,11 @@ class _SignInScreenState extends State<SignInScreen> {
                       onPressed: () => Navigator.pop(context, true),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.onPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                       ),
                       child: Text(l10n.authSendResetLink),
                     ),
@@ -277,117 +282,134 @@ class _SignInScreenState extends State<SignInScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // top row
-                    Row(
+                  Row(
+                    children: [
+                      _IconGlassButton(
+                        icon: Icons.arrow_back_rounded,
+                        onTap: () => Navigator.pop(context),
+                      ),
+                      const Spacer(),
+                      _IconGlassButton(
+                        icon: Icons.star_rounded,
+                        onTap: _handleStarTap,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 60),
+
+                  // Title
+                  Center(
+                    child: Text(
+                      l10n.signIn,
+                      style:
+                          Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // glass card
+                  Glass(
+                    radius: BorderRadius.circular(26),
+                    padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+                    child: Column(
                       children: [
-                        _IconGlassButton(
-                          icon: Icons.arrow_back_rounded,
-                          onTap: () => Navigator.pop(context),
+                        _GlassTextField(
+                          controller: _email,
+                          hint: l10n.authEmail,
+                          icon: Icons.mail_outline_rounded,
+                          keyboardType: TextInputType.emailAddress,
+                          obscure: false,
+                          onToggleObscure: null,
                         ),
-                        const Spacer(),
-                        _IconGlassButton(
-                          icon: Icons.star_rounded,
-                          onTap: _handleStarTap,
+                        const SizedBox(height: 12),
+                        _GlassTextField(
+                          controller: _password,
+                          hint: l10n.authPassword,
+                          icon: Icons.lock_outline_rounded,
+                          keyboardType: TextInputType.visiblePassword,
+                          obscure: _obscure,
+                          onToggleObscure: () =>
+                              setState(() => _obscure = !_obscure),
+                        ),
+                        const SizedBox(height: 8),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: _isSendingReset
+                                ? null
+                                : _showResetPasswordDialog,
+                            child: Text(l10n.authForgotPassword),
+                          ),
+                        ),
+                        const SizedBox(height: 18),
+                        SizedBox(
+                          width: double.infinity,
+                          child: NeonButton(
+                            label: _isLoading
+                                ? l10n.authSigningIn
+                                : l10n.authContinue,
+                            onTap: _isLoading ? () {} : _handleSignIn,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: _isLoading
+                                ? null
+                                : () =>
+                                    _handleOAuthSignIn(OAuthProvider.facebook),
+                            icon: const Icon(Icons.facebook_rounded),
+                            label: const Text('Continue with Facebook'),
+                          ),
                         ),
                       ],
                     ),
+                  ),
 
-                    const SizedBox(height: 60),
+                  const SizedBox(height: 14),
 
-                    // Title
-                    Center(
-                      child: Text(
-                        l10n.signIn,
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: Theme.of(context).colorScheme.onSurface,
-                            ),
+                  // bottom link
+                  Center(
+                    child: InkWell(
+                      onTap: () => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (final _) => const SignUpScreen()),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // glass card
-                    Glass(
-                      radius: BorderRadius.circular(26),
-                      padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
-                      child: Column(
-                        children: [
-                          _GlassTextField(
-                            controller: _email,
-                            hint: l10n.authEmail,
-                            icon: Icons.mail_outline_rounded,
-                            keyboardType: TextInputType.emailAddress,
-                            obscure: false,
-                            onToggleObscure: null,
-                          ),
-                          const SizedBox(height: 12),
-                          _GlassTextField(
-                            controller: _password,
-                            hint: l10n.authPassword,
-                            icon: Icons.lock_outline_rounded,
-                            keyboardType: TextInputType.visiblePassword,
-                            obscure: _obscure,
-                            onToggleObscure: () => setState(() => _obscure = !_obscure),
-                          ),
-                          const SizedBox(height: 8),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: _isSendingReset ? null : _showResetPasswordDialog,
-                              child: Text(l10n.authForgotPassword),
+                      child: Text.rich(
+                        TextSpan(
+                          text: l10n.authHaveAccount,
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.72),
+                                  ),
+                          children: [
+                            TextSpan(
+                              text: l10n.signUp,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.w800,
+                                  ),
                             ),
-                          ),
-                          const SizedBox(height: 18),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: NeonButton(
-                              label: _isLoading ? l10n.authSigningIn : l10n.authContinue,
-                              onTap: _isLoading ? () {} : _handleSignIn,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton.icon(
-                              onPressed: _isLoading ? null : () => _handleOAuthSignIn(OAuthProvider.facebook),
-                              icon: const Icon(Icons.facebook_rounded),
-                              label: const Text('Continue with Facebook'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 14),
-
-                    // bottom link
-                    Center(
-                      child: InkWell(
-                        onTap: () => Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (final _) => const SignUpScreen()),
-                        ),
-                        child: Text.rich(
-                          TextSpan(
-                            text: l10n.authHaveAccount,
-                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.72),
-                                ),
-                            children: [
-                              TextSpan(
-                                text: l10n.signUp,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 80),
+                  const SizedBox(height: 80),
                 ],
               ),
             ),
@@ -415,17 +437,16 @@ class _IconGlassButton extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
         onTap: onTap,
-       child: SizedBox(
-  width: 44,
-  height: 44,
-  child: Center(
-    child: Icon(
-      icon,
-      color: Theme.of(context).colorScheme.onSurface,
-    ),
-  ),
-),
-
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Center(
+            child: Icon(
+              icon,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -452,7 +473,7 @@ class _GlassTextField extends StatelessWidget {
   Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final isLight = Theme.of(context).brightness == Brightness.light;
-    
+
     return Container(
       height: 54,
       decoration: BoxDecoration(
@@ -492,7 +513,9 @@ class _GlassTextField extends StatelessWidget {
             IconButton(
               onPressed: onToggleObscure,
               icon: Icon(
-                obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                obscure
+                    ? Icons.visibility_off_rounded
+                    : Icons.visibility_rounded,
                 color: scheme.onSurface.withValues(alpha: 0.75),
                 size: 20,
               ),

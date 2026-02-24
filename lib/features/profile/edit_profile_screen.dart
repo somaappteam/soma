@@ -40,7 +40,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (widget.initialProfile != null) {
       draft = widget.initialProfile!.copy();
     } else {
-      draft = UserProfile(displayName: '', username: '', bio: '', location: '', dailyGoalMinutes: 10);
+      draft = UserProfile(
+          displayName: '',
+          username: '',
+          bio: '',
+          location: '',
+          dailyGoalMinutes: 10);
     }
 
     usernameCtrl = TextEditingController(text: draft.username);
@@ -123,12 +128,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           title: const Text('Profile photo URL'),
           content: TextField(
             controller: ctrl,
-            decoration: const InputDecoration(hintText: 'https://example.com/photo.jpg'),
+            decoration: const InputDecoration(
+                hintText: 'https://example.com/photo.jpg'),
             keyboardType: TextInputType.url,
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-            TextButton(onPressed: () => Navigator.pop(ctx, ctrl.text.trim()), child: const Text('Use')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+                child: const Text('Use')),
           ],
         );
       },
@@ -143,7 +153,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (uid == null) return;
 
     try {
-      final picked = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 85, maxWidth: 1024);
+      final picked = await _picker.pickImage(
+          source: ImageSource.gallery, imageQuality: 85, maxWidth: 1024);
       if (picked == null || !mounted) return;
 
       setState(() => _isUploadingAvatar = true);
@@ -185,7 +196,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     final next = UserProfile(
-      displayName: draft.displayName.isNotEmpty ? draft.displayName : usernameCtrl.text.trim(),
+      displayName: draft.displayName.isNotEmpty
+          ? draft.displayName
+          : usernameCtrl.text.trim(),
       username: usernameCtrl.text.trim(),
       bio: bioCtrl.text.trim(),
       location: locationCtrl.text.trim(),
@@ -197,14 +210,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await profileRepository.updateProfile(next);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text(l10n.editProfileUpdated)),
+          SnackBar(content: Text(l10n.editProfileUpdated)),
         );
         Navigator.pop(context);
       }
-    } catch(e) {
+    } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(content: Text(l10n.errorWithDetails(e.toString()))),
+          SnackBar(content: Text(l10n.errorWithDetails(e.toString()))),
         );
       }
     } finally {
@@ -217,200 +230,237 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
-          child: ResponsiveFrame(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-              child: Column(
-                children: [
-                  // Header
-                  Row(
-                    children: [
-                      _SmallIconButton(
-                        icon: Icons.arrow_back_ios_new_rounded,
-                        onTap: () => Navigator.pop(context),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.editProfileTitle,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.w900,
+        child: ResponsiveFrame(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+            child: Column(
+              children: [
+                // Header
+                Row(
+                  children: [
+                    _SmallIconButton(
+                      icon: Icons.arrow_back_ios_new_rounded,
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.editProfileTitle,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: _save,
+                      child: _isSaving
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(
+                              l10n.save,
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w800),
                             ),
-                      ),
-                      const Spacer(),
-                      TextButton(
-                        onPressed: _save,
-                        child: _isSaving
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(strokeWidth: 2),
-                              )
-                            : Text(
-                                l10n.save,
-                                style: const TextStyle(fontWeight: FontWeight.w800),
-                              ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
+                ),
 
-                  const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                  Expanded(
-                    child: _isLoadingProfile
-                        ? const Center(child: CircularProgressIndicator())
-                        : Form(
-                      key: _formKey,
-                      child: ListView(
-                        physics: const BouncingScrollPhysics(),
-                        children: [
-                          // Avatar card
-                          Glass(
-                            radius: BorderRadius.circular(24),
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                            child: Row(
-                              children: [
-                                _Avatar(imageUrl: _avatarUrl),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        l10n.editProfilePhotoLabel,
-                                        style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.92),
-                                        fontWeight: FontWeight.w900,
-                                        fontSize: 15,
+                Expanded(
+                  child: _isLoadingProfile
+                      ? const Center(child: CircularProgressIndicator())
+                      : Form(
+                          key: _formKey,
+                          child: ListView(
+                            physics: const BouncingScrollPhysics(),
+                            children: [
+                              // Avatar card
+                              Glass(
+                                radius: BorderRadius.circular(24),
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                                child: Row(
+                                  children: [
+                                    _Avatar(imageUrl: _avatarUrl),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            l10n.editProfilePhotoLabel,
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                                  .withValues(alpha: 0.92),
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            l10n.editProfilePhotoSubtitle,
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface
+                                                  .withValues(alpha: 0.62),
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 12.5,
+                                              height: 1.2,
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        l10n.editProfilePhotoSubtitle,
-                                        style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62),
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 12.5,
-                                          height: 1.2,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                _ChipButton(
-                                  label: _isUploadingAvatar ? l10n.loading : l10n.editProfileChangePhoto,
-                                  onTap: _isUploadingAvatar ? () {} : _showPhotoOptions,
-                                )
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 14),
-
-                          // Fields card
-                          Glass(
-                            radius: BorderRadius.circular(24),
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _FieldLabel(l10n.editProfileUsernameLabel),
-                                _GlassTextField(
-                                  controller: usernameCtrl,
-                                  hint: l10n.editProfileUsernameHint,
-                                  validator: (final v) {
-                                    final s = (v ?? '').trim();
-                                    if (s.isEmpty) return l10n.editProfileUsernameRequired;
-                                    if (s.length < 3) return l10n.editProfileUsernameTooShort;
-                                    final ok = RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(s);
-                                    if (!ok) return l10n.editProfileUsernameInvalid;
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 14),
-
-                                _FieldLabel(l10n.editProfileBioLabel),
-                                _GlassTextField(
-                                  controller: bioCtrl,
-                                  hint: l10n.editProfileBioHint,
-                                  maxLines: 3,
-                                  validator: (final v) {
-                                    final s = (v ?? '').trim();
-                                    if (s.length > 120) return l10n.editProfileBioTooLong;
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 14),
-
-                                _FieldLabel(l10n.editProfileLocationLabel),
-                                _GlassTextField(
-                                  controller: locationCtrl,
-                                  hint: l10n.editProfileLocationHint,
-                                  validator: (final v) => null,
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          const SizedBox(height: 14),
-
-                          // Daily goal
-                          Glass(
-                            radius: BorderRadius.circular(24),
-                            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.editProfileDailyGoalTitle,
-                                  style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                      fontWeight: FontWeight.w900,
-                                      fontSize: 15),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  l10n.editProfileDailyGoalSubtitle,
-                                  style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.62),
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12.5,
-                                    height: 1.2,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-
-                                Wrap(
-                                  spacing: 10,
-                                  runSpacing: 10,
-                                  children: [
-                                    _GoalChip(min: 5, selected: goalMinutes == 5, onTap: () => setState(() => goalMinutes = 5)),
-                                    _GoalChip(min: 10, selected: goalMinutes == 10, onTap: () => setState(() => goalMinutes = 10)),
-                                    _GoalChip(min: 15, selected: goalMinutes == 15, onTap: () => setState(() => goalMinutes = 15)),
-                                    _GoalChip(min: 20, selected: goalMinutes == 20, onTap: () => setState(() => goalMinutes = 20)),
+                                    _ChipButton(
+                                      label: _isUploadingAvatar
+                                          ? l10n.loading
+                                          : l10n.editProfileChangePhoto,
+                                      onTap: _isUploadingAvatar
+                                          ? () {}
+                                          : _showPhotoOptions,
+                                    )
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+
+                              const SizedBox(height: 14),
+
+                              // Fields card
+                              Glass(
+                                radius: BorderRadius.circular(24),
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _FieldLabel(l10n.editProfileUsernameLabel),
+                                    _GlassTextField(
+                                      controller: usernameCtrl,
+                                      hint: l10n.editProfileUsernameHint,
+                                      validator: (final v) {
+                                        final s = (v ?? '').trim();
+                                        if (s.isEmpty) {
+                                          return l10n
+                                              .editProfileUsernameRequired;
+                                        }
+                                        if (s.length < 3) {
+                                          return l10n
+                                              .editProfileUsernameTooShort;
+                                        }
+                                        final ok = RegExp(r'^[a-zA-Z0-9_]+$')
+                                            .hasMatch(s);
+                                        if (!ok) {
+                                          return l10n
+                                              .editProfileUsernameInvalid;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 14),
+                                    _FieldLabel(l10n.editProfileBioLabel),
+                                    _GlassTextField(
+                                      controller: bioCtrl,
+                                      hint: l10n.editProfileBioHint,
+                                      maxLines: 3,
+                                      validator: (final v) {
+                                        final s = (v ?? '').trim();
+                                        if (s.length > 120) {
+                                          return l10n.editProfileBioTooLong;
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    const SizedBox(height: 14),
+                                    _FieldLabel(l10n.editProfileLocationLabel),
+                                    _GlassTextField(
+                                      controller: locationCtrl,
+                                      hint: l10n.editProfileLocationHint,
+                                      validator: (final v) => null,
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const SizedBox(height: 14),
+
+                              // Daily goal
+                              Glass(
+                                radius: BorderRadius.circular(24),
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.editProfileDailyGoalTitle,
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 15),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      l10n.editProfileDailyGoalSubtitle,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withValues(alpha: 0.62),
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 12.5,
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Wrap(
+                                      spacing: 10,
+                                      runSpacing: 10,
+                                      children: [
+                                        _GoalChip(
+                                            min: 5,
+                                            selected: goalMinutes == 5,
+                                            onTap: () => setState(
+                                                () => goalMinutes = 5)),
+                                        _GoalChip(
+                                            min: 10,
+                                            selected: goalMinutes == 10,
+                                            onTap: () => setState(
+                                                () => goalMinutes = 10)),
+                                        _GoalChip(
+                                            min: 15,
+                                            selected: goalMinutes == 15,
+                                            onTap: () => setState(
+                                                () => goalMinutes = 15)),
+                                        _GoalChip(
+                                            min: 20,
+                                            selected: goalMinutes == 20,
+                                            onTap: () => setState(
+                                                () => goalMinutes = 20)),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                            ],
                           ),
-                          const SizedBox(height: 10),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                        ),
+                ),
+              ],
             ),
           ),
         ),
+      ),
     );
   }
 }
@@ -469,7 +519,8 @@ class _Avatar extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
+            color:
+                Theme.of(context).colorScheme.primary.withValues(alpha: 0.35),
             blurRadius: 18,
             spreadRadius: 2,
           ),
@@ -482,20 +533,26 @@ class _Avatar extends StatelessWidget {
               fit: BoxFit.cover,
               errorWidget: (final _, final __, final ___) => Center(
                 child: Text(
-                  '🙂',
+                  'ðŸ™‚',
                   style: TextStyle(
                     fontSize: 22,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.95),
                   ),
                 ),
               ),
             )
           : Center(
               child: Text(
-                '🙂',
+                'ðŸ™‚',
                 style: TextStyle(
                   fontSize: 22,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.95),
                 ),
               ),
             ),
@@ -522,7 +579,10 @@ class _ChipButton extends StatelessWidget {
               : Colors.black.withValues(alpha: 0.16),
           border: Border.all(
               color: Theme.of(context).brightness == Brightness.light
-                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)
+                  ? Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.2)
                   : Theme.of(context)
                       .colorScheme
                       .onSurface
@@ -554,10 +614,8 @@ class _FieldLabel extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          color: Theme.of(context)
-              .colorScheme
-              .onSurface
-              .withValues(alpha: 0.75),
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
           fontWeight: FontWeight.w900,
           fontSize: 12.5,
         ),
@@ -626,7 +684,8 @@ class _GoalChip extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
-  const _GoalChip({required this.min, required this.selected, required this.onTap});
+  const _GoalChip(
+      {required this.min, required this.selected, required this.onTap});
 
   @override
   Widget build(final BuildContext context) {

@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:soma/core/widgets/pressable_scale.dart';
 
 void main() {
-  testWidgets('PressableScale shrinks on tap down and restores on tap up', (final tester) async {
+  testWidgets('PressableScale shrinks on tap down and restores on tap up',
+      (final tester) async {
     bool tapped = false;
 
     await tester.pumpWidget(
@@ -13,7 +14,8 @@ void main() {
             child: PressableScale(
               onTap: () => tapped = true,
               pressedScale: 0.8,
-              enableHaptics: false, // Turn off haptics for the test to avoid native call issues
+              enableHaptics:
+                  false, // Turn off haptics for the test to avoid native call issues
               child: const SizedBox(
                 width: 100,
                 height: 50,
@@ -28,7 +30,7 @@ void main() {
     // Initial scale is 1.0 (AnimatedScale)
     final animatedScaleFinder = find.byType(AnimatedScale);
     expect(animatedScaleFinder, findsOneWidget);
-    
+
     AnimatedScale animatedScale = tester.widget(animatedScaleFinder);
     expect(animatedScale.scale, 1.0);
 

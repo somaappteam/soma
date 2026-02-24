@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
@@ -11,19 +12,19 @@ const String serviceRoleKey =
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
 
-  print('--- Starting Data Migration ---');
+  appLogger.info('--- Starting Data Migration ---');
 
   await migrateVocabulary(client);
   await migrateSentences(client);
 
-  print('--- Migration Completed ---');
+  appLogger.info('--- Migration Completed ---');
 }
 
 Future<void> migrateVocabulary(final SupabaseClient client) async {
-  print('Migrating Vocabulary...');
+  appLogger.info('Migrating Vocabulary...');
   final file = File('C:/Users/amosl/Desktop/vocabulary .csv');
   if (!await file.exists()) {
-    print('Vocabulary CSV not found!');
+    appLogger.info('Vocabulary CSV not found!');
     return;
   }
 
@@ -72,21 +73,21 @@ Future<void> migrateVocabulary(final SupabaseClient client) async {
     if (data.length >= 500) {
       await _upsert(client, 'vocabulary', data);
       data.clear();
-      print('Uploaded vocabulary up to row $i...');
+      appLogger.info('Uploaded vocabulary up to row $i...');
     }
   }
 
   if (data.isNotEmpty) {
     await _upsert(client, 'vocabulary', data);
   }
-  print('Vocabulary migration done.');
+  appLogger.info('Vocabulary migration done.');
 }
 
 Future<void> migrateSentences(final SupabaseClient client) async {
-  print('Migrating Sentences...');
+  appLogger.info('Migrating Sentences...');
   final file = File('C:/Users/amosl/Desktop/sentences .csv');
   if (!await file.exists()) {
-    print('Sentences CSV not found!');
+    appLogger.info('Sentences CSV not found!');
     return;
   }
 
@@ -135,14 +136,14 @@ Future<void> migrateSentences(final SupabaseClient client) async {
     if (data.length >= 500) {
       await _upsert(client, 'sentences', data);
       data.clear();
-      print('Uploaded sentences up to row $i...');
+      appLogger.info('Uploaded sentences up to row $i...');
     }
   }
 
   if (data.isNotEmpty) {
     await _upsert(client, 'sentences', data);
   }
-  print('Sentences migration done.');
+  appLogger.info('Sentences migration done.');
 }
 
 Future<void> _upsert(final SupabaseClient client, final String table,
@@ -150,6 +151,6 @@ Future<void> _upsert(final SupabaseClient client, final String table,
   try {
     await client.from(table).upsert(data);
   } catch (e) {
-    print('Error upserting to $table: $e');
+    appLogger.info('Error upserting to $table: $e');
   }
 }

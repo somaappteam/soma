@@ -1,5 +1,5 @@
-
 import 'package:postgres/postgres.dart';
+import 'package:soma/core/services/app_logger.dart';
 
 Future<void> main() async {
   final endpoint = Endpoint(
@@ -10,12 +10,14 @@ Future<void> main() async {
     password: 'M_SOMA_APP_2026',
   );
 
-  print('Testing connection to db.bnbjteedohflgkarfaxk.supabase.co...');
+  appLogger
+      .info('Testing connection to db.bnbjteedohflgkarfaxk.supabase.co...');
   try {
-    final connection = await Connection.open(endpoint, settings: ConnectionSettings(sslMode: SslMode.require));
-    print('✅ Connected successfully!');
+    final connection = await Connection.open(endpoint,
+        settings: ConnectionSettings(sslMode: SslMode.require));
+    appLogger.info('✅ Connected successfully!');
     await connection.close();
   } catch (e) {
-    print('❌ Connection failed: $e');
+    appLogger.info('❌ Connection failed: $e');
   }
 }

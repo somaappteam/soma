@@ -12,7 +12,17 @@ import 'package:soma/features/social/dm_chat_screen.dart';
 import 'package:soma/features/social/select_friend_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
-enum _InboxFilter { all, priority, unread, friends, requests, groups, muted, archived }
+enum _InboxFilter {
+  all,
+  priority,
+  unread,
+  friends,
+  requests,
+  groups,
+  muted,
+  archived
+}
+
 enum _InboxSort { latest, unreadFirst, name }
 
 class InboxScreen extends StatefulWidget {
@@ -47,7 +57,8 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
   Future<void> _loadExperimentPrompt() async {
-    final v = await experimentRepository.variant('inbox_onboarding_prompt', buckets: const ['A', 'B']);
+    final v = await experimentRepository
+        .variant('inbox_onboarding_prompt', buckets: const ['A', 'B']);
     if (!mounted) return;
     setState(() {
       _onboardingPrompt = v == 'B'
@@ -56,11 +67,12 @@ class _InboxScreenState extends State<InboxScreen> {
     });
   }
 
-
   Future<void> _loadInboxPremiumSettings() async {
     try {
       final settings = await settingsRepository.getSettings();
-      final rawSnooze = (settings['inbox_snoozed_until'] as Map?)?.cast<String, dynamic>() ?? const {};
+      final rawSnooze =
+          (settings['inbox_snoozed_until'] as Map?)?.cast<String, dynamic>() ??
+              const {};
       final nextSnoozed = <String, DateTime>{};
       for (final entry in rawSnooze.entries) {
         final dt = DateTime.tryParse(entry.value.toString());
@@ -87,7 +99,8 @@ class _InboxScreenState extends State<InboxScreen> {
     } catch (_) {}
   }
 
-  Future<void> _setSnooze(final String otherId, final Duration? duration) async {
+  Future<void> _setSnooze(
+      final String otherId, final Duration? duration) async {
     setState(() {
       if (duration == null) {
         _snoozedUntil.remove(otherId);
@@ -109,10 +122,19 @@ class _InboxScreenState extends State<InboxScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ListTile(title: const Text('Snooze 1 hour'), onTap: () => Navigator.pop(context, const Duration(hours: 1))),
-            ListTile(title: const Text('Snooze until tonight'), onTap: () => Navigator.pop(context, Duration(hours: (21 - DateTime.now().hour).clamp(1, 12)))),
-            ListTile(title: const Text('Snooze until tomorrow'), onTap: () => Navigator.pop(context, const Duration(hours: 24))),
-            ListTile(title: const Text('Remove snooze'), onTap: () => Navigator.pop(context, null)),
+            ListTile(
+                title: const Text('Snooze 1 hour'),
+                onTap: () => Navigator.pop(context, const Duration(hours: 1))),
+            ListTile(
+                title: const Text('Snooze until tonight'),
+                onTap: () => Navigator.pop(context,
+                    Duration(hours: (21 - DateTime.now().hour).clamp(1, 12)))),
+            ListTile(
+                title: const Text('Snooze until tomorrow'),
+                onTap: () => Navigator.pop(context, const Duration(hours: 24))),
+            ListTile(
+                title: const Text('Remove snooze'),
+                onTap: () => Navigator.pop(context, null)),
           ],
         ),
       ),
@@ -121,8 +143,8 @@ class _InboxScreenState extends State<InboxScreen> {
     await _setSnooze(otherId, selected);
   }
 
-
-  Future<void> _toggleMutedThread(final String otherId, {required final bool next}) async {
+  Future<void> _toggleMutedThread(final String otherId,
+      {required final bool next}) async {
     setState(() {
       if (next) {
         _mutedThreadIds.add(otherId);
@@ -133,7 +155,8 @@ class _InboxScreenState extends State<InboxScreen> {
     await chatRepository.setConversationPreference(otherId, muted: next);
   }
 
-  Future<void> _toggleArchivedThread(final String otherId, {required final bool next}) async {
+  Future<void> _toggleArchivedThread(final String otherId,
+      {required final bool next}) async {
     setState(() {
       if (next) {
         _archivedThreadIds.add(otherId);
@@ -144,7 +167,8 @@ class _InboxScreenState extends State<InboxScreen> {
     await chatRepository.setConversationPreference(otherId, archived: next);
   }
 
-  Future<void> _togglePreviewHidden(final String otherId, {required final bool next}) async {
+  Future<void> _togglePreviewHidden(final String otherId,
+      {required final bool next}) async {
     setState(() {
       if (next) {
         _hiddenPreviewThreadIds.add(otherId);
@@ -155,7 +179,8 @@ class _InboxScreenState extends State<InboxScreen> {
     await settingsRepository.updateSetting('dm_hide_preview_$otherId', next);
   }
 
-  Future<void> _removeThreadFromInbox(final String otherId, final String name) async {
+  Future<void> _removeThreadFromInbox(
+      final String otherId, final String name) async {
     setState(() => _deletedThreadIds.add(otherId));
     if (!mounted) return;
     ScaffoldMessenger.of(context)
@@ -171,7 +196,6 @@ class _InboxScreenState extends State<InboxScreen> {
       );
   }
 
-
   Future<bool> _confirmPermanentDelete(final String name) async {
     final result = await showDialog<bool>(
       context: context,
@@ -185,7 +209,8 @@ class _InboxScreenState extends State<InboxScreen> {
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(ctx).colorScheme.error),
+            style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(ctx).colorScheme.error),
             child: const Text('Delete'),
           ),
         ],
@@ -210,7 +235,8 @@ class _InboxScreenState extends State<InboxScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: Icon(isPinned ? Icons.push_pin_outlined : Icons.push_pin_rounded),
+              leading: Icon(
+                  isPinned ? Icons.push_pin_outlined : Icons.push_pin_rounded),
               title: Text(isPinned ? 'Unpin chat' : 'Pin chat'),
               onTap: () async {
                 Navigator.pop(context);
@@ -218,7 +244,9 @@ class _InboxScreenState extends State<InboxScreen> {
               },
             ),
             ListTile(
-              leading: Icon(isMuted ? Icons.notifications_active_rounded : Icons.notifications_off_rounded),
+              leading: Icon(isMuted
+                  ? Icons.notifications_active_rounded
+                  : Icons.notifications_off_rounded),
               title: Text(isMuted ? 'Unmute chat' : 'Mute chat'),
               onTap: () async {
                 Navigator.pop(context);
@@ -226,8 +254,12 @@ class _InboxScreenState extends State<InboxScreen> {
               },
             ),
             ListTile(
-              leading: Icon(hidePreview ? Icons.visibility_rounded : Icons.visibility_off_rounded),
-              title: Text(hidePreview ? 'Show message preview' : 'Hide message preview'),
+              leading: Icon(hidePreview
+                  ? Icons.visibility_rounded
+                  : Icons.visibility_off_rounded),
+              title: Text(hidePreview
+                  ? 'Show message preview'
+                  : 'Hide message preview'),
               onTap: () async {
                 Navigator.pop(context);
                 await _togglePreviewHidden(otherId, next: !hidePreview);
@@ -242,7 +274,8 @@ class _InboxScreenState extends State<InboxScreen> {
               },
             ),
             ListTile(
-              leading: Icon(isArchived ? Icons.unarchive_rounded : Icons.archive_rounded),
+              leading: Icon(
+                  isArchived ? Icons.unarchive_rounded : Icons.archive_rounded),
               title: Text(isArchived ? 'Move to inbox' : 'Archive chat'),
               onTap: () async {
                 Navigator.pop(context);
@@ -264,12 +297,14 @@ class _InboxScreenState extends State<InboxScreen> {
                   setState(() => _deletedThreadIds.add(otherId));
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
-                    ..showSnackBar(SnackBar(content: Text('Deleted chat with @$name')));
+                    ..showSnackBar(
+                        SnackBar(content: Text('Deleted chat with @$name')));
                 } catch (e) {
                   if (!mounted) return;
                   ScaffoldMessenger.of(context)
                     ..hideCurrentSnackBar()
-                    ..showSnackBar(SnackBar(content: Text('Failed to delete chat: $e')));
+                    ..showSnackBar(
+                        SnackBar(content: Text('Failed to delete chat: $e')));
                 }
               },
             ),
@@ -288,8 +323,6 @@ class _InboxScreenState extends State<InboxScreen> {
     );
   }
 
-
-
   Future<void> _toggleSearchBar() async {
     HapticFeedback.selectionClick();
     final next = !_showSearchBar;
@@ -299,8 +332,6 @@ class _InboxScreenState extends State<InboxScreen> {
     });
     await settingsRepository.updateSetting('inbox_search_expanded', next);
   }
-
-
 
   int get _activeViewOptionCount {
     var count = 0;
@@ -349,9 +380,6 @@ class _InboxScreenState extends State<InboxScreen> {
     });
   }
 
-
-
-
   Stream<List<Map<String, dynamic>>> _inboxThreadsStream() {
     return chatRepository.getInboxThreadsStream();
   }
@@ -381,8 +409,6 @@ class _InboxScreenState extends State<InboxScreen> {
     }
   }
 
-
-
   /*
   Future<void> _unarchiveThread(String otherId) async {
     setState(() {
@@ -392,7 +418,8 @@ class _InboxScreenState extends State<InboxScreen> {
   }
   */
 
-  Future<void> _togglePinnedThread(final String otherId, {required final bool next}) async {
+  Future<void> _togglePinnedThread(final String otherId,
+      {required final bool next}) async {
     setState(() {
       if (next) {
         _pinnedThreadIds.add(otherId);
@@ -406,8 +433,6 @@ class _InboxScreenState extends State<InboxScreen> {
       SnackBar(content: Text(next ? 'Chat pinned' : 'Chat unpinned')),
     );
   }
-
-
 
   /*
   Future<bool?> _confirmDelete() {
@@ -455,7 +480,10 @@ class _InboxScreenState extends State<InboxScreen> {
   }
 
   void _setFilter(final _InboxFilter next) {
-    if (_filter == next && _showArchivedOnly == (next == _InboxFilter.archived)) return;
+    if (_filter == next &&
+        _showArchivedOnly == (next == _InboxFilter.archived)) {
+      return;
+    }
     HapticFeedback.selectionClick();
     setState(() {
       _filter = next;
@@ -510,7 +538,10 @@ class _InboxScreenState extends State<InboxScreen> {
                 Text(
                   'Sort',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
@@ -536,7 +567,10 @@ class _InboxScreenState extends State<InboxScreen> {
                 Text(
                   'Filter',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
                     fontWeight: FontWeight.w700,
                     fontSize: 12,
                   ),
@@ -546,10 +580,22 @@ class _InboxScreenState extends State<InboxScreen> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _FilterPill(label: _filterLabel(_InboxFilter.all), selected: _filter == _InboxFilter.all, onTap: () => _setFilter(_InboxFilter.all)),
-                    _FilterPill(label: _filterLabel(_InboxFilter.unread), selected: _filter == _InboxFilter.unread, onTap: () => _setFilter(_InboxFilter.unread)),
-                    _FilterPill(label: _filterLabel(_InboxFilter.priority), selected: _filter == _InboxFilter.priority, onTap: () => _setFilter(_InboxFilter.priority)),
-                    _FilterPill(label: _filterLabel(_InboxFilter.archived), selected: _filter == _InboxFilter.archived, onTap: () => _setFilter(_InboxFilter.archived)),
+                    _FilterPill(
+                        label: _filterLabel(_InboxFilter.all),
+                        selected: _filter == _InboxFilter.all,
+                        onTap: () => _setFilter(_InboxFilter.all)),
+                    _FilterPill(
+                        label: _filterLabel(_InboxFilter.unread),
+                        selected: _filter == _InboxFilter.unread,
+                        onTap: () => _setFilter(_InboxFilter.unread)),
+                    _FilterPill(
+                        label: _filterLabel(_InboxFilter.priority),
+                        selected: _filter == _InboxFilter.priority,
+                        onTap: () => _setFilter(_InboxFilter.priority)),
+                    _FilterPill(
+                        label: _filterLabel(_InboxFilter.archived),
+                        selected: _filter == _InboxFilter.archived,
+                        onTap: () => _setFilter(_InboxFilter.archived)),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -601,7 +647,9 @@ class _InboxScreenState extends State<InboxScreen> {
                   ),
                   const SizedBox(width: 8),
                   _IconGlass(
-                    icon: _showSearchBar ? Icons.search_off_rounded : Icons.search_rounded,
+                    icon: _showSearchBar
+                        ? Icons.search_off_rounded
+                        : Icons.search_rounded,
                     onTap: _toggleSearchBar,
                   ),
                   const SizedBox(width: 8),
@@ -610,7 +658,8 @@ class _InboxScreenState extends State<InboxScreen> {
                     onTap: () async {
                       await Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (final _) => const SelectFriendScreen()),
+                        MaterialPageRoute(
+                            builder: (final _) => const SelectFriendScreen()),
                       );
                       if (mounted) setState(() {});
                     },
@@ -620,13 +669,15 @@ class _InboxScreenState extends State<InboxScreen> {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  _SectionTitle(_showArchivedOnly ? 'Archived chats' : 'Recent chats'),
+                  _SectionTitle(
+                      _showArchivedOnly ? 'Archived chats' : 'Recent chats'),
                   const Spacer(),
                 ],
               ),
               const SizedBox(height: 8),
               // Removed digest summary card
-              if (_filter != _InboxFilter.all || _sort != _InboxSort.latest) ...[
+              if (_filter != _InboxFilter.all ||
+                  _sort != _InboxSort.latest) ...[
                 Row(
                   children: [
                     _StatusChip(label: 'Filter: ${_filterLabel(_filter)}'),
@@ -647,20 +698,27 @@ class _InboxScreenState extends State<InboxScreen> {
                     ? Glass(
                         key: const ValueKey('search-open'),
                         radius: BorderRadius.circular(20),
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
                         child: Row(
                           children: [
-                            Icon(Icons.search_rounded, color: scheme.onSurface.withValues(alpha: 0.7)),
+                            Icon(Icons.search_rounded,
+                                color: scheme.onSurface.withValues(alpha: 0.7)),
                             const SizedBox(width: 10),
                             Expanded(
                               child: TextField(
                                 autofocus: true,
-                                onChanged: (final v) => setState(() => query = v),
-                                style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w700),
+                                onChanged: (final v) =>
+                                    setState(() => query = v),
+                                style: TextStyle(
+                                    color: scheme.onSurface,
+                                    fontWeight: FontWeight.w700),
                                 cursorColor: scheme.onSurface,
                                 decoration: InputDecoration(
                                   hintText: l10n.searchChatsHint,
-                                  hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.45)),
+                                  hintStyle: TextStyle(
+                                      color: scheme.onSurface
+                                          .withValues(alpha: 0.45)),
                                   border: InputBorder.none,
                                   isDense: true,
                                 ),
@@ -669,7 +727,9 @@ class _InboxScreenState extends State<InboxScreen> {
                             if (query.isNotEmpty)
                               GestureDetector(
                                 onTap: () => setState(() => query = ''),
-                                child: Icon(Icons.close_rounded, color: scheme.onSurface.withValues(alpha: 0.7)),
+                                child: Icon(Icons.close_rounded,
+                                    color: scheme.onSurface
+                                        .withValues(alpha: 0.7)),
                               ),
                           ],
                         ),
@@ -690,280 +750,415 @@ class _InboxScreenState extends State<InboxScreen> {
                   onRefresh: _refreshInbox,
                   child: StreamBuilder<List<Map<String, dynamic>>>(
                     stream: _threadsStream,
-                  builder: (final context, final snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    final threads = snapshot.data!;
-                    _syncServerPrefs(threads);
-
-                    final visibleThreads = threads.where((final t) {
-                      final otherId = t['otherId']?.toString();
-                      if (otherId == null || _deletedThreadIds.contains(otherId)) return false;
-
-                      final isArchived = _archivedThreadIds.contains(otherId);
-                      if (_showArchivedOnly != isArchived) return false;
-
-                      final hay = '${t['otherName'] ?? ''} ${t['lastMsg'] ?? ''}'.toLowerCase();
-                      if (query.isNotEmpty && !hay.contains(query.toLowerCase())) return false;
-
-                      final unreadCount = (t['unreadCount'] as int?) ?? 0;
-                      final snoozedUntil = _snoozedUntil[otherId];
-                      if (snoozedUntil != null && snoozedUntil.isAfter(DateTime.now())) return false;
-                      if (_filter == _InboxFilter.priority && !_isPriorityThread(t)) return false;
-                      if (_filter == _InboxFilter.unread && unreadCount <= 0) return false;
-                      if (_filter == _InboxFilter.friends && t['isFriend'] != true) return false;
-                      if (_filter == _InboxFilter.requests &&
-                          t['hasIncomingRequest'] != true &&
-                          t['hasOutgoingRequest'] != true) {
-                        return false;
+                    builder: (final context, final snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
                       }
-                      if (_filter == _InboxFilter.groups && !_isGroupThread(t)) return false;
-                      if (_filter == _InboxFilter.muted && !_mutedThreadIds.contains(otherId)) {
-                        return false;
-                      }
-                      if (_filter == _InboxFilter.archived && !isArchived) return false;
-                      return true;
-                    }).toList();
+                      final threads = snapshot.data!;
+                      _syncServerPrefs(threads);
 
-                    visibleThreads.sort((final a, final b) {
-                      final aId = a['otherId']?.toString() ?? '';
-                      final bId = b['otherId']?.toString() ?? '';
-                      final aPinned = _pinnedThreadIds.contains(aId);
-                      final bPinned = _pinnedThreadIds.contains(bId);
-                      if (aPinned != bPinned) return aPinned ? -1 : 1;
+                      final visibleThreads = threads.where((final t) {
+                        final otherId = t['otherId']?.toString();
+                        if (otherId == null ||
+                            _deletedThreadIds.contains(otherId)) {
+                          return false;
+                        }
 
-                      if (_sort == _InboxSort.unreadFirst) {
-                        final au = (a['unreadCount'] as int?) ?? 0;
-                        final bu = (b['unreadCount'] as int?) ?? 0;
-                        if ((au > 0) != (bu > 0)) return au > 0 ? -1 : 1;
-                      }
+                        final isArchived = _archivedThreadIds.contains(otherId);
+                        if (_showArchivedOnly != isArchived) return false;
 
-                      if (_sort == _InboxSort.name) {
-                        final an = (a['otherName']?.toString() ?? '').toLowerCase();
-                        final bn = (b['otherName']?.toString() ?? '').toLowerCase();
-                        final cmp = an.compareTo(bn);
-                        if (cmp != 0) return cmp;
-                      }
+                        final hay =
+                            '${t['otherName'] ?? ''} ${t['lastMsg'] ?? ''}'
+                                .toLowerCase();
+                        if (query.isNotEmpty &&
+                            !hay.contains(query.toLowerCase())) {
+                          return false;
+                        }
 
-                      final at = a['time'] as DateTime? ?? DateTime.fromMillisecondsSinceEpoch(0);
-                      final bt = b['time'] as DateTime? ?? DateTime.fromMillisecondsSinceEpoch(0);
-                      return bt.compareTo(at);
-                    });
+                        final unreadCount = (t['unreadCount'] as int?) ?? 0;
+                        final snoozedUntil = _snoozedUntil[otherId];
+                        if (snoozedUntil != null &&
+                            snoozedUntil.isAfter(DateTime.now())) {
+                          return false;
+                        }
+                        if (_filter == _InboxFilter.priority &&
+                            !_isPriorityThread(t)) {
+                          return false;
+                        }
+                        if (_filter == _InboxFilter.unread &&
+                            unreadCount <= 0) {
+                          return false;
+                        }
+                        if (_filter == _InboxFilter.friends &&
+                            t['isFriend'] != true) {
+                          return false;
+                        }
+                        if (_filter == _InboxFilter.requests &&
+                            t['hasIncomingRequest'] != true &&
+                            t['hasOutgoingRequest'] != true) {
+                          return false;
+                        }
+                        if (_filter == _InboxFilter.groups &&
+                            !_isGroupThread(t)) {
+                          return false;
+                        }
+                        if (_filter == _InboxFilter.muted &&
+                            !_mutedThreadIds.contains(otherId)) {
+                          return false;
+                        }
+                        if (_filter == _InboxFilter.archived && !isArchived) {
+                          return false;
+                        }
+                        return true;
+                      }).toList();
 
-                    if (visibleThreads.isEmpty) {
-                      return Center(
-                        child: Glass(
-                          radius: BorderRadius.circular(20),
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.mark_chat_read_rounded,
-                                color: scheme.primary,
-                                size: 28,
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                query.isNotEmpty ? l10n.noMatchForQuery(query) : l10n.inboxEmptyState,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: scheme.onSurface,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              if (query.isEmpty) ...[
-                                const SizedBox(height: 6),
-                                Text(
-                                  _onboardingPrompt,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: scheme.onSurface.withValues(alpha: 0.65),
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                      visibleThreads.sort((final a, final b) {
+                        final aId = a['otherId']?.toString() ?? '';
+                        final bId = b['otherId']?.toString() ?? '';
+                        final aPinned = _pinnedThreadIds.contains(aId);
+                        final bPinned = _pinnedThreadIds.contains(bId);
+                        if (aPinned != bPinned) return aPinned ? -1 : 1;
+
+                        if (_sort == _InboxSort.unreadFirst) {
+                          final au = (a['unreadCount'] as int?) ?? 0;
+                          final bu = (b['unreadCount'] as int?) ?? 0;
+                          if ((au > 0) != (bu > 0)) return au > 0 ? -1 : 1;
+                        }
+
+                        if (_sort == _InboxSort.name) {
+                          final an =
+                              (a['otherName']?.toString() ?? '').toLowerCase();
+                          final bn =
+                              (b['otherName']?.toString() ?? '').toLowerCase();
+                          final cmp = an.compareTo(bn);
+                          if (cmp != 0) return cmp;
+                        }
+
+                        final at = a['time'] as DateTime? ??
+                            DateTime.fromMillisecondsSinceEpoch(0);
+                        final bt = b['time'] as DateTime? ??
+                            DateTime.fromMillisecondsSinceEpoch(0);
+                        return bt.compareTo(at);
+                      });
+
+                      if (visibleThreads.isEmpty) {
+                        return Center(
+                          child: Glass(
+                            radius: BorderRadius.circular(20),
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.mark_chat_read_rounded,
+                                  color: scheme.primary,
+                                  size: 28,
                                 ),
                                 const SizedBox(height: 10),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    OutlinedButton.icon(
-                                      onPressed: () async {
-                                        await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(builder: (final _) => const SelectFriendScreen()),
-                                        );
-                                        if (mounted) setState(() => _refreshNonce++);
-                                      },
-                                      icon: const Icon(Icons.edit_rounded, size: 16),
-                                      label: const Text('New chat'),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-
-                    final participantIds = visibleThreads.map((final t) => t['otherId']?.toString() ?? '').where((final id) => id.isNotEmpty).toList();
-                    final vipThreads = visibleThreads.where((final t) => _pinnedThreadIds.contains(t['otherId']?.toString() ?? '')).take(8).toList();
-                    return Glass(
-                      radius: BorderRadius.circular(22),
-                      padding: const EdgeInsets.all(10),
-                      child: StreamBuilder<Map<String, bool>>(
-                        stream: presenceRepository.streamMultipleOnlineStatuses(participantIds),
-                        builder: (final context, final presenceSnapshot) {
-                          final onlineStatuses = presenceSnapshot.data ?? {};
-                          return Column(
-                            children: [
-                              if (vipThreads.isNotEmpty)
-                                _VipPinnedRow(
-                                  threads: vipThreads,
-                                ),
-                              Expanded(
-                                child: AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 160),
-                                  switchInCurve: Curves.easeOut,
-                                  switchOutCurve: Curves.easeIn,
-                                  transitionBuilder: (final child, final animation) {
-                                    final slide = Tween<Offset>(
-                                      begin: const Offset(0, 0.04),
-                                      end: Offset.zero,
-                                    ).animate(animation);
-                                    return FadeTransition(
-                                      opacity: animation,
-                                      child: SlideTransition(position: slide, child: child),
-                                    );
-                                  },
-                                  child: ListView.separated(
-                                    key: ValueKey('threads-${_filter.name}-${_sort.name}-${query.toLowerCase()}-$_showArchivedOnly'),
-                                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                                    itemCount: visibleThreads.length,
-                                    separatorBuilder: (final _, final __) => const SizedBox(height: 10),
-                                    itemBuilder: (final context, final index) {
-                                      final t = visibleThreads[index];
-                                      final otherId = t['otherId']?.toString() ?? '';
-                                      final isPinned = _pinnedThreadIds.contains(otherId);
-                                      final isMuted = _mutedThreadIds.contains(otherId);
-                                      final unreadCount = t['unreadCount'] ?? 0;
-                                      final hidePreview = _hiddenPreviewThreadIds.contains(otherId);
-                                      final trustScore = (((t['isFriend'] == true ? 60 : 35) + ((unreadCount as int) > 0 ? 10 : 0) + (t['hasIncomingRequest'] == true ? 5 : 0)).clamp(0, 99) as num).toInt();
-
-                                      return StaggeredIn(
-                                        index: index,
-                                        child: Dismissible(
-                                          key: ValueKey('thread-$otherId'),
-                              direction: DismissDirection.horizontal,
-                              confirmDismiss: (final direction) async {
-                                if (direction == DismissDirection.startToEnd) {
-                                  await _togglePinnedThread(otherId, next: !isPinned);
-                                  return false;
-                                }
-
-                                final name = (t['otherName'] ?? l10n.unknown).toString();
-                                final shouldDelete = await _confirmPermanentDelete(name);
-                                if (!shouldDelete) return false;
-
-                                try {
-                                  await chatRepository.deleteConversation(otherId);
-                                  if (!mounted) return false;
-                                  ScaffoldMessenger.of(context)
-                                    ..hideCurrentSnackBar()
-                                    ..showSnackBar(
-                                      SnackBar(content: Text('Deleted chat with @$name')),
-                                    );
-                                  return true;
-                                } catch (e) {
-                                  if (!mounted) return false;
-                                  ScaffoldMessenger.of(context)
-                                    ..hideCurrentSnackBar()
-                                    ..showSnackBar(
-                                      SnackBar(content: Text('Failed to delete chat: $e')),
-                                    );
-                                  return false;
-                                }
-                              },
-                              background: _SwipeActionBackground(
-                                alignment: Alignment.centerLeft,
-                                icon: isPinned ? Icons.push_pin_outlined : Icons.push_pin_rounded,
-                                label: isPinned ? 'Unpin' : 'Pin',
-                              ),
-                              secondaryBackground: const _SwipeActionBackground(
-                                alignment: Alignment.centerRight,
-                                icon: Icons.delete_forever_rounded,
-                                label: 'Delete',
-                              ),
-                              onDismissed: (final _) {
-                                setState(() => _deletedThreadIds.add(otherId));
-                              },
-                                        child: _ThreadRow(
-                                otherId: otherId,
-                                name: t['otherName'] ?? l10n.unknown,
-                                lastText: hidePreview ? 'Preview hidden for privacy' : (t['lastMsg'] ?? ''),
-                                summary: t['summary']?.toString(),
-                                time: _fmtTime(context, t['time'] as DateTime),
-                                unreadCount: unreadCount,
-                                showOnlineIndicator: onlineStatuses[otherId] == true,
-                                avatarUrl: t['avatar_url']?.toString(),
-                                pinned: isPinned,
-                                muted: isMuted,
-                                hasIncomingRequest: t['hasIncomingRequest'] == true,
-                                hasOutgoingRequest: t['hasOutgoingRequest'] == true,
-                                trustScore: trustScore,
-                                practiceStreakAtRisk: t['practiceStreakAtRisk'] == true,
-                                hasChallengePending: t['hasChallengePending'] == true,
-                                hasCorrectionUnread: t['hasCorrectionUnread'] == true,
-                                hasVoiceFeedback: t['hasVoiceFeedback'] == true,
-                                partnerQuality: (t['partnerQuality'] as num?)?.toInt(),
-                                reliabilityScore: (t['reliabilityScore'] as num?)?.toInt(),
-                                correctionHelpfulnessScore: (t['correctionHelpfulnessScore'] as num?)?.toInt(),
-                                voiceFeedbackScore: (t['voiceFeedbackScore'] as num?)?.toInt(),
-                                verifiedSeriousLearner: t['verifiedSeriousLearner'] == true,
-                                onTap: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (final _) => DmChatScreen(
-                                        meId: authRepository.currentUser?.id ?? 'me',
-                                        otherId: otherId,
-                                        otherName: t['otherName'] ?? l10n.unknown,
-                                      ),
-                                    ),
-                                  );
-                                  if (mounted) setState(() => _refreshNonce++);
-                                },
-                                onLongPress: () => _showThreadActionsSheet(
-                                  otherId: otherId,
-                                  name: (t['otherName'] ?? l10n.unknown).toString(),
-                                  isPinned: isPinned,
-                                  isMuted: isMuted,
-                                  isArchived: _archivedThreadIds.contains(otherId),
-                                  hidePreview: hidePreview,
-                                ),
-                                ),
-                              ),
-                            );
-                          },
+                                Text(
+                                  query.isNotEmpty
+                                      ? l10n.noMatchForQuery(query)
+                                      : l10n.inboxEmptyState,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: scheme.onSurface,
+                                    fontWeight: FontWeight.w800,
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                    );
-                  },
+                                if (query.isEmpty) ...[
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    _onboardingPrompt,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: scheme.onSurface
+                                          .withValues(alpha: 0.65),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      OutlinedButton.icon(
+                                        onPressed: () async {
+                                          await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (final _) =>
+                                                    const SelectFriendScreen()),
+                                          );
+                                          if (mounted) {
+                                            setState(() => _refreshNonce++);
+                                          }
+                                        },
+                                        icon: const Icon(Icons.edit_rounded,
+                                            size: 16),
+                                        label: const Text('New chat'),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      final participantIds = visibleThreads
+                          .map((final t) => t['otherId']?.toString() ?? '')
+                          .where((final id) => id.isNotEmpty)
+                          .toList();
+                      final vipThreads = visibleThreads
+                          .where((final t) => _pinnedThreadIds
+                              .contains(t['otherId']?.toString() ?? ''))
+                          .take(8)
+                          .toList();
+                      return Glass(
+                        radius: BorderRadius.circular(22),
+                        padding: const EdgeInsets.all(10),
+                        child: StreamBuilder<Map<String, bool>>(
+                          stream: presenceRepository
+                              .streamMultipleOnlineStatuses(participantIds),
+                          builder: (final context, final presenceSnapshot) {
+                            final onlineStatuses = presenceSnapshot.data ?? {};
+                            return Column(
+                              children: [
+                                if (vipThreads.isNotEmpty)
+                                  _VipPinnedRow(
+                                    threads: vipThreads,
+                                  ),
+                                Expanded(
+                                  child: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 160),
+                                    switchInCurve: Curves.easeOut,
+                                    switchOutCurve: Curves.easeIn,
+                                    transitionBuilder:
+                                        (final child, final animation) {
+                                      final slide = Tween<Offset>(
+                                        begin: const Offset(0, 0.04),
+                                        end: Offset.zero,
+                                      ).animate(animation);
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: SlideTransition(
+                                            position: slide, child: child),
+                                      );
+                                    },
+                                    child: ListView.separated(
+                                      key: ValueKey(
+                                          'threads-${_filter.name}-${_sort.name}-${query.toLowerCase()}-$_showArchivedOnly'),
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(
+                                              parent: BouncingScrollPhysics()),
+                                      itemCount: visibleThreads.length,
+                                      separatorBuilder: (final _, final __) =>
+                                          const SizedBox(height: 10),
+                                      itemBuilder:
+                                          (final context, final index) {
+                                        final t = visibleThreads[index];
+                                        final otherId =
+                                            t['otherId']?.toString() ?? '';
+                                        final isPinned =
+                                            _pinnedThreadIds.contains(otherId);
+                                        final isMuted =
+                                            _mutedThreadIds.contains(otherId);
+                                        final unreadCount =
+                                            t['unreadCount'] ?? 0;
+                                        final hidePreview =
+                                            _hiddenPreviewThreadIds
+                                                .contains(otherId);
+                                        final trustScore = (((t['isFriend'] ==
+                                                            true
+                                                        ? 60
+                                                        : 35) +
+                                                    ((unreadCount as int) > 0
+                                                        ? 10
+                                                        : 0) +
+                                                    (t['hasIncomingRequest'] ==
+                                                            true
+                                                        ? 5
+                                                        : 0))
+                                                .clamp(0, 99) as num)
+                                            .toInt();
+
+                                        return StaggeredIn(
+                                          index: index,
+                                          child: Dismissible(
+                                            key: ValueKey('thread-$otherId'),
+                                            direction:
+                                                DismissDirection.horizontal,
+                                            confirmDismiss:
+                                                (final direction) async {
+                                              if (direction ==
+                                                  DismissDirection.startToEnd) {
+                                                await _togglePinnedThread(
+                                                    otherId,
+                                                    next: !isPinned);
+                                                return false;
+                                              }
+
+                                              final name = (t['otherName'] ??
+                                                      l10n.unknown)
+                                                  .toString();
+                                              final shouldDelete =
+                                                  await _confirmPermanentDelete(
+                                                      name);
+                                              if (!shouldDelete) return false;
+
+                                              try {
+                                                await chatRepository
+                                                    .deleteConversation(
+                                                        otherId);
+                                                if (!mounted) return false;
+                                                ScaffoldMessenger.of(context)
+                                                  ..hideCurrentSnackBar()
+                                                  ..showSnackBar(
+                                                    SnackBar(
+                                                        content: Text(
+                                                            'Deleted chat with @$name')),
+                                                  );
+                                                return true;
+                                              } catch (e) {
+                                                if (!mounted) return false;
+                                                ScaffoldMessenger.of(context)
+                                                  ..hideCurrentSnackBar()
+                                                  ..showSnackBar(
+                                                    SnackBar(
+                                                        content: Text(
+                                                            'Failed to delete chat: $e')),
+                                                  );
+                                                return false;
+                                              }
+                                            },
+                                            background: _SwipeActionBackground(
+                                              alignment: Alignment.centerLeft,
+                                              icon: isPinned
+                                                  ? Icons.push_pin_outlined
+                                                  : Icons.push_pin_rounded,
+                                              label: isPinned ? 'Unpin' : 'Pin',
+                                            ),
+                                            secondaryBackground:
+                                                const _SwipeActionBackground(
+                                              alignment: Alignment.centerRight,
+                                              icon:
+                                                  Icons.delete_forever_rounded,
+                                              label: 'Delete',
+                                            ),
+                                            onDismissed: (final _) {
+                                              setState(() => _deletedThreadIds
+                                                  .add(otherId));
+                                            },
+                                            child: _ThreadRow(
+                                              otherId: otherId,
+                                              name: t['otherName'] ??
+                                                  l10n.unknown,
+                                              lastText: hidePreview
+                                                  ? 'Preview hidden for privacy'
+                                                  : (t['lastMsg'] ?? ''),
+                                              summary: t['summary']?.toString(),
+                                              time: _fmtTime(context,
+                                                  t['time'] as DateTime),
+                                              unreadCount: unreadCount,
+                                              showOnlineIndicator:
+                                                  onlineStatuses[otherId] ==
+                                                      true,
+                                              avatarUrl:
+                                                  t['avatar_url']?.toString(),
+                                              pinned: isPinned,
+                                              muted: isMuted,
+                                              hasIncomingRequest:
+                                                  t['hasIncomingRequest'] ==
+                                                      true,
+                                              hasOutgoingRequest:
+                                                  t['hasOutgoingRequest'] ==
+                                                      true,
+                                              trustScore: trustScore,
+                                              practiceStreakAtRisk:
+                                                  t['practiceStreakAtRisk'] ==
+                                                      true,
+                                              hasChallengePending:
+                                                  t['hasChallengePending'] ==
+                                                      true,
+                                              hasCorrectionUnread:
+                                                  t['hasCorrectionUnread'] ==
+                                                      true,
+                                              hasVoiceFeedback:
+                                                  t['hasVoiceFeedback'] == true,
+                                              partnerQuality:
+                                                  (t['partnerQuality'] as num?)
+                                                      ?.toInt(),
+                                              reliabilityScore:
+                                                  (t['reliabilityScore']
+                                                          as num?)
+                                                      ?.toInt(),
+                                              correctionHelpfulnessScore:
+                                                  (t['correctionHelpfulnessScore']
+                                                          as num?)
+                                                      ?.toInt(),
+                                              voiceFeedbackScore:
+                                                  (t['voiceFeedbackScore']
+                                                          as num?)
+                                                      ?.toInt(),
+                                              verifiedSeriousLearner:
+                                                  t['verifiedSeriousLearner'] ==
+                                                      true,
+                                              onTap: () async {
+                                                await Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (final _) =>
+                                                        DmChatScreen(
+                                                      meId: authRepository
+                                                              .currentUser
+                                                              ?.id ??
+                                                          'me',
+                                                      otherId: otherId,
+                                                      otherName:
+                                                          t['otherName'] ??
+                                                              l10n.unknown,
+                                                    ),
+                                                  ),
+                                                );
+                                                if (mounted) {
+                                                  setState(
+                                                      () => _refreshNonce++);
+                                                }
+                                              },
+                                              onLongPress: () =>
+                                                  _showThreadActionsSheet(
+                                                otherId: otherId,
+                                                name: (t['otherName'] ??
+                                                        l10n.unknown)
+                                                    .toString(),
+                                                isPinned: isPinned,
+                                                isMuted: isMuted,
+                                                isArchived: _archivedThreadIds
+                                                    .contains(otherId),
+                                                hidePreview: hidePreview,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   String _fmtTime(final BuildContext context, final DateTime dt) {
     final l10n = AppLocalizations.of(context);
@@ -994,9 +1189,6 @@ class _SectionTitle extends StatelessWidget {
     );
   }
 }
-
-
-
 
 class _VipPinnedRow extends StatelessWidget {
   final List<Map<String, dynamic>> threads;
@@ -1046,9 +1238,6 @@ class _VipPinnedRow extends StatelessWidget {
     );
   }
 }
-
-
-
 
 class _StatusChip extends StatelessWidget {
   final String label;
@@ -1210,9 +1399,6 @@ class _SwipeActionBackground extends StatelessWidget {
   }
 }
 
-
-
-
 class _IconGlass extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -1368,7 +1554,9 @@ class _ThreadRow extends StatelessWidget {
                         ),
                       ),
                       if (pinned)
-                        Icon(Icons.push_pin_rounded, size: 14, color: scheme.primary.withValues(alpha: 0.9)),
+                        Icon(Icons.push_pin_rounded,
+                            size: 14,
+                            color: scheme.primary.withValues(alpha: 0.9)),
                       if (showOnlineIndicator) ...[
                         const SizedBox(width: 6),
                         const _ActiveNowPill(),
@@ -1376,7 +1564,9 @@ class _ThreadRow extends StatelessWidget {
                       StreamBuilder<bool>(
                         stream: chatRepository.typingStream(otherId),
                         builder: (final context, final snapshot) {
-                          if (snapshot.data != true) return const SizedBox.shrink();
+                          if (snapshot.data != true) {
+                            return const SizedBox.shrink();
+                          }
                           return const Padding(
                             padding: EdgeInsets.only(left: 6),
                             child: _TypingPill(),
@@ -1386,7 +1576,8 @@ class _ThreadRow extends StatelessWidget {
                       if (muted) ...[
                         const SizedBox(width: 6),
                         Icon(Icons.notifications_off_rounded,
-                            size: 14, color: scheme.onSurface.withValues(alpha: 0.7)),
+                            size: 14,
+                            color: scheme.onSurface.withValues(alpha: 0.7)),
                       ],
                     ],
                   ),
@@ -1399,7 +1590,7 @@ class _ThreadRow extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isTyping ? 'Typing…' : lastText,
+                            isTyping ? 'Typingâ€¦' : lastText,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                             style: TextStyle(
@@ -1410,7 +1601,9 @@ class _ThreadRow extends StatelessWidget {
                               fontSize: 12.5,
                             ),
                           ),
-                          if (!isTyping && summary != null && summary!.isNotEmpty)
+                          if (!isTyping &&
+                              summary != null &&
+                              summary!.isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.only(top: 3),
                               child: Text(
@@ -1424,12 +1617,12 @@ class _ThreadRow extends StatelessWidget {
                                 ),
                               ),
                             ),
-
                           if (hasIncomingRequest || hasOutgoingRequest)
                             Padding(
                               padding: const EdgeInsets.only(top: 4),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 7, vertical: 2),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(999),
                                   color: hasIncomingRequest
@@ -1438,20 +1631,24 @@ class _ThreadRow extends StatelessWidget {
                                   border: Border.all(
                                     color: hasIncomingRequest
                                         ? Colors.green.withValues(alpha: 0.4)
-                                        : scheme.primary.withValues(alpha: 0.35),
+                                        : scheme.primary
+                                            .withValues(alpha: 0.35),
                                   ),
                                 ),
                                 child: Text(
-                                  hasIncomingRequest ? 'Request waiting' : 'Request sent',
+                                  hasIncomingRequest
+                                      ? 'Request waiting'
+                                      : 'Request sent',
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: FontWeight.w800,
-                                    color: hasIncomingRequest ? Colors.green : scheme.primary,
+                                    color: hasIncomingRequest
+                                        ? Colors.green
+                                        : scheme.primary,
                                   ),
                                 ),
                               ),
                             ),
-
                         ],
                       );
                     },
@@ -1474,11 +1671,13 @@ class _ThreadRow extends StatelessWidget {
                 const SizedBox(height: 6),
                 if (unreadCount > 0)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(999),
                       color: scheme.primary.withValues(alpha: 0.16),
-                      border: Border.all(color: scheme.primary.withValues(alpha: 0.22)),
+                      border: Border.all(
+                          color: scheme.primary.withValues(alpha: 0.22)),
                     ),
                     child: Text(
                       unreadCount.toString(),
@@ -1500,9 +1699,6 @@ class _ThreadRow extends StatelessWidget {
     );
   }
 }
-
-
-
 
 class _Avatar extends StatelessWidget {
   final bool showOnlineIndicator;
@@ -1542,7 +1738,8 @@ class _Avatar extends StatelessWidget {
       return CachedNetworkImage(
         imageUrl: url,
         fit: BoxFit.cover,
-        errorWidget: (final _, final __, final ___) => _AvatarFallback(name: name),
+        errorWidget: (final _, final __, final ___) =>
+            _AvatarFallback(name: name),
       );
     }
     return _AvatarFallback(name: name);
@@ -1557,7 +1754,8 @@ class _AvatarFallback extends StatelessWidget {
   Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final clean = name.trim();
-    final parts = clean.split(RegExp(r'\s+')).where((final e) => e.isNotEmpty).toList();
+    final parts =
+        clean.split(RegExp(r'\s+')).where((final e) => e.isNotEmpty).toList();
     final first = parts.isNotEmpty ? parts.first[0] : '?';
     final second = parts.length > 1 ? parts[1][0] : '';
     final initials = (first + second).toUpperCase();
@@ -1588,7 +1786,8 @@ class _ActiveNowPill extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
         color: const Color(0xFF58F7B6).withValues(alpha: 0.15),
-        border: Border.all(color: const Color(0xFF58F7B6).withValues(alpha: 0.45)),
+        border:
+            Border.all(color: const Color(0xFF58F7B6).withValues(alpha: 0.45)),
       ),
       child: const Text(
         'Active',
@@ -1615,8 +1814,9 @@ class _TypingPill extends StatelessWidget {
         border: Border.all(color: Colors.orange.withValues(alpha: 0.45)),
       ),
       child: const Text(
-        'Typing…',
-        style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.orange),
+        'Typingâ€¦',
+        style: TextStyle(
+            fontSize: 9.5, fontWeight: FontWeight.w800, color: Colors.orange),
       ),
     );
   }

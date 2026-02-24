@@ -57,8 +57,8 @@ class SomaPlusPlansScreen extends StatelessWidget {
                   stream: settingsRepository.getSettingsStream(),
                   builder: (final context, final snapshot) {
                     final data = snapshot.data ?? const <String, dynamic>{};
-                    final tier =
-                        SomaPlusRepository.parseTier(data['plus_plan']?.toString());
+                    final tier = SomaPlusRepository.parseTier(
+                        data['plus_plan']?.toString());
 
                     if (snapshot.connectionState == ConnectionState.waiting &&
                         !snapshot.hasData) {

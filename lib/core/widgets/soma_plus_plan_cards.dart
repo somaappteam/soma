@@ -69,7 +69,8 @@ class _PlanCard extends StatelessWidget {
                 if (isHighlighted) ...[
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: scheme.primary.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(999),
@@ -86,7 +87,8 @@ class _PlanCard extends StatelessWidget {
                 ],
                 const Spacer(),
                 if (selected)
-                  Icon(Icons.check_circle_rounded, color: scheme.primary, size: 20),
+                  Icon(Icons.check_circle_rounded,
+                      color: scheme.primary, size: 20),
               ],
             ),
             const SizedBox(height: 4),
@@ -122,7 +124,8 @@ class _PlanCard extends StatelessWidget {
                   if (plan.secondaryPriceBadge != null) ...[
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: scheme.primary.withValues(alpha: 0.14),
                         borderRadius: BorderRadius.circular(999),

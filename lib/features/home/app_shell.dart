@@ -22,7 +22,6 @@ import 'package:soma/features/social/dm_chat_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
 
@@ -76,9 +75,8 @@ class _AppShellState extends State<AppShell> {
     _deepLinkSub = AppLinks().uriLinkStream.listen((final uri) {
       // Handle soma://profile/<username>
       if (uri.scheme == 'soma' && uri.host == 'profile') {
-        final username = uri.pathSegments.isNotEmpty
-            ? uri.pathSegments.first
-            : null;
+        final username =
+            uri.pathSegments.isNotEmpty ? uri.pathSegments.first : null;
         if (username != null && username.isNotEmpty) {
           _navigateToProfileByUsername(username);
         }
@@ -103,10 +101,13 @@ class _AppShellState extends State<AppShell> {
     _signalSub = callSignalingService.events.listen((final event) async {
       if (event.type == CallSignalType.invite) {
         _handleGlobalInvite(event);
-      } else if (event.type == CallSignalType.accept && event.rawData['local_accept'] == true) {
+      } else if (event.type == CallSignalType.accept &&
+          event.rawData['local_accept'] == true) {
         if (!mounted) return;
-        final fromProfile = await profileRepository.fetchProfile(userId: event.fromUserId);
-        final fromName = fromProfile?.displayName ?? fromProfile?.username ?? 'Someone';
+        final fromProfile =
+            await profileRepository.fetchProfile(userId: event.fromUserId);
+        final fromName =
+            fromProfile?.displayName ?? fromProfile?.username ?? 'Someone';
         if (!mounted) return;
         Navigator.push(
           context,
@@ -136,9 +137,11 @@ class _AppShellState extends State<AppShell> {
     }
 
     if (!mounted) return;
-    
-    final fromProfile = await profileRepository.fetchProfile(userId: event.fromUserId);
-    final fromName = fromProfile?.displayName ?? fromProfile?.username ?? 'Someone';
+
+    final fromProfile =
+        await profileRepository.fetchProfile(userId: event.fromUserId);
+    final fromName =
+        fromProfile?.displayName ?? fromProfile?.username ?? 'Someone';
 
     final accepted = await _showGlobalIncomingCallDialog(fromName);
     if (accepted == true) {
@@ -175,12 +178,14 @@ class _AppShellState extends State<AppShell> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.call_rounded, size: 48, color: Theme.of(context).colorScheme.primary),
+              Icon(Icons.call_rounded,
+                  size: 48, color: Theme.of(context).colorScheme.primary),
               const SizedBox(height: 16),
               Text(
                 AppLocalizations.of(context).incomingCallFrom(name),
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               const SizedBox(height: 24),
               Row(
@@ -253,7 +258,8 @@ class _AppShellState extends State<AppShell> {
                     ],
                   ),
                 ),
-                child: Icon(Icons.public_rounded, color: scheme.onPrimary, size: 24),
+                child: Icon(Icons.public_rounded,
+                    color: scheme.onPrimary, size: 24),
               ),
               const SizedBox(height: 12),
               Text(
@@ -285,9 +291,11 @@ class _AppShellState extends State<AppShell> {
                       onPressed: () => Navigator.pop(ctx),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: scheme.onSurface,
-                        side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.25)),
+                        side: BorderSide(
+                            color: scheme.onSurface.withValues(alpha: 0.25)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                       ),
                       child: Text(l10n.notNow),
                     ),
@@ -303,7 +311,8 @@ class _AppShellState extends State<AppShell> {
                         backgroundColor: scheme.primary,
                         foregroundColor: scheme.onPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                       ),
                       child: Text(l10n.signIn),
                     ),
@@ -320,7 +329,8 @@ class _AppShellState extends State<AppShell> {
                   },
                   child: Text(
                     l10n.signUp,
-                    style: TextStyle(color: scheme.tertiary, fontWeight: FontWeight.w800),
+                    style: TextStyle(
+                        color: scheme.tertiary, fontWeight: FontWeight.w800),
                   ),
                 ),
               ),
@@ -387,7 +397,7 @@ class _AppShellState extends State<AppShell> {
               contentSlot,
               topOverlaySlot,
               floatingContextActionSlot,
-              // Achievement unlock toast — slides in from top when a new achievement is earned.
+              // Achievement unlock toast â€” slides in from top when a new achievement is earned.
               ValueListenableBuilder(
                 valueListenable: achievementUnlockNotifier,
                 builder: (final context, final achievement, final _) {
@@ -397,7 +407,8 @@ class _AppShellState extends State<AppShell> {
                     left: 16,
                     right: 16,
                     child: _AchievementToast(
-                      key: ValueKey(achievement.id + DateTime.now().millisecondsSinceEpoch.toString()),
+                      key: ValueKey(achievement.id +
+                          DateTime.now().millisecondsSinceEpoch.toString()),
                       title: achievement.title,
                       icon: achievement.icon,
                       onDismissed: () => achievementUnlockNotifier.value = null,
@@ -418,7 +429,8 @@ class _GlobalActiveCallOverlay extends StatefulWidget {
   const _GlobalActiveCallOverlay();
 
   @override
-  State<_GlobalActiveCallOverlay> createState() => _GlobalActiveCallOverlayState();
+  State<_GlobalActiveCallOverlay> createState() =>
+      _GlobalActiveCallOverlayState();
 }
 
 class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
@@ -454,12 +466,15 @@ class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
     });
   }
 
-  void _onDragUpdate(final DragUpdateDetails details, final BoxConstraints constraints) {
+  void _onDragUpdate(
+      final DragUpdateDetails details, final BoxConstraints constraints) {
     final media = MediaQuery.of(context);
     const pillWidth = 220.0;
     const pillHeight = 40.0;
-    final maxX = (constraints.maxWidth - pillWidth - 8).clamp(0.0, double.infinity);
-    final maxY = (constraints.maxHeight - media.padding.bottom - pillHeight - 8).clamp(0.0, double.infinity);
+    final maxX =
+        (constraints.maxWidth - pillWidth - 8).clamp(0.0, double.infinity);
+    final maxY = (constraints.maxHeight - media.padding.bottom - pillHeight - 8)
+        .clamp(0.0, double.infinity);
     final minY = (media.padding.top + 8);
 
     final next = _overlayOffset + details.delta;
@@ -478,15 +493,17 @@ class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
       builder: (final context, final snapshot) {
         final call = snapshot.data?['dm_active_call'];
         final isActive = call is Map && call['active'] == true;
-        
+
         // Safety check if l10n isn't ready
         final l10n = AppLocalizations.of(context);
         final defaultName = l10n.voiceCall;
-        final name = call is Map ? (call['other_name']?.toString() ?? defaultName) : defaultName;
+        final name = call is Map
+            ? (call['other_name']?.toString() ?? defaultName)
+            : defaultName;
         final otherId = call is Map ? call['other_id']?.toString() : null;
-        
+
         if (!isActive) return const SizedBox.shrink();
-        
+
         return LayoutBuilder(
           builder: (final context, final constraints) {
             return Positioned(
@@ -494,7 +511,8 @@ class _GlobalActiveCallOverlayState extends State<_GlobalActiveCallOverlay> {
               top: _overlayOffset.dy,
               child: _GlobalActiveCallPill(
                 name: name,
-                onDragUpdate: (final details) => _onDragUpdate(details, constraints),
+                onDragUpdate: (final details) =>
+                    _onDragUpdate(details, constraints),
                 onDragEnd: (final _) => _persistOverlayOffset(),
                 onTap: otherId == null || otherId.isEmpty
                     ? null
@@ -568,7 +586,6 @@ class _GlobalActiveCallPill extends StatelessWidget {
   }
 }
 
-
 class _BenefitRow extends StatelessWidget {
   final String label;
 
@@ -619,13 +636,16 @@ class _SomaBottomNav extends StatelessWidget {
         builder: (final context, final constraints) {
           final width = constraints.maxWidth;
           final scale = (width / 360).clamp(0.85, 1.1);
-          final outerPad = EdgeInsets.fromLTRB(14 * scale, 0, 14 * scale, 14 * scale);
-          final innerPad = EdgeInsets.symmetric(horizontal: 6 * scale, vertical: 8 * scale);
+          final outerPad =
+              EdgeInsets.fromLTRB(14 * scale, 0, 14 * scale, 14 * scale);
+          final innerPad =
+              EdgeInsets.symmetric(horizontal: 6 * scale, vertical: 8 * scale);
           final radius = 28 * scale;
           final iconSize = 22 * scale;
           final fontSize = 12 * scale;
           final labelGap = 4 * scale;
-          final itemPad = EdgeInsets.symmetric(horizontal: 8 * scale, vertical: 8 * scale);
+          final itemPad =
+              EdgeInsets.symmetric(horizontal: 8 * scale, vertical: 8 * scale);
 
           return Padding(
             padding: outerPad,
@@ -714,71 +734,75 @@ class _NavItem extends StatelessWidget {
     final bg = selected
         ? (isDark
             ? const Color(0xFF2E2B54)
-            : Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), scheme.surface))
+            : Color.alphaBlend(
+                scheme.primary.withValues(alpha: 0.16), scheme.surface))
         : Colors.transparent;
     final border = selected
-        ? (isDark ? const Color(0xFF8B7AFF) : scheme.primary.withValues(alpha: 0.35))
+        ? (isDark
+            ? const Color(0xFF8B7AFF)
+            : scheme.primary.withValues(alpha: 0.35))
         : Colors.transparent;
 
     return Semantics(
-      label: '$label tab${selected ? ", selected" : ""}',
-      button: true,
-      child: PressableScale(
-        onTap: onTap,
-        isButton: false, // Semantics already wraps it
-        child: Container(
-          padding: padding,
-          decoration: BoxDecoration(
-            color: bg,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: border),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Icon(icon, color: color, size: iconSize),
-                  if (badge > 0)
-                    Positioned(
-                      top: -4,
-                      right: -6,
-                      child: Container(
-                        padding: const EdgeInsets.all(2),
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
-                        child: Text(
-                          badge > 9 ? '9+' : '$badge',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 8,
-                            fontWeight: FontWeight.w800,
+        label: '$label tab${selected ? ", selected" : ""}',
+        button: true,
+        child: PressableScale(
+          onTap: onTap,
+          isButton: false, // Semantics already wraps it
+          child: Container(
+            padding: padding,
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: border),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Icon(icon, color: color, size: iconSize),
+                    if (badge > 0)
+                      Positioned(
+                        top: -4,
+                        right: -6,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: const BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
                           ),
-                          textAlign: TextAlign.center,
+                          constraints:
+                              const BoxConstraints(minWidth: 14, minHeight: 14),
+                          child: Text(
+                            badge > 9 ? '9+' : '$badge',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 8,
+                              fontWeight: FontWeight.w800,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
-                    ),
-                ],
-              ),
-            SizedBox(height: labelGap),
-            Text(
-              label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: color,
-                fontSize: fontSize,
-                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-              ),
+                  ],
+                ),
+                SizedBox(height: labelGap),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: fontSize,
+                    fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    ));
+          ),
+        ));
   }
 }
 
@@ -858,10 +882,13 @@ class _RailItem extends StatelessWidget {
     final bg = selected
         ? (isDark
             ? const Color(0xFF2E2B54)
-            : Color.alphaBlend(scheme.primary.withValues(alpha: 0.16), scheme.surface))
+            : Color.alphaBlend(
+                scheme.primary.withValues(alpha: 0.16), scheme.surface))
         : Colors.transparent;
     final border = selected
-        ? (isDark ? const Color(0xFF8B7AFF) : scheme.primary.withValues(alpha: 0.35))
+        ? (isDark
+            ? const Color(0xFF8B7AFF)
+            : scheme.primary.withValues(alpha: 0.35))
         : Colors.transparent;
 
     return PressableScale(
@@ -893,7 +920,7 @@ class _RailItem extends StatelessWidget {
   }
 }
 
-// ─────────────────────────── Achievement Toast ────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Achievement Toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Animated slide-in toast that appears at the top of the screen when an
 /// achievement is unlocked. Auto-dismisses after [_kDuration] and calls
@@ -916,8 +943,8 @@ class _AchievementToast extends StatefulWidget {
 
 class _AchievementToastState extends State<_AchievementToast>
     with SingleTickerProviderStateMixin {
-  static const _kVisible  = Duration(seconds: 3);
-  static const _kAnimate  = Duration(milliseconds: 420);
+  static const _kVisible = Duration(seconds: 3);
+  static const _kAnimate = Duration(milliseconds: 420);
 
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
@@ -956,7 +983,7 @@ class _AchievementToastState extends State<_AchievementToast>
   @override
   Widget build(final BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final emoji = widget.icon ?? '🏆';
+    final emoji = widget.icon ?? 'ðŸ†';
 
     return SlideTransition(
       position: _slide,

@@ -15,12 +15,20 @@ class AppLogger {
     _log(AppLogLevel.info, message, context: context);
   }
 
-  void warning(final String message, {final Map<String, Object?>? context, final Object? error, final StackTrace? stackTrace}) {
-    _log(AppLogLevel.warning, message, context: context, error: error, stackTrace: stackTrace);
+  void warning(final String message,
+      {final Map<String, Object?>? context,
+      final Object? error,
+      final StackTrace? stackTrace}) {
+    _log(AppLogLevel.warning, message,
+        context: context, error: error, stackTrace: stackTrace);
   }
 
-  void error(final String message, {final Map<String, Object?>? context, final Object? error, final StackTrace? stackTrace}) {
-    _log(AppLogLevel.error, message, context: context, error: error, stackTrace: stackTrace);
+  void error(final String message,
+      {final Map<String, Object?>? context,
+      final Object? error,
+      final StackTrace? stackTrace}) {
+    _log(AppLogLevel.error, message,
+        context: context, error: error, stackTrace: stackTrace);
   }
 
   void _log(
@@ -34,7 +42,8 @@ class AppLogger {
 
     final safeContext = _sanitizeContext(context ?? const <String, Object?>{});
     final base = '[${level.name.toUpperCase()}] $message';
-    final contextSuffix = safeContext.isEmpty ? '' : ' ${jsonEncode(safeContext)}';
+    final contextSuffix =
+        safeContext.isEmpty ? '' : ' ${jsonEncode(safeContext)}';
     debugPrint('$base$contextSuffix');
 
     if (error != null) {
@@ -46,7 +55,8 @@ class AppLogger {
   }
 
   Map<String, Object?> _sanitizeContext(final Map<String, Object?> context) {
-    return context.map((final key, final value) => MapEntry(key, _sanitizeValue(key, value)));
+    return context.map(
+        (final key, final value) => MapEntry(key, _sanitizeValue(key, value)));
   }
 
   Object? _sanitizeValue(final String key, final Object? value) {

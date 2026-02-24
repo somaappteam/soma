@@ -25,7 +25,8 @@ class StaggeredIn extends StatefulWidget {
   State<StaggeredIn> createState() => _StaggeredInState();
 }
 
-class _StaggeredInState extends State<StaggeredIn> with SingleTickerProviderStateMixin {
+class _StaggeredInState extends State<StaggeredIn>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late Animation<double> _fade;
   late Animation<Offset> _slide;
@@ -47,22 +48,27 @@ class _StaggeredInState extends State<StaggeredIn> with SingleTickerProviderStat
   void _ensureInitialized() {
     final isLight = Theme.of(context).brightness == Brightness.light;
     if (widget.duration == MotionTokens.short) {
-      _controller.duration = isLight ? MotionTokens.lightStagger : MotionTokens.darkStagger;
+      _controller.duration =
+          isLight ? MotionTokens.lightStagger : MotionTokens.darkStagger;
     }
     _configureAnimations(isLight);
   }
 
   void _configureAnimations(final bool isLight) {
     final effectiveCurve = widget.curve == MotionTokens.standardCurve
-        ? (isLight ? MotionTokens.lightStaggerCurve : MotionTokens.darkStaggerCurve)
+        ? (isLight
+            ? MotionTokens.lightStaggerCurve
+            : MotionTokens.darkStaggerCurve)
         : widget.curve;
     _fade = CurvedAnimation(parent: _controller, curve: effectiveCurve);
-    _slide = Tween<Offset>(begin: widget.offset, end: Offset.zero).animate(_fade);
+    _slide =
+        Tween<Offset>(begin: widget.offset, end: Offset.zero).animate(_fade);
     _scale = Tween<double>(begin: 0.97, end: 1).animate(_fade);
   }
 
   Future<void> _play() async {
-    final delay = Duration(milliseconds: widget.baseDelay.inMilliseconds * widget.index);
+    final delay =
+        Duration(milliseconds: widget.baseDelay.inMilliseconds * widget.index);
     if (delay > Duration.zero) {
       await Future.delayed(delay);
     }

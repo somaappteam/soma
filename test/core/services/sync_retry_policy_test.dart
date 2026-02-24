@@ -24,7 +24,8 @@ void main() {
           stepDurationsMs: {'offline_queue': 10},
         );
       },
-      onRetryScheduled: (final attempt, final _) async => scheduled.add(attempt),
+      onRetryScheduled: (final attempt, final _) async =>
+          scheduled.add(attempt),
       wait: (final _) async {},
     );
 

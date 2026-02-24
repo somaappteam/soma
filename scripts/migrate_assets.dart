@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:csv/csv.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
@@ -11,27 +12,29 @@ const String serviceRoleKey =
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
 
-  print('--- Starting Data Migration (Fix EOL) ---');
+  appLogger.info('--- Starting Data Migration (Fix EOL) ---');
 
   // Adjust these paths if running from a different directory
   final assetsDir = Directory('assets');
   if (!assetsDir.existsSync()) {
-    print('Error: assets directory not found in current working directory.');
-    print('Current directory: ${Directory.current.path}');
+    appLogger.info(
+        'Error: assets directory not found in current working directory.');
+    appLogger.info('Current directory: ${Directory.current.path}');
     return;
   }
 
   await migrateVocabulary(client, 'assets/vocabulary.csv');
   await migrateSentences(client, 'assets/sentences.csv');
 
-  print('--- Migration Completed ---');
+  appLogger.info('--- Migration Completed ---');
 }
 
-Future<void> migrateVocabulary(final SupabaseClient client, final String filePath) async {
-  print('Migrating Vocabulary from $filePath...');
+Future<void> migrateVocabulary(
+    final SupabaseClient client, final String filePath) async {
+  appLogger.info('Migrating Vocabulary from $filePath...');
   final file = File(filePath);
   if (!await file.exists()) {
-    print('Vocabulary CSV not found at $filePath!');
+    appLogger.info('Vocabulary CSV not found at $filePath!');
     return;
   }
 
@@ -42,13 +45,13 @@ Future<void> migrateVocabulary(final SupabaseClient client, final String filePat
       .transform(const CsvToListConverter(eol: '\n'))
       .toList();
 
-  print('Parsed ${fields.length} rows from vocabulary CSV.');
+  appLogger.info('Parsed ${fields.length} rows from vocabulary CSV.');
 
   if (fields.isEmpty) return;
 
   final rawHeaders = fields[0];
-  // print('Vocabulary Headers found: $rawHeaders');
-  
+  // appLogger.info('Vocabulary Headers found: $rawHeaders');
+
   final headers = <int, String>{};
   for (var j = 0; j < rawHeaders.length; j++) {
     final key = rawHeaders[j].toString().trim();
@@ -58,7 +61,7 @@ Future<void> migrateVocabulary(final SupabaseClient client, final String filePat
     }
   }
 
-  // print('Mapped headers: $headers');
+  // appLogger.info('Mapped headers: $headers');
 
   final data = <Map<String, dynamic>>[];
 
@@ -79,7 +82,8 @@ Future<void> migrateVocabulary(final SupabaseClient client, final String filePat
             row[key] = int.tryParse(val.toString().trim());
           }
         } else {
-          row[key] = val.toString().trim().isEmpty ? null : val.toString().trim();
+          row[key] =
+              val.toString().trim().isEmpty ? null : val.toString().trim();
         }
       }
     });
@@ -87,27 +91,29 @@ Future<void> migrateVocabulary(final SupabaseClient client, final String filePat
     if (row.isNotEmpty) {
       data.add(row);
     }
-    
-    if (i % 5000 == 0) print('Processed $i rows locally...');
 
-    if (data.length >= 1000) { // Batch 1000
+    if (i % 5000 == 0) appLogger.info('Processed $i rows locally...');
+
+    if (data.length >= 1000) {
+      // Batch 1000
       await _upsert(client, 'vocabulary', data);
       data.clear();
-      print('Uploaded vocabulary up to row $i...');
+      appLogger.info('Uploaded vocabulary up to row $i...');
     }
   }
 
   if (data.isNotEmpty) {
     await _upsert(client, 'vocabulary', data);
   }
-  print('Vocabulary migration done.');
+  appLogger.info('Vocabulary migration done.');
 }
 
-Future<void> migrateSentences(final SupabaseClient client, final String filePath) async {
-  print('Migrating Sentences from $filePath...');
+Future<void> migrateSentences(
+    final SupabaseClient client, final String filePath) async {
+  appLogger.info('Migrating Sentences from $filePath...');
   final file = File(filePath);
   if (!await file.exists()) {
-    print('Sentences CSV not found at $filePath!');
+    appLogger.info('Sentences CSV not found at $filePath!');
     return;
   }
 
@@ -116,13 +122,13 @@ Future<void> migrateSentences(final SupabaseClient client, final String filePath
       .transform(utf8.decoder)
       .transform(const CsvToListConverter(eol: '\n'))
       .toList();
-      
-  print('Parsed ${fields.length} rows from sentences CSV.');
+
+  appLogger.info('Parsed ${fields.length} rows from sentences CSV.');
 
   if (fields.isEmpty) return;
 
   final rawHeaders = fields[0];
-  // print('Sentences Headers found: $rawHeaders');
+  // appLogger.info('Sentences Headers found: $rawHeaders');
 
   final headers = <int, String>{};
   for (var j = 0; j < rawHeaders.length; j++) {
@@ -132,8 +138,8 @@ Future<void> migrateSentences(final SupabaseClient client, final String filePath
       headers[j] = key;
     }
   }
-  
-  // print('Mapped headers: $headers');
+
+  // appLogger.info('Mapped headers: $headers');
 
   final data = <Map<String, dynamic>>[];
 
@@ -152,7 +158,8 @@ Future<void> migrateSentences(final SupabaseClient client, final String filePath
             row[key] = int.tryParse(val.toString().trim());
           }
         } else {
-          row[key] = val.toString().trim().isEmpty ? null : val.toString().trim();
+          row[key] =
+              val.toString().trim().isEmpty ? null : val.toString().trim();
         }
       }
     });
@@ -160,33 +167,33 @@ Future<void> migrateSentences(final SupabaseClient client, final String filePath
     if (row.isNotEmpty) {
       data.add(row);
     }
-    
-    if (i % 5000 == 0) print('Processed $i rows locally...');
+
+    if (i % 5000 == 0) appLogger.info('Processed $i rows locally...');
 
     if (data.length >= 1000) {
       await _upsert(client, 'sentences', data);
       data.clear();
-      print('Uploaded sentences up to row $i...');
+      appLogger.info('Uploaded sentences up to row $i...');
     }
   }
 
   if (data.isNotEmpty) {
     await _upsert(client, 'sentences', data);
   }
-  print('Sentences migration done.');
+  appLogger.info('Sentences migration done.');
 }
 
 Future<void> _upsert(final SupabaseClient client, final String table,
     final List<Map<String, dynamic>> data) async {
   if (data.isEmpty) return;
-  
+
   try {
     // Use upsert on PK to handle existing rows if running multiple times
-    await client.from(table).upsert(data); 
-    // print('  Upserted ${data.length} rows to $table');
+    await client.from(table).upsert(data);
+    // appLogger.info('  Upserted ${data.length} rows to $table');
   } catch (e) {
-    print('Error upserting to $table: $e');
-    
+    appLogger.info('Error upserting to $table: $e');
+
     // If batch fails, try one by one to find the problematic row
     int success = 0;
     int failed = 0;
@@ -197,11 +204,11 @@ Future<void> _upsert(final SupabaseClient client, final String table,
       } catch (e2) {
         failed++;
         if (failed <= 3) {
-          print('  Failed row: $row');
-          print('  Error: $e2');
+          appLogger.info('  Failed row: $row');
+          appLogger.info('  Error: $e2');
         }
       }
     }
-    print('  Individual upsert: $success succeeded, $failed failed');
+    appLogger.info('  Individual upsert: $success succeeded, $failed failed');
   }
 }

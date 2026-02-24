@@ -24,14 +24,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     await settingsRepository.updateSetting('language_ui', languageCode);
   }
 
-  List<({String value, String label})> _languageOptions(final AppLocalizations l10n) {
+  List<({String value, String label})> _languageOptions(
+      final AppLocalizations l10n) {
     return [
       for (final language in kSupportedUiLanguages)
         (value: language.code, label: language.labelBuilder(l10n)),
     ];
   }
-
-
 
   @override
   Widget build(final BuildContext context) {
@@ -88,9 +87,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             Text(
                               l10n.welcomeTagline,
                               textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
                                     fontWeight: FontWeight.w500,
-                                    color: scheme.onSurface.withValues(alpha: 0.82),
+                                    color: scheme.onSurface
+                                        .withValues(alpha: 0.82),
                                     fontSize: 16,
                                   ),
                             ),
@@ -105,65 +108,72 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                              SizedBox(
-                                width: double.infinity,
-                                child: NeonButton(
-                                  label: l10n.signUp,
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (final context) => const SignUpScreen(),
-                                    ),
+                            SizedBox(
+                              width: double.infinity,
+                              child: NeonButton(
+                                label: l10n.signUp,
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (final context) =>
+                                        const SignUpScreen(),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 14),
-                              SizedBox(
-                                width: double.infinity,
-                                child: Glass(
-                                  radius: T.r28,
-                                  padding: EdgeInsets.zero,
-                                  child: InkWell(
-                                    borderRadius: T.r28,
-                                    onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (final context) => const SignInScreen(),
-                                      ),
+                            ),
+                            const SizedBox(height: 14),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Glass(
+                                radius: T.r28,
+                                padding: EdgeInsets.zero,
+                                child: InkWell(
+                                  borderRadius: T.r28,
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (final context) =>
+                                          const SignInScreen(),
                                     ),
-                                    child: SizedBox(
-                                      height: 56,
-                                      child: Center(
-                                        child: Text(
-                                          l10n.signIn,
-                                          style: TextStyle(
-                                            color: scheme.onSurface,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w800,
-                                          ),
+                                  ),
+                                  child: SizedBox(
+                                    height: 56,
+                                    child: Center(
+                                      child: Text(
+                                        l10n.signIn,
+                                        style: TextStyle(
+                                          color: scheme.onSurface,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w800,
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 18),
-                              GestureDetector(
-                                onTap: () {
-                                  profileStore.loginAsGuest();
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(builder: (final _) => const AppShell()),
-                                  );
-                                },
-                                child: Text(
-                                  l10n.skipForNow,
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                        fontWeight: FontWeight.w500,
-                                        color: scheme.onSurface.withValues(alpha: 0.6),
-                                      ),
-                                ),
+                            ),
+                            const SizedBox(height: 18),
+                            GestureDetector(
+                              onTap: () {
+                                profileStore.loginAsGuest();
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (final _) => const AppShell()),
+                                );
+                              },
+                              child: Text(
+                                l10n.skipForNow,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      color: scheme.onSurface
+                                          .withValues(alpha: 0.6),
+                                    ),
                               ),
+                            ),
                           ],
                         ),
                       ),
@@ -178,18 +188,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               child: StreamBuilder<Map<String, dynamic>>(
                 stream: settingsRepository.getSettingsStream(),
                 builder: (final context, final snapshot) {
-                  final current = normalizeUiLanguageCode(snapshot.data?['language_ui']?.toString());
+                  final current = normalizeUiLanguageCode(
+                      snapshot.data?['language_ui']?.toString());
                   final currentLabel = languageOptions
-                          .firstWhere(
-                            (final item) => item.value == current,
-                            orElse: () => languageOptions.first,
-                          )
-                          .label;
-
+                      .firstWhere(
+                        (final item) => item.value == current,
+                        orElse: () => languageOptions.first,
+                      )
+                      .label;
 
                   return Glass(
                     radius: BorderRadius.circular(20),
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
                     child: PopupMenuButton<String>(
                       tooltip: l10n.settingsUiLanguage,
                       onSelected: _changeLanguage,
@@ -204,18 +215,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                   Icon(
                                     Icons.check_rounded,
                                     size: 16,
-                                    color: Theme.of(context).colorScheme.primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                               ],
                             ),
                           ),
                       ],
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.language_rounded, color: scheme.onSurface, size: 18),
+                            Icon(Icons.language_rounded,
+                                color: scheme.onSurface, size: 18),
                             const SizedBox(width: 8),
                             Text(
                               currentLabel,
@@ -226,7 +240,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            Icon(Icons.expand_more_rounded, color: scheme.onSurface, size: 18),
+                            Icon(Icons.expand_more_rounded,
+                                color: scheme.onSurface, size: 18),
                           ],
                         ),
                       ),
@@ -239,6 +254,5 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         ),
       ),
     );
-
   }
 }

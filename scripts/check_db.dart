@@ -1,5 +1,6 @@
-
 import 'dart:io';
+
+import 'package:soma/core/services/app_logger.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
@@ -8,18 +9,18 @@ void main() async {
   final dbPath = 'soma_local.db';
 
   if (!await File(dbPath).exists()) {
-    print('Database file not found at $dbPath');
+    appLogger.info('Database file not found at $dbPath');
     return;
   }
 
   final db = await databaseFactory.openDatabase(dbPath);
 
-  Future<void> countTable(String table) async {
+  Future<void> countTable(final String table) async {
     try {
       final res = await db.rawQuery('SELECT COUNT(*) as count FROM $table');
-      print('$table count: ${res.first['count']}');
+      appLogger.info('$table count: ${res.first['count']}');
     } catch (e) {
-      print('Error counting $table: $e');
+      appLogger.info('Error counting $table: $e');
     }
   }
 
@@ -29,14 +30,15 @@ void main() async {
   await countTable('user_learned_items');
   await countTable('profiles');
 
-  print('\n--- Vocabulary by Language ---');
+  appLogger.info('\n--- Vocabulary by Language ---');
   try {
-    final res = await db.rawQuery('SELECT lang_code, COUNT(*) as count FROM vocabulary GROUP BY lang_code');
+    final res = await db.rawQuery(
+        'SELECT lang_code, COUNT(*) as count FROM vocabulary GROUP BY lang_code');
     for (var row in res) {
-      print('${row['lang_code']}: ${row['count']}');
+      appLogger.info('${row['lang_code']}: ${row['count']}');
     }
   } catch (e) {
-    print('Error grouping vocabulary: $e');
+    appLogger.info('Error grouping vocabulary: $e');
   }
 
   await db.close();

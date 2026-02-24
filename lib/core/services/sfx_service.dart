@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-
 import 'package:soma/data/settings_repository.dart';
 
 class SfxService {
@@ -12,7 +11,8 @@ class SfxService {
     final settings = await settingsRepository.getSettings();
     _enabled = settings['sfx_enabled'] ?? true;
     _subscription?.cancel();
-    _subscription = settingsRepository.getSettingsStream().listen((final settings) {
+    _subscription =
+        settingsRepository.getSettingsStream().listen((final settings) {
       final next = settings['sfx_enabled'];
       if (next is bool) {
         _enabled = next;
@@ -39,7 +39,6 @@ class SfxService {
       SystemSound.play(SystemSoundType.alert);
     }
   }
-
 
   void answerCorrect({final bool isStreak = false}) {
     if (!_enabled) return;

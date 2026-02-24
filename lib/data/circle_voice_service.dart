@@ -48,7 +48,8 @@ class CircleVoiceService {
 
   VoicePresence? voiceFor(final String userId) => _presenceByUser[userId];
 
-  Future<void> connect({required final String circleId, required final String name}) async {
+  Future<void> connect(
+      {required final String circleId, required final String name}) async {
     final uid = authRepository.currentUser?.id;
     if (uid == null) return;
 

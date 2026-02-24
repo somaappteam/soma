@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:soma/core/services/app_logger.dart';
 
 void main() {
   final path = 'lib/features/social/dm_chat_screen.dart';
@@ -54,12 +55,13 @@ void main() {
 
   var newContent = content;
   for (final node in nodesToRemove) {
-    print('Removing ${node.runtimeType} at ${node.offset} - ${node.end}');
+    appLogger
+        .info('Removing ${node.runtimeType} at ${node.offset} - ${node.end}');
     newContent = newContent.replaceRange(node.offset, node.end, '');
   }
 
   file.writeAsStringSync(newContent);
-  print('Done.');
+  appLogger.info('Done.');
 }
 
 class _Visitor extends RecursiveAstVisitor<void> {

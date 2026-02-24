@@ -4,16 +4,20 @@ class RtcConfig {
     {'urls': 'stun:stun1.l.google.com:19302'},
   ];
 
-  static const String turnUrl = String.fromEnvironment('TURN_URL', defaultValue: '');
-  static const String turnUsername = String.fromEnvironment('TURN_USERNAME', defaultValue: '');
-  static const String turnCredential = String.fromEnvironment('TURN_CREDENTIAL', defaultValue: '');
+  static const String turnUrl =
+      String.fromEnvironment('TURN_URL', defaultValue: '');
+  static const String turnUsername =
+      String.fromEnvironment('TURN_USERNAME', defaultValue: '');
+  static const String turnCredential =
+      String.fromEnvironment('TURN_CREDENTIAL', defaultValue: '');
 
   /// Optional Supabase Edge Function to mint short-lived TURN credentials.
   static const String turnCredentialsFunction =
       String.fromEnvironment('TURN_CREDENTIALS_FUNCTION', defaultValue: '');
 
   /// Soft cap to keep mesh affordable in circles.
-  static const int maxMeshPeers = int.fromEnvironment('RTC_MAX_MESH_PEERS', defaultValue: 6);
+  static const int maxMeshPeers =
+      int.fromEnvironment('RTC_MAX_MESH_PEERS', defaultValue: 6);
 
   /// Soft cap for active speakers before auto-demoting non-priority publishers.
   static const int maxActiveSpeakers =

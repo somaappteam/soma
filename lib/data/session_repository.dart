@@ -20,9 +20,8 @@ class UserSession {
 
   factory UserSession.fromRow(final Map<String, dynamic> row) {
     final rawSeen = row['last_seen'];
-    final lastSeen = rawSeen is DateTime
-        ? rawSeen
-        : DateTime.parse(rawSeen.toString());
+    final lastSeen =
+        rawSeen is DateTime ? rawSeen : DateTime.parse(rawSeen.toString());
     return UserSession(
       id: row['id'].toString(),
       deviceId: row['device_id']?.toString() ?? '',

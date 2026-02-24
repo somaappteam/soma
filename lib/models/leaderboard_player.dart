@@ -29,4 +29,3 @@ class LeaderboardPlayer {
 }
 
 enum LeaderboardAnswer { none, correct, wrong }
-

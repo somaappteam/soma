@@ -16,7 +16,8 @@ class GlassTheme extends ThemeExtension<GlassTheme> {
   });
 
   @override
-  GlassTheme copyWith({final Color? fill, final Color? stroke, final Color? shadow}) {
+  GlassTheme copyWith(
+      {final Color? fill, final Color? stroke, final Color? shadow}) {
     return GlassTheme(
       fill: fill ?? this.fill,
       stroke: stroke ?? this.stroke,
@@ -47,7 +48,8 @@ class AppBackgroundTheme extends ThemeExtension<AppBackgroundTheme> {
   }
 
   @override
-  AppBackgroundTheme lerp(final ThemeExtension<AppBackgroundTheme>? other, final double t) {
+  AppBackgroundTheme lerp(
+      final ThemeExtension<AppBackgroundTheme>? other, final double t) {
     if (other is! AppBackgroundTheme) return this;
     return AppBackgroundTheme(
       gradient: Gradient.lerp(gradient, other.gradient, t) ?? gradient,
@@ -68,7 +70,8 @@ class AppSemanticTheme extends ThemeExtension<AppSemanticTheme> {
   });
 
   @override
-  AppSemanticTheme copyWith({final Color? progress, final Color? social, final Color? reward}) {
+  AppSemanticTheme copyWith(
+      {final Color? progress, final Color? social, final Color? reward}) {
     return AppSemanticTheme(
       progress: progress ?? this.progress,
       social: social ?? this.social,
@@ -77,7 +80,8 @@ class AppSemanticTheme extends ThemeExtension<AppSemanticTheme> {
   }
 
   @override
-  AppSemanticTheme lerp(final ThemeExtension<AppSemanticTheme>? other, final double t) {
+  AppSemanticTheme lerp(
+      final ThemeExtension<AppSemanticTheme>? other, final double t) {
     if (other is! AppSemanticTheme) return this;
     return AppSemanticTheme(
       progress: Color.lerp(progress, other.progress, t) ?? progress,
@@ -100,7 +104,8 @@ class AppTextToneTheme extends ThemeExtension<AppTextToneTheme> {
   });
 
   @override
-  AppTextToneTheme copyWith({final Color? high, final Color? medium, final Color? muted}) {
+  AppTextToneTheme copyWith(
+      {final Color? high, final Color? medium, final Color? muted}) {
     return AppTextToneTheme(
       high: high ?? this.high,
       medium: medium ?? this.medium,
@@ -109,7 +114,8 @@ class AppTextToneTheme extends ThemeExtension<AppTextToneTheme> {
   }
 
   @override
-  AppTextToneTheme lerp(final ThemeExtension<AppTextToneTheme>? other, final double t) {
+  AppTextToneTheme lerp(
+      final ThemeExtension<AppTextToneTheme>? other, final double t) {
     if (other is! AppTextToneTheme) return this;
     return AppTextToneTheme(
       high: Color.lerp(high, other.high, t) ?? high,
@@ -290,7 +296,8 @@ class AppTheme {
         ),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: isLight ? Colors.white.withValues(alpha: 0.72) : Colors.transparent,
+        backgroundColor:
+            isLight ? Colors.white.withValues(alpha: 0.72) : Colors.transparent,
         surfaceTintColor: Colors.transparent,
         scrolledUnderElevation: isLight ? 2 : 0,
         shadowColor: cardShadow.withValues(alpha: 0.6),
@@ -309,13 +316,16 @@ class AppTheme {
               : scheme.onSurface.withValues(alpha: 0.2),
         ),
         thumbColor: WidgetStateProperty.resolveWith(
-          (final states) => states.contains(WidgetState.selected) ? scheme.primary : scheme.onSurface,
+          (final states) => states.contains(WidgetState.selected)
+              ? scheme.primary
+              : scheme.onSurface,
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: isLight ? Colors.white.withValues(alpha: 0.84) : T.fieldFill,
-        border: OutlineInputBorder(borderRadius: T.r20, borderSide: BorderSide.none),
+        border: OutlineInputBorder(
+            borderRadius: T.r20, borderSide: BorderSide.none),
         enabledBorder: OutlineInputBorder(
           borderRadius: T.r20,
           borderSide: BorderSide(
@@ -397,9 +407,8 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: T.r20),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: isLight
-            ? Colors.white.withValues(alpha: 0.92)
-            : scheme.surface,
+        backgroundColor:
+            isLight ? Colors.white.withValues(alpha: 0.92) : scheme.surface,
         shadowColor: isLight ? cardShadow : Colors.transparent,
         elevation: isLight ? 10 : 0,
         surfaceTintColor: scheme.primary.withValues(alpha: isLight ? 0.04 : 0),
@@ -422,20 +431,37 @@ class AppTheme {
           ),
         ),
       ),
-      textTheme: GoogleFonts.poppinsTextTheme(base.textTheme).copyWith(
-        displayLarge: GoogleFonts.poppins(fontSize: 36, fontWeight: isLight ? FontWeight.w700 : FontWeight.w600),
-        displayMedium: GoogleFonts.poppins(fontSize: 30, fontWeight: isLight ? FontWeight.w700 : FontWeight.w600),
-        displaySmall: GoogleFonts.poppins(fontSize: 24, fontWeight: isLight ? FontWeight.w700 : FontWeight.w600),
-        headlineMedium: GoogleFonts.poppins(fontSize: 22, fontWeight: isLight ? FontWeight.w700 : FontWeight.w600),
-        titleLarge: GoogleFonts.poppins(fontSize: 19, fontWeight: isLight ? FontWeight.w700 : FontWeight.w600),
-        titleMedium: GoogleFonts.poppins(fontSize: 16, fontWeight: isLight ? FontWeight.w600 : FontWeight.w500),
-        bodyLarge: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w400),
-        bodyMedium: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
-        bodySmall: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w400),
-      ).apply(
-        bodyColor: scheme.onSurface,
-        displayColor: scheme.onSurface,
-      ),
+      textTheme: GoogleFonts.poppinsTextTheme(base.textTheme)
+          .copyWith(
+            displayLarge: GoogleFonts.poppins(
+                fontSize: 36,
+                fontWeight: isLight ? FontWeight.w700 : FontWeight.w600),
+            displayMedium: GoogleFonts.poppins(
+                fontSize: 30,
+                fontWeight: isLight ? FontWeight.w700 : FontWeight.w600),
+            displaySmall: GoogleFonts.poppins(
+                fontSize: 24,
+                fontWeight: isLight ? FontWeight.w700 : FontWeight.w600),
+            headlineMedium: GoogleFonts.poppins(
+                fontSize: 22,
+                fontWeight: isLight ? FontWeight.w700 : FontWeight.w600),
+            titleLarge: GoogleFonts.poppins(
+                fontSize: 19,
+                fontWeight: isLight ? FontWeight.w700 : FontWeight.w600),
+            titleMedium: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: isLight ? FontWeight.w600 : FontWeight.w500),
+            bodyLarge:
+                GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w400),
+            bodyMedium:
+                GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w400),
+            bodySmall:
+                GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w400),
+          )
+          .apply(
+            bodyColor: scheme.onSurface,
+            displayColor: scheme.onSurface,
+          ),
       extensions: [
         glass,
         background,
@@ -456,7 +482,8 @@ class _FastPageTransitionsBuilder extends PageTransitionsBuilder {
   const _FastPageTransitionsBuilder({required this.isLight});
 
   @override
-  Duration get transitionDuration => isLight ? MotionTokens.lightPageIn : MotionTokens.darkPageIn;
+  Duration get transitionDuration =>
+      isLight ? MotionTokens.lightPageIn : MotionTokens.darkPageIn;
 
   @override
   Duration get reverseTransitionDuration =>
@@ -470,8 +497,11 @@ class _FastPageTransitionsBuilder extends PageTransitionsBuilder {
     final Animation<double> secondaryAnimation,
     final Widget child,
   ) {
-    final curve = isLight ? MotionTokens.lightPageInCurve : MotionTokens.darkPageInCurve;
-    final reverseCurve = isLight ? MotionTokens.lightPageOutCurve : MotionTokens.darkPageOutCurve;
+    final curve =
+        isLight ? MotionTokens.lightPageInCurve : MotionTokens.darkPageInCurve;
+    final reverseCurve = isLight
+        ? MotionTokens.lightPageOutCurve
+        : MotionTokens.darkPageOutCurve;
     final curved = CurvedAnimation(
       parent: animation,
       curve: curve,

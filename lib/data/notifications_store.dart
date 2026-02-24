@@ -4,7 +4,9 @@ import 'package:soma/data/notifications_repository.dart';
 enum NotifType { system, course, social, circle }
 
 enum SocialAction { friendRequest }
+
 enum CircleAction { invite }
+
 enum CourseAction { dailyGoal }
 
 class AppNotification {
@@ -36,16 +38,13 @@ class AppNotification {
     required this.body,
     required this.time,
     this.isRead = false,
-
     this.socialAction,
     this.fromUserId,
     this.fromUserName,
     this.friendshipId,
-
     this.circleAction,
     this.circleId,
     this.circleTitle,
-
     this.courseAction,
     this.courseId,
   });
@@ -67,13 +66,14 @@ class NotificationsStore extends ChangeNotifier {
     if (_initialized) return;
     _initialized = true;
 
-    final sub = notificationsRepository.getNotificationsStream().listen((final rows) {
+    final sub =
+        notificationsRepository.getNotificationsStream().listen((final rows) {
       _items = rows.map((final row) {
         final metadataRaw = row['metadata'];
         final metadata = metadataRaw is Map
             ? Map<String, dynamic>.from(metadataRaw)
             : <String, dynamic>{};
-        
+
         final courseAction = metadata['course_action'] == 'daily_goal'
             ? CourseAction.dailyGoal
             : null;
@@ -85,16 +85,17 @@ class NotificationsStore extends ChangeNotifier {
           body: row['body'] ?? '',
           time: _parseTime(row['created_at']),
           isRead: row['is_read'] == true || row['is_read'] == 1,
-          
-          socialAction: metadata['social_action'] == 'friend_request' ? SocialAction.friendRequest : null,
+          socialAction: metadata['social_action'] == 'friend_request'
+              ? SocialAction.friendRequest
+              : null,
           fromUserId: metadata['from_user_id'],
           fromUserName: metadata['from_user_name'],
           friendshipId: metadata['friendship_id']?.toString(),
-          
-          circleAction: metadata['circle_action'] == 'invite' ? CircleAction.invite : null,
+          circleAction: metadata['circle_action'] == 'invite'
+              ? CircleAction.invite
+              : null,
           circleId: metadata['circle_id'],
           circleTitle: metadata['circle_title'],
-
           courseAction: courseAction,
           courseId: metadata['course_id']?.toString(),
         );
@@ -118,10 +119,14 @@ class NotificationsStore extends ChangeNotifier {
 
   NotifType _parseType(final String? type) {
     switch (type) {
-      case 'social': return NotifType.social;
-      case 'circle': return NotifType.circle;
-      case 'course': return NotifType.course;
-      default: return NotifType.system;
+      case 'social':
+        return NotifType.social;
+      case 'circle':
+        return NotifType.circle;
+      case 'course':
+        return NotifType.course;
+      default:
+        return NotifType.system;
     }
   }
 

@@ -90,8 +90,7 @@ class _LockedWrapper extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.lock_rounded,
-                    size: 15, color: scheme.primary),
+                Icon(Icons.lock_rounded, size: 15, color: scheme.primary),
                 const SizedBox(width: 6),
                 Text(
                   featureName != null
@@ -138,8 +137,7 @@ class _PaywallShell extends StatelessWidget {
         final scheme = Theme.of(context).colorScheme;
         return Scaffold(
           backgroundColor: scheme.surface,
-          body: Center(
-              child: CircularProgressIndicator(color: scheme.primary)),
+          body: Center(child: CircularProgressIndicator(color: scheme.primary)),
         );
       },
     );

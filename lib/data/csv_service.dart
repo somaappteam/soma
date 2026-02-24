@@ -1,6 +1,6 @@
 import 'package:csv/csv.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:soma/core/services/app_logger.dart';
 
 class CsvService {
   static final CsvService instance = CsvService._init();
@@ -18,10 +18,10 @@ class CsvService {
         _vocabularyCache = [];
         return;
       }
-      
+
       final headers = rows.first.map((final e) => e.toString().trim()).toList();
       final result = <Map<String, dynamic>>[];
-      
+
       for (var i = 1; i < rows.length; i++) {
         final row = rows[i];
         final map = <String, dynamic>{};
@@ -31,9 +31,10 @@ class CsvService {
         result.add(map);
       }
       _vocabularyCache = result;
-      debugPrint('Loaded ${_vocabularyCache?.length} vocabulary items from CSV');
+      appLogger.debug(
+          'Loaded ${_vocabularyCache?.length} vocabulary items from CSV');
     } catch (e) {
-      debugPrint('Error loading vocabulary.csv: $e');
+      appLogger.debug('Error loading vocabulary.csv: $e');
       _vocabularyCache = [];
     }
   }
@@ -47,10 +48,10 @@ class CsvService {
         _sentencesCache = [];
         return;
       }
-      
+
       final headers = rows.first.map((final e) => e.toString().trim()).toList();
       final result = <Map<String, dynamic>>[];
-      
+
       for (var i = 1; i < rows.length; i++) {
         final row = rows[i];
         final map = <String, dynamic>{};
@@ -60,20 +61,29 @@ class CsvService {
         result.add(map);
       }
       _sentencesCache = result;
-      debugPrint('Loaded ${_sentencesCache?.length} sentence items from CSV');
+      appLogger
+          .debug('Loaded ${_sentencesCache?.length} sentence items from CSV');
     } catch (e) {
-      debugPrint('Error loading sentences.csv: $e');
+      appLogger.debug('Error loading sentences.csv: $e');
       _sentencesCache = [];
     }
   }
 
-  Future<List<Map<String, dynamic>>> getVocabularyByLang(final String langCode) async {
+  Future<List<Map<String, dynamic>>> getVocabularyByLang(
+      final String langCode) async {
     await _loadVocabulary();
-    return _vocabularyCache?.where((final row) => row['lang_code'] == langCode).toList() ?? [];
+    return _vocabularyCache
+            ?.where((final row) => row['lang_code'] == langCode)
+            .toList() ??
+        [];
   }
 
-  Future<List<Map<String, dynamic>>> getSentencesByLang(final String langCode) async {
+  Future<List<Map<String, dynamic>>> getSentencesByLang(
+      final String langCode) async {
     await _loadSentences();
-    return _sentencesCache?.where((final row) => row['lang_code'] == langCode).toList() ?? [];
+    return _sentencesCache
+            ?.where((final row) => row['lang_code'] == langCode)
+            .toList() ??
+        [];
   }
 }

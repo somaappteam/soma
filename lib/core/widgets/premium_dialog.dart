@@ -67,9 +67,11 @@ Future<bool?> showPremiumDialog({
                       onPressed: () => Navigator.pop(context, false),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: scheme.onSurface,
-                        side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.25)),
+                        side: BorderSide(
+                            color: scheme.onSurface.withValues(alpha: 0.25)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14)),
                       ),
                       child: Text(cancelText),
                     ),
@@ -79,10 +81,13 @@ Future<bool?> showPremiumDialog({
                   child: ElevatedButton(
                     onPressed: () => Navigator.pop(context, true),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: destructive ? scheme.error : scheme.primary,
-                      foregroundColor: destructive ? scheme.onError : scheme.onPrimary,
+                      backgroundColor:
+                          destructive ? scheme.error : scheme.primary,
+                      foregroundColor:
+                          destructive ? scheme.onError : scheme.onPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
                       shadowColor: destructive
                           ? scheme.error.withValues(alpha: 0.35)
                           : T.neonA.withValues(alpha: 0.35),
@@ -155,7 +160,8 @@ Future<ResultType?> showPremiumChoiceDialog<ResultType>({
                     : Colors.transparent;
                 final side = action.isPrimary
                     ? BorderSide.none
-                    : BorderSide(color: scheme.onSurface.withValues(alpha: 0.22));
+                    : BorderSide(
+                        color: scheme.onSurface.withValues(alpha: 0.22));
 
                 return action.isPrimary
                     ? ElevatedButton(
@@ -163,24 +169,32 @@ Future<ResultType?> showPremiumChoiceDialog<ResultType>({
                         style: ElevatedButton.styleFrom(
                           backgroundColor: background,
                           foregroundColor: foreground,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 12),
                           elevation: 6,
                           shadowColor: action.destructive
                               ? scheme.error.withValues(alpha: 0.3)
                               : T.neonA.withValues(alpha: 0.3),
                         ),
-                        child: Text(action.label, style: const TextStyle(fontWeight: FontWeight.w800)),
+                        child: Text(action.label,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w800)),
                       )
                     : OutlinedButton(
                         onPressed: () => Navigator.pop(ctx, action.value),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: foreground,
                           side: side,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 12),
                         ),
-                        child: Text(action.label, style: const TextStyle(fontWeight: FontWeight.w800)),
+                        child: Text(action.label,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w800)),
                       );
               }).toList(),
             ),

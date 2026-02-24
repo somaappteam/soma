@@ -3,7 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:soma/core/widgets/soma_empty_state.dart';
 
 void main() {
-  testWidgets('SomaEmptyState renders emoji, title, subtitle, and action', (final tester) async {
+  testWidgets('SomaEmptyState renders emoji, title, subtitle, and action',
+      (final tester) async {
     bool actionTapped = false;
 
     await tester.pumpWidget(

@@ -6,7 +6,8 @@ import 'package:soma/data/settings_repository.dart';
 class ExperimentRepository {
   final Random _random = Random();
 
-  Future<String> variant(final String key, {final List<String> buckets = const ['A', 'B']}) async {
+  Future<String> variant(final String key,
+      {final List<String> buckets = const ['A', 'B']}) async {
     final settings = await settingsRepository.getSettings();
     final exp = (settings['experiments'] as Map<String, dynamic>?) ?? {};
     final existing = exp[key]?.toString();
@@ -19,4 +20,5 @@ class ExperimentRepository {
   }
 }
 
-ExperimentRepository get experimentRepository => locator<ExperimentRepository>();
+ExperimentRepository get experimentRepository =>
+    locator<ExperimentRepository>();

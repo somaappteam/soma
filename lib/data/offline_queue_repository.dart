@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/foundation.dart';
 import 'package:soma/core/database/database_helper.dart';
 import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -99,15 +99,17 @@ class OfflineQueueRepository {
     try {
       final items = await getAll();
       if (items.isEmpty) return;
-      debugPrint('OfflineQueue: draining ${items.length} item(s)…');
+      appLogger.debug('OfflineQueue: draining ${items.length} item(s)…');
 
       for (final item in items) {
         try {
           await _replay(item);
           if (item.id != null) await delete(item.id!);
-          debugPrint('OfflineQueue: replayed ${item.operation} on ${item.tableName}');
+          appLogger.debug(
+              'OfflineQueue: replayed ${item.operation} on ${item.tableName}');
         } catch (e) {
-          debugPrint('OfflineQueue: replay failed for ${item.tableName} – $e (kept in queue)');
+          appLogger.debug(
+              'OfflineQueue: replay failed for ${item.tableName} – $e (kept in queue)');
         }
       }
     } finally {
@@ -125,7 +127,8 @@ class OfflineQueueRepository {
           await _supabase.from(item.tableName).delete().eq('id', id);
         }
       default:
-        debugPrint('OfflineQueue: unknown operation "${item.operation}" — skipping');
+        appLogger.debug(
+            'OfflineQueue: unknown operation "${item.operation}" — skipping');
     }
   }
 
@@ -135,15 +138,14 @@ class OfflineQueueRepository {
   /// Automatically drains the queue whenever the device goes back online.
   void startListening() {
     _connectivitySub?.cancel();
-    _connectivitySub = Connectivity()
-        .onConnectivityChanged
-        .listen((final results) {
+    _connectivitySub =
+        Connectivity().onConnectivityChanged.listen((final results) {
       final isOnline = results.any((final r) =>
           r == ConnectivityResult.wifi ||
           r == ConnectivityResult.mobile ||
           r == ConnectivityResult.ethernet);
       if (isOnline) {
-        debugPrint('OfflineQueue: network back online — draining queue…');
+        appLogger.debug('OfflineQueue: network back online — draining queue…');
         drain();
       }
     });
@@ -163,4 +165,5 @@ class OfflineQueueRepository {
   }
 }
 
-OfflineQueueRepository get offlineQueueRepository => locator<OfflineQueueRepository>();
+OfflineQueueRepository get offlineQueueRepository =>
+    locator<OfflineQueueRepository>();

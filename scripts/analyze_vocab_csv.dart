@@ -1,8 +1,8 @@
-
 import 'dart:io';
+import 'package:soma/core/services/app_logger.dart';
 
 void main() async {
-  print('--- Vocabulary Analysis ---');
+  appLogger.info('--- Vocabulary Analysis ---');
   final vocabFile = File('assets/vocabulary.csv');
   final vocabLines = await vocabFile.readAsLines();
   if (vocabLines.isNotEmpty) {
@@ -15,7 +15,9 @@ void main() async {
 
     for (var i = 1; i < vocabLines.length; i++) {
       final parts = vocabLines[i].split(',');
-      if (parts.length <= langIndex || parts.length <= conceptIndex || parts.length <= wordIndex) continue;
+      if (parts.length <= langIndex ||
+          parts.length <= conceptIndex ||
+          parts.length <= wordIndex) continue;
 
       final lang = parts[langIndex].trim();
       final word = parts[wordIndex].trim().toLowerCase();
@@ -27,17 +29,21 @@ void main() async {
       langValidConcepts.putIfAbsent(lang, () => <int>{}).add(concept);
     }
 
-    void checkPair(String l1, String l2) {
-      if (langValidConcepts.containsKey(l1) && langValidConcepts.containsKey(l2)) {
-        final common = langValidConcepts[l1]!.intersection(langValidConcepts[l2]!);
-        print('$l1 <-> $l2: ${common.length} common vocabulary concepts');
+    void checkPair(final String l1, final String l2) {
+      if (langValidConcepts.containsKey(l1) &&
+          langValidConcepts.containsKey(l2)) {
+        final common =
+            langValidConcepts[l1]!.intersection(langValidConcepts[l2]!);
+        appLogger
+            .info('$l1 <-> $l2: ${common.length} common vocabulary concepts');
       }
     }
+
     checkPair('en', 'de');
     checkPair('en', 'es');
   }
 
-  print('\n--- Sentences Analysis ---');
+  appLogger.info('\n--- Sentences Analysis ---');
   final sentFile = File('assets/sentences.csv');
   final sentLines = await sentFile.readAsLines();
   if (sentLines.isNotEmpty) {
@@ -50,7 +56,9 @@ void main() async {
 
     for (var i = 1; i < sentLines.length; i++) {
       final parts = sentLines[i].split(',');
-      if (parts.length <= langIndex || parts.length <= conceptIndex || parts.length <= textIndex) continue;
+      if (parts.length <= langIndex ||
+          parts.length <= conceptIndex ||
+          parts.length <= textIndex) continue;
 
       final lang = parts[langIndex].trim();
       final text = parts[textIndex].trim().toLowerCase();
@@ -62,12 +70,16 @@ void main() async {
       langValidConcepts.putIfAbsent(lang, () => <int>{}).add(concept);
     }
 
-    void checkPair(String l1, String l2) {
-      if (langValidConcepts.containsKey(l1) && langValidConcepts.containsKey(l2)) {
-        final common = langValidConcepts[l1]!.intersection(langValidConcepts[l2]!);
-        print('$l1 <-> $l2: ${common.length} common sentence concepts');
+    void checkPair(final String l1, final String l2) {
+      if (langValidConcepts.containsKey(l1) &&
+          langValidConcepts.containsKey(l2)) {
+        final common =
+            langValidConcepts[l1]!.intersection(langValidConcepts[l2]!);
+        appLogger
+            .info('$l1 <-> $l2: ${common.length} common sentence concepts');
       }
     }
+
     checkPair('en', 'de');
     checkPair('en', 'es');
   }

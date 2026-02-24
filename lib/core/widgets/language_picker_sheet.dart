@@ -56,7 +56,9 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
     final filtered = normalized.isEmpty
         ? widget.items
         : widget.items
-            .where((final e) => e.name.toLowerCase().contains(normalized) || e.code.toLowerCase().contains(normalized))
+            .where((final e) =>
+                e.name.toLowerCase().contains(normalized) ||
+                e.code.toLowerCase().contains(normalized))
             .toList();
     final maxHeight = MediaQuery.of(context).size.height * 0.75;
 
@@ -77,7 +79,9 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                     Text(
                       widget.title,
                       style: TextStyle(
-                        color: widget.darkModeStyle ? Colors.white : scheme.onSurface,
+                        color: widget.darkModeStyle
+                            ? Colors.white
+                            : scheme.onSurface,
                         fontWeight: FontWeight.w900,
                         fontSize: 16,
                       ),
@@ -86,15 +90,23 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                     IconButton(
                       onPressed: _toggleSearch,
                       icon: Icon(
-                        _showSearch ? Icons.search_off_rounded : Icons.search_rounded,
-                        color: (widget.darkModeStyle ? Colors.white : scheme.onSurface).withValues(alpha: 0.85),
+                        _showSearch
+                            ? Icons.search_off_rounded
+                            : Icons.search_rounded,
+                        color: (widget.darkModeStyle
+                                ? Colors.white
+                                : scheme.onSurface)
+                            .withValues(alpha: 0.85),
                       ),
                     ),
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: Icon(
                         Icons.close_rounded,
-                        color: (widget.darkModeStyle ? Colors.white : scheme.onSurface).withValues(alpha: 0.85),
+                        color: (widget.darkModeStyle
+                                ? Colors.white
+                                : scheme.onSurface)
+                            .withValues(alpha: 0.85),
                       ),
                     ),
                   ],
@@ -112,8 +124,11 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                               ? scheme.onSurface.withValues(alpha: 0.08)
                               : T.fieldFill,
                       border: Border.all(
-                        color: (widget.darkModeStyle ? Colors.white : scheme.onSurface)
-                            .withValues(alpha: widget.darkModeStyle ? 0.12 : 0.2),
+                        color: (widget.darkModeStyle
+                                ? Colors.white
+                                : scheme.onSurface)
+                            .withValues(
+                                alpha: widget.darkModeStyle ? 0.12 : 0.2),
                       ),
                     ),
                     child: TextField(
@@ -121,20 +136,29 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                       autofocus: true,
                       onChanged: (final v) => setState(() => _query = v),
                       style: TextStyle(
-                        color: widget.darkModeStyle ? Colors.white : scheme.onSurface,
+                        color: widget.darkModeStyle
+                            ? Colors.white
+                            : scheme.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
-                      cursorColor: widget.darkModeStyle ? Colors.white : scheme.primary,
+                      cursorColor:
+                          widget.darkModeStyle ? Colors.white : scheme.primary,
                       textInputAction: TextInputAction.search,
                       decoration: InputDecoration(
                         hintText: widget.searchHint,
                         hintStyle: TextStyle(
-                          color: (widget.darkModeStyle ? Colors.white : scheme.onSurface).withValues(alpha: 0.5),
+                          color: (widget.darkModeStyle
+                                  ? Colors.white
+                                  : scheme.onSurface)
+                              .withValues(alpha: 0.5),
                         ),
                         border: InputBorder.none,
                         prefixIcon: Icon(
                           Icons.search_rounded,
-                          color: (widget.darkModeStyle ? Colors.white : scheme.onSurface).withValues(alpha: 0.7),
+                          color: (widget.darkModeStyle
+                                  ? Colors.white
+                                  : scheme.onSurface)
+                              .withValues(alpha: 0.7),
                         ),
                       ),
                     ),
@@ -147,7 +171,10 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                     child: Text(
                       widget.noMatchesText,
                       style: TextStyle(
-                        color: (widget.darkModeStyle ? Colors.white : scheme.onSurface).withValues(alpha: 0.7),
+                        color: (widget.darkModeStyle
+                                ? Colors.white
+                                : scheme.onSurface)
+                            .withValues(alpha: 0.7),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -155,7 +182,8 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                 else
                   ...filtered.map((final e) {
                     final selected = e.code == widget.current.code;
-                    final baseColor = widget.darkModeStyle ? Colors.white : scheme.onSurface;
+                    final baseColor =
+                        widget.darkModeStyle ? Colors.white : scheme.onSurface;
                     return InkWell(
                       borderRadius: BorderRadius.circular(16),
                       onTap: () => Navigator.pop(context, e),
@@ -166,12 +194,25 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           color: selected
-                              ? (widget.darkModeStyle ? Colors.white : scheme.primary).withValues(alpha: widget.darkModeStyle ? 0.10 : 0.15)
-                              : (widget.darkModeStyle ? Colors.black : scheme.onSurface).withValues(alpha: 0.10),
+                              ? (widget.darkModeStyle
+                                      ? Colors.white
+                                      : scheme.primary)
+                                  .withValues(
+                                      alpha: widget.darkModeStyle ? 0.10 : 0.15)
+                              : (widget.darkModeStyle
+                                      ? Colors.black
+                                      : scheme.onSurface)
+                                  .withValues(alpha: 0.10),
                           border: Border.all(
                             color: selected
-                                ? (widget.darkModeStyle ? Colors.white : scheme.primary).withValues(alpha: widget.darkModeStyle ? 0.26 : 0.5)
-                                : baseColor.withValues(alpha: widget.darkModeStyle ? 0.10 : 0.15),
+                                ? (widget.darkModeStyle
+                                        ? Colors.white
+                                        : scheme.primary)
+                                    .withValues(
+                                        alpha:
+                                            widget.darkModeStyle ? 0.26 : 0.5)
+                                : baseColor.withValues(
+                                    alpha: widget.darkModeStyle ? 0.10 : 0.15),
                           ),
                         ),
                         child: Row(
@@ -180,7 +221,9 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                               child: Text(
                                 e.name,
                                 style: TextStyle(
-                                  color: widget.darkModeStyle ? Colors.white : scheme.onSurface,
+                                  color: widget.darkModeStyle
+                                      ? Colors.white
+                                      : scheme.onSurface,
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
@@ -188,7 +231,9 @@ class _LanguagePickerSheetState extends State<LanguagePickerSheet> {
                             if (selected)
                               Icon(
                                 Icons.check_rounded,
-                                color: widget.darkModeStyle ? Colors.white.withValues(alpha: 0.9) : scheme.primary,
+                                color: widget.darkModeStyle
+                                    ? Colors.white.withValues(alpha: 0.9)
+                                    : scheme.primary,
                               ),
                           ],
                         ),

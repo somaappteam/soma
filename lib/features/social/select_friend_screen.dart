@@ -37,12 +37,14 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
     final data = await socialRepository.getFriends();
     if (!mounted) return;
     setState(() {
-      _friends = data.map((final d) => Friend(
-        id: d['id'],
-        username: d['username'] ?? l10n.userFallbackName,
-        subtitle: d['location'], // or bio
-        status: FriendStatus.friend,
-      )).toList();
+      _friends = data
+          .map((final d) => Friend(
+                id: d['id'],
+                username: d['username'] ?? l10n.userFallbackName,
+                subtitle: d['location'], // or bio
+                status: FriendStatus.friend,
+              ))
+          .toList();
       _isLoading = false;
     });
   }
@@ -57,116 +59,141 @@ class _SelectFriendScreenState extends State<SelectFriendScreen> {
 
     return Scaffold(
       body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    _IconGlass(
-                      icon: Icons.arrow_back_ios_new_rounded,
-                      onTap: () => Navigator.pop(context),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  _IconGlass(
+                    icon: Icons.arrow_back_ios_new_rounded,
+                    onTap: () => Navigator.pop(context),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    l10n.newMessageTitle,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
                     ),
-                    const SizedBox(width: 12),
-                      Text(
-                      l10n.newMessageTitle,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 14),
+
+              // Search
+              Glass(
+                radius: BorderRadius.circular(20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: Row(
+                  children: [
+                    Icon(Icons.search_rounded,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        onChanged: (final v) => setState(() => query = v),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w700),
+                        cursorColor: Theme.of(context).colorScheme.primary,
+                        decoration: InputDecoration(
+                          hintText: l10n.searchFriendsHint,
+                          hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.45)),
+                          border: InputBorder.none,
+                          isDense: true,
+                        ),
                       ),
                     ),
+                    if (query.isNotEmpty)
+                      GestureDetector(
+                        onTap: () => setState(() => query = ''),
+                        child: Icon(Icons.close_rounded,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7)),
+                      ),
                   ],
                 ),
+              ),
 
-                const SizedBox(height: 14),
+              const SizedBox(height: 14),
 
-                // Search
-                Glass(
-                  radius: BorderRadius.circular(20),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  child: Row(
-                    children: [
-                      Icon(Icons.search_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: TextField(
-                          onChanged: (final v) => setState(() => query = v),
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w700),
-                          cursorColor: Theme.of(context).colorScheme.primary,
-                          decoration: InputDecoration(
-                            hintText: l10n.searchFriendsHint,
-                            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45)),
-                            border: InputBorder.none,
-                            isDense: true,
-                          ),
-                        ),
-                      ),
-                      if (query.isNotEmpty)
-                        GestureDetector(
-                          onTap: () => setState(() => query = ''),
-                          child: Icon(Icons.close_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
-                        ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                Expanded(
-                  child: _isLoading 
-                    ? const Center(child: CircularProgressIndicator(color: Color(0xFF2AFADF)))
+              Expanded(
+                child: _isLoading
+                    ? const Center(
+                        child:
+                            CircularProgressIndicator(color: Color(0xFF2AFADF)))
                     : filtered.isEmpty
-                      ? Glass(
-                          radius: BorderRadius.circular(22),
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            query.isEmpty ? l10n.friendsEmptyShort : l10n.noMatchForQuery(query),
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
-                              fontWeight: FontWeight.w700,
+                        ? Glass(
+                            radius: BorderRadius.circular(22),
+                            padding: const EdgeInsets.all(16),
+                            child: Text(
+                              query.isEmpty
+                                  ? l10n.friendsEmptyShort
+                                  : l10n.noMatchForQuery(query),
+                              style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.75),
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                          ),
-                        )
-                      : Glass(
-                          radius: BorderRadius.circular(22),
-                          padding: const EdgeInsets.all(12),
-                          child: StreamBuilder<Map<String, bool>>(
-                            stream: presenceRepository.streamMultipleOnlineStatuses(
-                              filtered.map((final f) => f.id).toList(),
-                            ),
-                            builder: (final context, final presenceSnapshot) {
-                              final onlineStatuses = presenceSnapshot.data ?? {};
-                              return ListView(
-                                physics: const BouncingScrollPhysics(),
-                                children: filtered.map((final f) {
-                                  return _PickRow(
-                                    friend: f,
-                                    isOnline: onlineStatuses[f.id] ?? false,
-                                    onTap: () {
-                                      // Start chat
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (final _) => DmChatScreen(
-                                            meId: socialRepository.currentUserId ?? 'me',
-                                            otherId: f.id,
-                                            otherName: f.username,
+                          )
+                        : Glass(
+                            radius: BorderRadius.circular(22),
+                            padding: const EdgeInsets.all(12),
+                            child: StreamBuilder<Map<String, bool>>(
+                              stream: presenceRepository
+                                  .streamMultipleOnlineStatuses(
+                                filtered.map((final f) => f.id).toList(),
+                              ),
+                              builder: (final context, final presenceSnapshot) {
+                                final onlineStatuses =
+                                    presenceSnapshot.data ?? {};
+                                return ListView(
+                                  physics: const BouncingScrollPhysics(),
+                                  children: filtered.map((final f) {
+                                    return _PickRow(
+                                      friend: f,
+                                      isOnline: onlineStatuses[f.id] ?? false,
+                                      onTap: () {
+                                        // Start chat
+                                        Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (final _) => DmChatScreen(
+                                              meId: socialRepository
+                                                      .currentUserId ??
+                                                  'me',
+                                              otherId: f.id,
+                                              otherName: f.username,
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                }).toList(),
-                              );
-                            },
+                                        );
+                                      },
+                                    );
+                                  }).toList(),
+                                );
+                              },
+                            ),
                           ),
-                        ),
-                ),
-
-              ],
-            ),
+              ),
+            ],
           ),
+        ),
       ),
     );
   }
@@ -187,7 +214,11 @@ class _IconGlass extends StatelessWidget {
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92)),
+        child: Icon(icon,
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.92)),
       ),
     );
   }
@@ -249,7 +280,8 @@ class _PickRow extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: scheme.onSurface.withValues(alpha: 0.5)),
+              Icon(Icons.chevron_right_rounded,
+                  color: scheme.onSurface.withValues(alpha: 0.5)),
             ],
           ),
         ),
@@ -278,7 +310,8 @@ class _AvatarDot extends StatelessWidget {
           Center(
             child: Text(
               '🙂',
-              style: TextStyle(fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
+              style: TextStyle(
+                  fontSize: 18, color: scheme.onSurface.withValues(alpha: 0.9)),
             ),
           ),
           Positioned(
@@ -289,8 +322,11 @@ class _AvatarDot extends StatelessWidget {
               height: 10,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: online ? const Color(0xFF58F7B6) : scheme.onSurface.withValues(alpha: 0.25),
-                border: Border.all(color: scheme.surface, width: 2), // border matches bg
+                color: online
+                    ? const Color(0xFF58F7B6)
+                    : scheme.onSurface.withValues(alpha: 0.25),
+                border: Border.all(
+                    color: scheme.surface, width: 2), // border matches bg
               ),
             ),
           ),

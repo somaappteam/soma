@@ -64,9 +64,16 @@ class _PressableScaleState extends State<PressableScale> {
       onTapUp: enabled ? (final _) => _setPressed(false) : null,
       onTapCancel: enabled ? () => _setPressed(false) : null,
       child: widget.child,
-    ).animate(target: _pressed && enabled ? 1 : 0)
-     .scaleXY(end: widget.pressedScale, duration: effectiveDuration, curve: effectiveCurve)
-     .tint(color: isLight ? Colors.black : Colors.white, end: 0.05, duration: effectiveDuration);
+    )
+        .animate(target: _pressed && enabled ? 1 : 0)
+        .scaleXY(
+            end: widget.pressedScale,
+            duration: effectiveDuration,
+            curve: effectiveCurve)
+        .tint(
+            color: isLight ? Colors.black : Colors.white,
+            end: 0.05,
+            duration: effectiveDuration);
 
     if (widget.semanticLabel != null || widget.isButton) {
       core = Semantics(

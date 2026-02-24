@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SessionTracker {
@@ -66,8 +67,7 @@ class SessionTracker {
     try {
       await _supabase
           .from('user_sessions')
-          .update({'is_current': false})
-          .eq('user_id', userId);
+          .update({'is_current': false}).eq('user_id', userId);
 
       await _supabase.from('user_sessions').upsert({
         'user_id': userId,
@@ -78,7 +78,7 @@ class SessionTracker {
         'is_current': true,
       }, onConflict: 'user_id, device_id');
     } catch (e) {
-      debugPrint('Failed to upsert session: $e');
+      appLogger.debug('Failed to upsert session: $e');
     }
   }
 }

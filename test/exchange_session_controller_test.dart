@@ -103,10 +103,10 @@ void main() {
     expect(controller.requestStatus, 'declined');
   });
 
-
   test('pending request becomes expired after ttl when ticking', () async {
     SharedPreferences.setMockInitialValues({
-      'exchange_session_expire': '{"requestStatus":"pending","requestCreatedAt":"2000-01-01T00:00:00.000Z","turnStartedAt":"2000-01-01T00:00:00.000Z"}',
+      'exchange_session_expire':
+          '{"requestStatus":"pending","requestCreatedAt":"2000-01-01T00:00:00.000Z","turnStartedAt":"2000-01-01T00:00:00.000Z"}',
     });
     final controller = ExchangeSessionController(
       partnerName: 'Alex',
@@ -123,7 +123,8 @@ void main() {
 
   test('hydrate restores accepted request status', () async {
     SharedPreferences.setMockInitialValues({
-      'exchange_session_hydrate': '{"requestStatus":"accepted","activeLanguageCode":"es","turnStartedAt":"2030-01-01T00:00:00.000Z"}',
+      'exchange_session_hydrate':
+          '{"requestStatus":"accepted","activeLanguageCode":"es","turnStartedAt":"2030-01-01T00:00:00.000Z"}',
     });
     final controller = ExchangeSessionController(
       partnerName: 'Alex',
@@ -140,7 +141,8 @@ void main() {
 
   test('turn timeout auto-skip triggers when timer elapsed', () async {
     SharedPreferences.setMockInitialValues({
-      'exchange_session_timeout': '{"requestStatus":"accepted","isMyTurn":true,"turnStartedAt":"2000-01-01T00:00:00.000Z"}',
+      'exchange_session_timeout':
+          '{"requestStatus":"accepted","isMyTurn":true,"turnStartedAt":"2000-01-01T00:00:00.000Z"}',
     });
     final controller = ExchangeSessionController(
       partnerName: 'Alex',
@@ -155,5 +157,4 @@ void main() {
     expect(skipped, isTrue);
     expect(controller.isMyTurn, isFalse);
   });
-
 }

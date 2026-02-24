@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
 import 'package:soma/core/database/database_helper.dart';
 import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/data/offline_queue_repository.dart';
 import 'package:soma/models/user_stats.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -17,7 +17,7 @@ class StatsRepository {
       final local = await DatabaseHelper.instance.getUserStats(uid);
       if (local != null) return UserStats.fromRow(local);
     } catch (e) {
-      debugPrint('Local stats fetch failed: $e');
+      appLogger.debug('Local stats fetch failed: $e');
     }
 
     final row = await _supabase
@@ -83,15 +83,15 @@ class StatsRepository {
       longest = streak > currentLongest ? streak : currentLongest;
     }
 
-    final totalQuizzes   = (existing?['total_quizzes']   ?? 0) + 1;
-    final totalCorrect   = (existing?['total_correct']   ?? 0) + correctCount;
+    final totalQuizzes = (existing?['total_quizzes'] ?? 0) + 1;
+    final totalCorrect = (existing?['total_correct'] ?? 0) + correctCount;
     final totalQuestions = (existing?['total_questions'] ?? 0) + totalCount;
     final perfectQuizzes = (existing?['perfect_quizzes'] ?? 0) +
         ((totalCount > 0 && correctCount == totalCount) ? 1 : 0);
 
     final winThreshold = (totalCount * 0.7).ceil();
     final didWin = totalCount > 0 && correctCount >= winThreshold;
-    final totalWins     = (existing?['total_wins']     ?? 0) + (didWin ? 1 : 0);
+    final totalWins = (existing?['total_wins'] ?? 0) + (didWin ? 1 : 0);
     final circlesJoined = (existing?['circles_joined'] ?? 0) as int;
 
     final payload = {
@@ -112,7 +112,7 @@ class StatsRepository {
     try {
       await DatabaseHelper.instance.upsertUserStats(payload);
     } catch (e) {
-      debugPrint('StatsRepository: local write failed – $e');
+      appLogger.debug('StatsRepository: local write failed – $e');
     }
 
     // ── Cloud in background: fire-and-forget, enqueue on failure. ───────────
@@ -152,7 +152,7 @@ class StatsRepository {
     try {
       await DatabaseHelper.instance.upsertUserStats(payload);
     } catch (e) {
-      debugPrint('StatsRepository: local write (circles) failed – $e');
+      appLogger.debug('StatsRepository: local write (circles) failed – $e');
     }
 
     // Cloud in background.
@@ -168,9 +168,10 @@ class StatsRepository {
         .from(table)
         .upsert(payload, onConflict: 'user_id')
         .then((final _) {
-      debugPrint('StatsRepository: cloud sync OK for $table');
+      appLogger.debug('StatsRepository: cloud sync OK for $table');
     }).catchError((final e) {
-      debugPrint('StatsRepository: cloud sync failed for $table – $e. Enqueuing.');
+      appLogger.debug(
+          'StatsRepository: cloud sync failed for $table – $e. Enqueuing.');
       offlineQueueRepository.enqueue(
         tableName: table,
         operation: 'UPSERT',

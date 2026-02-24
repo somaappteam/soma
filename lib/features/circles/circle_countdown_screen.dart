@@ -9,7 +9,6 @@ import 'package:soma/data/profile_store.dart';
 import 'package:soma/data/rtc_voice_service.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 
-
 class CircleCountdownScreen extends StatefulWidget {
   final int seconds;
   final VoidCallback onFinished;
@@ -60,77 +59,81 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            ...rtcVoiceService.activeRenderers.map((final renderer) => Positioned(
-                  left: 0,
-                  top: 0,
-                  width: 1,
-                  height: 1,
-                  child: SizedBox(
-                    width: 1,
-                    height: 1,
-                    child: RTCVideoView(
-                      renderer,
-                      objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                    ),
-                  ),
-                )),
+            ...rtcVoiceService.activeRenderers
+                .map((final renderer) => Positioned(
+                      left: 0,
+                      top: 0,
+                      width: 1,
+                      height: 1,
+                      child: SizedBox(
+                        width: 1,
+                        height: 1,
+                        child: RTCVideoView(
+                          renderer,
+                          objectFit:
+                              RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                        ),
+                      ),
+                    )),
             ResponsiveFrame(
-            alignment: Alignment.center,
-            maxWidth: 420,
-            child: Center(
-              child: Glass(
-                radius: BorderRadius.circular(28),
-                padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 28),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      l10n.circleCountdownTitle,
-                      style: TextStyle(
-                        color: scheme.onSurface.withValues(alpha: 0.92),
-                        fontWeight: FontWeight.w900,
-                        fontSize: 18,
+              alignment: Alignment.center,
+              maxWidth: 420,
+              child: Center(
+                child: Glass(
+                  radius: BorderRadius.circular(28),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 26, vertical: 28),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        l10n.circleCountdownTitle,
+                        style: TextStyle(
+                          color: scheme.onSurface.withValues(alpha: 0.92),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 18,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      '$_t',
-                      style: TextStyle(
-                        color: scheme.onSurface,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 72,
-                        height: 1.0,
-                        letterSpacing: 1.0,
+                      const SizedBox(height: 14),
+                      Text(
+                        '$_t',
+                        style: TextStyle(
+                          color: scheme.onSurface,
+                          fontWeight: FontWeight.w900,
+                          fontSize: 72,
+                          height: 1.0,
+                          letterSpacing: 1.0,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      l10n.circleCountdownSubtitle,
-                      style: TextStyle(
-                        color: scheme.onSurface.withValues(alpha: 0.72),
-                        fontWeight: FontWeight.w800,
-                        fontSize: 13,
+                      const SizedBox(height: 10),
+                      Text(
+                        l10n.circleCountdownSubtitle,
+                        style: TextStyle(
+                          color: scheme.onSurface.withValues(alpha: 0.72),
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    if (widget.circleId != null)
-                      StreamBuilder<Map<String, VoicePresence>>(
-                        stream: circleVoiceService.stream,
-                        builder: (final context, final snapshot) {
-                          final me = circleVoiceService.me;
-                          return _MicToggleButton(
-                            muted: me?.muted ?? false,
-                            speaking: me?.speaking ?? false,
-                            onTap: rtcVoiceService.toggleMuted,
-                          );
-                        },
-                      ),
-                    const SizedBox(height: 14),
-                    _GlowBar(progress: (widget.seconds - _t) / widget.seconds),
-                  ],
+                      const SizedBox(height: 16),
+                      if (widget.circleId != null)
+                        StreamBuilder<Map<String, VoicePresence>>(
+                          stream: circleVoiceService.stream,
+                          builder: (final context, final snapshot) {
+                            final me = circleVoiceService.me;
+                            return _MicToggleButton(
+                              muted: me?.muted ?? false,
+                              speaking: me?.speaking ?? false,
+                              onTap: rtcVoiceService.toggleMuted,
+                            );
+                          },
+                        ),
+                      const SizedBox(height: 14),
+                      _GlowBar(
+                          progress: (widget.seconds - _t) / widget.seconds),
+                    ],
+                  ),
                 ),
               ),
-            ),
             ),
           ],
         ),
@@ -154,10 +157,13 @@ class _CircleCountdownScreenState extends State<CircleCountdownScreen> {
     final profile = profileStore.profile;
     final name = profile.displayName.isNotEmpty
         ? profile.displayName
-        : (profile.username.isNotEmpty ? profile.username : l10n.userFallbackName);
+        : (profile.username.isNotEmpty
+            ? profile.username
+            : l10n.userFallbackName);
 
     await circleVoiceService.connect(circleId: circleId, name: name);
-    await rtcVoiceService.connect(circleId: circleId, asSpeaker: true, prioritySpeaker: true);
+    await rtcVoiceService.connect(
+        circleId: circleId, asSpeaker: true, prioritySpeaker: true);
   }
 }
 
@@ -173,7 +179,11 @@ class _GlowBar extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.16)),
+        border: Border.all(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.16)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(999),
@@ -184,7 +194,11 @@ class _GlowBar extends StatelessWidget {
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF2AFADF), Color(0xFF7C7CFF), Color(0xFFFF4FD8)],
+                  colors: [
+                    Color(0xFF2AFADF),
+                    Color(0xFF7C7CFF),
+                    Color(0xFFFF4FD8)
+                  ],
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -241,7 +255,8 @@ class _MicToggleButton extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(muted ? Icons.mic_off_rounded : Icons.mic_rounded, color: color, size: 18),
+            Icon(muted ? Icons.mic_off_rounded : Icons.mic_rounded,
+                color: color, size: 18),
             const SizedBox(width: 8),
             Text(
               label,

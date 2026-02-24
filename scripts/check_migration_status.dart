@@ -1,3 +1,4 @@
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
@@ -7,8 +8,8 @@ const String serviceRoleKey =
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
 
-  print('=== FULL MIGRATION STATUS CHECK ===');
-  print('');
+  appLogger.info('=== FULL MIGRATION STATUS CHECK ===');
+  appLogger.info('');
 
   // 1. Check all tables exist and get sample counts
   final tables = [
@@ -29,10 +30,10 @@ void main() async {
     'notifications',
   ];
 
-  print('--- TABLE STATUS ---');
+  appLogger.info('--- TABLE STATUS ---');
   final missing = <String>[];
   final existing = <String>[];
-  
+
   for (final table in tables) {
     try {
       final result = await client.from(table).select().limit(3);
@@ -47,41 +48,41 @@ void main() async {
     }
   }
 
-  print('');
-  print('EXISTING TABLES:');
+  appLogger.info('');
+  appLogger.info('EXISTING TABLES:');
   for (final t in existing) {
-    print('  ✅ $t');
+    appLogger.info('  ✅ $t');
   }
-  
-  print('');
-  print('MISSING TABLES:');
+
+  appLogger.info('');
+  appLogger.info('MISSING TABLES:');
   if (missing.isEmpty) {
-    print('  None!');
+    appLogger.info('  None!');
   } else {
     for (final t in missing) {
-      print('  ❌ $t');
+      appLogger.info('  ❌ $t');
     }
   }
 
-  print('');
-  print('--- DATA COUNTS ---');
-  
+  appLogger.info('');
+  appLogger.info('--- DATA COUNTS ---');
+
   // Check vocabulary
   try {
     final vocab = await client.from('vocabulary').select('voca_id');
-    print('Vocabulary: ${vocab.length} rows');
+    appLogger.info('Vocabulary: ${vocab.length} rows');
   } catch (e) {
-    print('Vocabulary: ERROR');
+    appLogger.info('Vocabulary: ERROR');
   }
 
   // Check sentences
   try {
     final sent = await client.from('sentences').select('sentence_id');
-    print('Sentences: ${sent.length} rows');
+    appLogger.info('Sentences: ${sent.length} rows');
   } catch (e) {
-    print('Sentences: ERROR');
+    appLogger.info('Sentences: ERROR');
   }
 
-  print('');
-  print('=== DONE ===');
+  appLogger.info('');
+  appLogger.info('=== DONE ===');
 }

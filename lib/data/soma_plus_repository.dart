@@ -4,17 +4,17 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/data/settings_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // ─── Product IDs (must match App Store Connect / Play Console) ───────────────
-const kIapPlusMonthly  = 'soma_plus_monthly';
-const kIapPlusAnnual   = 'soma_plus_annual';
-const kIapProMonthly   = 'soma_pro_monthly';
-const kIapProAnnual    = 'soma_pro_annual';
+const kIapPlusMonthly = 'soma_plus_monthly';
+const kIapPlusAnnual = 'soma_plus_annual';
+const kIapProMonthly = 'soma_pro_monthly';
+const kIapProAnnual = 'soma_pro_annual';
 
 enum SomaSubscriptionTier { free, plus, pro }
-
 
 class DmPlanLimits {
   final int maxImageBytes;
@@ -155,7 +155,8 @@ const List<SomaSubscriptionPlan> kSomaSubscriptionPlans = [
       firstResponseHours: 24,
       is24x7: false,
       channels: 'chat/email',
-      scope: 'First response in business days; resolution time varies by issue type.',
+      scope:
+          'First response in business days; resolution time varies by issue type.',
     ),
     features: [
       'No Ads',
@@ -198,7 +199,8 @@ const List<SomaSubscriptionPlan> kSomaSubscriptionPlans = [
       firstResponseHours: 2,
       is24x7: true,
       channels: 'chat/email',
-      scope: 'First response target is 24/7; severity P1 updates every 2 hours.',
+      scope:
+          'First response target is 24/7; severity P1 updates every 2 hours.',
     ),
     coaching: SomaPlanCoaching(
       sessionsPerMonth: 2,
@@ -316,16 +318,17 @@ class SomaPlusRepository {
     _stateNotifier.value = _fromSettings(settings);
 
     _subscription?.cancel();
-    _subscription = settingsRepository.getSettingsStream().listen((final settings) {
+    _subscription =
+        settingsRepository.getSettingsStream().listen((final settings) {
       _stateNotifier.value = _fromSettings(settings);
     });
 
     // Start IAP purchase stream (mobile only).
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       _iapSub?.cancel();
-      _iapSub = InAppPurchase.instance.purchaseStream
-          .listen(_onPurchaseUpdate, onError: (final e) {
-        debugPrint('SomaPlusRepository: IAP stream error – $e');
+      _iapSub = InAppPurchase.instance.purchaseStream.listen(_onPurchaseUpdate,
+          onError: (final e) {
+        appLogger.debug('SomaPlusRepository: IAP stream error – $e');
       });
     }
 
@@ -338,7 +341,8 @@ class SomaPlusRepository {
     _iapSub?.cancel();
   }
 
-  bool get isSomaPlus => _stateNotifier.value.isActive && !_stateNotifier.value.isExpired;
+  bool get isSomaPlus =>
+      _stateNotifier.value.isActive && !_stateNotifier.value.isExpired;
 
   static SomaSubscriptionTier parseTier(final String? rawValue) {
     final value = (rawValue ?? '').trim().toLowerCase();
@@ -375,7 +379,8 @@ class SomaPlusRepository {
     });
   }
 
-  Future<void> setTier(final SomaSubscriptionTier tier, {final DateTime? expiresAt}) async {
+  Future<void> setTier(final SomaSubscriptionTier tier,
+      {final DateTime? expiresAt}) async {
     await settingsRepository.updateSettings({
       'plus_plan': serializeTier(tier),
       'plus_enabled': tier != SomaSubscriptionTier.free,
@@ -396,10 +401,10 @@ class SomaPlusRepository {
     final enabled = settings['plus_enabled'] == true;
     final trialStartedAt =
         DateTime.tryParse(settings['plus_trial_started_at']?.toString() ?? '');
-    final expiresAt = DateTime.tryParse(settings['plus_expires_at']?.toString() ?? '');
+    final expiresAt =
+        DateTime.tryParse(settings['plus_expires_at']?.toString() ?? '');
 
-    final isActive =
-        tier != SomaSubscriptionTier.free &&
+    final isActive = tier != SomaSubscriptionTier.free &&
         enabled &&
         (expiresAt == null || DateTime.now().isBefore(expiresAt));
 
@@ -416,20 +421,20 @@ class SomaPlusRepository {
   /// Initiates a purchase for the given [productId].
   Future<void> purchaseProduct(final String productId) async {
     if (kIsWeb || !(Platform.isAndroid || Platform.isIOS)) {
-      debugPrint('SomaPlusRepository: IAP not supported on this platform');
+      appLogger.debug('SomaPlusRepository: IAP not supported on this platform');
       return;
     }
 
     final available = await InAppPurchase.instance.isAvailable();
     if (!available) {
-      debugPrint('SomaPlusRepository: IAP not available');
+      appLogger.debug('SomaPlusRepository: IAP not available');
       return;
     }
 
-    final response = await InAppPurchase.instance
-        .queryProductDetails({productId});
+    final response =
+        await InAppPurchase.instance.queryProductDetails({productId});
     if (response.productDetails.isEmpty) {
-      debugPrint('SomaPlusRepository: product not found – $productId');
+      appLogger.debug('SomaPlusRepository: product not found – $productId');
       return;
     }
 
@@ -454,8 +459,8 @@ class SomaPlusRepository {
           await _verifyPurchaseWithServer(purchase);
           await InAppPurchase.instance.completePurchase(purchase);
         case PurchaseStatus.error:
-          debugPrint(
-              'SomaPlusRepository: purchase error – ${purchase.error}');
+          appLogger
+              .debug('SomaPlusRepository: purchase error – ${purchase.error}');
           if (purchase.pendingCompletePurchase) {
             await InAppPurchase.instance.completePurchase(purchase);
           }
@@ -485,12 +490,12 @@ class SomaPlusRepository {
         final tier = parseTier(data!['tier']?.toString());
         final expiry = DateTime.tryParse(data['expiresAt']?.toString() ?? '');
         await setTier(tier, expiresAt: expiry);
-        debugPrint('SomaPlusRepository: purchase verified – tier=$tier');
+        appLogger.debug('SomaPlusRepository: purchase verified – tier=$tier');
       } else {
-        debugPrint('SomaPlusRepository: receipt rejected by server');
+        appLogger.debug('SomaPlusRepository: receipt rejected by server');
       }
     } catch (e) {
-      debugPrint('SomaPlusRepository: server verification failed – $e');
+      appLogger.debug('SomaPlusRepository: server verification failed – $e');
     }
   }
 
@@ -509,21 +514,24 @@ class SomaPlusRepository {
       final data = response.data as Map<String, dynamic>?;
       if (data == null) return;
 
-      final serverTier    = parseTier(data['tier']?.toString());
-      final serverActive  = data['isActive'] == true;
-      final serverExpiry  = DateTime.tryParse(data['expiresAt']?.toString() ?? '');
-      final localState    = _stateNotifier.value;
+      final serverTier = parseTier(data['tier']?.toString());
+      final serverActive = data['isActive'] == true;
+      final serverExpiry =
+          DateTime.tryParse(data['expiresAt']?.toString() ?? '');
+      final localState = _stateNotifier.value;
 
       // If server says inactive but local thinks active → sync down.
       if (!serverActive && localState.isActive) {
-        debugPrint('SomaPlusRepository: server says subscription expired — revoking locally');
+        appLogger.debug(
+            'SomaPlusRepository: server says subscription expired — revoking locally');
         await cancelPlan();
       } else if (serverActive && serverTier != localState.tier) {
         // Server has a different (upgraded) tier — sync it locally.
         await setTier(serverTier, expiresAt: serverExpiry);
       }
     } catch (e) {
-      debugPrint('SomaPlusRepository: server validation failed (best-effort) – $e');
+      appLogger.debug(
+          'SomaPlusRepository: server validation failed (best-effort) – $e');
     }
   }
 }

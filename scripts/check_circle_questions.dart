@@ -1,3 +1,4 @@
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// Quick script to check if a circle's questions are being stored and retrieved correctly
@@ -9,40 +10,41 @@ void main() async {
   );
 
   final supabase = Supabase.instance.client;
-  
+
   // Fetch the most recent circle
-  print('Fetching most recent circle...');
+  appLogger.info('Fetching most recent circle...');
   final response = await supabase
       .from('circles')
       .select()
       .order('created_at', ascending: false)
       .limit(1)
       .maybeSingle();
-  
+
   if (response == null) {
-    print('No circles found');
+    appLogger.info('No circles found');
     return;
   }
-  
-  print('\n=== Circle Data ===');
-  print('ID: ${response['id']}');
-  print('Name: ${response['name']}');
-  print('Status: ${response['status']}');
-  print('Questions count field: ${response['questions_count']}');
-  print('Questions column exists: ${response.containsKey('questions')}');
-  
+
+  appLogger.info('\n=== Circle Data ===');
+  appLogger.info('ID: ${response['id']}');
+  appLogger.info('Name: ${response['name']}');
+  appLogger.info('Status: ${response['status']}');
+  appLogger.info('Questions count field: ${response['questions_count']}');
+  appLogger
+      .info('Questions column exists: ${response.containsKey('questions')}');
+
   if (response.containsKey('questions')) {
     final questions = response['questions'];
-    print('Questions type: ${questions.runtimeType}');
-    print('Questions value: $questions');
-    
+    appLogger.info('Questions type: ${questions.runtimeType}');
+    appLogger.info('Questions value: $questions');
+
     if (questions is List) {
-      print('Questions array length: ${questions.length}');
+      appLogger.info('Questions array length: ${questions.length}');
       if (questions.isNotEmpty) {
-        print('First question: ${questions.first}');
+        appLogger.info('First question: ${questions.first}');
       }
     }
   } else {
-    print('ERROR: questions column does not exist in response!');
+    appLogger.info('ERROR: questions column does not exist in response!');
   }
 }

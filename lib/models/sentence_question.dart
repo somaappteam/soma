@@ -93,5 +93,6 @@ class SentenceQuestion {
   }
 
   @override
-  String toString() => 'SentenceQuestion(conceptId: $conceptId, prompt: $prompt)';
+  String toString() =>
+      'SentenceQuestion(conceptId: $conceptId, prompt: $prompt)';
 }

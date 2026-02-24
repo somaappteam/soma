@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:soma/core/services/app_logger.dart';
 
 void main() {
   final file = File('lib/features/social/dm_chat_screen.dart');
@@ -37,7 +38,10 @@ void main() {
     // Basic approach: find the method signature, then count braces
     // This regex looks for `[ReturnType] _methodName(` or `_methodName(` or `get _methodName`
     // We strictly look for the method name followed by '(' or '=>'
-    final regex = RegExp(r'(Future<.*?>|String|bool|List<.*?>|void|_CorrectionResult)?\s*' + method + r'\s*\([^)]*\)\s*(async\s*)?\{');
+    final regex = RegExp(
+        r'(Future<.*?>|String|bool|List<.*?>|void|_CorrectionResult)?\s*' +
+            method +
+            r'\s*\([^)]*\)\s*(async\s*)?\{');
     final match = regex.firstMatch(content);
     if (match != null) {
       final int start = match.start;
@@ -70,26 +74,32 @@ void main() {
       }
 
       final int end = idx;
-      print('Removing $method (${end - start} chars)');
+      appLogger.info('Removing $method (${end - start} chars)');
       content = content.replaceRange(start, end, '');
     } else {
       // maybe it's an arrow function like _themeLabel
-      final arrowRegex = RegExp(r'(Future<.*?>|String|bool|List<.*?>|void)?\s*' + method + r'\s*\([^)]*\)\s*=>.*?;', dotAll: true);
+      final arrowRegex = RegExp(
+          r'(Future<.*?>|String|bool|List<.*?>|void)?\s*' +
+              method +
+              r'\s*\([^)]*\)\s*=>.*?;',
+          dotAll: true);
       final arrowMatch = arrowRegex.firstMatch(content);
       if (arrowMatch != null) {
-        print('Removing arrow method $method');
+        appLogger.info('Removing arrow method $method');
         content = content.replaceRange(arrowMatch.start, arrowMatch.end, '');
       } else {
-        print('Could not find $method');
+        appLogger.info('Could not find $method');
       }
     }
   }
 
   // Also strip out 'translatedText' block inside _sendText
-  final translatedTextRegex = RegExp(r'String\? translatedText;.*?// Fallback or ignore\s*}\s*}', dotAll: true);
+  final translatedTextRegex = RegExp(
+      r'String\? translatedText;.*?// Fallback or ignore\s*}\s*}',
+      dotAll: true);
   if (translatedTextRegex.hasMatch(content)) {
     content = content.replaceAll(translatedTextRegex, '');
-    print('Removed translatedText block.');
+    appLogger.info('Removed translatedText block.');
   }
 
   file.writeAsStringSync(content);

@@ -13,7 +13,7 @@ import 'package:soma/features/profile/profile_screen.dart';
 import 'package:soma/l10n/gen/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// ─── Tab definition ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Tab definition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 enum _LeaderboardTab { global, language, friends }
 
@@ -158,7 +158,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
 
     return PremiumScreenScaffold(
       includeHeader: true,
-      title: _weeklyOnly ? 'Weekly · $tabTitle' : tabTitle,
+      title: _weeklyOnly ? 'Weekly Â· $tabTitle' : tabTitle,
       leading: _IconGlass(
         icon: Icons.arrow_back_ios_new_rounded,
         onTap: () => Navigator.pop(context),
@@ -170,7 +170,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
 
           return Column(
             children: [
-              // ── Tab bar ──────────────────────────────────────────────────
+              // â”€â”€ Tab bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               Glass(
                 depth: GlassDepth.l1,
                 radius: BorderRadius.circular(20),
@@ -183,8 +183,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                   ),
                   dividerColor: Colors.transparent,
                   labelColor: scheme.primary,
-                  unselectedLabelColor:
-                      textTones?.muted ?? scheme.onSurface.withValues(alpha: 0.5),
+                  unselectedLabelColor: textTones?.muted ??
+                      scheme.onSurface.withValues(alpha: 0.5),
                   labelStyle: const TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 13,
@@ -201,7 +201,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               ),
               const SizedBox(height: 10),
 
-              // ── Weekly toggle + search row ────────────────────────────────
+              // â”€â”€ Weekly toggle + search row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               Row(
                 children: [
                   // Weekly toggle pill.
@@ -274,7 +274,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                   fontWeight: FontWeight.w700),
                               cursorColor: scheme.onSurface,
                               decoration: InputDecoration(
-                                hintText: 'Search players…',
+                                hintText: 'Search playersâ€¦',
                                 hintStyle: TextStyle(
                                     color: textTones?.muted ??
                                         scheme.onSurface
@@ -303,15 +303,15 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
               ),
               const SizedBox(height: SectionGap.lg),
 
-              // ── List ─────────────────────────────────────────────────────
+              // â”€â”€ List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
               Expanded(
                 child: FutureBuilder<List<Map<String, dynamic>>>(
                   future: _leaderboardFuture,
                   builder: (final context, final snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
-                          child: CircularProgressIndicator(
-                              color: scheme.primary));
+                          child:
+                              CircularProgressIndicator(color: scheme.primary));
                     }
                     if (snapshot.hasError) {
                       return const Center(
@@ -336,14 +336,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                           child: Text(emptyMsg,
                               style: TextStyle(
                                   color: textTones?.muted ??
-                                      scheme.onSurface.withValues(alpha: 0.62))),
+                                      scheme.onSurface
+                                          .withValues(alpha: 0.62))),
                         ),
                       );
                     }
 
                     final userIds = data
-                        .map((final u) =>
-                            (u['id'] ?? u['user_id'])?.toString())
+                        .map((final u) => (u['id'] ?? u['user_id'])?.toString())
                         .whereType<String>()
                         .toList();
 
@@ -357,8 +357,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                       stream: presenceRepository
                           .streamMultipleOnlineStatuses(userIds),
                       builder: (final context, final presenceSnapshot) {
-                        final onlineStatuses =
-                            presenceSnapshot.data ?? {};
+                        final onlineStatuses = presenceSnapshot.data ?? {};
                         return ListView(
                           physics: const BouncingScrollPhysics(),
                           children: [
@@ -370,15 +369,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                             ],
                             ...List.generate(data.length, (final index) {
                               final user = data[index];
-                              final rank =
-                                  user['rank'] ?? (index + 1);
+                              final rank = user['rank'] ?? (index + 1);
                               final isTop3 = rank <= 3;
-                              final avatarUrl =
-                                  user['avatar_url']?.toString();
+                              final avatarUrl = user['avatar_url']?.toString();
                               final displayName =
                                   user['display_name']?.toString();
-                              final username =
-                                  user['username']?.toString();
+                              final username = user['username']?.toString();
                               final userId = user['id']?.toString() ??
                                   user['user_id']?.toString();
                               final name = (displayName != null &&
@@ -387,21 +383,17 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                   : (username?.isNotEmpty == true
                                       ? username!
                                       : l10n.userFallbackName);
-                              final isOnline =
-                                  onlineStatuses[userId] == true;
+                              final isOnline = onlineStatuses[userId] == true;
                               final trend = (rank % 4) - 2;
-                              final streak =
-                                  (user['streak_days'] is int)
-                                      ? user['streak_days'] as int
-                                      : (int.tryParse(user[
-                                                  'streak_days']
-                                              ?.toString() ??
-                                          '') ??
-                                          0);
+                              final streak = (user['streak_days'] is int)
+                                  ? user['streak_days'] as int
+                                  : (int.tryParse(
+                                          user['streak_days']?.toString() ??
+                                              '') ??
+                                      0);
 
                               return Padding(
-                                padding:
-                                    EdgeInsets.only(bottom: listGap),
+                                padding: EdgeInsets.only(bottom: listGap),
                                 child: StaggeredIn(
                                   index: index + 1,
                                   child: PressableScale(
@@ -423,10 +415,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                           ? GlassDepth.l3
                                           : GlassDepth.l2,
                                       radius: BorderRadius.circular(18),
-                                      padding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 12),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 12),
                                       child: Row(
                                         children: [
                                           SizedBox(
@@ -436,14 +426,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                               style: TextStyle(
                                                 color: isTop3
                                                     ? scheme.primary
-                                                    : (textTones
-                                                            ?.muted ??
+                                                    : (textTones?.muted ??
                                                         scheme.onSurface
                                                             .withValues(
-                                                                alpha:
-                                                                    0.52)),
-                                                fontWeight:
-                                                    FontWeight.w900,
+                                                                alpha: 0.52)),
+                                                fontWeight: FontWeight.w900,
                                                 fontSize: 15,
                                               ),
                                             ),
@@ -457,42 +444,35 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                                 Container(
                                                   width: 40,
                                                   height: 40,
-                                                  decoration:
-                                                      BoxDecoration(
-                                                    shape:
-                                                        BoxShape.circle,
-                                                    color: scheme
-                                                        .onSurface
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: scheme.onSurface
                                                         .withValues(
                                                             alpha: 0.08),
                                                   ),
-                                                  child: (avatarUrl !=
-                                                              null &&
+                                                  child: (avatarUrl != null &&
                                                           avatarUrl
                                                               .trim()
                                                               .isNotEmpty)
                                                       ? ClipOval(
-                                                          child: Image
-                                                              .network(
+                                                          child: Image.network(
                                                             avatarUrl,
                                                             width: 40,
                                                             height: 40,
-                                                            fit: BoxFit
-                                                                .cover,
-                                                            errorBuilder:
-                                                                (final _, final __,
-                                                                        final ___) =>
-                                                                    Icon(
-                                                              Icons
-                                                                  .person,
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder: (final _,
+                                                                    final __,
+                                                                    final ___) =>
+                                                                Icon(
+                                                              Icons.person,
                                                               color: scheme
                                                                   .onSurface,
                                                             ),
                                                           ),
                                                         )
                                                       : Icon(Icons.person,
-                                                          color: scheme
-                                                              .onSurface),
+                                                          color:
+                                                              scheme.onSurface),
                                                 ),
                                                 if (isOnline)
                                                   Positioned(
@@ -501,15 +481,13 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                                     child: Container(
                                                       width: 10,
                                                       height: 10,
-                                                      decoration:
-                                                          BoxDecoration(
-                                                        shape:
-                                                            BoxShape.circle,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
                                                         color: const Color(
                                                             0xFF58F7B6),
                                                         border: Border.all(
-                                                            color: scheme
-                                                                .surface,
+                                                            color:
+                                                                scheme.surface,
                                                             width: 2),
                                                       ),
                                                     ),
@@ -521,19 +499,16 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                           Expanded(
                                             child: Column(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment
-                                                      .start,
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
                                                   name,
                                                   maxLines: 1,
-                                                  overflow: TextOverflow
-                                                      .ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: TextStyle(
-                                                    color:
-                                                        scheme.onSurface,
-                                                    fontWeight:
-                                                        FontWeight.w700,
+                                                    color: scheme.onSurface,
+                                                    fontWeight: FontWeight.w700,
                                                     fontSize: 16,
                                                   ),
                                                 ),
@@ -542,8 +517,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                                   children: [
                                                     _RankTrendChip(
                                                         delta: trend),
-                                                    const SizedBox(
-                                                        width: 6),
+                                                    const SizedBox(width: 6),
                                                     if (streak > 0)
                                                       Row(
                                                         children: [
@@ -551,23 +525,22 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                                             Icons
                                                                 .local_fire_department_rounded,
                                                             size: 14,
-                                                            color: scheme
-                                                                .tertiary,
+                                                            color:
+                                                                scheme.tertiary,
                                                           ),
                                                           const SizedBox(
                                                               width: 2),
                                                           Text(
                                                             '$streak',
-                                                            style:
-                                                                TextStyle(
+                                                            style: TextStyle(
                                                               color: textTones
                                                                       ?.medium ??
-                                                                  scheme.onSurface
+                                                                  scheme
+                                                                      .onSurface
                                                                       .withValues(
                                                                           alpha:
                                                                               0.72),
-                                                              fontSize:
-                                                                  11.5,
+                                                              fontSize: 11.5,
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w700,
@@ -586,8 +559,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
                                             style: TextStyle(
                                               color: textTones?.high ??
                                                   scheme.onSurface
-                                                      .withValues(
-                                                          alpha: 0.9),
+                                                      .withValues(alpha: 0.9),
                                               fontWeight: FontWeight.w800,
                                               fontSize: 14,
                                             ),
@@ -614,7 +586,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen>
   }
 }
 
-// ─── Podium ──────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Podium â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _PodiumCard extends StatelessWidget {
   final List<Map<String, dynamic>> players;
@@ -691,7 +663,7 @@ class _PodiumCard extends StatelessWidget {
   }
 }
 
-// ─── Rank trend chip ─────────────────────────────────────────────────────────
+// â”€â”€â”€ Rank trend chip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _RankTrendChip extends StatelessWidget {
   final int delta;
@@ -710,9 +682,7 @@ class _RankTrendChip extends StatelessWidget {
             : scheme.error.withValues(alpha: 0.82));
     final icon = isFlat
         ? Icons.trending_flat_rounded
-        : (isUp
-            ? Icons.arrow_upward_rounded
-            : Icons.arrow_downward_rounded);
+        : (isUp ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded);
     final text = isFlat ? '0' : '${isUp ? '+' : ''}$delta';
 
     return Container(
@@ -728,16 +698,14 @@ class _RankTrendChip extends StatelessWidget {
           const SizedBox(width: 2),
           Text(text,
               style: TextStyle(
-                  color: color,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800)),
+                  color: color, fontSize: 10.5, fontWeight: FontWeight.w800)),
         ],
       ),
     );
   }
 }
 
-// ─── Icon glass button ───────────────────────────────────────────────────────
+// â”€â”€â”€ Icon glass button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class _IconGlass extends StatelessWidget {
   final IconData icon;
@@ -754,8 +722,7 @@ class _IconGlass extends StatelessWidget {
         depth: GlassDepth.l1,
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child:
-            Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),
+        child: Icon(icon, color: scheme.onSurface.withValues(alpha: 0.92)),
       ),
     );
   }

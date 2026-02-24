@@ -2,13 +2,14 @@ import 'dart:io';
 
 import 'package:path/path.dart';
 import 'package:soma/core/database/database_helper.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
 
-  print('--- SQLite Database Health Check (Version 3) ---');
+  appLogger.info('--- SQLite Database Health Check (Version 3) ---');
 
   final dbHelper = DatabaseHelper.instance;
 
@@ -16,7 +17,7 @@ void main() async {
   final db = await dbHelper.database;
 
   final path = join(await getDatabasesPath(), 'soma_local.db');
-  print('Database Path: $path');
+  appLogger.info('Database Path: $path');
 
   final tables = [
     'courses',
@@ -28,7 +29,7 @@ void main() async {
     'user_learned_items'
   ];
 
-  print('\nChecking tables...');
+  appLogger.info('\nChecking tables...');
   for (final table in tables) {
     final res = await db.rawQuery(
         "SELECT name FROM sqlite_master WHERE type='table' AND name='$table'");
@@ -36,13 +37,13 @@ void main() async {
       final countRes =
           await db.rawQuery('SELECT COUNT(*) as count FROM $table');
       final count = countRes.first['count'];
-      print("[OK] Table '$table' exists. Count: $count");
+      appLogger.info("[OK] Table '$table' exists. Count: $count");
     } else {
-      print("[FAIL] Table '$table' is MISSING.");
+      appLogger.info("[FAIL] Table '$table' is MISSING.");
     }
   }
 
   await db.close();
-  print('\n--- Check Complete ---');
+  appLogger.info('\n--- Check Complete ---');
   exit(0);
 }

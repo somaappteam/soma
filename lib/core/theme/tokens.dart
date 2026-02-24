@@ -26,7 +26,8 @@ class T {
   static const neonG = Color(0xFF2BD910); // slightly more natural green
 
   // Semantic accents (consistent meaning across themes)
-  static const semanticProgress = Color(0xFF2AFADF); // teal-leaning, matches progress bar gradient
+  static const semanticProgress =
+      Color(0xFF2AFADF); // teal-leaning, matches progress bar gradient
   static const semanticSocial = Color(0xFF7B6CFF);
   static const semanticReward = Color(0xFFFFC85C);
 

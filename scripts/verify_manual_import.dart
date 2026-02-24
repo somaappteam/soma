@@ -1,4 +1,6 @@
 import 'dart:io';
+
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
@@ -8,12 +10,12 @@ const String serviceRoleKey =
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
 
-  print('--- Testing Manual Import Data Integrity ---');
+  appLogger.info('--- Testing Manual Import Data Integrity ---');
 
   // Test Case: English to Spanish (en -> es)
   // Adjust these based on what languages you imported!
   // I will try to find *any* language pair with data if these are empty.
-  
+
   // First, let's list available languages to be smart.
   await listAvailableLanguages(client);
 
@@ -22,28 +24,31 @@ void main() async {
   await testVocab(client, 'en', 'am');
   await testSentences(client, 'en', 'am');
 
-  print('--- Test Completed ---');
+  appLogger.info('--- Test Completed ---');
   exit(0);
 }
 
 Future<void> listAvailableLanguages(final SupabaseClient client) async {
-  print('\n[Discovery] Checking available languages...');
+  appLogger.info('\n[Discovery] Checking available languages...');
   try {
-    final vocabLangs = await client.from('vocabulary').select('lang_code').limit(50);
-    final sentenceLangs = await client.from('sentences').select('lang_code').limit(50);
+    final vocabLangs =
+        await client.from('vocabulary').select('lang_code').limit(50);
+    final sentenceLangs =
+        await client.from('sentences').select('lang_code').limit(50);
 
     final vSet = vocabLangs.map((final e) => e['lang_code']).toSet();
     final sSet = sentenceLangs.map((final e) => e['lang_code']).toSet();
 
-    print('  Vocabulary Languages found (sample): $vSet');
-    print('  Sentence Languages found (sample): $sSet');
+    appLogger.info('  Vocabulary Languages found (sample): $vSet');
+    appLogger.info('  Sentence Languages found (sample): $sSet');
   } catch (e) {
-    print('  Error listing languages: $e');
+    appLogger.info('  Error listing languages: $e');
   }
 }
 
-Future<void> testVocab(final SupabaseClient client, final String sourceLang, final String targetLang) async {
-  print('\n[Vocabulary] Fetching for $sourceLang -> $targetLang');
+Future<void> testVocab(final SupabaseClient client, final String sourceLang,
+    final String targetLang) async {
+  appLogger.info('\n[Vocabulary] Fetching for $sourceLang -> $targetLang');
 
   try {
     final sourceResponse = await client
@@ -57,32 +62,33 @@ Future<void> testVocab(final SupabaseClient client, final String sourceLang, fin
         .select()
         .eq('lang_code', targetLang)
         .limit(5);
-    
-    print('  Fetched ${sourceResponse.length} source items');
-    print('  Fetched ${targetResponse.length} target items');
+
+    appLogger.info('  Fetched ${sourceResponse.length} source items');
+    appLogger.info('  Fetched ${targetResponse.length} target items');
 
     if (targetResponse.isNotEmpty) {
       final sample = targetResponse.first;
-      print('  Sample Target Item:');
-      print('    ID: ${sample['vocabulary_id']}');
-      print('    Word: ${sample['word']}');
-      print('    Pronunciation: ${sample['pronunciation']}');
-      
-      if (sample['pronunciation'] == null || sample['pronunciation'].toString().isEmpty) {
-         print('  Note: Pronunciation is empty.');
+      appLogger.info('  Sample Target Item:');
+      appLogger.info('    ID: ${sample['vocabulary_id']}');
+      appLogger.info('    Word: ${sample['word']}');
+      appLogger.info('    Pronunciation: ${sample['pronunciation']}');
+
+      if (sample['pronunciation'] == null ||
+          sample['pronunciation'].toString().isEmpty) {
+        appLogger.info('  Note: Pronunciation is empty.');
       } else {
-         print('  OK: Pronunciation present.');
+        appLogger.info('  OK: Pronunciation present.');
       }
     }
-
   } catch (e) {
-    print('  Error: $e');
+    appLogger.info('  Error: $e');
   }
 }
 
-Future<void> testSentences(final SupabaseClient client, final String sourceLang, final String targetLang) async {
-  print('\n[Sentences] Fetching for $sourceLang -> $targetLang');
-  
+Future<void> testSentences(final SupabaseClient client, final String sourceLang,
+    final String targetLang) async {
+  appLogger.info('\n[Sentences] Fetching for $sourceLang -> $targetLang');
+
   try {
     final sourceResponse = await client
         .from('sentences')
@@ -95,24 +101,25 @@ Future<void> testSentences(final SupabaseClient client, final String sourceLang,
         .select()
         .eq('lang_code', targetLang)
         .limit(5);
-    
-    print('  Fetched ${sourceResponse.length} source items');
-    print('  Fetched ${targetResponse.length} target items');
+
+    appLogger.info('  Fetched ${sourceResponse.length} source items');
+    appLogger.info('  Fetched ${targetResponse.length} target items');
 
     if (targetResponse.isNotEmpty) {
       final sample = targetResponse.first;
-      print('  Sample Target Item:');
-       print('    ID: ${sample['sentence_id']}');
-      print('    Sentence: ${sample['sentence']}');
-      print('    Pronunciation: ${sample['pronunciation']}');
+      appLogger.info('  Sample Target Item:');
+      appLogger.info('    ID: ${sample['sentence_id']}');
+      appLogger.info('    Sentence: ${sample['sentence']}');
+      appLogger.info('    Pronunciation: ${sample['pronunciation']}');
 
-       if (sample['pronunciation'] == null || sample['pronunciation'].toString().isEmpty) {
-         print('  Note: Pronunciation is empty.');
+      if (sample['pronunciation'] == null ||
+          sample['pronunciation'].toString().isEmpty) {
+        appLogger.info('  Note: Pronunciation is empty.');
       } else {
-         print('  OK: Pronunciation present.');
+        appLogger.info('  OK: Pronunciation present.');
       }
     }
   } catch (e) {
-    print('  Error: $e');
+    appLogger.info('  Error: $e');
   }
 }

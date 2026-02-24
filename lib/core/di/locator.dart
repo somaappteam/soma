@@ -34,19 +34,28 @@ void setupLocator() {
   );
 
   // No-arg constructors
-  locator.registerLazySingleton<AchievementsRepository>(() => AchievementsRepository());
-  locator.registerLazySingleton<ActivityFeedRepository>(() => ActivityFeedRepository());
-  locator.registerLazySingleton<AppAnalyticsRepository>(() => AppAnalyticsRepository());
+  locator.registerLazySingleton<AchievementsRepository>(
+      () => AchievementsRepository());
+  locator.registerLazySingleton<ActivityFeedRepository>(
+      () => ActivityFeedRepository());
+  locator.registerLazySingleton<AppAnalyticsRepository>(
+      () => AppAnalyticsRepository());
   locator.registerLazySingleton<AuthRepository>(() => AuthRepository());
   locator.registerLazySingleton<ChatRepository>(() => ChatRepository());
   locator.registerLazySingleton<CirclesRepository>(() => CirclesRepository());
-  locator.registerLazySingleton<CircleChatRepository>(() => CircleChatRepository());
+  locator.registerLazySingleton<CircleChatRepository>(
+      () => CircleChatRepository());
   locator.registerLazySingleton<CoursesRepository>(() => CoursesRepository());
-  locator.registerLazySingleton<ExchangeAnalyticsRepository>(() => ExchangeAnalyticsRepository());
-  locator.registerLazySingleton<ExperimentRepository>(() => ExperimentRepository());
-  locator.registerLazySingleton<LeaderboardRepository>(() => LeaderboardRepository());
-  locator.registerLazySingleton<NotificationsRepository>(() => NotificationsRepository());
-  locator.registerLazySingleton<OfflineQueueRepository>(() => OfflineQueueRepository());
+  locator.registerLazySingleton<ExchangeAnalyticsRepository>(
+      () => ExchangeAnalyticsRepository());
+  locator.registerLazySingleton<ExperimentRepository>(
+      () => ExperimentRepository());
+  locator.registerLazySingleton<LeaderboardRepository>(
+      () => LeaderboardRepository());
+  locator.registerLazySingleton<NotificationsRepository>(
+      () => NotificationsRepository());
+  locator.registerLazySingleton<OfflineQueueRepository>(
+      () => OfflineQueueRepository());
   locator.registerLazySingleton<PresenceRepository>(() => PresenceRepository());
   locator.registerLazySingleton<PrivacyRepository>(() => PrivacyRepository());
   locator.registerLazySingleton<ProfileRepository>(() => ProfileRepository());
@@ -56,5 +65,6 @@ void setupLocator() {
   locator.registerLazySingleton<SocialRepository>(() => SocialRepository());
   locator.registerLazySingleton<SomaPlusRepository>(() => SomaPlusRepository());
   locator.registerLazySingleton<StatsRepository>(() => StatsRepository());
-  locator.registerLazySingleton<UserReportRepository>(() => UserReportRepository());
+  locator.registerLazySingleton<UserReportRepository>(
+      () => UserReportRepository());
 }

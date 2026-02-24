@@ -1,25 +1,23 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:soma/core/services/app_logger.dart';
 
 void main() {
   final dir = Directory('lib/l10n');
-  final files = dir.listSync().whereType<File>().where((final f) => f.path.endsWith('.arb') && !f.path.endsWith('app_en.arb'));
+  final files = dir.listSync().whereType<File>().where(
+      (final f) => f.path.endsWith('.arb') && !f.path.endsWith('app_en.arb'));
 
   final newKeys = {
     'incomingCallFrom': 'Incoming call from {name}',
     '@incomingCallFrom': {
-      'placeholders': {
-        'name': {}
-      }
+      'placeholders': {'name': {}}
     },
     'declineCall': 'Decline',
     'acceptCall': 'Accept',
     'voiceCall': 'Voice call',
     'inCallWith': 'In call • {name}',
     '@inCallWith': {
-      'placeholders': {
-        'name': {}
-      }
+      'placeholders': {'name': {}}
     },
     'authBenefitLiveCircles': 'Live circles with real learners',
     'authBenefitVoiceRooms': 'Voice rooms with instant practice',
@@ -31,7 +29,7 @@ void main() {
     try {
       final content = file.readAsStringSync();
       final Map<String, dynamic> json = jsonDecode(content);
-      
+
       bool updated = false;
       for (final entry in newKeys.entries) {
         if (!json.containsKey(entry.key)) {
@@ -46,9 +44,9 @@ void main() {
         count++;
       }
     } catch (e) {
-      print('Failed to process ${file.path}: $e');
+      appLogger.info('Failed to process ${file.path}: $e');
     }
   }
 
-  print('Added new keys to $count files.');
+  appLogger.info('Added new keys to $count files.');
 }

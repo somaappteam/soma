@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:soma/core/config/app_config.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/core/services/haptics_service.dart';
 import 'package:soma/core/services/notification_service.dart';
 import 'package:soma/core/services/session_tracker.dart';
@@ -27,7 +28,7 @@ class AppBootstrap {
     try {
       await sessionTracker.start();
     } catch (e) {
-      debugPrint('Session tracking failed to start: $e');
+      appLogger.debug('Session tracking failed to start: $e');
     }
 
     await themeModeController.load();
@@ -45,7 +46,7 @@ class AppBootstrap {
           reminderTime: settings.dailyReminder,
         );
       } catch (e) {
-        debugPrint('AppBootstrap: notification init failed – $e');
+        appLogger.debug('AppBootstrap: notification init failed – $e');
       }
     }
   }

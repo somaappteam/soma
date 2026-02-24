@@ -11,7 +11,8 @@ enum AboutView {
 }
 
 class AboutScreen extends StatelessWidget {
-  static const _appVersion = String.fromEnvironment('APP_VERSION', defaultValue: '1.0.0');
+  static const _appVersion =
+      String.fromEnvironment('APP_VERSION', defaultValue: '1.0.0');
   final AboutView view;
 
   const AboutScreen({super.key, required this.view});
@@ -19,109 +20,128 @@ class AboutScreen extends StatelessWidget {
   @override
   Widget build(final BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    
+
     // Determine title based on view
-    final String title = view == AboutView.version 
-        ? l10n.settingsVersion 
+    final String title = view == AboutView.version
+        ? l10n.settingsVersion
         : l10n.settingsTermsPrivacy;
 
     return Scaffold(
       body: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: InkWell(
-                  onTap: () => Navigator.pop(context),
-                  borderRadius: BorderRadius.circular(12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: InkWell(
+                onTap: () => Navigator.pop(context),
+                borderRadius: BorderRadius.circular(12),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
-              Text(
-                title,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontWeight: FontWeight.bold,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 30),
+            if (view == AboutView.version)
+              Glass(
+                radius: T.r20,
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'SOMA',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                          ),
                     ),
+                    const SizedBox(height: 10),
+                    Text(
+                      l10n.aboutVersion(_appVersion),
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.72)),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      l10n.aboutDescription,
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.9),
+                          height: 1.5),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 30),
-              
-              if (view == AboutView.version)
-                Glass(
-                  radius: T.r20,
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'SOMA',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.w900,
-                            ),
+            if (view == AboutView.termsAndPrivacy)
+              Glass(
+                radius: T.r20,
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    _InfoRow(
+                      label: l10n.aboutTerms,
+                      onTap: () => _openLegalDoc(
+                          context, l10n.aboutTerms, LegalData.termsOfService),
+                    ),
+                    Divider(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.12)),
+                    _InfoRow(
+                      label: l10n.aboutPrivacy,
+                      onTap: () => _openLegalDoc(
+                          context, l10n.aboutPrivacy, LegalData.privacyPolicy),
+                    ),
+                    Divider(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.12)),
+                    _InfoRow(
+                      label: l10n.aboutOpenSource,
+                      onTap: () => showLicensePage(
+                        context: context,
+                        applicationName: 'SOMA',
+                        applicationVersion: _appVersion,
+                        applicationLegalese: LegalData.attributions,
+                        useRootNavigator: true,
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        l10n.aboutVersion(_appVersion),
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.72)),
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        l10n.aboutDescription,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), height: 1.5),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-
-              if (view == AboutView.termsAndPrivacy)
-                Glass(
-                  radius: T.r20,
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      _InfoRow(
-                        label: l10n.aboutTerms,
-                        onTap: () => _openLegalDoc(context, l10n.aboutTerms, LegalData.termsOfService),
-                      ),
-                      Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
-                      _InfoRow(
-                        label: l10n.aboutPrivacy,
-                        onTap: () => _openLegalDoc(context, l10n.aboutPrivacy, LegalData.privacyPolicy),
-                      ),
-                      Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
-                      _InfoRow(
-                        label: l10n.aboutOpenSource,
-                        onTap: () => showLicensePage(
-                          context: context,
-                          applicationName: 'SOMA',
-                          applicationVersion: _appVersion,
-                          applicationLegalese: LegalData.attributions,
-                          useRootNavigator: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
+              ),
+          ],
         ),
+      ),
     );
   }
 
-  void _openLegalDoc(final BuildContext context, final String title, final String content) {
+  void _openLegalDoc(
+      final BuildContext context, final String title, final String content) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (final context) => _LegalDetailScreen(title: title, content: content),
+        builder: (final context) =>
+            _LegalDetailScreen(title: title, content: content),
       ),
     );
   }
@@ -150,7 +170,11 @@ class _InfoRow extends StatelessWidget {
                 ),
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55)),
+            Icon(Icons.chevron_right_rounded,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.55)),
           ],
         ),
       ),
@@ -176,9 +200,22 @@ class _LegalDetailScreen extends StatelessWidget {
       body: Markdown(
         data: content,
         styleSheet: MarkdownStyleSheet(
-          p: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), fontSize: 15, height: 1.5),
-          h1: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 24, fontWeight: FontWeight.bold),
-          h2: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold, height: 2),
+          p: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.9),
+              fontSize: 15,
+              height: 1.5),
+          h1: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 24,
+              fontWeight: FontWeight.bold),
+          h2: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              height: 2),
           listBullet: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           blockSpacing: 16,
         ),

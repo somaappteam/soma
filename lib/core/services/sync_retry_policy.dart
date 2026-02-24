@@ -2,7 +2,8 @@ import 'package:soma/data/content_sync_service.dart';
 
 typedef SyncRunner = Future<ContentSyncResult> Function();
 
-typedef RetryScheduled = Future<void> Function(int attempt, List<String> failedSteps);
+typedef RetryScheduled = Future<void> Function(
+    int attempt, List<String> failedSteps);
 
 class SyncRetryPolicy {
   static const int maxAttempts = 3;
@@ -27,10 +28,11 @@ class SyncRetryPolicy {
       await waiter(Duration(milliseconds: delayMs));
     }
 
-    return result ?? const ContentSyncResult(
-      duration: Duration.zero,
-      failedSteps: <String>['unknown'],
-      stepDurationsMs: <String, int>{},
-    );
+    return result ??
+        const ContentSyncResult(
+          duration: Duration.zero,
+          failedSteps: <String>['unknown'],
+          stepDurationsMs: <String, int>{},
+        );
   }
 }

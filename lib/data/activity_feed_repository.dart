@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/models/activity_event.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,9 +19,7 @@ class ActivityFeedRepository {
 
     return rows.map<String>((final r) {
       final requesterId = r['requester_id'] as String;
-      return requesterId == uid
-          ? r['addressee_id'] as String
-          : requesterId;
+      return requesterId == uid ? r['addressee_id'] as String : requesterId;
     }).toList();
   }
 
@@ -57,15 +55,16 @@ class ActivityFeedRepository {
 
       return rows.map<ActivityEvent>((final r) {
         final profile = r['profiles'] as Map<String, dynamic>? ?? {};
-        final username    = profile['username']?.toString()     ?? 'learner';
+        final username = profile['username']?.toString() ?? 'learner';
         final displayName = profile['display_name']?.toString() ?? username;
-        final avatarUrl   = profile['avatar_url']?.toString();
-        final xp          = (profile['total_xp'] as num?)?.toInt() ?? 0;
-        final quizzes     = (r['total_quizzes'] as num?)?.toInt() ?? 0;
-        final correct     = (r['total_correct'] as num?)?.toInt() ?? 0;
-        final total       = (r['total_questions'] as num?)?.toInt() ?? 0;
-        final streak      = (r['streak_days'] as num?)?.toInt() ?? 0;
-        final ts          = DateTime.tryParse(r['updated_at'] as String? ?? '') ?? DateTime.now();
+        final avatarUrl = profile['avatar_url']?.toString();
+        final xp = (profile['total_xp'] as num?)?.toInt() ?? 0;
+        final quizzes = (r['total_quizzes'] as num?)?.toInt() ?? 0;
+        final correct = (r['total_correct'] as num?)?.toInt() ?? 0;
+        final total = (r['total_questions'] as num?)?.toInt() ?? 0;
+        final streak = (r['streak_days'] as num?)?.toInt() ?? 0;
+        final ts = DateTime.tryParse(r['updated_at'] as String? ?? '') ??
+            DateTime.now();
 
         String action;
         int xpDelta = 0;
@@ -74,26 +73,28 @@ class ActivityFeedRepository {
         } else if (quizzes > 0 && total > 0) {
           final pct = (correct / total * 100).round();
           xpDelta = correct * 3; // approx
-          action = 'completed a quiz · $pct% correct (+${xpDelta > 0 ? xpDelta : correct * 3} XP)';
+          action =
+              'completed a quiz · $pct% correct (+${xpDelta > 0 ? xpDelta : correct * 3} XP)';
         } else {
           action = 'is learning · $xp XP total';
         }
 
         return ActivityEvent(
-          userId:      r['user_id'] as String,
-          username:    username,
+          userId: r['user_id'] as String,
+          username: username,
           displayName: displayName,
-          avatarUrl:   avatarUrl,
-          actionText:  action,
-          xpDelta:     xpDelta,
-          timestamp:   ts,
+          avatarUrl: avatarUrl,
+          actionText: action,
+          xpDelta: xpDelta,
+          timestamp: ts,
         );
       }).toList();
     } catch (e) {
-      debugPrint('ActivityFeedRepository: error – $e');
+      appLogger.debug('ActivityFeedRepository: error – $e');
       return [];
     }
   }
 }
 
-ActivityFeedRepository get activityFeedRepository => locator<ActivityFeedRepository>();
+ActivityFeedRepository get activityFeedRepository =>
+    locator<ActivityFeedRepository>();

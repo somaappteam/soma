@@ -66,8 +66,9 @@ class _ResultsScreenState extends State<ResultsScreen> {
   void _listenCircleStatus() {
     if (widget.circleId == null) return;
     _circleSub?.cancel();
-    _circleSub =
-        circlesRepository.getCircleStream(widget.circleId!).listen((final data) {
+    _circleSub = circlesRepository
+        .getCircleStream(widget.circleId!)
+        .listen((final data) {
       if (!mounted) return;
       final status = data['status']?.toString();
       if (status == 'active' && !_isNavigatingToQuiz && !_isHostMe) {
@@ -248,7 +249,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (final _) => CircleLobbyScreen(circleId: circleId)),
+      MaterialPageRoute(
+          builder: (final _) => CircleLobbyScreen(circleId: circleId)),
       (final route) => route.isFirst,
     );
   }
@@ -269,8 +271,8 @@ class _ResultsScreenState extends State<ResultsScreen> {
       body: isHost
           ? l10n.circlesLeavePromptEndOnly
           : (isSpectator
-              ? '${l10n.circlesSpectator} • ${l10n.leave}'
-              : '${l10n.circlesParticipant} • ${l10n.leave}'),
+              ? '${l10n.circlesSpectator} â€¢ ${l10n.leave}'
+              : '${l10n.circlesParticipant} â€¢ ${l10n.leave}'),
       cancelText: l10n.cancel,
       confirmText: isHost ? l10n.circlesEndCircle : l10n.leave,
       destructive: true,
@@ -305,21 +307,22 @@ class _ResultsScreenState extends State<ResultsScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            ...rtcVoiceService.activeRenderers.map((final renderer) => Positioned(
-                  left: 0,
-                  top: 0,
-                  width: 1,
-                  height: 1,
-                  child: SizedBox(
-                    width: 1,
-                    height: 1,
-                    child: RTCVideoView(
-                      renderer,
-                      objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-                    ),
-                  ),
-                )),
+            ...rtcVoiceService.activeRenderers
+                .map((final renderer) => Positioned(
+                      left: 0,
+                      top: 0,
+                      width: 1,
+                      height: 1,
+                      child: SizedBox(
+                        width: 1,
+                        height: 1,
+                        child: RTCVideoView(
+                          renderer,
+                          objectFit:
+                              RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                        ),
+                      ),
+                    )),
             LayoutBuilder(
               builder: (final context, final constraints) {
                 final compactHeight = constraints.maxHeight < 760;
@@ -582,8 +585,10 @@ class _ResultsScreenState extends State<ResultsScreen> {
                                         _sortedLeaderboard(widget.leaderboard);
 
                                     return Column(
-                                      children:
-                                          sorted.asMap().entries.map((final entry) {
+                                      children: sorted
+                                          .asMap()
+                                          .entries
+                                          .map((final entry) {
                                         final i = entry.key; // 0-based
                                         final p = entry.value;
                                         final rank = i + 1;

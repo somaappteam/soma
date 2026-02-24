@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:soma/core/database/database_helper.dart';
 import 'package:soma/core/di/locator.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/data/achievements_repository.dart';
 import 'package:soma/data/offline_queue_repository.dart';
 import 'package:soma/data/quiz_local_store.dart';
@@ -16,24 +16,30 @@ class QuizRepository {
   final Random _random = Random();
   final VocabSrsStore _srsStore = VocabSrsStore();
 
-  Future<List<Map<String, dynamic>>> getVocabQuestions(final String courseId, final int limit,
-      {final bool reverse = false, final Set<int>? onlyConceptIds, final bool preferDue = true}) async {
+  Future<List<Map<String, dynamic>>> getVocabQuestions(
+      final String courseId, final int limit,
+      {final bool reverse = false,
+      final Set<int>? onlyConceptIds,
+      final bool preferDue = true}) async {
     final langs = _parseCourseLangs(courseId);
     if (langs == null) return [];
-    final dueConcepts = preferDue ? await _srsStore.dueConceptIds(courseId) : <int>[];
+    final dueConcepts =
+        preferDue ? await _srsStore.dueConceptIds(courseId) : <int>[];
 
     try {
       List<Map<String, dynamic>> sourceList;
       List<Map<String, dynamic>> targetList;
 
       final sqliteSrc = const SqliteVocabDataSource();
-      final sqliteRes = await sqliteSrc.fetchVocab(sourceLang: langs.source, targetLang: langs.target);
+      final sqliteRes = await sqliteSrc.fetchVocab(
+          sourceLang: langs.source, targetLang: langs.target);
       sourceList = sqliteRes.source;
       targetList = sqliteRes.target;
 
       if (sourceList.isEmpty || targetList.isEmpty) {
         final csvSrc = const CsvVocabDataSource();
-        final csvRes = await csvSrc.fetchVocab(sourceLang: langs.source, targetLang: langs.target);
+        final csvRes = await csvSrc.fetchVocab(
+            sourceLang: langs.source, targetLang: langs.target);
         sourceList = csvRes.source;
         targetList = csvRes.target;
       }
@@ -84,9 +90,8 @@ class QuizRepository {
       selected.addAll(dueCandidates.take(limit));
 
       if (selected.length < limit) {
-        final remaining = candidates
-            .where((final row) => !selected.contains(row))
-            .toList();
+        final remaining =
+            candidates.where((final row) => !selected.contains(row)).toList();
         remaining.shuffle();
         selected.addAll(remaining.take(limit - selected.length));
       }
@@ -120,7 +125,7 @@ class QuizRepository {
 
         final nativeChoices = _buildChoices(sourceWords, correct);
         final targetChoices = _buildChoices(targetWords, targetWord);
-        
+
         return {
           'concept_id': concept,
           'word': s(row['word']),
@@ -141,7 +146,9 @@ class QuizRepository {
           // Reverse-aware display fields
           'prompt': reverse ? correct : targetWord,
           'choices': reverse ? targetChoices : nativeChoices,
-          'correct': reverse ? targetChoices.indexOf(targetWord) : nativeChoices.indexOf(correct),
+          'correct': reverse
+              ? targetChoices.indexOf(targetWord)
+              : nativeChoices.indexOf(correct),
           'correct_answer': reverse ? targetWord : correct,
           'choice_pool': reverse ? targetWords : sourceWords,
         };
@@ -149,13 +156,15 @@ class QuizRepository {
 
       return questions;
     } catch (e) {
-      debugPrint('Error fetching vocab questions from CSV/SQLite: $e');
+      appLogger.debug('Error fetching vocab questions from CSV/SQLite: $e');
       return [];
     }
   }
 
   // Fallback or future implementation for Sentences
-  Future<List<Map<String, dynamic>>> getSentenceQuestions(final String courseId, final int limit, {final Set<int>? onlyConceptIds}) async {
+  Future<List<Map<String, dynamic>>> getSentenceQuestions(
+      final String courseId, final int limit,
+      {final Set<int>? onlyConceptIds}) async {
     final langs = _parseCourseLangs(courseId);
     if (langs == null) return [];
 
@@ -164,19 +173,21 @@ class QuizRepository {
       List<Map<String, dynamic>> targetList;
 
       final sqliteSrc = const SqliteSentenceDataSource();
-      final sqliteRes = await sqliteSrc.fetchSentences(sourceLang: langs.source, targetLang: langs.target);
+      final sqliteRes = await sqliteSrc.fetchSentences(
+          sourceLang: langs.source, targetLang: langs.target);
       sourceList = sqliteRes.source;
       targetList = sqliteRes.target;
 
       if (sourceList.isEmpty || targetList.isEmpty) {
         final csvSrc = const CsvSentenceDataSource();
-        final csvRes = await csvSrc.fetchSentences(sourceLang: langs.source, targetLang: langs.target);
+        final csvRes = await csvSrc.fetchSentences(
+            sourceLang: langs.source, targetLang: langs.target);
         sourceList = csvRes.source;
         targetList = csvRes.target;
       }
 
       if (sourceList.isEmpty || targetList.isEmpty) {
-         return [];
+        return [];
       }
 
       final targetByConcept = <int, Map<String, dynamic>>{};
@@ -204,10 +215,15 @@ class QuizRepository {
         // Skip if either sentence is empty
         final targetSentence = row['sentence']?.toString() ?? '';
         final sourceSentence = sourceRow['sentence']?.toString() ?? '';
-        if (targetSentence.trim().isEmpty || sourceSentence.trim().isEmpty) continue;
+        if (targetSentence.trim().isEmpty || sourceSentence.trim().isEmpty) {
+          continue;
+        }
 
         // Skip if 'null' literal (CSV often has this)
-        if (targetSentence.toLowerCase() == 'null' || sourceSentence.toLowerCase() == 'null') continue;
+        if (targetSentence.toLowerCase() == 'null' ||
+            sourceSentence.toLowerCase() == 'null') {
+          continue;
+        }
 
         // CRITICAL: Skip if blanking fails (this was likely the main issue for sentences)
         if (_blankSentence(targetSentence) == null) continue;
@@ -225,7 +241,8 @@ class QuizRepository {
         if (sentence.trim().isEmpty) continue;
         targetWords.addAll(_extractSentenceWords(sentence));
       }
-      final targetPool = targetWords.where((final word) => word.trim().isNotEmpty).toList();
+      final targetPool =
+          targetWords.where((final word) => word.trim().isNotEmpty).toList();
 
       final questions = selected.map((final row) {
         final concept = _parseInt(row['concept_id'])!;
@@ -260,9 +277,9 @@ class QuizRepository {
         };
       }).toList();
 
-        return questions;
+      return questions;
     } catch (e) {
-      debugPrint('Error fetching sentence questions from CSV/SQLite: $e');
+      appLogger.debug('Error fetching sentence questions from CSV/SQLite: $e');
       return [];
     }
   }
@@ -281,14 +298,15 @@ class QuizRepository {
     );
   }
 
-
-  Future<Set<int>> _reviewConceptIds(final String courseId, {required final String scope}) async {
+  Future<Set<int>> _reviewConceptIds(final String courseId,
+      {required final String scope}) async {
     final entries = await _srsStore.load(courseId);
     if (entries.isEmpty) return <int>{};
 
     if (scope == 'struggling') {
       return entries.values
-          .where((final entry) => entry.intervalDays <= 1 && entry.easeFactor < 2.5)
+          .where((final entry) =>
+              entry.intervalDays <= 1 && entry.easeFactor < 2.5)
           .map((final entry) => entry.conceptId)
           .toSet();
     }
@@ -358,6 +376,7 @@ class QuizRepository {
       final s = v?.toString().trim() ?? '';
       return s.toLowerCase() == 'null' ? '' : s;
     }
+
     final word = nonNull(row['word']);
     if (word.isEmpty) return '';
     final article = nonNull(row['article']);
@@ -407,13 +426,14 @@ class QuizRepository {
     // Bucket by word length for more plausible distractors.
     int bucket(final String w) {
       final len = w.length;
-      if (len <= 5) return 0;   // short
-      if (len <= 10) return 1;  // medium
-      return 2;                 // long
+      if (len <= 5) return 0; // short
+      if (len <= 10) return 1; // medium
+      return 2; // long
     }
 
     final correctBucket = bucket(correct);
-    final sameBucket = unique.where((final v) => bucket(v) == correctBucket).toList();
+    final sameBucket =
+        unique.where((final v) => bucket(v) == correctBucket).toList();
     sameBucket.shuffle();
 
     List<String> distractors;
@@ -421,7 +441,8 @@ class QuizRepository {
       distractors = sameBucket.take(3).toList();
     } else {
       // Not enough same-bucket words — pad from the full pool.
-      final rest = unique.where((final v) => bucket(v) != correctBucket).toList();
+      final rest =
+          unique.where((final v) => bucket(v) != correctBucket).toList();
       rest.shuffle();
       distractors = [...sameBucket, ...rest.take(3 - sameBucket.length)];
     }
@@ -437,7 +458,8 @@ class QuizRepository {
       final parts = sentence.split(RegExp(r'\s+'));
       final words = <String>[];
       for (final part in parts) {
-        final cleaned = part.replaceAll(RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '');
+        final cleaned = part.replaceAll(
+            RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '');
         if (cleaned.isNotEmpty) {
           words.add(cleaned);
         }
@@ -445,7 +467,8 @@ class QuizRepository {
       return words;
     }
 
-    final chars = sentence.runes.map((final rune) => String.fromCharCode(rune)).toList();
+    final chars =
+        sentence.runes.map((final rune) => String.fromCharCode(rune)).toList();
     return chars.where((final char) => char.trim().isNotEmpty).toList();
   }
 
@@ -459,10 +482,14 @@ class QuizRepository {
         final result = <int>[];
         for (var i = 0; i < parts.length; i++) {
           final cleaned = parts[i]
-              .replaceAll(RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
+              .replaceAll(
+                  RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true),
+                  '')
               .trim();
           if (cleaned.isEmpty) continue;
-          if (skipStopwords && _kStopwords.contains(cleaned.toLowerCase())) continue;
+          if (skipStopwords && _kStopwords.contains(cleaned.toLowerCase())) {
+            continue;
+          }
           result.add(i);
         }
         return result;
@@ -476,7 +503,8 @@ class QuizRepository {
       final pickIndex = candidates[_random.nextInt(candidates.length)];
       final original = parts[pickIndex];
       final cleaned = original
-          .replaceAll(RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
+          .replaceAll(
+              RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
           .trim();
       if (cleaned.isEmpty) return null;
       parts[pickIndex] = original.replaceFirst(cleaned, '____');
@@ -484,12 +512,14 @@ class QuizRepository {
     }
 
     // CJK / single-character language fallback: pick a non-stopword char.
-    final chars = sentence.runes.map((final rune) => String.fromCharCode(rune)).toList();
+    final chars =
+        sentence.runes.map((final rune) => String.fromCharCode(rune)).toList();
     if (chars.isEmpty) return null;
     final contentChars = chars
         .asMap()
         .entries
-        .where((final e) => e.value.trim().isNotEmpty && !_kStopwords.contains(e.value))
+        .where((final e) =>
+            e.value.trim().isNotEmpty && !_kStopwords.contains(e.value))
         .map((final e) => e.key)
         .toList();
     final pickIndex = contentChars.isNotEmpty
@@ -516,7 +546,7 @@ class QuizRepository {
           .eq('lang_code', langs.source) // Changed to lang_code
           .limit(1000); // Fetch a decent pool
 
-      // 2. Fetch target language items 
+      // 2. Fetch target language items
       final targetResponse = await _client
           .from('vocabulary')
           .select()
@@ -526,20 +556,25 @@ class QuizRepository {
       final sourceList = List<Map<String, dynamic>>.from(sourceResponse);
       final targetList = List<Map<String, dynamic>>.from(targetResponse);
 
-      debugPrint('Supabase Vocab Fetch: Source(${langs.source})=${sourceList.length}, Target(${langs.target})=${targetList.length}');
+      appLogger.debug(
+          'Supabase Vocab Fetch: Source(${langs.source})=${sourceList.length}, Target(${langs.target})=${targetList.length}');
 
       if (sourceList.isEmpty || targetList.isEmpty) return [];
 
       final targetByConcept = <int, Map<String, dynamic>>{};
       final sourceByConcept = <int, Map<String, dynamic>>{};
-      
+
       for (final row in targetList) {
         final concept = _parseInt(row['concept_id']);
-        if (concept != null && row['word'] != null) targetByConcept[concept] = row;
+        if (concept != null && row['word'] != null) {
+          targetByConcept[concept] = row;
+        }
       }
       for (final row in sourceList) {
         final concept = _parseInt(row['concept_id']);
-        if (concept != null && row['word'] != null) sourceByConcept[concept] = row;
+        if (concept != null && row['word'] != null) {
+          sourceByConcept[concept] = row;
+        }
       }
 
       final candidates = <Map<String, dynamic>>[];
@@ -549,7 +584,7 @@ class QuizRepository {
           // Strict filtering: skip items with empty words after formatting
           final targetWord = _formatVocabWord(row);
           final nativeWord = _formatVocabWord(sourceRow);
-          
+
           if (targetWord.isNotEmpty && nativeWord.isNotEmpty) {
             if (onlyConceptIds == null || onlyConceptIds.contains(concept)) {
               candidates.add(row);
@@ -597,7 +632,9 @@ class QuizRepository {
           'reading': s(row['pronunciation']),
           'gender': s(row['gender']),
           'choices': reverse ? targetChoices : nativeChoices,
-          'correct': reverse ? targetChoices.indexOf(targetWord) : nativeChoices.indexOf(nativeWord),
+          'correct': reverse
+              ? targetChoices.indexOf(targetWord)
+              : nativeChoices.indexOf(nativeWord),
           'choice_pool': reverse ? targetWords : sourceWords,
           'correct_answer': reverse ? targetWord : nativeWord,
           'translation': reverse ? targetWord : nativeWord,
@@ -607,14 +644,15 @@ class QuizRepository {
           'source_lang': langs.source,
         };
       }).toList();
-
     } catch (e) {
-      debugPrint('Error fetching vocab from Supabase: $e');
+      appLogger.debug('Error fetching vocab from Supabase: $e');
       return [];
     }
   }
 
-  Future<List<Map<String, dynamic>>> getSentenceQuestionsFromSupabase(final String courseId, final int limit, {final Set<int>? onlyConceptIds}) async {
+  Future<List<Map<String, dynamic>>> getSentenceQuestionsFromSupabase(
+      final String courseId, final int limit,
+      {final Set<int>? onlyConceptIds}) async {
     final langs = _parseCourseLangs(courseId);
     if (langs == null) return [];
 
@@ -634,7 +672,8 @@ class QuizRepository {
       final sourceList = List<Map<String, dynamic>>.from(sourceResponse);
       final targetList = List<Map<String, dynamic>>.from(targetResponse);
 
-      debugPrint('Supabase Sentence Fetch: Source(${langs.source})=${sourceList.length}, Target(${langs.target})=${targetList.length}');
+      appLogger.debug(
+          'Supabase Sentence Fetch: Source(${langs.source})=${sourceList.length}, Target(${langs.target})=${targetList.length}');
 
       if (sourceList.isEmpty || targetList.isEmpty) return [];
 
@@ -643,11 +682,15 @@ class QuizRepository {
 
       for (final row in targetList) {
         final concept = _parseInt(row['concept_id']);
-        if (concept != null && row['sentence'] != null) targetByConcept[concept] = row;
+        if (concept != null && row['sentence'] != null) {
+          targetByConcept[concept] = row;
+        }
       }
       for (final row in sourceList) {
         final concept = _parseInt(row['concept_id']);
-        if (concept != null && row['sentence'] != null) sourceByConcept[concept] = row;
+        if (concept != null && row['sentence'] != null) {
+          sourceByConcept[concept] = row;
+        }
       }
 
       final candidates = <Map<String, dynamic>>[];
@@ -656,10 +699,11 @@ class QuizRepository {
         if (sourceRow != null) {
           final targetSentence = row['sentence']?.toString() ?? '';
           final sourceSentence = sourceRow['sentence']?.toString() ?? '';
-          
-          if (targetSentence.isNotEmpty && sourceSentence.isNotEmpty && 
-              targetSentence.toLowerCase() != 'null' && sourceSentence.toLowerCase() != 'null') {
-            
+
+          if (targetSentence.isNotEmpty &&
+              sourceSentence.isNotEmpty &&
+              targetSentence.toLowerCase() != 'null' &&
+              sourceSentence.toLowerCase() != 'null') {
             // CRITICAL: Blanking check
             if (_blankSentence(targetSentence) != null) {
               if (onlyConceptIds == null || onlyConceptIds.contains(concept)) {
@@ -672,14 +716,15 @@ class QuizRepository {
 
       candidates.shuffle();
       final selected = candidates.take(limit).toList();
-      
+
       final targetWords = <String>{};
       for (final row in targetList) {
         final sentence = row['sentence']?.toString() ?? '';
         if (sentence.trim().isEmpty) continue;
         targetWords.addAll(_extractSentenceWords(sentence));
       }
-      final targetPool = targetWords.where((final word) => word.trim().isNotEmpty).toList();
+      final targetPool =
+          targetWords.where((final word) => word.trim().isNotEmpty).toList();
 
       return selected.map((final row) {
         final concept = _parseInt(row['concept_id'])!;
@@ -704,12 +749,12 @@ class QuizRepository {
           'correct_answer': blanked.answer,
         };
       }).toList();
-
     } catch (e) {
-      debugPrint('Error fetching sentences from Supabase: $e');
+      appLogger.debug('Error fetching sentences from Supabase: $e');
       return [];
     }
   }
+
   // Save quiz result to Supabase and Local SQLite
   Future<void> saveQuizResult({
     required final String courseId,
@@ -724,14 +769,15 @@ class QuizRepository {
     try {
       // 1. Update Profile Total XP
       try {
-        await client.rpc('update_profile_xp', params: {'increment_xp': xpEarned});
+        await client
+            .rpc('update_profile_xp', params: {'increment_xp': xpEarned});
       } catch (e) {
-         debugPrint('Cloud Update XP RPC failed: $e. Enqueuing.');
-         await offlineQueueRepository.enqueue(
-           tableName: 'rpc:update_profile_xp',
-           operation: 'RPC',
-           data: {'increment_xp': xpEarned},
-         );
+        appLogger.debug('Cloud Update XP RPC failed: $e. Enqueuing.');
+        await offlineQueueRepository.enqueue(
+          tableName: 'rpc:update_profile_xp',
+          operation: 'RPC',
+          data: {'increment_xp': xpEarned},
+        );
       }
 
       final stats = await statsRepository.recordQuizResult(
@@ -760,15 +806,18 @@ class QuizRepository {
             .eq('course_id', courseId)
             .maybeSingle();
       } catch (_) {
-         // Offline fetch failed, try local
-         final localCourses = await DatabaseHelper.instance.getUserCourses(userId);
-         // Find matching course manually
-         try {
-           courseProgress = localCourses.firstWhere((final c) => c['course_id'] == courseId);
-         } catch (_) {}
+        // Offline fetch failed, try local
+        final localCourses =
+            await DatabaseHelper.instance.getUserCourses(userId);
+        // Find matching course manually
+        try {
+          courseProgress =
+              localCourses.firstWhere((final c) => c['course_id'] == courseId);
+        } catch (_) {}
       }
 
-      final int oldCourseXp = courseProgress != null ? (courseProgress['progress_xp'] as int) : 0;
+      final int oldCourseXp =
+          courseProgress != null ? (courseProgress['progress_xp'] as int) : 0;
 
       final updatedCourse = {
         'user_id': userId,
@@ -778,21 +827,22 @@ class QuizRepository {
       };
 
       try {
-        await client.from('user_courses').upsert(updatedCourse, onConflict: 'user_id, course_id');
+        await client
+            .from('user_courses')
+            .upsert(updatedCourse, onConflict: 'user_id, course_id');
       } catch (e) {
-        debugPrint('Cloud User Course Upsert failed: $e. Enqueuing.');
+        appLogger.debug('Cloud User Course Upsert failed: $e. Enqueuing.');
         await offlineQueueRepository.enqueue(
           tableName: 'user_courses',
           operation: 'UPSERT',
           data: updatedCourse,
         );
       }
-      
+
       // Always update local for immediate feedback
       await DatabaseHelper.instance.upsertUserCourse(updatedCourse);
-
     } catch (e) {
-      debugPrint('Error saving quiz result: $e');
+      appLogger.debug('Error saving quiz result: $e');
     }
   }
 
@@ -801,23 +851,26 @@ class QuizRepository {
     return parts.length >= 4;
   }
 
-  Future<void> _updateCustomCourseProgress(final String courseId, final int xpEarned) async {
+  Future<void> _updateCustomCourseProgress(
+      final String courseId, final int xpEarned) async {
     try {
       final settings = await settingsRepository.getSettings();
       final raw = settings['custom_course_progress'];
       final progress = <String, int>{};
       if (raw is Map) {
         raw.forEach((final key, final value) {
-          final xp = value is int ? value : int.tryParse(value?.toString() ?? '');
+          final xp =
+              value is int ? value : int.tryParse(value?.toString() ?? '');
           if (xp != null) progress[key.toString()] = xp;
         });
       }
 
       final current = progress[courseId] ?? 0;
       progress[courseId] = current + xpEarned;
-      await settingsRepository.updateSetting('custom_course_progress', progress);
+      await settingsRepository.updateSetting(
+          'custom_course_progress', progress);
     } catch (e) {
-      debugPrint('Error updating custom course progress: $e');
+      appLogger.debug('Error updating custom course progress: $e');
     }
   }
 }

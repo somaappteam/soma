@@ -78,7 +78,8 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
     if (!mounted || _hasShownFreePlanAd) return;
     final settings = await settingsRepository.getSettings();
     if (!mounted) return;
-    final tier = SomaPlusRepository.parseTier(settings['plus_plan']?.toString());
+    final tier =
+        SomaPlusRepository.parseTier(settings['plus_plan']?.toString());
     if (tier != SomaSubscriptionTier.free) return;
 
     _hasShownFreePlanAd = true;
@@ -104,7 +105,8 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
     );
   }
 
-  int get accuracyPct => widget.total == 0 ? 0 : ((widget.correct / widget.total) * 100).round();
+  int get accuracyPct =>
+      widget.total == 0 ? 0 : ((widget.correct / widget.total) * 100).round();
 
   void _playMilestoneFeedback() {
     if (_didPlayMilestoneFx || !mounted) return;
@@ -143,7 +145,7 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
 
   Future<void> _shareResults() async {
     final l10n = AppLocalizations.of(context);
-    final summary = '${widget.course.subtitle} • ${_modeLabel(l10n)}';
+    final summary = '${widget.course.subtitle} â€¢ ${_modeLabel(l10n)}';
     final stats = '${l10n.statCorrect}: ${widget.correct}/${widget.total}';
     final points = '${l10n.pointsLabel}: +${widget.points}';
     final accuracy = '${l10n.statAccuracy}: $accuracyPct%';
@@ -159,265 +161,278 @@ class _SoloResultScreenState extends State<SoloResultScreen> {
 
     return PremiumScreenScaffold(
       body: LayoutBuilder(
-          builder: (final context, final constraints) {
-            final compactHeight = constraints.maxHeight < 760;
-            final blockSpacing = compactHeight ? 12.0 : 14.0;
-            final buttonSpacing = compactHeight ? 8.0 : 10.0;
+        builder: (final context, final constraints) {
+          final compactHeight = constraints.maxHeight < 760;
+          final blockSpacing = compactHeight ? 12.0 : 14.0;
+          final buttonSpacing = compactHeight ? 8.0 : 10.0;
 
-            return Align(
-              alignment: Alignment.topCenter,
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 760),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-                  child: ListView(
-                    physics: const BouncingScrollPhysics(),
-                    children: [
-                      StaggeredIn(
-                        index: 0,
-                        child: Row(
-                          children: [
-                            _IconGlass(
-                              icon: Icons.close_rounded,
-                              onTap: () => Navigator.popUntil(context, (final r) => r.isFirst),
+          return Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 760),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  children: [
+                    StaggeredIn(
+                      index: 0,
+                      child: Row(
+                        children: [
+                          _IconGlass(
+                            icon: Icons.close_rounded,
+                            onTap: () => Navigator.popUntil(
+                                context, (final r) => r.isFirst),
+                          ),
+                          const Spacer(),
+                          Text(
+                            l10n.resultsTitle,
+                            style: TextStyle(
+                              color: textTones?.high ??
+                                  scheme.onSurface.withValues(alpha: 0.92),
+                              fontWeight: FontWeight.w900,
+                              fontSize: 18,
                             ),
-                            const Spacer(),
-                            Text(
-                              l10n.resultsTitle,
-                              style: TextStyle(
-                                color: textTones?.high ?? scheme.onSurface.withValues(alpha: 0.92),
-                                fontWeight: FontWeight.w900,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const Spacer(),
-                            _IconGlass(
-                              icon: Icons.ios_share_rounded,
-                              onTap: _shareResults,
-                            ),
-                          ],
-                        ),
+                          ),
+                          const Spacer(),
+                          _IconGlass(
+                            icon: Icons.ios_share_rounded,
+                            onTap: _shareResults,
+                          ),
+                        ],
                       ),
-                      SizedBox(height: blockSpacing),
-                      StaggeredIn(
-                        index: 1,
-                        child: Glass(
-                          depth: GlassDepth.l3,
-                          selected: true,
-                          radius: BorderRadius.circular(24),
-                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: RewardSparkle(
-                                  show: widget.total > 0 && widget.correct == widget.total,
-                                  size: 20,
-                                ),
+                    ),
+                    SizedBox(height: blockSpacing),
+                    StaggeredIn(
+                      index: 1,
+                      child: Glass(
+                        depth: GlassDepth.l3,
+                        selected: true,
+                        radius: BorderRadius.circular(24),
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: RewardSparkle(
+                                show: widget.total > 0 &&
+                                    widget.correct == widget.total,
+                                size: 20,
                               ),
-                              Text(
-                                '${widget.course.subtitle} • ${_modeLabel(l10n)}',
-                                style: TextStyle(
-                                  color: textTones?.medium ?? scheme.onSurface.withValues(alpha: 0.7),
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 12.5,
-                                ),
+                            ),
+                            Text(
+                              '${widget.course.subtitle} â€¢ ${_modeLabel(l10n)}',
+                              style: TextStyle(
+                                color: textTones?.medium ??
+                                    scheme.onSurface.withValues(alpha: 0.7),
+                                fontWeight: FontWeight.w800,
+                                fontSize: 12.5,
                               ),
-                              const SizedBox(height: SectionGap.sm),
-                              Row(
-                                children: [
-                                  _Badge(level: widget.level),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          l10n.soloResultsCompletedTitle,
-                                          style: TextStyle(
-                                            color: scheme.onSurface,
-                                            fontWeight: FontWeight.w900,
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          _feedbackLine(l10n),
-                                          style: TextStyle(
-                                            color: textTones?.muted ?? scheme.onSurface.withValues(alpha: 0.62),
-                                            fontWeight: FontWeight.w700,
-                                            fontSize: 12,
-                                            height: 1.25,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
+                            ),
+                            const SizedBox(height: SectionGap.sm),
+                            Row(
+                              children: [
+                                _Badge(level: widget.level),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        l10n.pointsLabel,
-                                        style: TextStyle(
-                                          color: textTones?.muted ?? scheme.onSurface.withValues(alpha: 0.60),
-                                          fontWeight: FontWeight.w800,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '+${widget.points}',
+                                        l10n.soloResultsCompletedTitle,
                                         style: TextStyle(
                                           color: scheme.onSurface,
                                           fontWeight: FontWeight.w900,
-                                          fontSize: 22,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        _feedbackLine(l10n),
+                                        style: TextStyle(
+                                          color: textTones?.muted ??
+                                              scheme.onSurface
+                                                  .withValues(alpha: 0.62),
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 12,
+                                          height: 1.25,
                                         ),
                                       ),
                                     ],
                                   ),
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(
+                                      l10n.pointsLabel,
+                                      style: TextStyle(
+                                        color: textTones?.muted ??
+                                            scheme.onSurface
+                                                .withValues(alpha: 0.60),
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      '+${widget.points}',
+                                      style: TextStyle(
+                                        color: scheme.onSurface,
+                                        fontWeight: FontWeight.w900,
+                                        fontSize: 22,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: blockSpacing),
+                            _AccuracyBar(percent: p),
+                            SizedBox(height: blockSpacing),
+                            StaggeredIn(
+                              index: 2,
+                              withScale: true,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _StatTile(
+                                      title: l10n.statCorrect,
+                                      value: '${widget.correct}',
+                                      subtitle: l10n.statAnswers,
+                                      icon: Icons.check_circle_rounded,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: _StatTile(
+                                      title: l10n.statTotal,
+                                      value: '${widget.total}',
+                                      subtitle: l10n.statQuestions,
+                                      icon: Icons.quiz_rounded,
+                                    ),
+                                  ),
                                 ],
                               ),
-                              SizedBox(height: blockSpacing),
-                              _AccuracyBar(percent: p),
-                              SizedBox(height: blockSpacing),
-                              StaggeredIn(
-                                index: 2,
-                                withScale: true,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: _StatTile(
-                                        title: l10n.statCorrect,
-                                        value: '${widget.correct}',
-                                        subtitle: l10n.statAnswers,
-                                        icon: Icons.check_circle_rounded,
-                                      ),
+                            ),
+                            SizedBox(height: buttonSpacing),
+                            StaggeredIn(
+                              index: 3,
+                              withScale: true,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _StatTile(
+                                      title: l10n.statAccuracy,
+                                      value: '$p%',
+                                      subtitle: l10n.statRate,
+                                      icon: Icons.track_changes_rounded,
                                     ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: _StatTile(
-                                        title: l10n.statTotal,
-                                        value: '${widget.total}',
-                                        subtitle: l10n.statQuestions,
-                                        icon: Icons.quiz_rounded,
-                                      ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: _StatTile(
+                                      title: l10n.statMode,
+                                      value: _modeLabel(l10n),
+                                      subtitle: l10n.statType,
+                                      icon: Icons.layers_rounded,
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(height: buttonSpacing),
-                              StaggeredIn(
-                                index: 3,
-                                withScale: true,
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: _StatTile(
-                                        title: l10n.statAccuracy,
-                                        value: '$p%',
-                                        subtitle: l10n.statRate,
-                                        icon: Icons.track_changes_rounded,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: _StatTile(
-                                        title: l10n.statMode,
-                                        value: _modeLabel(l10n),
-                                        subtitle: l10n.statType,
-                                        icon: Icons.layers_rounded,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: blockSpacing),
-                      StaggeredIn(
-                        index: 4,
-                        child: Glass(
-                          depth: GlassDepth.l1,
-                          radius: BorderRadius.circular(22),
-                          padding: const EdgeInsets.all(14),
-                          child: Row(
-                            children: [
-                              Icon(Icons.auto_fix_high_rounded, color: scheme.onSurface),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  widget.mistakes.isEmpty
-                                      ? l10n.soloResultsPerfectScore
-                                      : l10n.soloResultsReviewPrompt,
-                                  style: TextStyle(
-                                    color: textTones?.medium ?? scheme.onSurface.withValues(alpha: 0.78),
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 12.5,
-                                    height: 1.25,
-                                  ),
+                    ),
+                    SizedBox(height: blockSpacing),
+                    StaggeredIn(
+                      index: 4,
+                      child: Glass(
+                        depth: GlassDepth.l1,
+                        radius: BorderRadius.circular(22),
+                        padding: const EdgeInsets.all(14),
+                        child: Row(
+                          children: [
+                            Icon(Icons.auto_fix_high_rounded,
+                                color: scheme.onSurface),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                widget.mistakes.isEmpty
+                                    ? l10n.soloResultsPerfectScore
+                                    : l10n.soloResultsReviewPrompt,
+                                style: TextStyle(
+                                  color: textTones?.medium ??
+                                      scheme.onSurface.withValues(alpha: 0.78),
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12.5,
+                                  height: 1.25,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                      SizedBox(height: compactHeight ? 14 : 18),
-                      if (widget.mistakes.isNotEmpty) ...[
-                        NeonButton(
-                          style: NeonButtonStyle.subtle,
-                          label: l10n.soloResultsReviewMistakes(widget.mistakes.length),
-                          onTap: () {
-                            if (widget.mode == SoloMode.vocabulary) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (final _) => SoloVocabQuizScreen(
-                                    course: widget.course,
-                                    level: widget.level,
-                                    totalQuestions: widget.mistakes.length,
-                                    isReview: true,
-                                    reviewQuestions: widget.mistakes,
-                                  ),
+                    ),
+                    SizedBox(height: compactHeight ? 14 : 18),
+                    if (widget.mistakes.isNotEmpty) ...[
+                      NeonButton(
+                        style: NeonButtonStyle.subtle,
+                        label: l10n
+                            .soloResultsReviewMistakes(widget.mistakes.length),
+                        onTap: () {
+                          if (widget.mode == SoloMode.vocabulary) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (final _) => SoloVocabQuizScreen(
+                                  course: widget.course,
+                                  level: widget.level,
+                                  totalQuestions: widget.mistakes.length,
+                                  isReview: true,
+                                  reviewQuestions: widget.mistakes,
                                 ),
-                              );
-                            } else {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (final _) => SoloSentencesQuizScreen(
-                                    course: widget.course,
-                                    level: widget.level,
-                                    totalQuestions: widget.mistakes.length,
-                                    isReview: true,
-                                    reviewQuestions: widget.mistakes,
-                                  ),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (final _) => SoloSentencesQuizScreen(
+                                  course: widget.course,
+                                  level: widget.level,
+                                  totalQuestions: widget.mistakes.length,
+                                  isReview: true,
+                                  reviewQuestions: widget.mistakes,
                                 ),
-                              );
-                            }
-                          },
-                        ),
-                        SizedBox(height: buttonSpacing),
-                      ],
-                      _SecondaryButton(
-                        label: l10n.playAgain,
-                        onTap: widget.onPlayAgain,
+                              ),
+                            );
+                          }
+                        },
                       ),
                       SizedBox(height: buttonSpacing),
-                      _SecondaryButton(
-                        label: l10n.continueLabel,
-                        onTap: widget.onContinue,
-                      ),
                     ],
-                  ),
+                    _SecondaryButton(
+                      label: l10n.playAgain,
+                      onTap: widget.onPlayAgain,
+                    ),
+                    SizedBox(height: buttonSpacing),
+                    _SecondaryButton(
+                      label: l10n.continueLabel,
+                      onTap: widget.onContinue,
+                    ),
+                  ],
                 ),
               ),
-            );
-          },
-        ),
-      padding: PremiumLayout.screenPadding(PremiumLayout.densityForWidth(MediaQuery.of(context).size.width)),
+            ),
+          );
+        },
+      ),
+      padding: PremiumLayout.screenPadding(
+          PremiumLayout.densityForWidth(MediaQuery.of(context).size.width)),
     );
   }
 }
@@ -439,7 +454,9 @@ class _IconGlass extends StatelessWidget {
       child: Glass(
         radius: BorderRadius.circular(16),
         padding: const EdgeInsets.all(10),
-        child: Icon(icon, color: textTones?.high ?? scheme.onSurface.withValues(alpha: 0.92), size: 20),
+        child: Icon(icon,
+            color: textTones?.high ?? scheme.onSurface.withValues(alpha: 0.92),
+            size: 20),
       ),
     );
   }
@@ -464,7 +481,10 @@ class _Badge extends StatelessWidget {
       child: Center(
         child: Text(
           level,
-          style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900, fontSize: 18),
+          style: TextStyle(
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w900,
+              fontSize: 18),
         ),
       ),
     );
@@ -488,12 +508,18 @@ class _AccuracyBar extends StatelessWidget {
           children: [
             Text(
               l10n.statAccuracy,
-              style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.70), fontSize: 12, fontWeight: FontWeight.w800),
+              style: TextStyle(
+                  color: scheme.onSurface.withValues(alpha: 0.70),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800),
             ),
             const Spacer(),
             Text(
               '$clamped%',
-              style: TextStyle(color: scheme.onSurface, fontSize: 12, fontWeight: FontWeight.w900),
+              style: TextStyle(
+                  color: scheme.onSurface,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900),
             ),
           ],
         ),
@@ -510,7 +536,11 @@ class _AccuracyBar extends StatelessWidget {
                 child: Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Color(0xFF35E7FF), Color(0xFF9A5BFF), Color(0xFFFF49D7)],
+                      colors: [
+                        Color(0xFF35E7FF),
+                        Color(0xFF9A5BFF),
+                        Color(0xFFFF49D7)
+                      ],
                     ),
                   ),
                 ),
@@ -551,7 +581,8 @@ class _StatTile extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
               color: scheme.onSurface.withValues(alpha: 0.1),
-              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.2)),
+              border:
+                  Border.all(color: scheme.onSurface.withValues(alpha: 0.2)),
             ),
             child: Icon(icon, color: scheme.onSurface, size: 20),
           ),
@@ -620,7 +651,10 @@ class _SecondaryButton extends StatelessWidget {
         alignment: Alignment.center,
         child: Text(
           label,
-          style: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w900, fontSize: 16),
+          style: TextStyle(
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w900,
+              fontSize: 16),
         ),
       ),
     );

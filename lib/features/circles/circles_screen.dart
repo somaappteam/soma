@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/core/theme/tokens.dart';
 import 'package:soma/core/widgets/glass.dart';
 import 'package:soma/core/widgets/neon_button.dart';
@@ -43,15 +44,17 @@ class _CirclesScreenState extends State<CirclesScreen> {
     _openCirclesStream = circlesRepository.getOpenCircles();
 
     // Subscribe to course changes for the filter
-    _coursesSub = coursesRepository.getUserCoursesStream().listen((final courses) {
-       if (!mounted) return;
-       final selectedExists = _selectedCourseId == _courseAll || courses.any((final c) => c.id == _selectedCourseId);
-       setState(() {
-         _courses = courses;
-         if (!selectedExists) {
-           _selectedCourseId = _courseAll;
-         }
-       });
+    _coursesSub =
+        coursesRepository.getUserCoursesStream().listen((final courses) {
+      if (!mounted) return;
+      final selectedExists = _selectedCourseId == _courseAll ||
+          courses.any((final c) => c.id == _selectedCourseId);
+      setState(() {
+        _courses = courses;
+        if (!selectedExists) {
+          _selectedCourseId = _courseAll;
+        }
+      });
     });
   }
 
@@ -75,13 +78,16 @@ class _CirclesScreenState extends State<CirclesScreen> {
 
   List<_CourseOption> _buildCourseOptions() {
     final options = _courses.map(_CourseOption.fromCourse).toList();
-    options.sort((final a, final b) => a.label.toLowerCase().compareTo(b.label.toLowerCase()));
+    options.sort((final a, final b) =>
+        a.label.toLowerCase().compareTo(b.label.toLowerCase()));
     return options;
   }
 
-  String _courseLabel(final List<_CourseOption> options, final AppLocalizations l10n) {
+  String _courseLabel(
+      final List<_CourseOption> options, final AppLocalizations l10n) {
     if (_selectedCourseId == _courseAll) return l10n.circlesAllCourses;
-    final match = options.where((final o) => o.id == _selectedCourseId).toList();
+    final match =
+        options.where((final o) => o.id == _selectedCourseId).toList();
     if (match.isEmpty) return l10n.circlesAllCourses;
     return match.first.label;
   }
@@ -116,27 +122,36 @@ class _CirclesScreenState extends State<CirclesScreen> {
     return normalized != null && normalized == _selectedLevel;
   }
 
-  bool _matchesCourse(final Map<String, dynamic> data, final _CourseOption option) {
+  bool _matchesCourse(
+      final Map<String, dynamic> data, final _CourseOption option) {
     final fromRaw = data['from_lang']?.toString() ?? '';
     final toRaw = data['to_lang']?.toString() ?? '';
     final fromCode = langCodeFromValue(fromRaw);
     final toCode = langCodeFromValue(toRaw);
 
-    if (option.fromCode != null && option.toCode != null && fromCode != null && toCode != null) {
+    if (option.fromCode != null &&
+        option.toCode != null &&
+        fromCode != null &&
+        toCode != null) {
       return option.fromCode == fromCode && option.toCode == toCode;
     }
 
     final fromLabel = langLabel(fromRaw).toLowerCase();
     final toLabel = langLabel(toRaw).toLowerCase();
-    return fromLabel == option.fromName.toLowerCase() && toLabel == option.toName.toLowerCase();
+    return fromLabel == option.fromName.toLowerCase() &&
+        toLabel == option.toName.toLowerCase();
   }
 
   Future<void> _selectCourseFilter(final List<_CourseOption> options) async {
     final l10n = AppLocalizations.of(context);
     final items = <_FilterOption>[
-      _FilterOption(label: l10n.circlesAllCourses, value: _courseAll, icon: Icons.all_inclusive_rounded),
+      _FilterOption(
+          label: l10n.circlesAllCourses,
+          value: _courseAll,
+          icon: Icons.all_inclusive_rounded),
       ...options.map(
-        (final o) => _FilterOption(label: o.label, value: o.id, icon: Icons.translate_rounded),
+        (final o) => _FilterOption(
+            label: o.label, value: o.id, icon: Icons.translate_rounded),
       ),
       _FilterOption(
         label: l10n.circlesAddNewCourse,
@@ -165,9 +180,18 @@ class _CirclesScreenState extends State<CirclesScreen> {
   Future<void> _selectModeFilter() async {
     final l10n = AppLocalizations.of(context);
     final items = <_FilterOption>[
-      _FilterOption(label: l10n.circlesAllModes, value: _modeAll, icon: Icons.all_inclusive_rounded),
-      _FilterOption(label: l10n.soloModeVocabulary, value: 'Vocabulary', icon: Icons.view_list_rounded),
-      _FilterOption(label: l10n.soloModeSentences, value: 'Sentences', icon: Icons.chat_bubble_rounded),
+      _FilterOption(
+          label: l10n.circlesAllModes,
+          value: _modeAll,
+          icon: Icons.all_inclusive_rounded),
+      _FilterOption(
+          label: l10n.soloModeVocabulary,
+          value: 'Vocabulary',
+          icon: Icons.view_list_rounded),
+      _FilterOption(
+          label: l10n.soloModeSentences,
+          value: 'Sentences',
+          icon: Icons.chat_bubble_rounded),
     ];
 
     final result = await _pickFilterOption(
@@ -183,10 +207,22 @@ class _CirclesScreenState extends State<CirclesScreen> {
   Future<void> _selectLevelFilter() async {
     final l10n = AppLocalizations.of(context);
     final items = <_FilterOption>[
-      _FilterOption(label: l10n.circlesAllLevels, value: _levelAll, icon: Icons.all_inclusive_rounded),
-      _FilterOption(label: l10n.levelBeginner, value: 'A', icon: Icons.rocket_launch_rounded),
-      _FilterOption(label: l10n.levelIntermediate, value: 'B', icon: Icons.trending_up_rounded),
-      _FilterOption(label: l10n.levelAdvanced, value: 'C', icon: Icons.auto_awesome_rounded),
+      _FilterOption(
+          label: l10n.circlesAllLevels,
+          value: _levelAll,
+          icon: Icons.all_inclusive_rounded),
+      _FilterOption(
+          label: l10n.levelBeginner,
+          value: 'A',
+          icon: Icons.rocket_launch_rounded),
+      _FilterOption(
+          label: l10n.levelIntermediate,
+          value: 'B',
+          icon: Icons.trending_up_rounded),
+      _FilterOption(
+          label: l10n.levelAdvanced,
+          value: 'C',
+          icon: Icons.auto_awesome_rounded),
     ];
 
     final result = await _pickFilterOption(
@@ -201,10 +237,10 @@ class _CirclesScreenState extends State<CirclesScreen> {
 
   @override
   Widget build(final BuildContext context) {
-    debugPrint('CirclesScreen.build called');
+    appLogger.debug('CirclesScreen.build called');
     final l10n = AppLocalizations.of(context);
     final isCompactWidth = MediaQuery.sizeOf(context).width < 380;
-    
+
     final courseOptions = _buildCourseOptions();
     _CourseOption? selectedCourseOption;
     if (_selectedCourseId != _courseAll) {
@@ -235,23 +271,29 @@ class _CirclesScreenState extends State<CirclesScreen> {
                   const Spacer(),
                   _SmallIconButton(
                     icon: Icons.people_rounded,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const FriendsScreen())),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (final _) => const FriendsScreen())),
                   ),
                   const SizedBox(width: 10),
                   _SmallIconButton(
                     icon: Icons.mail_rounded,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (final _) => const InboxScreen())),
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (final _) => const InboxScreen())),
                   ),
                 ],
               ),
 
               const SizedBox(height: 12),
 
-
               // Filters row
               Glass(
                 radius: BorderRadius.circular(18),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 child: isCompactWidth
                     ? Column(
                         children: [
@@ -313,100 +355,122 @@ class _CirclesScreenState extends State<CirclesScreen> {
               // Active circles list
               Expanded(
                 child: StreamBuilder<List<Map<String, dynamic>>>(
-                  stream: _openCirclesStream,
-                  builder: (final context, final snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(
-                        child: CircularProgressIndicator(color: Color(0xFF2AFADF)),
-                      );
-                    }
-                    
-                    final rooms = snapshot.data!;
+                    stream: _openCirclesStream,
+                    builder: (final context, final snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                              color: Color(0xFF2AFADF)),
+                        );
+                      }
 
-                    final filtered = rooms.where((final data) {
-                      if (!_matchesMode(data['mode']?.toString())) return false;
-                      if (!_matchesLevel(data['level']?.toString())) return false;
-                      if (selectedCourseOption != null && !_matchesCourse(data, selectedCourseOption)) return false;
-                      return true;
-                    }).toList();
+                      final rooms = snapshot.data!;
 
-                    if (filtered.isEmpty) {
-                      return Center(
-                        child: Text(
-                          l10n.circlesNoActiveForFilters,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                            fontWeight: FontWeight.w700,
+                      final filtered = rooms.where((final data) {
+                        if (!_matchesMode(data['mode']?.toString())) {
+                          return false;
+                        }
+                        if (!_matchesLevel(data['level']?.toString())) {
+                          return false;
+                        }
+                        if (selectedCourseOption != null &&
+                            !_matchesCourse(data, selectedCourseOption)) {
+                          return false;
+                        }
+                        return true;
+                      }).toList();
+
+                      if (filtered.isEmpty) {
+                        return Center(
+                          child: Text(
+                            l10n.circlesNoActiveForFilters,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.6),
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                      );
-                    }
+                        );
+                      }
 
-                    return ListView.separated(
-                      physics: const BouncingScrollPhysics(),
-                      itemCount: filtered.length,
-                      separatorBuilder: (final _, final __) => const SizedBox(height: 12),
-                      itemBuilder: (final context, final i) {
-                        try {
-                          final data = filtered[i];
-                          final circleId = data['id']?.toString() ?? '';
-                          // Use counts directly from circle data
-                          final playerCount = data['player_count'] as int? ?? 0;
-                          final spectatorCount = data['spectator_count'] as int? ?? 0;
-                          
-                          final fromLabel = langLabel(data['from_lang']?.toString() ?? '?');
-                          final toLabel = langLabel(data['to_lang']?.toString() ?? '?');
-                          
-                          final room = CircleRoom(
-                            id: circleId,
-                            title: data['name'] ?? l10n.circlesUnknownRoom,
-                            fromLang: fromLabel,
-                            toLang: toLabel,
-                            level: data['level'] ?? 'A',
-                            mode: data['mode'] ?? 'Vocabulary',
-                            players: playerCount,
-                            maxPlayers: data['max_players'] ?? 5,
-                            spectators: spectatorCount,
-                            questions: data['questions_count'] ?? 15,
-                            timePerQ: data['time_per_q'] ?? 10,
-                            isLive: true,
-                          );
+                      return ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: filtered.length,
+                        separatorBuilder: (final _, final __) =>
+                            const SizedBox(height: 12),
+                        itemBuilder: (final context, final i) {
+                          try {
+                            final data = filtered[i];
+                            final circleId = data['id']?.toString() ?? '';
+                            // Use counts directly from circle data
+                            final playerCount =
+                                data['player_count'] as int? ?? 0;
+                            final spectatorCount =
+                                data['spectator_count'] as int? ?? 0;
 
-                          return CircleCard(
-                            room: room,
-                            onJoin: () async {
-                              try {
-                                final status = data['status']?.toString() ?? 'lobby';
-                                final role = status == 'active' ? 'spectator' : 'player';
-                                await circlesRepository.joinCircle(room.id, role: role);
-                                if (!context.mounted) return;
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (final _) => CircleLobbyScreen(circleId: room.id),
-                                  ),
-                                );
-                              } catch (e) {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(l10n.circlesJoinError(e.toString())),
-                                      backgroundColor: Colors.redAccent,
+                            final fromLabel =
+                                langLabel(data['from_lang']?.toString() ?? '?');
+                            final toLabel =
+                                langLabel(data['to_lang']?.toString() ?? '?');
+
+                            final room = CircleRoom(
+                              id: circleId,
+                              title: data['name'] ?? l10n.circlesUnknownRoom,
+                              fromLang: fromLabel,
+                              toLang: toLabel,
+                              level: data['level'] ?? 'A',
+                              mode: data['mode'] ?? 'Vocabulary',
+                              players: playerCount,
+                              maxPlayers: data['max_players'] ?? 5,
+                              spectators: spectatorCount,
+                              questions: data['questions_count'] ?? 15,
+                              timePerQ: data['time_per_q'] ?? 10,
+                              isLive: true,
+                            );
+
+                            return CircleCard(
+                              room: room,
+                              onJoin: () async {
+                                try {
+                                  final status =
+                                      data['status']?.toString() ?? 'lobby';
+                                  final role = status == 'active'
+                                      ? 'spectator'
+                                      : 'player';
+                                  await circlesRepository.joinCircle(room.id,
+                                      role: role);
+                                  if (!context.mounted) return;
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (final _) =>
+                                          CircleLobbyScreen(circleId: room.id),
                                     ),
                                   );
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(l10n
+                                            .circlesJoinError(e.toString())),
+                                        backgroundColor: Colors.redAccent,
+                                      ),
+                                    );
+                                  }
                                 }
-                              }
-                            },
-                          );
-                        } catch (e, stack) {
-                          debugPrint('Error building circle card at index $i: $e\n$stack');
-                          return const SizedBox.shrink();
-                        }
-                      },
-                    );
-                  }
-                ),
+                              },
+                            );
+                          } catch (e, stack) {
+                            appLogger.debug(
+                                'Error building circle card at index $i: $e\n$stack');
+                            return const SizedBox.shrink();
+                          }
+                        },
+                      );
+                    }),
               ),
 
               // Create Circle CTA
@@ -482,7 +546,8 @@ class _CourseOption {
 
   factory _CourseOption.fromCourse(final SoloCourse course) {
     final parts = course.subtitle.split('?');
-    final fromName = parts.isNotEmpty ? parts.first.trim() : course.subtitle.trim();
+    final fromName =
+        parts.isNotEmpty ? parts.first.trim() : course.subtitle.trim();
     final toName = parts.length > 1 ? parts[1].trim() : '';
     final label = toName.isEmpty ? fromName : '$fromName ? $toName';
     return _CourseOption(
@@ -652,7 +717,12 @@ class _SmallIconButton extends StatelessWidget {
           width: 44,
           height: 44,
           child: Center(
-            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 22),
+            child: Icon(icon,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.9),
+                size: 22),
           ),
         ),
       ),
@@ -666,7 +736,11 @@ class _FilterChip extends StatelessWidget {
   final VoidCallback onTap;
   final bool compact;
 
-  const _FilterChip({required this.label, required this.icon, required this.onTap, this.compact = false});
+  const _FilterChip(
+      {required this.label,
+      required this.icon,
+      required this.onTap,
+      this.compact = false});
 
   @override
   Widget build(final BuildContext context) {
@@ -680,12 +754,24 @@ class _FilterChip extends StatelessWidget {
           borderRadius: BorderRadius.circular(14),
           color: Theme.of(context).brightness == Brightness.light
               ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
-              : Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+              : Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
+                  .withValues(alpha: 0.5),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.12)),
         ),
         child: Row(
           children: [
-            Icon(icon, size: compact ? 16 : 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85)),
+            Icon(icon,
+                size: compact ? 16 : 18,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.85)),
             SizedBox(width: compact ? 6 : 8),
             Expanded(
               child: Text(
@@ -694,14 +780,22 @@ class _FilterChip extends StatelessWidget {
                 softWrap: false,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.95),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.95),
                   fontWeight: FontWeight.w800,
                   fontSize: compact ? 12 : 12.5,
                 ),
               ),
             ),
             if (!compact)
-              Icon(Icons.expand_more_rounded, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65)),
+              Icon(Icons.expand_more_rounded,
+                  size: 18,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.65)),
           ],
         ),
       ),
@@ -749,7 +843,11 @@ Future<String?> _pickFilterOption(
                       const Spacer(),
                       IconButton(
                         onPressed: () => Navigator.pop(ctx),
-                        icon: Icon(Icons.close_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85)),
+                        icon: Icon(Icons.close_rounded,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.85)),
                       ),
                     ],
                   ),
@@ -758,7 +856,10 @@ Future<String?> _pickFilterOption(
                     final selected = !item.isAction && item.value == current;
                     final textColor = item.isAction
                         ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: selected ? 0.98 : 0.92);
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: selected ? 0.98 : 0.92);
                     return InkWell(
                       borderRadius: BorderRadius.circular(16),
                       onTap: () => Navigator.pop(ctx, item.value),
@@ -769,17 +870,31 @@ Future<String?> _pickFilterOption(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           color: selected
-                              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.10)
-                              : (Theme.of(context).brightness == Brightness.light
-                                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)
+                              ? Theme.of(context)
+                                  .colorScheme
+                                  .primary
+                                  .withValues(alpha: 0.10)
+                              : (Theme.of(context).brightness ==
+                                      Brightness.light
+                                  ? Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.08)
                                   : Theme.of(context)
                                       .colorScheme
                                       .surfaceContainerHighest
-                                      .withValues(alpha: item.isAction ? 0.18 : 0.10)),
+                                      .withValues(
+                                          alpha: item.isAction ? 0.18 : 0.10)),
                           border: Border.all(
                             color: selected
-                                ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.26)
-                                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withValues(alpha: 0.26)
+                                : Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.10),
                           ),
                         ),
                         child: Row(
@@ -798,7 +913,11 @@ Future<String?> _pickFilterOption(
                               ),
                             ),
                             if (selected)
-                              Icon(Icons.check_rounded, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.9)),
+                              Icon(Icons.check_rounded,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withValues(alpha: 0.9)),
                           ],
                         ),
                       ),
@@ -877,7 +996,9 @@ class _LiveDot extends StatelessWidget {
       height: 12,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: live ? const Color(0xFF2AFADF) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
+        color: live
+            ? const Color(0xFF2AFADF)
+            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
         boxShadow: live
             ? [
                 BoxShadow(
@@ -895,13 +1016,11 @@ class _LiveDot extends StatelessWidget {
 class _Pill extends StatelessWidget {
   final IconData? icon;
   final String label;
-  final bool filled;
   final Color? backgroundColor;
 
   const _Pill({
     this.icon,
     required this.label,
-    this.filled = false,
     this.backgroundColor,
   });
 
@@ -962,8 +1081,9 @@ class _ActionButton extends StatelessWidget {
         : T.neonGradient;
 
     final bg = filled ? gradient : null;
-    final shadowColor =
-        isLight ? scheme.primary.withValues(alpha: 0.25) : T.neonA.withValues(alpha: 0.15);
+    final shadowColor = isLight
+        ? scheme.primary.withValues(alpha: 0.25)
+        : T.neonA.withValues(alpha: 0.15);
 
     return InkWell(
       borderRadius: BorderRadius.circular(14),

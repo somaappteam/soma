@@ -137,7 +137,6 @@ String? langCodeFromValue(final String value) {
   return null;
 }
 
-
 String langNameFromCode(final String code) {
   final normalized = code.trim().toLowerCase();
   for (final l in kLanguages) {

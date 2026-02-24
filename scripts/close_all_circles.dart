@@ -1,3 +1,4 @@
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
@@ -7,7 +8,7 @@ const String serviceRoleKey =
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
 
-  print('--- Closing ALL open circles (lobby & active) ---');
+  appLogger.info('--- Closing ALL open circles (lobby & active) ---');
 
   try {
     // 1. Fetch all open circles
@@ -15,12 +16,12 @@ void main() async {
         .from('circles')
         .select('id, name, status')
         .or('status.eq.lobby,status.eq.active');
-    
+
     final circles = List<Map<String, dynamic>>.from(response);
-    print('Found ${circles.length} open circles.');
+    appLogger.info('Found ${circles.length} open circles.');
 
     if (circles.isEmpty) {
-      print('No open circles to close.');
+      appLogger.info('No open circles to close.');
       return;
     }
 
@@ -28,15 +29,17 @@ void main() async {
       final circleId = circle['id'] as String;
       final name = circle['name'];
       final status = circle['status'];
-      
-      print("Closing circle '$name' (ID: $circleId, status: $status)...");
-      await client.from('circles').update({'status': 'ended'}).eq('id', circleId);
-      print('  -> Closed.');
+
+      appLogger
+          .info("Closing circle '$name' (ID: $circleId, status: $status)...");
+      await client
+          .from('circles')
+          .update({'status': 'ended'}).eq('id', circleId);
+      appLogger.info('  -> Closed.');
     }
 
-    print('\nDone! Closed ${circles.length} circles.');
-
+    appLogger.info('\nDone! Closed ${circles.length} circles.');
   } catch (e) {
-    print('Error: $e');
+    appLogger.info('Error: $e');
   }
 }

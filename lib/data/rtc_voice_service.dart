@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart'
-    show TargetPlatform, debugPrint, defaultTargetPlatform, kIsWeb;
+    show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:soma/core/config/rtc_config.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/data/auth_repository.dart';
 import 'package:soma/data/circle_voice_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -64,7 +65,9 @@ class RtcVoiceService {
     final uid = authRepository.currentUser?.id;
     if (uid == null) return false;
 
-    if (_joined && _circleId == circleId && _asSpeaker == asSpeaker) return true;
+    if (_joined && _circleId == circleId && _asSpeaker == asSpeaker) {
+      return true;
+    }
 
     await disconnectIfCircle(_circleId);
 
@@ -95,7 +98,6 @@ class RtcVoiceService {
     circleVoiceService.setMuted(_muted);
     _startMicLevelSampling();
     _emitConnectionState();
-
 
     _announceJoin();
     // Default to speakerphone for circles
@@ -148,7 +150,8 @@ class RtcVoiceService {
 
     switch (type) {
       case 'join':
-        if (!_peers.containsKey(from) && _peers.length >= RtcConfig.maxMeshPeers) {
+        if (!_peers.containsKey(from) &&
+            _peers.length >= RtcConfig.maxMeshPeers) {
           _meshLimitSkips += 1;
           _emitTelemetry('mesh_limit_skip');
           return;
@@ -199,7 +202,9 @@ class RtcVoiceService {
         final sdpMLineIndex = data['sdpMLineIndex'] is int
             ? data['sdpMLineIndex'] as int
             : int.tryParse('${data['sdpMLineIndex']}');
-        if (candidate == null || sdpMid == null || sdpMLineIndex == null) return;
+        if (candidate == null || sdpMid == null || sdpMLineIndex == null) {
+          return;
+        }
         final ice = RTCIceCandidate(candidate, sdpMid, sdpMLineIndex);
         if (_hasRemoteDescription[from] == true) {
           await pc.addCandidate(ice);
@@ -260,7 +265,8 @@ class RtcVoiceService {
     if (RtcConfig.turnCredentialsFunction.isEmpty) return;
     final now = DateTime.now();
     final expires = _ephemeralTurnExpiresAt;
-    if (expires != null && expires.isAfter(now.add(const Duration(seconds: 30)))) {
+    if (expires != null &&
+        expires.isAfter(now.add(const Duration(seconds: 30)))) {
       return;
     }
 
@@ -283,8 +289,7 @@ class RtcVoiceService {
       _ephemeralTurnUsername = username;
       _ephemeralTurnCredential = credential;
       if (expiresInSeconds > 0) {
-        _ephemeralTurnExpiresAt =
-            now.add(Duration(seconds: expiresInSeconds));
+        _ephemeralTurnExpiresAt = now.add(Duration(seconds: expiresInSeconds));
       }
       _emitTelemetry('turn_credentials_refreshed');
     } catch (_) {
@@ -345,13 +350,13 @@ class RtcVoiceService {
       _emitConnectionState();
 
       if ((state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
-              state == RTCIceConnectionState.RTCIceConnectionStateCompleted)) {
+          state == RTCIceConnectionState.RTCIceConnectionStateCompleted)) {
         // Connected!
       }
     };
 
     pc.onTrack = (final event) async {
-      debugPrint('Voice track received from $peerId: ${event.track.kind}');
+      appLogger.debug('Voice track received from $peerId: ${event.track.kind}');
       if (event.streams.isNotEmpty) {
         final stream = event.streams[0];
         try {
@@ -359,9 +364,10 @@ class RtcVoiceService {
           await renderer.initialize();
           renderer.srcObject = stream;
           _renderers[peerId] = renderer;
-          debugPrint('Successfully wired audio via RTCVideoRenderer for $peerId');
+          appLogger.debug(
+              'Successfully wired audio via RTCVideoRenderer for $peerId');
         } catch (e) {
-          debugPrint('Failed to wire audio for $peerId: $e');
+          appLogger.debug('Failed to wire audio for $peerId: $e');
         }
       }
     };
@@ -383,7 +389,8 @@ class RtcVoiceService {
     });
   }
 
-  Future<void> _sendSignal(final String? to, final Map<String, dynamic> payload) async {
+  Future<void> _sendSignal(
+      final String? to, final Map<String, dynamic> payload) async {
     final channel = _signalChannel;
     final me = _userId;
     if (channel == null || me == null) return;
@@ -415,7 +422,7 @@ class RtcVoiceService {
     try {
       await Helper.setSpeakerphoneOn(enabled);
     } catch (e) {
-      debugPrint('Failed to set speakerphone: $e');
+      appLogger.debug('Failed to set speakerphone: $e');
     }
   }
 

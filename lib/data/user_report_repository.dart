@@ -33,7 +33,8 @@ class UserReportRepository {
   Future<void> removeReport(final String reportedUserId) async {
     final reporterId = _supabase.auth.currentUser?.id;
     if (reporterId == null || reportedUserId.isEmpty) {
-      throw StateError('Cannot remove report without an authenticated reporter.');
+      throw StateError(
+          'Cannot remove report without an authenticated reporter.');
     }
 
     await _supabase
@@ -44,4 +45,5 @@ class UserReportRepository {
   }
 }
 
-UserReportRepository get userReportRepository => locator<UserReportRepository>();
+UserReportRepository get userReportRepository =>
+    locator<UserReportRepository>();

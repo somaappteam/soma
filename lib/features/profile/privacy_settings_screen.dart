@@ -14,6 +14,7 @@ import 'package:soma/l10n/gen/app_localizations.dart';
 
 // Enum definitions (could be in a model file, but keeping here for simplicity as they were in privacy_store)
 enum ProfileVisibility { public, friends, private }
+
 enum DmPermission { everyone, friendsOnly, noOne }
 
 class PrivacySettingsScreen extends StatefulWidget {
@@ -37,47 +38,54 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: SafeArea(
-            child: ResponsiveFrame(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
-                child: Column(
+        child: ResponsiveFrame(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
+            child: Column(
+              children: [
+                // Header
+                Row(
                   children: [
-                  // Header
-                  Row(
-                    children: [
-                      _IconBtn(
-                        icon: Icons.arrow_back_ios_new_rounded,
-                        onTap: () => Navigator.pop(context),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        l10n.privacyTitle,
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.w900,
-                            ),
-                      ),
-                    ],
-                  ),
+                    _IconBtn(
+                      icon: Icons.arrow_back_ios_new_rounded,
+                      onTap: () => Navigator.pop(context),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.privacyTitle,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                          ),
+                    ),
+                  ],
+                ),
 
-                  const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                  Expanded(
-                    child: StreamBuilder<Map<String, dynamic>>(
+                Expanded(
+                  child: StreamBuilder<Map<String, dynamic>>(
                       stream: _settingsStream,
                       builder: (final context, final snapshot) {
                         // Default values if loading or empty
                         final data = snapshot.data ?? {};
-                        
-                        final visibility = _parseVisibility(data['profile_visibility']);
-                        final showOnline = data['show_online_status'] ?? true;
-                        final showActivity = data['show_learning_activity'] ?? true;
-                        final allowRequests = data['allow_friend_requests'] ?? true;
-                        final dmPermission = _parseDmPermission(data['dm_permission']);
-                        final blockedIds = _parseBlockedUsers(data['blocked_user_ids']);
 
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
+                        final visibility =
+                            _parseVisibility(data['profile_visibility']);
+                        final showOnline = data['show_online_status'] ?? true;
+                        final showActivity =
+                            data['show_learning_activity'] ?? true;
+                        final allowRequests =
+                            data['allow_friend_requests'] ?? true;
+                        final dmPermission =
+                            _parseDmPermission(data['dm_permission']);
+                        final blockedIds =
+                            _parseBlockedUsers(data['blocked_user_ids']);
+
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
                         }
 
                         return ListView(
@@ -99,19 +107,19 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                                     : i == 1
                                         ? ProfileVisibility.friends
                                         : ProfileVisibility.private;
-                                settingsRepository.updateSetting('profile_visibility', v.name);
+                                settingsRepository.updateSetting(
+                                    'profile_visibility', v.name);
                               },
                             ),
-
                             const SizedBox(height: 14),
-
                             _SectionTitle(l10n.privacySectionActivity),
                             _SwitchTile(
                               icon: Icons.circle_outlined,
                               title: l10n.privacyShowOnlineTitle,
                               subtitle: l10n.privacyShowOnlineSubtitle,
                               value: showOnline,
-                              onChanged: (final v) => settingsRepository.updateSetting('show_online_status', v),
+                              onChanged: (final v) => settingsRepository
+                                  .updateSetting('show_online_status', v),
                             ),
                             const SizedBox(height: 10),
                             _SwitchTile(
@@ -119,23 +127,20 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                               title: l10n.privacyShowActivityTitle,
                               subtitle: l10n.privacyShowActivitySubtitle,
                               value: showActivity,
-                              onChanged: (final v) => settingsRepository.updateSetting('show_learning_activity', v),
+                              onChanged: (final v) => settingsRepository
+                                  .updateSetting('show_learning_activity', v),
                             ),
-
-
                             const SizedBox(height: 14),
-
                             _SectionTitle(l10n.privacySectionSocial),
                             _SwitchTile(
                               icon: Icons.person_add_alt_1_rounded,
                               title: l10n.privacyAllowRequestsTitle,
                               subtitle: l10n.privacyAllowRequestsSubtitle,
                               value: allowRequests,
-                              onChanged: (final v) => settingsRepository.updateSetting('allow_friend_requests', v),
+                              onChanged: (final v) => settingsRepository
+                                  .updateSetting('allow_friend_requests', v),
                             ),
-
                             const SizedBox(height: 10),
-
                             _SegmentedChoice(
                               title: l10n.privacyWhoCanDmTitle,
                               subtitle: _dmSubtitle(dmPermission, l10n),
@@ -151,12 +156,11 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                                     : i == 1
                                         ? DmPermission.friendsOnly
                                         : DmPermission.noOne;
-                                settingsRepository.updateSetting('dm_permission', p.name);
+                                settingsRepository.updateSetting(
+                                    'dm_permission', p.name);
                               },
                             ),
-
                             const SizedBox(height: 14),
-
                             _SectionTitle(l10n.privacySectionBlockedUsers),
                             _Tile(
                               icon: Icons.block_rounded,
@@ -175,9 +179,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                                 );
                               },
                             ),
-
                             const SizedBox(height: 14),
-
                             _SectionTitle(l10n.privacySectionDataControls),
                             _Tile(
                               icon: Icons.file_download_rounded,
@@ -192,64 +194,78 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                               subtitle: l10n.privacyDeleteAccountSubtitle,
                               onTap: () => _confirmDelete(context),
                             ),
-
                             const SizedBox(height: 10),
                           ],
                         );
-                      }
-                    ),
-                  ),
-                  ],
+                      }),
                 ),
-              ),
+              ],
             ),
           ),
+        ),
+      ),
     );
   }
 
   // --- Parsers ---
 
   ProfileVisibility _parseVisibility(final String? v) {
-    return ProfileVisibility.values.firstWhere((final e) => e.name == v, orElse: () => ProfileVisibility.friends);
+    return ProfileVisibility.values.firstWhere((final e) => e.name == v,
+        orElse: () => ProfileVisibility.friends);
   }
 
   DmPermission _parseDmPermission(final String? v) {
-    return DmPermission.values.firstWhere((final e) => e.name == v, orElse: () => DmPermission.friendsOnly);
+    return DmPermission.values.firstWhere((final e) => e.name == v,
+        orElse: () => DmPermission.friendsOnly);
   }
 
   int _visIndex(final ProfileVisibility v) {
     switch (v) {
-      case ProfileVisibility.public: return 0;
-      case ProfileVisibility.friends: return 1;
-      case ProfileVisibility.private: return 2;
+      case ProfileVisibility.public:
+        return 0;
+      case ProfileVisibility.friends:
+        return 1;
+      case ProfileVisibility.private:
+        return 2;
     }
   }
 
-  String _visibilitySubtitle(final ProfileVisibility v, final AppLocalizations l10n) {
+  String _visibilitySubtitle(
+      final ProfileVisibility v, final AppLocalizations l10n) {
     switch (v) {
-      case ProfileVisibility.public: return l10n.privacyVisibilityPublicSubtitle;
-      case ProfileVisibility.friends: return l10n.privacyVisibilityFriendsSubtitle;
-      case ProfileVisibility.private: return l10n.privacyVisibilityPrivateSubtitle;
+      case ProfileVisibility.public:
+        return l10n.privacyVisibilityPublicSubtitle;
+      case ProfileVisibility.friends:
+        return l10n.privacyVisibilityFriendsSubtitle;
+      case ProfileVisibility.private:
+        return l10n.privacyVisibilityPrivateSubtitle;
     }
   }
 
   int _dmIndex(final DmPermission p) {
     switch (p) {
-      case DmPermission.everyone: return 0;
-      case DmPermission.friendsOnly: return 1;
-      case DmPermission.noOne: return 2;
+      case DmPermission.everyone:
+        return 0;
+      case DmPermission.friendsOnly:
+        return 1;
+      case DmPermission.noOne:
+        return 2;
     }
   }
 
   String _dmSubtitle(final DmPermission p, final AppLocalizations l10n) {
     switch (p) {
-      case DmPermission.everyone: return l10n.privacyDmEveryoneSubtitle;
-      case DmPermission.friendsOnly: return l10n.privacyDmFriendsSubtitle;
-      case DmPermission.noOne: return l10n.privacyDmNoOneSubtitle;
+      case DmPermission.everyone:
+        return l10n.privacyDmEveryoneSubtitle;
+      case DmPermission.friendsOnly:
+        return l10n.privacyDmFriendsSubtitle;
+      case DmPermission.noOne:
+        return l10n.privacyDmNoOneSubtitle;
     }
   }
 
-  void _showInfo(final BuildContext context, final String title, final String body) {
+  void _showInfo(
+      final BuildContext context, final String title, final String body) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -275,7 +291,10 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
 
   List<String> _parseBlockedUsers(final dynamic value) {
     if (value is List) {
-      return value.map((final e) => e.toString()).where((final e) => e.isNotEmpty).toList();
+      return value
+          .map((final e) => e.toString())
+          .where((final e) => e.isNotEmpty)
+          .toList();
     }
     return [];
   }
@@ -386,30 +405,36 @@ class _BlockedUsersScreenState extends State<_BlockedUsersScreen> {
                       : FutureBuilder<List<Map<String, dynamic>>>(
                           future: _profilesFuture,
                           builder: (final context, final snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return const Center(child: CircularProgressIndicator());
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             }
                             final profiles = snapshot.data ?? [];
                             return ListView.separated(
                               physics: const BouncingScrollPhysics(),
                               itemCount: profiles.length,
-                              separatorBuilder: (final _, final __) => const SizedBox(height: 10),
+                              separatorBuilder: (final _, final __) =>
+                                  const SizedBox(height: 10),
                               itemBuilder: (final context, final index) {
                                 final profile = profiles[index];
                                 final id = profile['id']?.toString() ?? '';
                                 return Glass(
                                   radius: BorderRadius.circular(24),
-                                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                                  padding:
+                                      const EdgeInsets.fromLTRB(14, 12, 14, 12),
                                   child: Row(
                                     children: [
                                       _IconBox(icon: Icons.person_rounded),
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              profile['username'] ?? l10n.genericUser,
+                                              profile['username'] ??
+                                                  l10n.genericUser,
                                               style: TextStyle(
                                                 color: scheme.onSurface,
                                                 fontWeight: FontWeight.w900,
@@ -420,7 +445,8 @@ class _BlockedUsersScreenState extends State<_BlockedUsersScreen> {
                                             Text(
                                               profile['display_name'] ?? '',
                                               style: TextStyle(
-                                                color: scheme.onSurface.withValues(alpha: 0.62),
+                                                color: scheme.onSurface
+                                                    .withValues(alpha: 0.62),
                                                 fontWeight: FontWeight.w700,
                                                 height: 1.2,
                                               ),
@@ -429,7 +455,9 @@ class _BlockedUsersScreenState extends State<_BlockedUsersScreen> {
                                         ),
                                       ),
                                       TextButton(
-                                        onPressed: id.isEmpty ? null : () => _unblock(id),
+                                        onPressed: id.isEmpty
+                                            ? null
+                                            : () => _unblock(id),
                                         child: Text(l10n.remove),
                                       ),
                                     ],
@@ -467,7 +495,13 @@ class _IconBtn extends StatelessWidget {
         child: SizedBox(
           width: 44,
           height: 44,
-          child: Center(child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9), size: 20)),
+          child: Center(
+              child: Icon(icon,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.9),
+                  size: 20)),
         ),
       ),
     );
@@ -485,7 +519,8 @@ class _SectionTitle extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
           fontWeight: FontWeight.w900,
           fontSize: 12.5,
           letterSpacing: 0.2,
@@ -523,9 +558,20 @@ class _SwitchTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
+                Text(title,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 15)),
                 const SizedBox(height: 4),
-                Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+                Text(subtitle,
+                    style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.62),
+                        fontWeight: FontWeight.w700,
+                        height: 1.2)),
               ],
             ),
           ),
@@ -549,9 +595,15 @@ class _IconBox extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
         border: Border.all(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.12)),
       ),
-      child: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92), size: 22),
+      child: Icon(icon,
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.92),
+          size: 22),
     );
   }
 }
@@ -584,16 +636,28 @@ class _SegmentedChoice extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
+          Text(title,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 15)),
           const SizedBox(height: 4),
-          Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+          Text(subtitle,
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.62),
+                  fontWeight: FontWeight.w700,
+                  height: 1.2)),
           const SizedBox(height: 12),
           Row(
             children: List.generate(options.length, (final i) {
               final selected = i == selectedIndex;
               return Expanded(
                 child: Container(
-                  margin: EdgeInsets.only(right: i == options.length - 1 ? 0 : 10),
+                  margin:
+                      EdgeInsets.only(right: i == options.length - 1 ? 0 : 10),
                   child: AppSelectablePill(
                     label: options[i].label,
                     selected: selected,
@@ -610,20 +674,20 @@ class _SegmentedChoice extends StatelessWidget {
     );
   }
 }
- 
+
 class _Tile extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
- 
+
   const _Tile({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
   });
- 
+
   @override
   Widget build(final BuildContext context) {
     return Glass(
@@ -642,13 +706,28 @@ class _Tile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
+                    Text(title,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 15)),
                     const SizedBox(height: 4),
-                    Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+                    Text(subtitle,
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.62),
+                            fontWeight: FontWeight.w700,
+                            height: 1.2)),
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75)),
+              Icon(Icons.chevron_right_rounded,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.75)),
             ],
           ),
         ),
@@ -656,20 +735,20 @@ class _Tile extends StatelessWidget {
     );
   }
 }
- 
+
 class _TileDanger extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
- 
+
   const _TileDanger({
     required this.icon,
     required this.title,
     required this.subtitle,
     required this.onTap,
   });
- 
+
   @override
   Widget build(final BuildContext context) {
     return Glass(
@@ -688,13 +767,28 @@ class _TileDanger extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 15)),
+                    Text(title,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w900,
+                            fontSize: 15)),
                     const SizedBox(height: 4),
-                    Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.62), fontWeight: FontWeight.w700, height: 1.2)),
+                    Text(subtitle,
+                        style: TextStyle(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.62),
+                            fontWeight: FontWeight.w700,
+                            height: 1.2)),
                   ],
                 ),
               ),
-              Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.onErrorContainer.withValues(alpha: 0.85)),
+              Icon(Icons.warning_amber_rounded,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onErrorContainer
+                      .withValues(alpha: 0.85)),
             ],
           ),
         ),
@@ -720,9 +814,20 @@ class _InfoSheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 16)),
+            Text(title,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16)),
             const SizedBox(height: 8),
-            Text(body, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70), fontWeight: FontWeight.w700, height: 1.2)),
+            Text(body,
+                style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.70),
+                    fontWeight: FontWeight.w700,
+                    height: 1.2)),
             const SizedBox(height: 12),
             InkWell(
               borderRadius: BorderRadius.circular(999),
@@ -732,11 +837,22 @@ class _InfoSheet extends StatelessWidget {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(999),
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
-                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.14)),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.10),
+                  border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.14)),
                 ),
                 alignment: Alignment.center,
-                child: Text(l10n.ok, style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w900, fontSize: 14)),
+                child: Text(l10n.ok,
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 14)),
               ),
             ),
           ],

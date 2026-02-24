@@ -1,3 +1,4 @@
+import 'package:soma/core/services/app_logger.dart';
 import 'package:supabase/supabase.dart';
 
 const String supabaseUrl = 'https://bnbjteedohflgkarfaxk.supabase.co';
@@ -7,7 +8,7 @@ const String serviceRoleKey =
 void main() async {
   final client = SupabaseClient(supabaseUrl, serviceRoleKey);
 
-  print('--- Checking for Ghost Circles ---');
+  appLogger.info('--- Checking for Ghost Circles ---');
 
   try {
     // 1. Fetch all open circles (lobby/active)
@@ -15,9 +16,9 @@ void main() async {
         .from('circles')
         .select('id, name, host_id, status')
         .or('status.eq.lobby,status.eq.active');
-    
+
     final circles = List<Map<String, dynamic>>.from(response);
-    print('Found ${circles.length} open circles.');
+    appLogger.info('Found ${circles.length} open circles.');
 
     int ghostsFound = 0;
 
@@ -36,24 +37,26 @@ void main() async {
 
       // 3. If host missing, end the circle
       if (hostParticipant == null) {
-        print("MISSING HOST: Circle '$name' ($circleId). Host $hostId is not in participants.");
+        appLogger.info(
+            "MISSING HOST: Circle '$name' ($circleId). Host $hostId is not in participants.");
         ghostsFound++;
-        
-        print('  -> Closing circle...');
-        await client.from('circles').update({'status': 'ended'}).eq('id', circleId);
-        print('  -> Closed.');
+
+        appLogger.info('  -> Closing circle...');
+        await client
+            .from('circles')
+            .update({'status': 'ended'}).eq('id', circleId);
+        appLogger.info('  -> Closed.');
       } else {
-        // print("  OK: Circle '$name' has host.");
+        // appLogger.info("  OK: Circle '$name' has host.");
       }
     }
 
     if (ghostsFound == 0) {
-      print('No ghost circles found!');
+      appLogger.info('No ghost circles found!');
     } else {
-      print('Cleaned up $ghostsFound ghost circles.');
+      appLogger.info('Cleaned up $ghostsFound ghost circles.');
     }
-
   } catch (e) {
-    print('Error: $e');
+    appLogger.info('Error: $e');
   }
 }

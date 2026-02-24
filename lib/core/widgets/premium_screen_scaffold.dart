@@ -33,7 +33,8 @@ class PremiumScreenScaffold extends StatelessWidget {
       builder: (final context, final constraints) {
         final density = PremiumLayout.densityForWidth(constraints.maxWidth);
         final resolvedPadding = padding ?? PremiumLayout.screenPadding(density);
-        final resolvedMaxWidth = maxContentWidth ?? PremiumLayout.maxContentWidth(constraints.maxWidth);
+        final resolvedMaxWidth = maxContentWidth ??
+            PremiumLayout.maxContentWidth(constraints.maxWidth);
 
         return Scaffold(
           body: SafeArea(

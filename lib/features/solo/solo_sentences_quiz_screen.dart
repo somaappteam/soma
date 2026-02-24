@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:soma/core/services/app_logger.dart';
 import 'package:soma/core/services/haptics_service.dart';
 import 'package:soma/core/services/sfx_service.dart';
 import 'package:soma/core/services/tts_service.dart';
@@ -10,7 +11,6 @@ import 'package:soma/core/theme/motion.dart';
 import 'package:soma/core/widgets/glass.dart';
 import 'package:soma/core/widgets/neon_button.dart';
 import 'package:soma/core/widgets/pressable_scale.dart';
-
 import 'package:soma/core/widgets/staggered_in.dart';
 import 'package:soma/data/quiz_repository.dart';
 import 'package:soma/data/settings_repository.dart';
@@ -72,12 +72,14 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     super.initState();
     remaining = widget.timePerQuestion ?? 0;
     _loadSettings();
-    if (widget.initialQuestions != null && widget.initialQuestions!.isNotEmpty) {
+    if (widget.initialQuestions != null &&
+        widget.initialQuestions!.isNotEmpty) {
       questions = widget.initialQuestions!;
       _loading = false;
       _prepareQuestion();
       _startTimer();
-    } else if (widget.reviewQuestions != null && widget.reviewQuestions!.isNotEmpty) {
+    } else if (widget.reviewQuestions != null &&
+        widget.reviewQuestions!.isNotEmpty) {
       questions = widget.reviewQuestions!;
       _loading = false;
       _prepareQuestion();
@@ -104,7 +106,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       });
       await prefs.setString(_sessionKey, payload);
     } catch (e) {
-      debugPrint('Session save error: $e');
+      appLogger.debug('Session save error: $e');
     }
   }
 
@@ -145,13 +147,15 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
             .whereType<Map>()
             .map((final e) => Map<String, dynamic>.from(e))
             .toList();
-        final savedIndex = (data['index'] as int? ?? 0).clamp(0, savedQuestions.length - 1);
+        final savedIndex =
+            (data['index'] as int? ?? 0).clamp(0, savedQuestions.length - 1);
         setState(() {
           questions = savedQuestions;
           index = savedIndex;
           correctCount = data['correct'] as int? ?? 0;
           _loading = false;
-          _loadError = savedQuestions.isEmpty ? 'No questions in saved session.' : null;
+          _loadError =
+              savedQuestions.isEmpty ? 'No questions in saved session.' : null;
         });
         if (questions.isNotEmpty) {
           _prepareQuestion();
@@ -162,7 +166,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
         _loadQuestions();
       }
     } catch (e) {
-      debugPrint('Session load error: $e');
+      appLogger.debug('Session load error: $e');
       _loadQuestions();
     }
   }
@@ -180,7 +184,8 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
             decoration: BoxDecoration(
               color: scheme.surface.withValues(alpha: 0.95),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
+              border:
+                  Border.all(color: scheme.onSurface.withValues(alpha: 0.12)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -189,13 +194,18 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                 const SizedBox(height: 12),
                 Text(
                   'Resume session?',
-                  style: TextStyle(color: scheme.onSurface, fontSize: 18, fontWeight: FontWeight.w900),
+                  style: TextStyle(
+                      color: scheme.onSurface,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'You have an unfinished quiz. Continue where you left off?',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      color: scheme.onSurface.withValues(alpha: 0.7),
+                      fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -205,9 +215,11 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                         onPressed: () => Navigator.pop(ctx, false),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: scheme.onSurface,
-                          side: BorderSide(color: scheme.onSurface.withValues(alpha: 0.25)),
+                          side: BorderSide(
+                              color: scheme.onSurface.withValues(alpha: 0.25)),
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
                         ),
                         child: const Text('Start fresh'),
                       ),
@@ -218,7 +230,8 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                         onPressed: () => Navigator.pop(ctx, true),
                         style: FilledButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14)),
                         ),
                         child: const Text('Resume'),
                       ),
@@ -273,13 +286,13 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
         }
       }
     } catch (e, stack) {
-      debugPrint('Error loading quiz: $e');
+      appLogger.debug('Error loading quiz: $e');
       if (mounted) {
         setState(() {
           _loading = false;
           _loadError = 'Failed to load sentence questions. Please try again.';
         });
-        debugPrint('$stack');
+        appLogger.debug('$stack');
       }
     }
   }
@@ -304,12 +317,18 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
           }
         });
       } catch (e, stack) {
-        debugPrint('Timer error: $e');
-         showDialog(context: context, builder: (final _) => AlertDialog(
-          title: const Text('Timer Error'),
-          content: SingleChildScrollView(child: Text('$e\n$stack')),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
-        ));
+        appLogger.debug('Timer error: $e');
+        showDialog(
+            context: context,
+            builder: (final _) => AlertDialog(
+                  title: const Text('Timer Error'),
+                  content: SingleChildScrollView(child: Text('$e\n$stack')),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK'))
+                  ],
+                ));
       }
     });
   }
@@ -370,7 +389,9 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     if (!revealed) return Future.value();
     final q = questions[index % questions.length];
     final sentence = q['full_sentence']?.toString() ?? '';
-    if (sentence.trim().isEmpty || sentence.trim() == 'null') return Future.value();
+    if (sentence.trim().isEmpty || sentence.trim() == 'null') {
+      return Future.value();
+    }
     final lang = q['target_lang']?.toString().trim() ?? '';
     // Always pass a language. TtsService will stay silent if empty or unavailable.
     if (lang.isEmpty) return Future.value();
@@ -384,7 +405,7 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       try {
         await ttsService.speak(sentence, language: lang);
       } catch (e) {
-        debugPrint('TTS Error in _speakSentence: $e');
+        appLogger.debug('TTS Error in _speakSentence: $e');
       }
       completer.complete();
     });
@@ -425,12 +446,19 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       }
 
       final sentence = sanitize(q['full_sentence'] ?? q['sentence']);
-      if ((q['full_sentence']?.toString().trim() ?? '') == 'null') q['full_sentence'] = null;
-      if ((q['reading']?.toString().trim() ?? '') == 'null') q['reading'] = null;
-      if ((q['translation']?.toString().trim() ?? '') == 'null') q['translation'] = null;
+      if ((q['full_sentence']?.toString().trim() ?? '') == 'null') {
+        q['full_sentence'] = null;
+      }
+      if ((q['reading']?.toString().trim() ?? '') == 'null') {
+        q['reading'] = null;
+      }
+      if ((q['translation']?.toString().trim() ?? '') == 'null') {
+        q['translation'] = null;
+      }
 
       final hasPool = q['choice_pool'] is List;
-      final blanked = hasPool && sentence.isNotEmpty ? _blankSentence(sentence) : null;
+      final blanked =
+          hasPool && sentence.isNotEmpty ? _blankSentence(sentence) : null;
       final choiceSet = _buildChoiceSet(q, blanked?.answer);
       setState(() {
         _prompt = blanked?.prompt ?? sanitize(q['prompt'] ?? sentence);
@@ -444,18 +472,22 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
         builder: (final _) => AlertDialog(
           title: const Text('Error Preparing Question'),
           content: SingleChildScrollView(child: Text('$e\n$stack')),
-          actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK'))],
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'))
+          ],
         ),
       );
     }
   }
 
-
   _ChoiceSet _buildChoiceSet(
       final Map<String, dynamic> question, final String? correctOverride) {
     final pool = question['choice_pool'];
     final correctAnswer =
-        (correctOverride ?? question['correct_answer']?.toString() ?? '').trim();
+        (correctOverride ?? question['correct_answer']?.toString() ?? '')
+            .trim();
     if (pool is List && correctAnswer.isNotEmpty) {
       final items = pool
           .map((final e) => e.toString().trim())
@@ -485,20 +517,142 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
 
   // Stopwords used in _blankSentence to avoid blanking trivial grammatical words.
   static const Set<String> _kStopwords = {
-    'a','an','the','is','are','was','were','be','been','being',
-    'i','me','my','we','our','you','your','he','she','it',
-    'they','them','their','this','that','these','those',
-    'in','on','at','to','for','of','and','or','but','not',
-    'with','by','from','as','so','do','did','does','have','has','had',
-    'der','die','das','ein','eine','und','oder','aber','ist','sind',
-    'war','ich','du','er','sie','es','wir','ihr','den','dem',
-    'le','la','les','un','une','des','et','ou','mais','est',
-    'je','tu','il','elle','nous','vous','ils','elles',
-    'el','los','las','y','o','son','era','yo','ellos',
-    'は','が','を','に','で','と','も','か','の','へ','から','まで',
-    'です','ます','した','て','な','だ',
-    '的','了','在','是','有','和','也','都','不','没','人',
-    '은','는','이','가','을','를','에','의','과','와','도','로',
+    'a',
+    'an',
+    'the',
+    'is',
+    'are',
+    'was',
+    'were',
+    'be',
+    'been',
+    'being',
+    'i',
+    'me',
+    'my',
+    'we',
+    'our',
+    'you',
+    'your',
+    'he',
+    'she',
+    'it',
+    'they',
+    'them',
+    'their',
+    'this',
+    'that',
+    'these',
+    'those',
+    'in',
+    'on',
+    'at',
+    'to',
+    'for',
+    'of',
+    'and',
+    'or',
+    'but',
+    'not',
+    'with',
+    'by',
+    'from',
+    'as',
+    'so',
+    'do',
+    'did',
+    'does',
+    'have',
+    'has',
+    'had',
+    'der',
+    'die',
+    'das',
+    'ein',
+    'eine',
+    'und',
+    'oder',
+    'aber',
+    'ist',
+    'sind',
+    'war',
+    'ich',
+    'du',
+    'er',
+    'sie',
+    'es',
+    'wir',
+    'ihr',
+    'den',
+    'dem',
+    'le',
+    'la',
+    'les',
+    'un',
+    'une',
+    'des',
+    'et',
+    'ou',
+    'mais',
+    'est',
+    'je',
+    'tu',
+    'il',
+    'elle',
+    'nous',
+    'vous',
+    'ils',
+    'elles',
+    'el',
+    'los',
+    'las',
+    'y',
+    'o',
+    'son',
+    'era',
+    'yo',
+    'ellos',
+    'は',
+    'が',
+    'を',
+    'に',
+    'で',
+    'と',
+    'も',
+    'か',
+    'の',
+    'へ',
+    'から',
+    'まで',
+    'です',
+    'ます',
+    'した',
+    'て',
+    'な',
+    'だ',
+    '的',
+    '了',
+    '在',
+    '是',
+    '有',
+    '和',
+    '也',
+    '都',
+    '不',
+    '没',
+    '人',
+    '은',
+    '는',
+    '이',
+    '가',
+    '을',
+    '를',
+    '에',
+    '의',
+    '과',
+    '와',
+    '도',
+    '로',
   };
 
   _BlankResult? _blankSentence(final String sentence) {
@@ -510,10 +664,14 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
         final result = <int>[];
         for (var i = 0; i < parts.length; i++) {
           final cleaned = parts[i]
-              .replaceAll(RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
+              .replaceAll(
+                  RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true),
+                  '')
               .trim();
           if (cleaned.isEmpty) continue;
-          if (skipStopwords && _kStopwords.contains(cleaned.toLowerCase())) continue;
+          if (skipStopwords && _kStopwords.contains(cleaned.toLowerCase())) {
+            continue;
+          }
           result.add(i);
         }
         return result;
@@ -527,7 +685,8 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
       final pickIndex = candidates.first;
       final original = parts[pickIndex];
       final cleaned = original
-          .replaceAll(RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
+          .replaceAll(
+              RegExp(r"^[^\p{L}\p{M}'-]+|[^\p{L}\p{M}'-]+$", unicode: true), '')
           .trim();
       if (cleaned.isEmpty) return null;
       parts[pickIndex] = original.replaceFirst(cleaned, '____');
@@ -535,19 +694,24 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
     }
 
     // CJK / single-char fallback: pick a non-stopword character.
-    final chars = sentence.runes.map((final rune) => String.fromCharCode(rune)).toList();
+    final chars =
+        sentence.runes.map((final rune) => String.fromCharCode(rune)).toList();
     if (chars.isEmpty) return null;
     final contentChars = chars
         .asMap()
         .entries
-        .where((final e) => e.value.trim().isNotEmpty && !_kStopwords.contains(e.value))
+        .where((final e) =>
+            e.value.trim().isNotEmpty && !_kStopwords.contains(e.value))
         .map((final e) => e.key)
         .toList();
     contentChars.shuffle();
-    final chars2 = sentence.runes.map((final rune) => String.fromCharCode(rune)).toList();
+    final chars2 =
+        sentence.runes.map((final rune) => String.fromCharCode(rune)).toList();
     final pickIdx = contentChars.isNotEmpty
         ? contentChars.first
-        : (chars2..shuffle()).isEmpty ? 0 : 0;
+        : (chars2..shuffle()).isEmpty
+            ? 0
+            : 0;
     final answer = chars2[pickIdx];
     chars2[pickIdx] = '____';
     return _BlankResult(prompt: chars2.join(''), answer: answer);
@@ -612,7 +776,8 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
   Widget build(final BuildContext context) {
     if (_loading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: Color(0xFF33D6FF))),
+        body:
+            Center(child: CircularProgressIndicator(color: Color(0xFF33D6FF))),
       );
     }
 
@@ -664,288 +829,328 @@ class _SoloSentencesQuizScreenState extends State<SoloSentencesQuizScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
                 child: Column(
                   children: [
-              Row(
-                children: [
-                  _IconGlass(
-                      icon: Icons.arrow_back_ios_new_rounded,
-                      onTap: () => Navigator.pop(context)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Sentences • ${widget.course.title}',
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: scheme.onSurface,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900),
-                    ),
-                  ),
-                  _IconGlass(
-                    icon: showReading
-                        ? Icons.sort_by_alpha_rounded
-                        : Icons.sort_by_alpha_outlined,
-                    onTap: () => setState(() => showReading = !showReading),
-                  ),
-                  const SizedBox(width: 10),
-                  _Pill(
-                      text:
-                          '${index + 1}/${questions.length < widget.totalQuestions ? questions.length : widget.totalQuestions}',
-                      icon: Icons.layers_rounded),
-                ],
-              ),
-              SizedBox(height: topSpacing),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: SizedBox(
-                  height: 10,
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: scheme.onSurface.withValues(alpha: 0.10),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Color.lerp(const Color(0xFF33D6FF),
-                          const Color(0xFFFF4BD8), 1.0 - progress)!,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: topSpacing),
-              Glass(
-                radius: BorderRadius.circular(22),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 92),
-                  child: AnimatedSize(
-                    duration: MotionTokens.short,
-                    curve: MotionTokens.standardCurve,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Row(
                       children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _SentencePromptWidget(
-                              prompt: _prompt,
-                              correctAnswer: _correctAnswer,
-                              revealed: revealed,
-                              langCode: q['target_lang']?.toString() ?? '',
-                              scheme: scheme,
-                              fontSize: 22,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (revealed &&
-                          showReading &&
-                          (q['reading']?.toString().trim() ?? '').isNotEmpty) ...[
-                        const SizedBox(height: 8),
-                        Directionality(
-                          textDirection: _isRtlLang(q['target_lang']?.toString() ?? '')
-                              ? TextDirection.rtl
-                              : TextDirection.ltr,
+                        _IconGlass(
+                            icon: Icons.arrow_back_ios_new_rounded,
+                            onTap: () => Navigator.pop(context)),
+                        const SizedBox(width: 12),
+                        Expanded(
                           child: Text(
-                            q['reading'] as String,
-                            textAlign: TextAlign.center,
+                            'Sentences • ${widget.course.title}',
+                            overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                                color: scheme.onSurface.withValues(alpha: 0.55),
-                                fontSize: 13.5,
-                                fontWeight: FontWeight.w600),
+                                color: scheme.onSurface,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900),
                           ),
                         ),
-                      ],
-                      if (showTranslation) ...[
-                        SizedBox(height: compactHeight ? 8 : 10),
-                        Directionality(
-                          textDirection: _isRtlLang(q['source_lang']?.toString() ?? '')
-                              ? TextDirection.rtl
-                              : TextDirection.ltr,
-                          child: Text(
-                            q['translation']?.toString() ?? '',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: scheme.onSurface.withValues(alpha: 0.80),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700),
-                          ),
+                        _IconGlass(
+                          icon: showReading
+                              ? Icons.sort_by_alpha_rounded
+                              : Icons.sort_by_alpha_outlined,
+                          onTap: () =>
+                              setState(() => showReading = !showReading),
                         ),
+                        const SizedBox(width: 10),
+                        _Pill(
+                            text:
+                                '${index + 1}/${questions.length < widget.totalQuestions ? questions.length : widget.totalQuestions}',
+                            icon: Icons.layers_rounded),
                       ],
-                    ],
                     ),
-                  ),
-                ),
-              ),
-              SizedBox(height: sectionSpacing),
-              Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 330),
-                  child: _TtsControls(
-                    rates: const [0.75, 1.0, 1.25],
-                    selectedRate: _speechRate,
-                    onRateSelected: (final rate) {
-                      setState(() => _speechRate = rate);
-                      ttsService.setRate(rate);
-                    },
-                    onSpeak: _onSpeakTap,
-                    disabled: !revealed,
-                  ),
-                ),
-              ),
-              SizedBox(height: choicesTopSpacing),
-              Expanded(
-                child: ListView.separated(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(12, 20, 12, 20),
-                  clipBehavior: Clip.none,
-                  itemCount: choices.length,
-                  separatorBuilder: (final _, final __) => const SizedBox(height: 10),
-                  itemBuilder: (final _, final i) {
-                    final isSel = selected == i;
-                    final isCorrect = i == _correctIndex;
-
-                    Color bg = scheme.onSurface.withValues(alpha: 0.10);
-                    Color border = scheme.onSurface.withValues(alpha: 0.20);
-
-                    if (revealed) {
-                      if (isCorrect) {
-                        bg = const Color(0xFF2AFADF).withValues(alpha: 0.14);
-                        border = const Color(0xFF2AFADF).withValues(alpha: 0.85);
-                      } else if (isSel) {
-                        bg = const Color(0xFFFF4FD8).withValues(alpha: 0.12);
-                        border = const Color(0xFFFF4FD8).withValues(alpha: 0.85);
-                      }
-                    } else {
-                      if (isSel) {
-                        bg = scheme.onSurface.withValues(alpha: 0.12);
-                        border = scheme.onSurface.withValues(alpha: 0.28);
-                      }
-                    }
-
-                    return StaggeredIn(
-                      index: i,
-                      child: PressableScale(
-                        onTap: revealed
-                            ? null
-                            : () {
-                                setState(() => selected = i);
-                                _submit();
-                              },
-                        child: AnimatedScale(
-                          scale: revealed && isCorrect && isSel ? 1.015 : 1,
+                    SizedBox(height: topSpacing),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(999),
+                      child: SizedBox(
+                        height: 10,
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          backgroundColor:
+                              scheme.onSurface.withValues(alpha: 0.10),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color.lerp(const Color(0xFF33D6FF),
+                                const Color(0xFFFF4BD8), 1.0 - progress)!,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: topSpacing),
+                    Glass(
+                      radius: BorderRadius.circular(22),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 92),
+                        child: AnimatedSize(
                           duration: MotionTokens.short,
-                          curve: MotionTokens.emphasisCurve,
-                          child: AnimatedContainer(
-                            duration: MotionTokens.short,
-                            curve: MotionTokens.standardCurve,
-                            constraints: const BoxConstraints(minHeight: 72),
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-                            clipBehavior: Clip.antiAlias,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              color: bg,
-                              border: Border.all(color: border),
-                              boxShadow: revealed && isCorrect
-                                  ? [
-                                      BoxShadow(
-                                        color: const Color(0xFF2AFADF).withValues(alpha: 0.35),
-                                        blurRadius: 16,
-                                        spreadRadius: 1,
-                                      ),
-                                    ]
-                                  : [],
-                            ),
-                            child: AnimatedSize(
-                              duration: MotionTokens.short,
-                              curve: MotionTokens.standardCurve,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                          curve: MotionTokens.standardCurve,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
                                 children: [
                                   Expanded(
-                                    child: Directionality(
-                                      textDirection: _isRtlLang(q['target_lang']?.toString() ?? '')
-                                          ? TextDirection.rtl
-                                          : TextDirection.ltr,
-                                      child: Text(
-                                        choices[i],
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            color: scheme.onSurface.withValues(alpha: 0.92),
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w800),
-                                      ),
+                                    child: _SentencePromptWidget(
+                                      prompt: _prompt,
+                                      correctAnswer: _correctAnswer,
+                                      revealed: revealed,
+                                      langCode:
+                                          q['target_lang']?.toString() ?? '',
+                                      scheme: scheme,
+                                      fontSize: 22,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  SizedBox(
-                                    width: 72,
-                                    height: 28,
-                                    child: Align(
-                                      alignment: Alignment.centerRight,
-                                      child: ClipRect(
-                                        child: AnimatedSwitcher(
-                                          duration: MotionTokens.short,
-                                          transitionBuilder: (final child, final anim) {
-                                            final slide = Tween<Offset>(
-                                              begin: const Offset(0.16, 0),
-                                              end: Offset.zero,
-                                            ).animate(CurvedAnimation(
-                                              parent: anim,
-                                              curve: Curves.easeOutCubic,
-                                            ));
-                                            return FadeTransition(
-                                              opacity: anim,
-                                              child: SlideTransition(
-                                                position: slide,
-                                                child: child,
-                                              ),
-                                            );
-                                          },
-                                        child: (revealed && isCorrect)
-                                            ? Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                key: const ValueKey('correct-reveal'),
-                                                children: [
-                                                  const Icon(Icons.check_rounded, color: Color(0xFF2AFADF), size: 18),
-                                                  const SizedBox(width: 4),
-                                                  const SizedBox.shrink(),
-                                                ],
-                                              )
-                                            : (revealed && isSel && !isCorrect)
-                                                ? const Icon(
-                                                    Icons.close_rounded,
-                                                    color: Color(0xFFFF4FD8),
-                                                    size: 18,
-                                                    key: ValueKey('wrong-reveal'),
-                                                  )
-                                                : const SizedBox.shrink(key: ValueKey('none')),
-                                        ),
-                                      ),
-                                    ),
+                                ],
+                              ),
+                              if (revealed &&
+                                  showReading &&
+                                  (q['reading']?.toString().trim() ?? '')
+                                      .isNotEmpty) ...[
+                                const SizedBox(height: 8),
+                                Directionality(
+                                  textDirection: _isRtlLang(
+                                          q['target_lang']?.toString() ?? '')
+                                      ? TextDirection.rtl
+                                      : TextDirection.ltr,
+                                  child: Text(
+                                    q['reading'] as String,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: scheme.onSurface
+                                            .withValues(alpha: 0.55),
+                                        fontSize: 13.5,
+                                        fontWeight: FontWeight.w600),
                                   ),
+                                ),
                               ],
-                            ),
+                              if (showTranslation) ...[
+                                SizedBox(height: compactHeight ? 8 : 10),
+                                Directionality(
+                                  textDirection: _isRtlLang(
+                                          q['source_lang']?.toString() ?? '')
+                                      ? TextDirection.rtl
+                                      : TextDirection.ltr,
+                                  child: Text(
+                                    q['translation']?.toString() ?? '',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: scheme.onSurface
+                                            .withValues(alpha: 0.80),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ),
                       ),
                     ),
-                  );
-                },
-                ),
-              ),
-              SizedBox(height: compactHeight ? 8 : 10),
-              if (widget.timePerQuestion == null)
-                AnimatedSize(
-                  duration: MotionTokens.short,
-                  curve: MotionTokens.standardCurve,
-                  child: revealed
-                      ? Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: NeonButton(
-                            label: 'Next',
-                            onTap: _next,
-                          ),
-                        )
-                      : const SizedBox(width: double.infinity, height: 0),
-                ),
+                    SizedBox(height: sectionSpacing),
+                    Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 330),
+                        child: _TtsControls(
+                          rates: const [0.75, 1.0, 1.25],
+                          selectedRate: _speechRate,
+                          onRateSelected: (final rate) {
+                            setState(() => _speechRate = rate);
+                            ttsService.setRate(rate);
+                          },
+                          onSpeak: _onSpeakTap,
+                          disabled: !revealed,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: choicesTopSpacing),
+                    Expanded(
+                      child: ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(12, 20, 12, 20),
+                        clipBehavior: Clip.none,
+                        itemCount: choices.length,
+                        separatorBuilder: (final _, final __) =>
+                            const SizedBox(height: 10),
+                        itemBuilder: (final _, final i) {
+                          final isSel = selected == i;
+                          final isCorrect = i == _correctIndex;
+
+                          Color bg = scheme.onSurface.withValues(alpha: 0.10);
+                          Color border =
+                              scheme.onSurface.withValues(alpha: 0.20);
+
+                          if (revealed) {
+                            if (isCorrect) {
+                              bg = const Color(0xFF2AFADF)
+                                  .withValues(alpha: 0.14);
+                              border = const Color(0xFF2AFADF)
+                                  .withValues(alpha: 0.85);
+                            } else if (isSel) {
+                              bg = const Color(0xFFFF4FD8)
+                                  .withValues(alpha: 0.12);
+                              border = const Color(0xFFFF4FD8)
+                                  .withValues(alpha: 0.85);
+                            }
+                          } else {
+                            if (isSel) {
+                              bg = scheme.onSurface.withValues(alpha: 0.12);
+                              border = scheme.onSurface.withValues(alpha: 0.28);
+                            }
+                          }
+
+                          return StaggeredIn(
+                            index: i,
+                            child: PressableScale(
+                              onTap: revealed
+                                  ? null
+                                  : () {
+                                      setState(() => selected = i);
+                                      _submit();
+                                    },
+                              child: AnimatedScale(
+                                scale:
+                                    revealed && isCorrect && isSel ? 1.015 : 1,
+                                duration: MotionTokens.short,
+                                curve: MotionTokens.emphasisCurve,
+                                child: AnimatedContainer(
+                                  duration: MotionTokens.short,
+                                  curve: MotionTokens.standardCurve,
+                                  constraints:
+                                      const BoxConstraints(minHeight: 72),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14, vertical: 16),
+                                  clipBehavior: Clip.antiAlias,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(18),
+                                    color: bg,
+                                    border: Border.all(color: border),
+                                    boxShadow: revealed && isCorrect
+                                        ? [
+                                            BoxShadow(
+                                              color: const Color(0xFF2AFADF)
+                                                  .withValues(alpha: 0.35),
+                                              blurRadius: 16,
+                                              spreadRadius: 1,
+                                            ),
+                                          ]
+                                        : [],
+                                  ),
+                                  child: AnimatedSize(
+                                    duration: MotionTokens.short,
+                                    curve: MotionTokens.standardCurve,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Directionality(
+                                            textDirection: _isRtlLang(
+                                                    q['target_lang']
+                                                            ?.toString() ??
+                                                        '')
+                                                ? TextDirection.rtl
+                                                : TextDirection.ltr,
+                                            child: Text(
+                                              choices[i],
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  color: scheme.onSurface
+                                                      .withValues(alpha: 0.92),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w800),
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        SizedBox(
+                                          width: 72,
+                                          height: 28,
+                                          child: Align(
+                                            alignment: Alignment.centerRight,
+                                            child: ClipRect(
+                                              child: AnimatedSwitcher(
+                                                duration: MotionTokens.short,
+                                                transitionBuilder:
+                                                    (final child, final anim) {
+                                                  final slide = Tween<Offset>(
+                                                    begin:
+                                                        const Offset(0.16, 0),
+                                                    end: Offset.zero,
+                                                  ).animate(CurvedAnimation(
+                                                    parent: anim,
+                                                    curve: Curves.easeOutCubic,
+                                                  ));
+                                                  return FadeTransition(
+                                                    opacity: anim,
+                                                    child: SlideTransition(
+                                                      position: slide,
+                                                      child: child,
+                                                    ),
+                                                  );
+                                                },
+                                                child: (revealed && isCorrect)
+                                                    ? Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        key: const ValueKey(
+                                                            'correct-reveal'),
+                                                        children: [
+                                                          const Icon(
+                                                              Icons
+                                                                  .check_rounded,
+                                                              color: Color(
+                                                                  0xFF2AFADF),
+                                                              size: 18),
+                                                          const SizedBox(
+                                                              width: 4),
+                                                          const SizedBox
+                                                              .shrink(),
+                                                        ],
+                                                      )
+                                                    : (revealed &&
+                                                            isSel &&
+                                                            !isCorrect)
+                                                        ? const Icon(
+                                                            Icons.close_rounded,
+                                                            color: Color(
+                                                                0xFFFF4FD8),
+                                                            size: 18,
+                                                            key: ValueKey(
+                                                                'wrong-reveal'),
+                                                          )
+                                                        : const SizedBox.shrink(
+                                                            key: ValueKey(
+                                                                'none')),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: compactHeight ? 8 : 10),
+                    if (widget.timePerQuestion == null)
+                      AnimatedSize(
+                        duration: MotionTokens.short,
+                        curve: MotionTokens.standardCurve,
+                        child: revealed
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 8),
+                                child: NeonButton(
+                                  label: 'Next',
+                                  onTap: _next,
+                                ),
+                              )
+                            : const SizedBox(width: double.infinity, height: 0),
+                      ),
                   ],
                 ),
               );
@@ -981,7 +1186,7 @@ bool _isRtlLang(final String code) {
 // ----------- Widgets ---------------------------------------------------------
 
 class _SentencePromptWidget extends StatelessWidget {
-  final String prompt;       // The blanked sentence  e.g. "Ich ____ Deutsch"
+  final String prompt; // The blanked sentence  e.g. "Ich ____ Deutsch"
   final String correctAnswer; // The word that fills the blank
   final bool revealed;
   final String langCode;
@@ -1075,7 +1280,6 @@ class _BlankResult {
   const _BlankResult({required this.prompt, required this.answer});
 }
 
-
 class _TtsControls extends StatelessWidget {
   final List<double> rates;
   final double selectedRate;
@@ -1167,7 +1371,9 @@ class _SpeedChip extends StatelessWidget {
         child: Text(
           label,
           style: TextStyle(
-              color: scheme.onSurface, fontWeight: FontWeight.w800, fontSize: 11),
+              color: scheme.onSurface,
+              fontWeight: FontWeight.w800,
+              fontSize: 11),
         ),
       ),
     );

@@ -21,7 +21,8 @@ class PrivacyRepository {
       table: 'user_stats',
       filters: (final q) => q.eq('user_id', uid),
     );
-    snapshot['user_settings'] = (snapshot['profile'] as Map<String, dynamic>?)?['settings'];
+    snapshot['user_settings'] =
+        (snapshot['profile'] as Map<String, dynamic>?)?['settings'];
 
     snapshot['user_courses'] = await _safeSelectList(
       table: 'user_courses',
@@ -37,7 +38,8 @@ class PrivacyRepository {
     );
     snapshot['messages'] = await _safeSelectList(
       table: 'messages',
-      filters: (final q) => q.or('sender_id.eq.$uid,receiver_id.eq.$uid').order('created_at'),
+      filters: (final q) =>
+          q.or('sender_id.eq.$uid,receiver_id.eq.$uid').order('created_at'),
       limit: 5000,
     );
     snapshot['conversations'] = await _safeSelectList(
@@ -64,7 +66,8 @@ class PrivacyRepository {
     );
     snapshot['user_sessions'] = await _safeSelectList(
       table: 'user_sessions',
-      filters: (final q) => q.eq('user_id', uid).order('last_seen', ascending: false),
+      filters: (final q) =>
+          q.eq('user_id', uid).order('last_seen', ascending: false),
       limit: 300,
     );
 
@@ -73,7 +76,9 @@ class PrivacyRepository {
 
   Future<Map<String, dynamic>?> _safeSelectSingle({
     required final String table,
-    required final PostgrestTransformBuilder<dynamic> Function(PostgrestFilterBuilder<dynamic>) filters,
+    required final PostgrestTransformBuilder<dynamic> Function(
+            PostgrestFilterBuilder<dynamic>)
+        filters,
   }) async {
     try {
       final res = await filters(_supabase.from(table).select()).maybeSingle();
@@ -88,7 +93,9 @@ class PrivacyRepository {
 
   Future<List<Map<String, dynamic>>> _safeSelectList({
     required final String table,
-    required final PostgrestTransformBuilder<dynamic> Function(PostgrestFilterBuilder<dynamic>) filters,
+    required final PostgrestTransformBuilder<dynamic> Function(
+            PostgrestFilterBuilder<dynamic>)
+        filters,
     final int? limit,
   }) async {
     try {
@@ -98,7 +105,10 @@ class PrivacyRepository {
       }
       final data = await query;
       if (data is List) {
-        return data.whereType<Map>().map((final e) => Map<String, dynamic>.from(e)).toList();
+        return data
+            .whereType<Map>()
+            .map((final e) => Map<String, dynamic>.from(e))
+            .toList();
       }
       return const [];
     } catch (e) {

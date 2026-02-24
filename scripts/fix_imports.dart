@@ -1,38 +1,53 @@
-
 import 'dart:io';
 
-void main() {
-  final directory = Directory('lib');
-  final files = directory.listSync(recursive: true).whereType<File>().where((final f) => f.path.endsWith('.dart'));
-  
-  int count = 0;
-  for (final file in files) {
-    String content = file.readAsStringSync();
-    bool updated = false;
-    
-    // Replace old imports
-    if (content.contains('package:soma/l10n/app_localizations.dart')) {
-      content = content.replaceAll(
-        'package:soma/l10n/app_localizations.dart',
-        'package:soma/l10n/gen/app_localizations.dart'
-      );
-      updated = true;
-    }
-    
-    // Replace synthetic imports
-    if (content.contains('package:flutter_gen/gen_l10n/app_localizations.dart')) {
-      content = content.replaceAll(
-        'package:flutter_gen/gen_l10n/app_localizations.dart',
-        'package:soma/l10n/gen/app_localizations.dart'
-      );
-      updated = true;
-    }
+Future<void> main() async {
+  final file = File('analyze_script_output.txt');
+  if (!file.existsSync()) {
+    print('analyze_script_output.txt not found');
+    return;
+  }
 
-    if (updated) {
-      print('Fixing ${file.path}');
-      file.writeAsStringSync(content);
-      count++;
+  final contentStr = await file.readAsString();
+  final filesToFix = <String>{};
+
+  // Find occurrences of the file path immediately preceding undefined_identifier
+  // by looking for 'lib\...dart'
+  final regex = RegExp(r'(?:lib|scripts)[\/\\][a-zA-Z0-9_\/\\]+\.dart');
+  final matches = regex.allMatches(contentStr);
+
+  for (final match in matches) {
+    final path = match.group(0);
+    if (path != null) {
+      filesToFix.add(path);
     }
   }
-  print('Fixed $count files.');
+
+  print('Found \${filesToFix.length} files missing appLogger import.');
+
+  final appLoggerImport =
+      "import 'package:soma/core/services/app_logger.dart';\n";
+
+  int fixedCount = 0;
+  for (final filePath in filesToFix) {
+    final targetFile = File(filePath);
+    if (!targetFile.existsSync()) {
+      continue;
+    }
+
+    String content = await targetFile.readAsString();
+    if (content.contains('appLogger') && !content.contains('app_logger.dart')) {
+      final importIndex = content.indexOf('import ');
+      if (importIndex != -1) {
+        content = content.substring(0, importIndex) +
+            appLoggerImport +
+            content.substring(importIndex);
+      } else {
+        content = appLoggerImport + content;
+      }
+      await targetFile.writeAsString(content);
+      fixedCount++;
+    }
+  }
+
+  print('Fixed \$fixedCount files.');
 }

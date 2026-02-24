@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:soma/core/services/app_logger.dart';
 
 void main() {
   final file = File('lib/features/social/dm_chat_screen.dart');
@@ -24,7 +25,7 @@ void main() {
                   await _showWordExplanation(msg);
                 },
               ),''';
-              
+
   final menu2 = '''
             if (msg.payload.type == 'voice' && (msg.payload.transcript?.isNotEmpty ?? false))
               ListTile(
@@ -76,7 +77,7 @@ void main() {
     'bool _hidePreviewInInbox = false;',
     'bool _callRecordingConsent = false;'
   ];
-  
+
   for (var v in vars) {
     content = content.replaceAll(RegExp(r'\s*' + RegExp.escape(v)), '');
   }
@@ -93,9 +94,12 @@ void main() {
     '_fmtCallDuration',
     '_chatBackgroundGradient'
   ];
-  
+
   for (final method in toRemove) {
-    final regex = RegExp(r'(class\s+|Future<.*?>|String|bool|List<.*?>|void|Widget)?\s*' + method + r'(\s+extends.*?)?\s*\([^)]*\)\s*(async\s*)?\{');
+    final regex = RegExp(
+        r'(class\s+|Future<.*?>|String|bool|List<.*?>|void|Widget)?\s*' +
+            method +
+            r'(\s+extends.*?)?\s*\([^)]*\)\s*(async\s*)?\{');
     final match = regex.firstMatch(content);
     if (match != null) {
       final int start = match.start;
@@ -117,17 +121,22 @@ void main() {
   }
 
   // Also catch arrow functions again for the formatters
-  final arrowRegex1 = RegExp(r'String\s+_tutorPersonaLabel\s*\([^)]+\)\s*=>.*?;', dotAll: true);
+  final arrowRegex1 =
+      RegExp(r'String\s+_tutorPersonaLabel\s*\([^)]+\)\s*=>.*?;', dotAll: true);
   content = content.replaceAll(arrowRegex1, '');
-  final arrowRegex2 = RegExp(r'String\s+_autoCorrectLabel\s*\([^)]+\)\s*=>.*?;', dotAll: true);
+  final arrowRegex2 =
+      RegExp(r'String\s+_autoCorrectLabel\s*\([^)]+\)\s*=>.*?;', dotAll: true);
   content = content.replaceAll(arrowRegex2, '');
-  final arrowRegex3 = RegExp(r'String\s+_fmtCallDuration\s*\([^)]+\)\s*=>.*?;', dotAll: true);
+  final arrowRegex3 =
+      RegExp(r'String\s+_fmtCallDuration\s*\([^)]+\)\s*=>.*?;', dotAll: true);
   content = content.replaceAll(arrowRegex3, '');
 
   // 5. _composerSuggestionsForLevel is a switch Expression
-  final compRegex = RegExp(r'List<String>\s+_composerSuggestionsForLevel\s*\([^)]+\)\s*\{.*?\}\s*;', dotAll: true);
+  final compRegex = RegExp(
+      r'List<String>\s+_composerSuggestionsForLevel\s*\([^)]+\)\s*\{.*?\}\s*;',
+      dotAll: true);
   content = content.replaceAll(compRegex, '');
 
   file.writeAsStringSync(content);
-  print('Cleanup pass 2 complete');
+  appLogger.info('Cleanup pass 2 complete');
 }

@@ -33,44 +33,57 @@ class AiRepository {
   }
 
   Future<String> rewriteText(final String text, final String style) async {
-    final res = await _invokeWithRetry('ai-rewrite', body: {'text': text, 'style': style});
+    final res = await _invokeWithRetry('ai-rewrite',
+        body: {'text': text, 'style': style});
     return _readTextResponse(res.data, field: 'text');
   }
 
-  Future<String> translateText(final String text, final String targetLanguage) async {
+  Future<String> translateText(
+      final String text, final String targetLanguage) async {
     final res = await _invokeWithRetry(
       'ai-translate',
       body: {'text': text, 'target_language': targetLanguage},
     );
     final translated = _readTextResponse(res.data, field: 'text');
     if (translated.length > 1200) {
-      throw const FormatException('Translated output exceeded maximum allowed length');
+      throw const FormatException(
+          'Translated output exceeded maximum allowed length');
     }
     return translated;
   }
 
-  Future<Map<String, dynamic>> analyzePronunciation(final String transcript) async {
-    final res = await _invokeWithRetry('ai-pronunciation', body: {'transcript': transcript});
+  Future<Map<String, dynamic>> analyzePronunciation(
+      final String transcript) async {
+    final res = await _invokeWithRetry('ai-pronunciation',
+        body: {'transcript': transcript});
     final data = res.data;
     if (data is! Map<String, dynamic>) {
-      throw const FormatException('Unexpected response format for pronunciation analysis');
+      throw const FormatException(
+          'Unexpected response format for pronunciation analysis');
     }
 
     final score = data['score'];
     final difficultWords = data['difficult_words'];
     final tip = data['tip'];
-    if (score is! num || score < 0 || score > 100 || difficultWords is! List || tip is! String) {
-      throw const FormatException('Pronunciation analysis payload schema mismatch');
+    if (score is! num ||
+        score < 0 ||
+        score > 100 ||
+        difficultWords is! List ||
+        tip is! String) {
+      throw const FormatException(
+          'Pronunciation analysis payload schema mismatch');
     }
     return data;
   }
 
-  Future<FunctionResponse> _invokeWithRetry(final String name, {required final Map<String, Object?> body}) async {
+  Future<FunctionResponse> _invokeWithRetry(final String name,
+      {required final Map<String, Object?> body}) async {
     Object? lastError;
 
     for (var attempt = 1; attempt <= _maxAttempts; attempt++) {
       try {
-        final response = await _invoker.invoke(name, body: body).timeout(_requestTimeout);
+        final response =
+            await _invoker.invoke(name, body: body).timeout(_requestTimeout);
         return response;
       } catch (error) {
         lastError = error;
@@ -80,7 +93,11 @@ class AiRepository {
         final delay = Duration(milliseconds: 250 * attempt);
         appLogger.warning(
           'Retrying AI invocation',
-          context: {'function': name, 'attempt': attempt + 1, 'delay_ms': delay.inMilliseconds},
+          context: {
+            'function': name,
+            'attempt': attempt + 1,
+            'delay_ms': delay.inMilliseconds
+          },
           error: error,
         );
         await Future<void>.delayed(delay);
